@@ -47,7 +47,7 @@ These recipes may appear anywhere in a sequence. Their names do not prescribe an
 ### orientation/headline-cover
 
 - **Use:** Establish one authoritative subject, update, or announcement.
-- **Form:** One dominant headline, one short descriptor, one institutional or human anchor, and optional source context.
+- **Form:** One dominant headline, one short descriptor, one organizational or human anchor, and optional source context.
 - **Capacity:** Headline of 4–12 words; descriptor of 1–2 lines; one anchor only.
 - **Presenter:** Optional when the person is an identity cue. Prefer standard-size `full`; use grounded bottom-corner `head-shoulders` only when the global presenter rules allow it.
 - **Motion:** Headline and text hierarchy.
@@ -63,14 +63,14 @@ These recipes may appear anywhere in a sequence. Their names do not prescribe an
 ### orientation/section-pivot
 
 - **Use:** Reframe the question, mark a change in responsibility, or introduce a new evidence domain.
-- **Form:** One transition claim paired with one incoming category, place, time, or institution.
+- **Form:** One transition claim paired with one incoming category, place, time, or organization.
 - **Capacity:** One sentence and one short context label.
 - **Presenter:** Optional; keep static and outside the transition claim.
 - **Motion:** Status or state change.
 
 ### orientation/public-action-close
 
-- **Use:** Land the one action the public, institution, or named group should take next.
+- **Use:** Land the one action the public, organization, or named group should take next.
 - **Form:** One action statement, one deadline or contact route, and one responsibility label.
 - **Capacity:** One action; one date or channel; one disclosure line.
 - **Presenter:** Optional `full` presenter as reassurance, never as a substitute for the action text.
@@ -128,7 +128,7 @@ These recipes may appear anywhere in a sequence. Their names do not prescribe an
 
 ### text/document-excerpt
 
-- **Use:** Closely read a policy clause, record, release, notice, or transcript excerpt.
+- **Use:** Closely read a contract clause, record, release, notice, or transcript excerpt.
 - **Form:** One excerpt field with 1–3 anchored callouts and a traceable document label.
 - **Capacity:** 35–80 visible words; 1–3 callouts; one source record.
 - **Presenter:** None by default.
@@ -296,7 +296,7 @@ These recipes may appear anywhere in a sequence. Their names do not prescribe an
 
 ### system/layered-system
 
-- **Use:** Explain a policy, service, institution, or technical system as meaningful layers.
+- **Use:** Explain a program, service, organization, or technical system as meaningful layers.
 - **Form:** Three to five stacked layers with one responsibility per layer and only essential cross-layer links.
 - **Capacity:** 3–5 layers; 1–3 labels per layer.
 - **Presenter:** None by default.
@@ -312,7 +312,7 @@ These recipes may appear anywhere in a sequence. Their names do not prescribe an
 
 ### system/hub-spoke
 
-- **Use:** Show one institution, rule, service, or event affecting several peer groups.
+- **Use:** Show one organization, rule, service, or event affecting several peer groups.
 - **Form:** One central hub connected to 3–6 labeled spokes with no implied chronology.
 - **Capacity:** One hub; 3–6 spokes; one relationship label per spoke when necessary.
 - **Presenter:** Optional only if the presenter is the central accountable actor.

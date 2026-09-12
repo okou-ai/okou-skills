@@ -1,4 +1,4 @@
-# this system Fast Router
+# Fast Router
 
 This file is the first stop for scene selection. Take the smallest row that truthfully holds the message, and install its mapped Registry item directly. Search the Registry only when that item is unavailable, fails the real capacity, or expresses the wrong relationship; on that exception compare no more than two candidates total.
 
@@ -9,7 +9,7 @@ Codes: `C` = content-complete component merged into the scene; `B` = content-com
 | `orientation/headline-cover` | One authoritative announcement | 4–12-word headline + 1–2 lines | C `titlecard-lockup` | text hierarchy | optional |
 | `orientation/briefing-map` | Preview 3–5 briefing issues | 3–5 short items | M `grid-card-assemble` + `line-by-line-slide` | list | secondary only |
 | `orientation/section-pivot` | Reframe the question or responsibility | 1 sentence + short label | C `titlecard-calm` | status | optional |
-| `orientation/public-action-close` | Land one public or institutional action | action + date/channel + disclosure | M `cta-close` + `line-by-line-slide` | status/stat | optional |
+| `orientation/public-action-close` | Land one public or organizational action | action + date/channel + disclosure | M `cta-close` + `line-by-line-slide` | status/stat | optional |
 | `text/claim-support` | One claim needs direct supports | 1 claim + 1–3 supports | M `line-by-line-slide` + `inline-highlight` | text hierarchy | optional |
 | `text/two-column-argument` | Two complementary parts explain one point | 2 fields, ≤35 words each | M `split-tilt-cards` | list | normally none |
 | `text/three-fact-columns` | Three peer facts need equal weight | exactly 3 peers | C `grid-card-assemble` | category | none |

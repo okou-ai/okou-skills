@@ -1,8 +1,8 @@
-# this system → HyperFrames Official Layout Map
+# HyperFrames Official Layout Map
 
 This document is the submission and operational source.
 
-The forty entries below are semantic recipes, not DOM templates. this system owns the fixed background, palette, typography, presenter geometry, and safety zones. The primary content visualization must be installed from the current HyperFrames Registry and preserved as an official component or block. Do not recreate a chart, comparison, process, network, map, or media system with ordinary DOM when a matching official item exists.
+The forty entries below are semantic recipes, not DOM templates. This system owns the fixed background, palette, typography, presenter geometry, and safety zones. The primary content visualization must be installed from the current HyperFrames Registry and preserved as an official component or block. Do not recreate a chart, comparison, process, network, map, or media system with ordinary DOM when a matching official item exists.
 
 - Components are merged into the scene or mounted from their installed template contract.
 - Blocks remain sub-compositions wired with `data-composition-src`.
@@ -345,6 +345,6 @@ The forty entries below are semantic recipes, not DOM templates. this system own
 
 ## Known exact-component gaps
 
-- `text/document-excerpt`: the Registry has no exact institutional-document evidence component. The proof merges official `line-by-line-slide` and `inline-highlight`; the authored scene must retain document title, date, section or page, and source.
+- `text/document-excerpt`: the Registry has no exact sourced-document evidence component. The proof merges official `line-by-line-slide` and `inline-highlight`; the authored scene must retain document title, date, section or page, and source.
 - `data/data-table`: no exact editorial data-table item was returned by the current word-tier search. `mk-specs-list` is only a row-structured starting point; use a future official table item when available.
 - `data/scenario-range`: `chart-story` supplies the official chart behavior, but real lower/estimate/upper bounds still require a truthful range band built from HyperFrames atomic rules. Do not imply uncertainty with blur or random jitter.

@@ -72,7 +72,7 @@ A narration well short of the target is a mismatch too. With a target you derive
 
 In verbatim mode the duration follows the script: estimate it from the script length at the pace above, record the estimate as both `narration_seconds` and the expected length, and do not state a different target.
 
-These are starting values. Re-calibrate from real transcripts of accepted outputs rather than tuning the prompt.
+These are starting estimates; the transcript of the finished video is the actual measurement.
 
 ## Mapping the entry form
 
@@ -97,7 +97,7 @@ The form's configuration block maps one-to-one onto the brief:
 
 `silent` anywhere in the request means no audio track at all and also selects the controlled route.
 
-A hard `scene: integrated`, the standing `framing: safe`, or `min_resolution: 1080p` is settled before any paid submission by the presenter capability check in SKILL.md, so it never becomes a post-render surprise. Settled does not always mean routed away: a hard 1080p goes to controlled composition, while a real environment and safe framing are what the complete native prompt is for, and the user is told before generation that both are prompt-guided.
+A hard `scene: integrated`, the standing `framing: safe`, or `min_resolution: 1080p` is settled before submission by the presenter capability check in SKILL.md, so it never becomes a post-render surprise. Settled does not always mean routed away: a hard 1080p goes to controlled composition, while a real environment and safe framing are what the complete native prompt is for, and the user is told before generation that both are prompt-guided.
 
 ## Script mode cues
 

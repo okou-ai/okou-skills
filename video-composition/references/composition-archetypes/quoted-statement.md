@@ -1,23 +1,23 @@
 ---
-id: navy-cobalt/national-context
-name: "National Context"
-relation: "A broad contextual field carries the setting while text protects a calm reading zone."
+id: navy-cobalt/quoted-statement
+name: "Quoted Statement"
+relation: "One voice fills the field; attribution stays quiet and traceable."
 presenter: "optional"
-density: "low-medium"
-source_frame: "../../assets/frames/source/national-context.html"
-preview: "../../assets/frames/preview/national-context.png"
+density: "low"
+source_frame: "../../assets/frames/source/quoted-statement.html"
+preview: "../../assets/frames/preview/quoted-statement.png"
 approved_style_master: false
 ---
 
-# National Context
+# Quoted Statement
 
-A broad contextual field carries the setting while text protects a calm reading zone.
+One voice fills the field; attribution stays quiet and traceable.
 
 ## Frame sketch
 
 ~~~text
 +----------------------------------------------------------+
-| ENVIRONMENT / PLACE        PROTECTED READING ZONE        |
+| ONE VOICE ACROSS THE FIELD        ATTRIBUTION            |
 |                                                          |
 |        ONE DOMINANT FIELD · PURPOSEFUL NEGATIVE SPACE    |
 +----------------------------------------------------------+
@@ -27,7 +27,7 @@ The sketch describes a spatial relationship, not coordinates. Mirror, stretch, c
 
 ## HyperFrames building blocks
 
-- Search the HyperFrames registry for semantic behavior matching place, environment, geography.
+- Search the HyperFrames registry for semantic behavior matching quotation, testimony, voice.
 - Use native text, chart, diagram, and media components for behavior they already own.
 - Keep presenter media in a replaceable `.presenter-media` layer when the person appears.
 - Apply the system's hierarchy, materials, color budget, and conditional motion around those components.
@@ -44,9 +44,9 @@ The sketch describes a spatial relationship, not coordinates. Mirror, stretch, c
 - Preserve one dominant reading priority and one coherent background field.
 - Keep critical text at video-readable sizes; add or reorganize scenes before shrinking.
 - Keep face, hands, leaders, labels, data, media, and essential shapes disjoint.
-- Use public brief rail, deadline block, decision field, implementation marker only when they carry meaning.
+- Use the brief rail, deadline block, decision field, and rollout marker only when they carry meaning.
 - Do not add page numbers, slide counters, folios, template labels, or pagination UI.
 
 ## Motion order
 
-If this composition becomes video, establish the primary field and presenter if present, reveal the relationship, hold for reading, then let one public brief rail confirm state. This is choreography guidance, not fixed timing. Read `../MOTION.md` before implementation.
+If this composition becomes video, establish the primary field and presenter if present, reveal the relationship, hold for reading, then let one brief rail confirm state. This is choreography guidance, not fixed timing. Read `../MOTION.md` before implementation.
