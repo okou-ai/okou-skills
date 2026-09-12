@@ -32,10 +32,11 @@ h1,h2,p,blockquote{margin:0}.eyebrow{font:700 17px Mono,monospace;letter-spacing
    the generated take, and these rules stop applying. */
 .presenter-media[data-presenter-media="pending"]{
   display:flex;align-items:flex-end;justify-content:center;
-  border:2px dashed rgba(255,255,255,.26);border-radius:10px;
-  background:rgba(255,255,255,.035);filter:none;
+  border:2px dashed color-mix(in srgb,currentColor 32%,transparent);border-radius:10px;
+  background:color-mix(in srgb,currentColor 5%,transparent);filter:none;
 }
 .presenter-media[data-presenter-media="pending"]::after{
   content:"PRESENTER";margin-bottom:26px;
-  font:700 15px Mono,monospace;letter-spacing:.18em;color:rgba(255,255,255,.42);
+  font:700 15px Mono,monospace;letter-spacing:.18em;
+  color:color-mix(in srgb,currentColor 52%,transparent);
 }
