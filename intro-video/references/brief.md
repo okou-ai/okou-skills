@@ -26,7 +26,7 @@ presenter:                      # or none
   avatar_id: ""
   group_id: ""
   avatar_type: studio_avatar    # studio_avatar | photo_avatar | digital_twin, from the form or the catalog
-  preview: { width: 1080, height: 1080, environment: transparent }   # decoded from the preview; environment: real | transparent | solid | empty
+  preview: { width: 1080, height: 1080, environment: transparent }   # size from the form or the catalog record; environment: real | transparent | solid | empty
   scene: any                    # any | integrated (a real environment behind the presenter is a hard requirement)
   framing: safe                 # always safe: the complete head with margin is required in every frame, and no user instruction relaxes it
 facts: open                     # open | source-only (only facts from the request and sources may appear)
