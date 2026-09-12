@@ -1,6 +1,6 @@
 # QA: accept or reject against the brief
 
-A provider `completed` status, a rendered file, or a passing lint is a candidate, not acceptance. Compare the output with the brief, keep the evidence in the workspace, and never repeat a billed job automatically. QA results stay in the workspace; the final message to the user never lists them.
+A rendered file is a candidate, not an accepted one — but it is still the user's file, already paid for. Hand it over as soon as it exists, name any defect you already know of in one sentence, and run these checks after that, not before. QA decides what to say about the video and whether to propose a retry; it never decides whether the user may see it. Compare the output with the brief, keep the evidence in the workspace, and never repeat a billed job automatically. QA results stay in the workspace; the final message to the user never lists them.
 
 ## Inspect
 
@@ -41,4 +41,4 @@ When the build was handed to `video-composition`, its four-phase review owns the
 
 ## When it fails
 
-Retain the generation, session, and video IDs and the artifact as evidence in the workspace, and record each failed check there with what would change on a retry. Tell the user in one or two plain sentences what is wrong and what you propose, without the check list or tier labels. Hold a Tier A failure rather than delivering it, and obtain the user's direction before a route change, their authorization before a materially different or paid retry. A retry never reuses the identical prompt.
+Retain the generation, session, and video IDs and the artifact as evidence in the workspace, and record each failed check there with what would change on a retry. Tell the user in one or two plain sentences what is wrong and what you propose, without the check list or tier labels. A Tier A failure is delivered like any other output and described as what it is — never as polished — with what you propose in one sentence. Obtain the user's direction before a route change, and their authorization before a materially different or paid retry. A retry never reuses the identical prompt.
