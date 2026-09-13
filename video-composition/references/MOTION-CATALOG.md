@@ -1,4 +1,4 @@
-# this system HyperFrames Motion Candidate Catalog
+# HyperFrames Motion Candidate Catalog
 
 This document is the submission and operational source.
 
@@ -50,12 +50,12 @@ Apply these in order. A failure is a rejection, not a small score penalty.
 
 ## Headline and text hierarchy
 
-Query example: `reveal a policy headline line by line, then underline one action phrase`.
+Query example: `reveal a decision headline line by line, then underline one action phrase`.
 
 - Choose `line-by-line-slide` for two to five readable lines with a clear order.
 - Choose `soft-blur-in` for one restrained headline or caption, not a full paragraph.
 - Choose `inline-highlight` when the sentence is already visible and one phrase must gain meaning.
-- Choose `tracking-in` for a short institutional label or section identifier.
+- Choose `tracking-in` for a short organizational label or section identifier.
 - Choose `text-shimmer` only for one finite emphasis pass; never use it as ambient decoration.
 - Use `line-swap` or `strikethrough-replace` only when the message genuinely changes from one statement to another.
 
@@ -122,7 +122,7 @@ Do not reduce a process to unrelated cards fading in. Connectors and active stat
 
 ## Quantitative or before-and-after comparison
 
-Query example: `compare two policy outcomes on one baseline and reveal the delta`.
+Query example: `compare two outcomes on one baseline and reveal the delta`.
 
 - Choose `animated-bar-chart` or `chart-story` for numerical comparison on a shared scale.
 - Choose `comparison-split` or `before-after-wipe` for two states of the same object or scene.
@@ -165,13 +165,13 @@ Use state snaps or coupled indicator motion; do not imply continuous interpolati
 
 ## Source evidence or quote
 
-Query example: `reveal a sourced institutional excerpt at reading pace and underline the exact evidence sentence`.
+Query example: `reveal a sourced document excerpt at reading pace and underline the exact evidence sentence`.
 
 - Choose `testimonial-proof-card` or `testimonial-card` only for an attributed human quotation.
 - For an official document excerpt, combine a line or mask text reveal with `inline-highlight`, while keeping source, document title, date, and page context visible.
 - Keep the document surface static; animate reading order and evidence emphasis, not a floating paper card.
 
-The current Registry has no exact institutional-document evidence component; this gap has been reported. Preserve citation context in the authored scene.
+The current Registry has no exact sourced-document evidence component; this gap has been reported. Preserve citation context in the authored scene.
 
 ## Affected groups or categorical counts
 

@@ -1,4 +1,4 @@
-# this system Authoring Exceptions
+# Authoring Exceptions
 
 Open this guide only for an existing authored project, a starter migration, a capacity exception, or an unclear review result. The normal path is `SKILL.md + ROUTER.md`, then one bootstrap command.
 

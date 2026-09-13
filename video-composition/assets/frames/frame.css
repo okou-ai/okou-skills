@@ -26,3 +26,17 @@ h1,h2,p,blockquote{margin:0}.eyebrow{font:700 17px Mono,monospace;letter-spacing
 .palette-night-brief{--bg:#0F1A2B;--ink:#F3F6FA;--accent:#4F7CE8;--support:#F0A03A;--muted:#AAB6C8;--panel:#182943}
 .frame{--display:Body}.frame h1,.frame h2,.metric strong{font-family:var(--display),Body,sans-serif}
 .style-composition .ambient{position:absolute;inset:0;background:linear-gradient(120deg,transparent 0 55%,color-mix(in srgb,var(--accent) 18%,transparent) 55% 76%,transparent 76%)}.style-composition .compare article,.style-composition .sequence article,.style-composition .evidence-field{border-top:9px solid var(--accent)}.style-composition .subject-object{border-radius:0;border-left:20px solid var(--accent)}.style-composition .presenter-media{filter:drop-shadow(22px 12px 34px rgba(7,14,24,.34))}
+
+/* Reference renders only: make the reserved presenter territory visible while
+   no media is bound. A real scene replaces data-presenter-media="pending" with
+   the generated take, and these rules stop applying. */
+.presenter-media[data-presenter-media="pending"]{
+  display:flex;align-items:flex-end;justify-content:center;
+  border:2px dashed color-mix(in srgb,currentColor 32%,transparent);border-radius:10px;
+  background:color-mix(in srgb,currentColor 5%,transparent);filter:none;
+}
+.presenter-media[data-presenter-media="pending"]::after{
+  content:"PRESENTER";margin-bottom:26px;
+  font:700 15px Mono,monospace;letter-spacing:.18em;
+  color:color-mix(in srgb,currentColor 52%,transparent);
+}

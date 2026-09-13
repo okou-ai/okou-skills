@@ -26,7 +26,7 @@ presenter:                      # or none
   avatar_id: ""
   group_id: ""
   avatar_type: studio_avatar    # studio_avatar | photo_avatar | digital_twin, from the form or the catalog
-  preview: { width: 1080, height: 1080, environment: transparent }   # decoded from the preview; environment: real | transparent | solid | empty
+  preview: { width: 1080, height: 1080, environment: transparent }   # size from the form or the catalog record; environment: real | transparent | solid | empty
   scene: any                    # any | integrated (a real environment behind the presenter is a hard requirement)
   framing: safe                 # always safe: the complete head with margin is required in every frame, and no user instruction relaxes it
 facts: open                     # open | source-only (only facts from the request and sources may appear)
@@ -72,7 +72,7 @@ A narration well short of the target is a mismatch too. With a target you derive
 
 In verbatim mode the duration follows the script: estimate it from the script length at the pace above, record the estimate as both `narration_seconds` and the expected length, and do not state a different target.
 
-These are starting values. Re-calibrate from real transcripts of accepted outputs rather than tuning the prompt.
+These are starting estimates; the transcript of the finished video is the actual measurement.
 
 ## Mapping the entry form
 
@@ -97,7 +97,7 @@ The form's configuration block maps one-to-one onto the brief:
 
 `silent` anywhere in the request means no audio track at all and also selects the controlled route.
 
-A hard `scene: integrated`, the standing `framing: safe`, or `min_resolution: 1080p` is settled before any paid submission by the presenter capability check in SKILL.md, so it never becomes a post-render surprise. Settled does not always mean routed away: a hard 1080p goes to controlled composition, while a real environment and safe framing are what the complete native prompt is for, and the user is told before generation that both are prompt-guided.
+A hard `scene: integrated`, the standing `framing: safe`, or `min_resolution: 1080p` is settled before submission by the presenter capability check in SKILL.md, so it never becomes a post-render surprise. Settled does not always mean routed away: a hard 1080p goes to controlled composition, while a real environment and safe framing are what the complete native prompt is for, and the user is told before generation that both are prompt-guided.
 
 ## Script mode cues
 

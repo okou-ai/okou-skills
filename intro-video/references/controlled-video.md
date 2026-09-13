@@ -53,7 +53,7 @@ npx hyperframes@VERSION check PROJECT --strict --samples 5 --json
 npx hyperframes@VERSION snapshot PROJECT --at FIRST,MIDDLE,LAST --no-end --describe false
 ```
 
-Use numeric snapshot times, check every required page/segment, and confirm no stretching, covered text, duplicate audio, or missing assets. A public Video Agent style ID is not a local-render option; any similar custom treatment is an adaptation and must have been described as such.
+Use numeric snapshot times, check every required page/segment, and confirm no stretching, covered text, duplicate audio, or missing assets. A public Video Agent style ID is not a controlled-render option; any similar custom treatment is an adaptation and must have been described as such.
 
 The preservation path requires the Okou API and CLI release containing `okou video render`, under the existing Intro Video switch. Check `okou video render --help` once. If the command or platform access is unavailable, report the missing release/access; do not invoke the personal HeyGen connector or silently switch export routes.
 

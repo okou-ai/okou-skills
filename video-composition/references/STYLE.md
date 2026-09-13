@@ -3,7 +3,7 @@ name: "Video Composition visual system"
 id: "video-composition"
 version: "2.4"
 kind: "open-visual-style"
-domain: "Institutional and informational video"
+domain: "Briefing and informational video"
 identity: "One dominant field, a high-contrast decision surface and a single restrained accent, so structure carries the meaning and ornament does not."
 style_master_a: "assets/style-master-a.png"
 style_master_b: "assets/style-master-b.png"
@@ -68,7 +68,7 @@ typography:
   body: "Body 400"
   data: "Mono 700"
 materials:
-  - "matte institutional field"
+  - "matte background field"
   - "high-contrast information surface"
   - "restrained alert marker"
 signature_motifs:
@@ -104,7 +104,7 @@ It suits updates, briefings, explainers, summaries, and any subject whose value 
 
 ## Style Master fidelity
 
-Treat `assets/style-master-a.png` and `assets/style-master-b.png` as the approved identity pair. A generated sequence should preserve at least three recognition anchors: one dominant institutional field, a high-contrast decision surface, a restrained composition accent, and an isolated deadline signal. Do not copy either frame mechanically, and do not claim fidelity from palette alone.
+Treat `assets/style-master-a.png` and `assets/style-master-b.png` as the identity pair. A generated sequence should preserve at least three recognition anchors: one dominant background field, a high-contrast decision surface, a restrained composition accent, and an isolated deadline signal. Do not copy either frame mechanically, and do not claim fidelity from palette alone.
 
 ## Spatial grammar
 
@@ -146,7 +146,7 @@ Use one collection for the whole project. The field and ink establish hierarchy;
 
 ## Materials and motifs
 
-The material world combines a matte institutional field, a high-contrast information surface, and one restrained alert marker. Signature motifs are public brief rail, deadline block, decision field, implementation marker. A motif must establish hierarchy, identify state, frame evidence, or connect meaning. Remove it if it only fills space.
+The material world combines a matte background field, a high-contrast information surface, and one restrained alert marker. Signature motifs are the brief rail, deadline block, decision field, and rollout marker. A motif must establish hierarchy, identify state, frame evidence, or connect meaning. Remove it if it only fills space.
 
 ## Presenter grammar
 
@@ -177,7 +177,7 @@ Replacing only `.presenter-media` with transparent presenter video must preserve
 
 ## Domain-native media and information
 
-Use supplied imagery, footage, charts, maps, scans, interfaces, documents, or objects according to the domain. Give essential media one readable territory. When a matching official Registry item exists, it must own the primary text system, chart, diagram, comparison, process, map, or media behavior. Apply this system surface, hierarchy, and safety around it; do not rebuild it as ordinary DOM.
+Use supplied imagery, footage, charts, maps, scans, interfaces, documents, or objects according to the domain. Give essential media one readable territory. When a matching official Registry item exists, it must own the primary text system, chart, diagram, comparison, process, map, or media behavior. Apply this system's surface, hierarchy, and safety around it; do not rebuild it as ordinary DOM.
 
 ## AI composition freedoms
 
