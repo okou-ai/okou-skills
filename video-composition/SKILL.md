@@ -1,6 +1,6 @@
 ---
 name: video-composition
-description: "Compose a video locally with HyperFrames from an executable layout library, with generated voice or a talking avatar and a deterministic review. Use when Okou composes the video itself: exact pages, frames, timing or geometry, voice-over with no digital human, a retained source track, or a binding duration."
+description: "Compose a video with HyperFrames from an executable layout library, with generated voice or a talking avatar and a deterministic review. Use when Okou composes the video itself: exact pages, frames, timing or geometry, voice-over with no digital human, a retained source track, or a binding duration."
 ---
 
 # Video Composition
@@ -96,14 +96,22 @@ npx hyperframes@<pinned> preview --background
 
 Preview runs the full check with contrast; a later call checks only changed scenes, or reuses the result. Give the user the Studio URL, and keep Preview alive.
 
-Render after the user approves:
+Render after the user approves. The composition renders through Okou's managed cloud, the same path the intro-video controlled route uses. Check `okou video render --help` once; if the command or platform access is missing, report that rather than rendering locally.
 
 ```bash
 node <SKILL_DIR>/scripts/review-project.mjs --project . --phase release
-npx hyperframes@<pinned> render --quality high --output renders/composition.mp4
-test -s renders/composition.mp4
-ffprobe -v error -show_format renders/composition.mp4
+okou video render . --dry-run --json
+okou video render . --json
 ```
+
+The dry run packages and inspects the archive without spending render credits. It honours `.hyperframesignore` and leaves out generated renders, snapshots and development files, so inspect the largest included files before submitting. Submission returns a durable generation ID and the deliverable is the persisted artifact URL that job returns.
+
+```bash
+okou video render status GENERATION_ID --json
+okou video render resume GENERATION_ID --json
+```
+
+Poll `status` at the interval it reports instead of resubmitting, and after an interruption continue the same ID with `resume`.
 
 Release reuses current successful Preview coverage. Every `hyperframes` call uses the version the project pins in `package.json`, the one `review-project.mjs` resolves; a bare `npx hyperframes` floats to the latest release mid-project.
 
