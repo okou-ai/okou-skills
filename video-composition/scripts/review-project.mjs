@@ -269,6 +269,11 @@ export function preflightProject(projectRoot, parsed) {
   const allowedColors = new Set([...tokenCss.matchAll(/#[0-9a-f]{3,8}\b/gi)].map(match => match[0].toLowerCase()));
   for (const file of projectTextFiles(projectRoot)) {
     const source = fs.readFileSync(file, "utf8");
+    for (const tag of source.matchAll(/<audio\b[^>]*>/gi)) {
+      const attributes = parseAttributes(tag[0]);
+      const rate = Number(attributes["data-playback-rate"] ?? 1);
+      if (rate !== 1) errors.push(`${path.relative(projectRoot, file)}: audio ${attributes.id || attributes.src || "clip"} uses runtime playback rate ${attributes["data-playback-rate"]}. Prepare any permitted speed change in the audio file, measure that result, and mount it at rate 1 before review.`);
+    }
     if (/@font-face\s*\{[^}]*font-family\s*:\s*["']?(?:VcContent|[^;}]*CJK)/is.test(source)) nonLatinFontDeclared = true;
     if ([...source].some(character => {
       const point = character.codePointAt(0);
@@ -294,12 +299,12 @@ export function preflightProject(projectRoot, parsed) {
 
 export function sourceFingerprint(projectRoot) {
   const hash = crypto.createHash("sha256");
-  const files = [path.join(projectRoot, "index.motion.json"), ...projectTextFiles(projectRoot)]
+  const files = [path.join(projectRoot, "index.motion.json"), ...projectTextFiles(projectRoot), ...localMediaFiles(projectRoot)]
     .filter(file => fs.existsSync(file))
     .sort();
   for (const file of files) {
     hash.update(path.relative(projectRoot, file));
-    hash.update(fs.readFileSync(file));
+    hashFile(hash, file);
   }
   for (const relative of ["assets/video-composition/fonts"]) {
     const directory = path.join(projectRoot, relative);
@@ -313,11 +318,38 @@ export function sourceFingerprint(projectRoot) {
   return hash.digest("hex");
 }
 
+// Audio replacements must invalidate Preview even when the HTML and filename stay unchanged.
+function localMediaFiles(projectRoot) {
+  const files = new Set();
+  for (const file of projectTextFiles(projectRoot).filter(file => /\.html$/i.test(file))) {
+    for (const match of fs.readFileSync(file, "utf8").matchAll(/\bsrc\s*=\s*["']([^"']+)["']/g)) {
+      const src = match[1];
+      if (/^(?:[a-z]+:|\/\/)/i.test(src) || !/\.(?:mp3|mp4|m4a|aac|wav|ogg|oga|webm|mov|flac|opus)(?:[?#]|$)/i.test(src)) continue;
+      const clean = decodeURIComponent(src.split(/[?#]/)[0]);
+      const candidates = [path.resolve(projectRoot, clean), path.resolve(path.dirname(file), clean)];
+      const local = candidates.find(candidate => candidate.startsWith(`${projectRoot}${path.sep}`) && fs.existsSync(candidate) && fs.statSync(candidate).isFile());
+      if (local) files.add(local);
+    }
+  }
+  return [...files];
+}
+
+function hashFile(hash, file) {
+  const fd = fs.openSync(file, "r");
+  const buffer = Buffer.allocUnsafe(1024 * 1024);
+  try {
+    let count;
+    while ((count = fs.readSync(fd, buffer, 0, buffer.length, null)) > 0) hash.update(buffer.subarray(0, count));
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
 function hashFiles(projectRoot, files) {
   const hash = crypto.createHash("sha256");
   for (const file of [...new Set(files)].filter(file => fs.existsSync(file)).sort()) {
     hash.update(path.relative(projectRoot, file));
-    hash.update(fs.readFileSync(file));
+    hashFile(hash, file);
   }
   return hash.digest("hex");
 }
@@ -335,7 +367,7 @@ function sceneDependencyFiles(projectRoot, scene) {
 }
 
 export function fingerprintState(projectRoot, parsed) {
-  const shared = [path.join(projectRoot, "index.html"), path.join(projectRoot, "index.motion.json")];
+  const shared = [path.join(projectRoot, "index.html"), path.join(projectRoot, "index.motion.json"), ...localMediaFiles(projectRoot)];
   for (const relative of ["assets/video-composition", "assets/runtime/gsap.min.js"]) {
     const start = path.join(projectRoot, relative);
     if (!fs.existsSync(start)) continue;
@@ -529,6 +561,7 @@ export function createBaseReport({ phase, projectRoot, parsed, selectedScenes, c
 }
 
 export function main(argv = process.argv.slice(2)) {
+  const started = Date.now();
   const args = parseArgs(argv);
   if (!args.project || !PHASES.has(args.phase)) usage(1);
   const projectRoot = path.resolve(args.project);
@@ -566,6 +599,7 @@ export function main(argv = process.argv.slice(2)) {
     state: incremental.state,
     incrementalMode: incremental.mode,
   });
+  report.startedAt = new Date(started).toISOString();
   report.errors.push(...preflight.errors);
 
   fs.mkdirSync(outputRoot, { recursive: true });
@@ -648,7 +682,10 @@ export function main(argv = process.argv.slice(2)) {
     }
   }
 
+  if (!args.dryRun && sourceFingerprint(projectRoot) !== fingerprint) report.errors.push("Project inputs changed during review. Wait for this job to finish, then review the updated inputs.");
   report.ok = report.errors.length === 0;
+  report.completedAt = new Date().toISOString();
+  report.durationMs = Date.now() - started;
   fs.writeFileSync(path.join(outputRoot, "report.json"), JSON.stringify(report, null, 2) + "\n");
   fs.writeFileSync(path.join(outputRoot, "summary.md"), buildSummary(report) + "\n");
   console.log(buildSummary(report));

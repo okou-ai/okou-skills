@@ -4,6 +4,18 @@ Read this only after the main skill selects controlled composition. It is the ro
 
 The lanes, validation and render steps below are the preservation path. A build handed to `video-composition` follows that skill's own bootstrap, authoring and review instead; what this file still governs there is the locked plan and the brief-level acceptance in [QA](qa.md).
 
+## Resolve the composition skill once
+
+For a library-based build, use the mounted `video-composition` skill or the sibling `../../video-composition/SKILL.md` in this repository. A revision reuses the checkout recorded by the accepted project. If neither is available, fetch the official source into a new resource directory once:
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/vm0-ai/vm0-skills.git <RESOURCE_DIR>
+git -C <RESOURCE_DIR> sparse-checkout set video-composition
+git -C <RESOURCE_DIR> rev-parse HEAD
+```
+
+Record that commit and skill directory with the brief; read `<RESOURCE_DIR>/video-composition/SKILL.md` and its selected references. Do not repeat discovery or update the checkout during the build. This fallback does not depend on an `okou resource` registry alias, a web search for skills, or the legacy HyperFrames intro workflow. If the official source cannot be obtained, report that concrete dependency failure and retain any completed media.
+
 ## Exact pages, footage, audio, or layout
 
 Okou owns the scene list, prepared visuals, narration mapping, and time-based composition. The managed HeyGen integration generates optional speech and transparent presenter takes using Okou credits; Okou’s managed cloud-render command finishes the composition using the platform HeyGen account. **No avatar**, **no voiceover**, **silent**, and **original audio** are implemented by including or omitting audio and presenter layers in the composition, not by asking a generative agent to remember an exclusion. Okou owns the audio decision on this route.

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 
 function usage(exitCode = 0) {
@@ -276,7 +277,12 @@ function applyPresenterGeometry(html, presenter) {
   return html.replace('id="vc-official-mount"', `id="vc-official-mount" style="${geometry}"`);
 }
 
-function isBlankScaffold(html) {
+function isBlankScaffold(html, projectRoot) {
+  const receiptPath = path.join(projectRoot, ".hyperframes/video-composition/bootstrap.json");
+  if (fs.existsSync(receiptPath)) {
+    const receipt = JSON.parse(fs.readFileSync(receiptPath, "utf8"));
+    return receipt.blankIndexSha256 === crypto.createHash("sha256").update(html).digest("hex");
+  }
   return !/data-composition-src\s*=/.test(html) && /Add your clips here\. Example:/.test(html);
 }
 
@@ -303,7 +309,7 @@ function main(argv = process.argv.slice(2)) {
     throw new Error("The destination must be an initialized HyperFrames project.");
   }
   const existingIndex = fs.readFileSync(indexPath, "utf8");
-  if (!args.force && !isBlankScaffold(existingIndex)) {
+  if (!args.force && !isBlankScaffold(existingIndex, projectRoot)) {
     throw new Error("index.html is not the untouched blank HyperFrames scaffold; use --force only when replacement is intentional.");
   }
 

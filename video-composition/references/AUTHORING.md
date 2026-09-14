@@ -22,6 +22,20 @@ For the first Chinese, Japanese, or Korean build, add one licensed local font wi
 
 Bootstrap does not research, select layouts, write claims, or render. Do not use `--force` on an authored project unless replacing its host is intentional.
 
+### Prepare a content font only when needed
+
+Reuse a previously verified complete CJK webfont when available. A local font collection can be located with `fc-match -f '%{file}\n%{index}\n' ':lang=zh-cn'` (use the requested language). The second line identifies the face; do not assume a collection's first face is Simplified Chinese. Convert that licensed face once before bootstrap:
+
+```bash
+python3 <SKILL_DIR>/scripts/prepare-content-font.py --input <FONT_FILE> --face-index <INDEX> --output <FONT_DIR>/content.woff2
+```
+
+The helper keeps the full character coverage by default. If its FontTools/Brotli dependencies are missing, install them once in an isolated environment and reuse that environment; for example `python3 -m pip install --target <FONT_DEPS_DIR> fonttools brotli`, then run the helper with `PYTHONPATH=<FONT_DEPS_DIR>`. There is no reason to repeat this setup on a revision.
+
+Use `--text-file <FINAL_VISIBLE_TEXT>` only when package size warrants subsetting and the file includes every final content slot, number, symbol, and label. The helper also keeps printable ASCII and fails when the source lacks a requested glyph. Rebuild the subset when visible copy changes; narration alone is not an inventory of screen text.
+
+### Color system
+
 Built-in names are `navy-cobalt`, `monumental-minimal`, `black-gold`, `obsidian-champagne`, `petrol-brass`, `parchment-oxblood`, and `porcelain-carbon`. Use `--color-system custom --color-tokens <CSS_FILE>` for a user-supplied collection. This single project-level name is propagated to all scenes and recorded in `.style-reference/video-composition/COLOR-SYSTEM.json`. The supplied CSS defines the complete `--palette-*` contract from `STYLE.md`; layout geometry is unchanged.
 
 After content authoring, switch the whole project without scaffolding again:
@@ -45,6 +59,8 @@ Do not trace a proof PNG into new DOM. The proof verifies the settled visual res
 
 ## Existing authored projects
 
+Recover the accepted project's contract, output format, voice ID, skill commit, runtime pin, and complete content font. Preserve existing scene sources and finished media; change only what the revision requires. Start new narration as soon as its script is ready while making the visual edits. Do not repeat voice catalogs, runtime installation, or generic skill discovery for unchanged choices. Use `finalize-timing.mjs` after measuring the new media; it preserves authored scene content.
+
 Stage dependencies and references without overwriting the host:
 
 ```bash
@@ -62,14 +78,15 @@ Omit the font after it has been staged. The command keeps the managed content fo
 
 Migrate a scene by copying one selected executable starter and reconciling its IDs and duration with the existing host. If the existing host has bespoke shared geometry, integrate one scene first and run Preflight before repeating the operation.
 
-## Review with one deterministic entry point
+## Review and resume checks
 
 ```bash
-node scripts/review-project.mjs --project . --phase preflight
-node scripts/review-project.mjs --project . --phase static
-node scripts/review-project.mjs --project . --phase preview
-node scripts/review-project.mjs --project . --phase release
+node <SKILL_DIR>/scripts/review-project.mjs --project . --phase preflight
+node <SKILL_DIR>/scripts/review-job.mjs start --project . --phase static
+node <SKILL_DIR>/scripts/review-job.mjs status --project . --job JOB_ID
 ```
+
+After Static passes and its contact sheet is inspected, start a Preview job and follow its new ID. After it passes, run `review-project.mjs --phase release`. The helper detaches with a log file and permits only one active review per project. Repeating a start for the same active phase/scope returns that job; it does not restart the check. A failed or interrupted job needs its log inspected before an explicit new start. It never retries or submits a paid generation.
 
 - `preflight` runs package contract, local-font, path, timing, and sidecar checks plus one HyperFrames lint command.
 - `static` captures every selected scene once and writes a contact sheet.
@@ -77,7 +94,7 @@ node scripts/review-project.mjs --project . --phase release
 - A later `preview` compares shared and per-scene fingerprints. It reuses the result when nothing changed, checks only changed scenes when shared sources did not change, and falls back to full coverage when a shared dependency changed.
 - `release` reuses current successful Preview coverage; changed or incomplete coverage triggers the required check.
 
-Each phase writes `report.json` and `summary.md`. Run a manual `--scenes id,id` only when deliberately overriding automatic selection. Start one persistent preview after Preview succeeds, then follow the managed render path in [the main skill](../SKILL.md). Wait for preview approval only when the user requested that gate.
+Each phase writes `report.json` and `summary.md`, including start/end timestamps and elapsed milliseconds. A background job also retains its own status and report; use that job's terminal state rather than a leftover report from an earlier attempt. Keep sources unchanged during a running check. Run a manual `--scenes id,id` only when deliberately overriding automatic selection. Start Studio only for requested interactive review with a user-accessible surface; otherwise proceed through the managed render path in [the main skill](../SKILL.md). Wait for preview approval only when the user requested that gate.
 
 ## Boundaries
 
