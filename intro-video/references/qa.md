@@ -7,6 +7,7 @@ After rendering completes, run the default technical check and any applicable ta
 - Make one lightweight media probe for container, duration, dimensions, frame rate, and audio-track presence, plus a short decode sample. Reuse available metadata and the managed artifact URL where supported; a full-file decode is not a default requirement.
 - Report the actual duration and any material mismatch. An approximate duration mismatch alone calls for disclosure, not automatic transcription, speed changes, padding, subtitle work, or re-export.
 - For ordinary native videos, deliver after this check and finish. This check establishes basic file readability and parameters; it does not certify every frame, spoken word, or subtitle. Unchecked content has no pass/fail result.
+- **With `presenter: none`, add the no-presenter frame check before delivering.** Sample the whole video densely enough that no shot can hide between samples — 2 frames per second covers a video of ordinary intro length — and inspect the samples for a digital human. A contact sheet keeps this to one or two images: `ffmpeg -i <file> -vf "fps=2,scale=300:-1,tile=7x6" -frames:v 1 sheet.png`. Record the sheet and the sampling rate in the workspace. This is the only content check that runs without a targeted trigger, because it is the sole evidence that the prompt's exclusion held.
 
 ## Targeted review
 
@@ -33,7 +34,7 @@ Use only the rows relevant to the targeted review. A technical pass alone is not
 | Facts | numbers, names, labels, headings, counts, and interface details match the verified brief; an invented statistic or label is a failure even when the narration is right | A |
 | On-screen text | every `on_screen_text` string appears literally; readable at delivery size on a contrasting panel | A |
 | Brand names | the transcript spells brand terms correctly or the mispronunciation is recorded in the workspace | A when a hint was omitted, B when the hint was present |
-| Presenter presence | on camera where the recipe says; a native job always has a presenter, since `presenter: none` routes to controlled composition and its absence is checked by the controlled gate | A |
+| Presenter presence | with a look in the brief, on camera where the recipe says. With `presenter: none`, **always checked**: sample the rendered frames across the whole video and confirm no digital human appears in any of them. This is the one native check that is never skipped, because the exclusion is a prompt direction rather than an API contract | A |
 | Orientation | requested landscape or portrait | A |
 | Decode | audio and video decode cleanly; no long silences (transcript gaps over a few seconds) | A |
 | Narration completeness | when this check is needed, the closing audio and transcript support a complete sentence carrying the brief's ask or recap; record ambiguous recognition as unverified. A short duration alone does not establish a truncated ending or trigger transcription | A when truncation is confirmed |
@@ -46,7 +47,7 @@ Use only the rows relevant to the targeted review. A technical pass alone is not
 
 ## Controlled gate
 
-When the build was handed to `video-composition`, its four-phase review owns the composition mechanics — lint, layout, contrast, motion and the render itself — and is not repeated here. Reuse that evidence for the relevant checks above and everything the brief fixed: no presenter in any frame when the brief says `presenter: none` — the reason that requirement routes here, so it is checked on the frames rather than assumed from the composition; every required page or segment present, in order, unstretched and uncropped; no covered text; no duplicate audio from a presenter take; original audio retained when required; the transparent presenter take has real alpha and fits without cropping essential content; the composition renders at the resolved 1920×1080 or 1080×1920. On this route presenter scene, framing, and resolution are Tier A because Okou controls them.
+When the build was handed to `video-composition`, its four-phase review owns the composition mechanics — lint, layout, contrast, motion and the render itself — and is not repeated here. Reuse that evidence for the relevant checks above and everything the brief fixed: no presenter in any frame when the brief says `presenter: none` — checked on the frames rather than assumed from the composition, even though this route omits the layer by construction; every required page or segment present, in order, unstretched and uncropped; no covered text; no duplicate audio from a presenter take; original audio retained when required; the transparent presenter take has real alpha and fits without cropping essential content; the composition renders at the resolved 1920×1080 or 1080×1920. On this route presenter scene, framing, and resolution are Tier A because Okou controls them.
 
 ## When it fails
 

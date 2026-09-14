@@ -40,11 +40,21 @@ okou __intro-video-agent --prompt-file ./prompt.txt \
   --request-id '<request-uuid>' --json
 ```
 
-Replace placeholders with resolved values and use `portrait` for 9:16. Use exactly one of `--prompt` or `--prompt-file`. Style ID and orientation are required. Always pass a resolved `--avatar-id`; an omitted one means the agent picks a look, and `presenter: none` is a controlled-route requirement that never reaches this command. The group ID is a catalog lookup hint. With an explicit avatar and no voice override, the managed API resolves the avatar's actual default voice. When the brief already contains an exact voice ID, pass it explicitly.
+Replace placeholders with resolved values and use `portrait` for 9:16. Use exactly one of `--prompt` or `--prompt-file`. Style ID and orientation are required. Pass a resolved `--avatar-id` whenever the brief carries a look; an omitted one otherwise means the agent picks one. The group ID is a catalog lookup hint. With an explicit avatar and no voice override, the managed API resolves the avatar's actual default voice. When the brief already contains an exact voice ID, pass it explicitly.
 
-Add `--file-url <managed-https-reference>` for each prepared reference, up to 20. Use URLs accepted by the managed file resolver; the command does not accept arbitrary local paths or raw document types. It has no no-avatar/no-voice switches; those requirements belong to the controlled route.
+For `presenter: none`, omit `--avatar-id` and `--avatar-group-id` entirely and pass an explicit `--voice-id`, because there is no look to inherit a default voice from. The command accepts the submission without a look, and the prompt's no-presenter directive carries the exclusion:
 
-Duration, language, and narrative are prompt directions; the flags this command accepts are the ones `--help` lists, and exact frames, FPS, resolution, and avatar/voice removal are not among them.
+```bash
+okou __intro-video-agent --prompt-file ./prompt.txt \
+  --style-id '<resolved-style-id>' --orientation landscape \
+  --voice-id '<resolved-voice-id>' --request-id '<request-uuid>' --json
+```
+
+The response echoes `styleId`, `voiceId`, and `orientation` with no avatar field. That is a submission property, not proof about the render: confirm the absence of a digital human on the finished frames under [QA](qa.md).
+
+Add `--file-url <managed-https-reference>` for each prepared reference, up to 20. Use URLs accepted by the managed file resolver; the command does not accept arbitrary local paths or raw document types. It has no no-voice switch; narration removal, source-audio retention, and page/frame retention belong to the controlled route.
+
+Duration, language, narrative, and the absence of a presenter are prompt directions; the flags this command accepts are the ones `--help` lists, and exact frames, FPS, resolution, and voice removal are not among them.
 
 Submission returns immediately with a durable `generationId`; it does not wait for rendering. `requestId` is that generation ID. The CLI creates a UUID if none is supplied, but explicitly persisting one before submission makes interrupted execution recoverable. Reuse the same UUID and unchanged input for transport recovery, which reconciles the existing job instead of buying a second one. Reusing a UUID with different input returns a conflict. Keep the brief, prepared references, selected style, request UUID, and command response in the task workspace.
 
