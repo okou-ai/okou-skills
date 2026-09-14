@@ -19,9 +19,9 @@ Inspect further only for an explicit review request, a binding wording, timing, 
 
 ## Two tiers
 
-**Tier A, brief violations.** Something the prompt or route controls went wrong. Reject the output, record what a corrected prompt or route would change, and tell the user in one sentence what is wrong and what you propose.
+**Tier A, brief violations.** A performed check confirms that a requirement was missed. Mark that requirement as failed, retain the original artifact for delivery, and record what a corrected prompt or route would change. Tell the user in one sentence what the check found and what you propose.
 
-**Tier B, provider-control gaps.** The requirement was met as far as the prompt can carry it, and HeyGen's API has no field to enforce it. Deliver the file with one plain sentence that names the gap, says a retry with the same prompt will not change it, and offers the concrete alternatives (another look, the controlled route, or acceptance); keep the frames in the workspace as evidence. If the brief had marked the property as a hard requirement, the capability check should have routed away before submission; record it as an accepted risk that materialized.
+**Tier B, provider-control gaps.** A performed check identifies a gap that the submitted prompt addressed but HeyGen's API cannot enforce. Deliver the file with one plain sentence naming the observed gap and relevant alternatives; the same prompt adds no new control and does not guarantee improvement. Keep the evidence in the workspace. Use the check's Tier A classification when a binding requirement was missed; do not infer user acceptance of a risk merely from the provider's limitations.
 
 ## Native gate
 
@@ -38,10 +38,10 @@ Use only the rows relevant to the targeted review. A technical pass alone is not
 | Decode | audio and video decode cleanly; no long silences (transcript gaps over a few seconds) | A |
 | Narration completeness | when this check is needed, the closing audio and transcript support a complete sentence carrying the brief's ask or recap; record ambiguous recognition as unverified. A short duration alone does not establish a truncated ending or trigger transcription | A when truncation is confirmed |
 | Duration, approximate | 0.8× to 1.4× the target passes; 1.4× to 1.75× is B with the overrun stated; above 1.75× or below 0.8× is A | A or B as stated |
-| Duration, verbatim | within about 20% of the pre-submission estimate | A |
+| Duration, verbatim | report the measured duration and any material difference from the pre-submission estimate; exact timing belongs to the controlled route | An estimate mismatch alone is disclosed, not a wording failure |
 | Resolution | at least 1280×720 landscape or 720×1280 portrait; record the actual value. 1080p is a gate only on the controlled route or when the provider exposes a resolution field | B when below the baseline |
-| Presenter scene | a real integrated background when the brief or style expects one | A when the prompt lacked the presenter sentences, the expansion directive its `facts` setting calls for, or the BACKGROUND NOTE; B when the full prompt was present, the look is transparent, solid, or empty, and the brief left `scene: any`; A when the brief made it a hard `scene: integrated` and the complete prompt still produced no environment, with the controlled route named as the alternative; A for a `photo_avatar` with an environment |
-| Presenter framing | complete head with clear headroom in every representative frame | A always: a cropped head is never delivered. Record whether the prompt was complete and which look the scenes used; a crop means a non-landscape look was fitted to the width, so the fix is the adaptation directive when it was missing, then a look with lower crop risk, then a landscape look with a real environment where the catalog offers one, and otherwise the controlled route |
+| Presenter scene | a real integrated background when the brief or style expects one | A when the prompt lacked the presenter sentences, the correct script-mode directive, or a triggered BACKGROUND NOTE; B when the full prompt was present, the look is transparent, solid, or empty, and the brief left `scene: any`; A when the brief made it a hard `scene: integrated` and the complete prompt still produced no environment, with the controlled route named as the alternative; A for a `photo_avatar` with an environment |
+| Presenter framing | when checked, the inspected frames match the user's composition preference, with full head and headroom as the default goal | A for a confirmed mismatch; retain and deliver the original artifact with the finding. Describe only what the frames establish; another look or route is a proposal governed by the user's choices and paid-retry rules |
 | Style | style-bearing scenes visibly reflect the selected style; the recorded `style_id` matches the selection (a matching ID alone does not prove adherence) | A |
 
 ## Controlled gate

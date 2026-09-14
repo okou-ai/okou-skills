@@ -19,13 +19,13 @@ With `avatar_id` resolved, use the look classification from [managed catalogs](c
 
 - `photo_avatar` with a real environment → no BACKGROUND NOTE; FRAMING NOTE only when the look's orientation does not match the output;
 - `studio_avatar`, `digital_twin`, or any transparent, solid, or visually empty preview → BACKGROUND NOTE, plus the matching FRAMING NOTE when `cropRisk` is high;
-- preserve the exact avatar, group, voice, style, and orientation IDs; if the managed API rejects the look's default voice, substitute a public voice in the narration language and record it.
+- preserve the exact avatar, group, voice, style, and orientation IDs. Resolve an unavailable voice under the delegated-choice rules in [catalogs](catalogs.md); a rejected default voice is not permission to replace it.
 
-The note texts live only in the [prompt compiler](prompt-compiler.md); append only the triggered notes, verbatim, at the very end of the prompt, FRAMING before BACKGROUND. They guide Video Agent but do not guarantee the result: `POST /v3/video-agents` has no background, crop, scale, position, or safe-area fields. Hard scene, framing, and 1080p requirements are therefore settled before submission, and QA files a failure of a complete prompt as a provider-control gap.
+The note texts live only in the [prompt compiler](prompt-compiler.md); append the triggered notes at the very end of the prompt, FRAMING before BACKGROUND. They guide Video Agent but do not guarantee the result: `POST /v3/video-agents` has no background, crop, scale, position, or safe-area fields. A hard 1080p requirement selects controlled composition; native scene and framing goals remain prompt-guided, with output findings reported only when targeted QA establishes them.
 
 ## Compile the prompt once
 
-Assemble the prompt from the cached brief with the compiler's skeleton: brief paragraph with the presenter sentences, quoted narration, literal on-screen text, attachment sentences, production lines, the script-mode directive, then the presenter notes. The prompt is as long as its narration and on-screen list require, with the provider's 10,000 characters as the only ceiling; never trim the narration to hit a character count. Carry the public style through `style_id` and name it once in the brief paragraph. Save the final prompt in a UTF-8 file and keep it with the brief as evidence.
+Assemble the prompt from the cached brief with the compiler's skeleton: brief paragraph with the presenter sentences, quoted narration, literal on-screen text, attachment sentences, production lines, the script-mode directive, then the presenter notes. The prompt is as long as its narration and on-screen list require, with the provider's 10,000 characters as the only ceiling. Use the compiler's overflow rule if needed; preserve verbatim copy unchanged. Carry the public style through `style_id` and name it once in the brief paragraph. Save the final prompt in a UTF-8 file and keep it with the brief as evidence.
 
 ## Submit through the managed command
 
