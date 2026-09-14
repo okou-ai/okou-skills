@@ -1,16 +1,16 @@
 # QA: accept or reject against the brief
 
-A completed render is already the user's file. Deliver its permanent URL first, name any known defect in one sentence, and keep routine QA to the technical check below. Keep evidence in the workspace and never repeat a generation job automatically.
+After rendering completes, run the default technical check and any applicable targeted checks below. Then deliver the permanent URL and measured duration, reporting only issues supported by the checks performed. Keep evidence in the workspace and never repeat a generation job automatically.
 
 ## Default technical check
 
 - Make one lightweight media probe for container, duration, dimensions, frame rate, and audio-track presence, plus a short decode sample. Reuse available metadata and the managed artifact URL where supported; a full-file decode is not a default requirement.
 - Report the actual duration and any material mismatch. An approximate duration mismatch alone calls for disclosure, not automatic transcription, speed changes, padding, subtitle work, or re-export.
-- For ordinary native videos, stop here. This check establishes basic file readability and parameters; it does not certify every frame, spoken word, or subtitle.
+- For ordinary native videos, deliver after this check and finish. This check establishes basic file readability and parameters; it does not certify every frame, spoken word, or subtitle. Unchecked content has no pass/fail result.
 
 ## Targeted review
 
-Inspect further only for an explicit review request, a binding wording, timing, or preservation requirement, or a concrete observed problem. Select the relevant checks below instead of running the whole gate. Reuse existing evidence and stop once the required check or specific issue is resolved.
+Inspect further only for an explicit review request, a binding wording, timing, or preservation requirement, or a problem found by a performed check or reported by the user. Select the relevant checks below instead of running the whole gate. Reuse existing evidence and stop once the required check or specific issue is resolved.
 
 - Extract only frames needed for the requested visual check or observed issue, using `okou video frames --at ...` or a local decode. Routine delivery does not scan every scene transition, presenter shot, or text-dense scene.
 - Use `okou video transcribe` for verbatim fidelity, an explicitly requested narration or subtitle review, or an observed audio problem. Reuse the transcript; neither narration being present, a non-default language, nor brand terms alone requires transcription. Ambiguous recognition is uncertainty to report, not proof of a missing word or a reason for repeated variant exports.

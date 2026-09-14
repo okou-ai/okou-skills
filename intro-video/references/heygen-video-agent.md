@@ -70,4 +70,4 @@ A slow job, lost CLI response, or HTTP timeout does not authorize another billed
 
 ## Accept and deliver
 
-Deliver the managed job's permanent artifact URL as soon as the job completes, with any known defect stated. Apply the default technical check in [QA](qa.md), then finish; use its native gate only for a triggered, targeted review. Temporary HeyGen download URLs and intermediate session JSON are working material.
+After the job completes, apply the default technical check and any applicable targeted checks in [QA](qa.md). Then deliver the managed job's permanent artifact URL with the measured duration and only issues supported by the checks performed, and finish. Use the native gate only for a triggered, targeted review. Temporary HeyGen download URLs and intermediate session JSON are working material.
