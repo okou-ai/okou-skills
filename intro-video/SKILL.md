@@ -31,7 +31,7 @@ That list follows from one boundary: Video Agent does what the prompt says, righ
 
 **It acts on what you tell it about the presenter.**
 
-- Leave the presenter out — a verified run omitted `avatar_id` entirely and rendered with no digital human in any frame.
+- Leave the presenter out. The prompt's no-presenter directive is what does this; an omitted `avatar_id` on its own reads as automatic selection. A verified run sent the directive, omitted the ID, and rendered with no digital human in any frame.
 - Put a real environment behind one (`presenter.scene: integrated`).
 
 **It keeps the rest for itself, and no field overrides that.**
