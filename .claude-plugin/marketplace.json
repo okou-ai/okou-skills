@@ -55,6 +55,15 @@
       ]
     },
     {
+      "name": "video-motion-template",
+      "description": "Okou-branded intro and outro motion templates for product videos. Use this skill to pick, configure and capture one of 36 deterministic 16:9 brand animations.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./video-motion-template"
+      ]
+    },
+    {
       "name": "vm0",
       "description": "VM0 API for running AI agents in secure sandboxes. Use this skill to execute agents, manage runs, and download outputs (artifacts) and inputs (volumes) via the VM0 platform API.",
       "source": "./",

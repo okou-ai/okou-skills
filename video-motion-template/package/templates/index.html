@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Video Motion Templates · Okou</title>
+<link rel="stylesheet" href="style.css?v=5770ac65a8aa"></head><body>
+<main id="template-library">
+  <header class="heading"><div><p class="eyebrow">OKOU / MOTION COLLECTION 01</p><h1>Video Motion Templates</h1><p class="intro">36 条已确认的品牌动画，为产品视频选一段利落的开场与收尾。</p></div><div class="heading-links"><span class="version">36 TEMPLATES · V1</span><a href="https://okou-brand-motion-library.okou.app/#refined" target="_top">查看品牌资产 ↗</a></div></header>
+  <div class="workspace">
+    <section class="preview" aria-label="模板预览">
+      <div class="screen"><iframe id="player" src="player.html?v=98b815d55614" title="当前视频动效模板" allow="autoplay"></iframe><div id="load-message" role="status">载入动画…</div></div>
+      <div class="transport"><button id="play" disabled>播放</button><button id="restart" disabled aria-label="从头重播">重播</button><input id="seek" type="range" min="0" max="1000" value="0" aria-label="动画进度"><span id="time">0.00 / 1.60s</span></div>
+      <p class="preview-note">播放一次后保留末帧供查看；视频内的停留以所选时长为准。</p>
+    </section>
+    <aside class="inspector" aria-label="模板设置">
+      <div class="identity"><span id="template-code" class="eyebrow">VM-01</span><span id="collection" class="badge">品牌动画</span></div>
+      <h2 id="template-name">精密擦入</h2><p id="description" class="description"></p><p id="use-case" class="use-case"></p>
+      <div class="settings">
+        <label>视频位置<select id="placement"><option value="intro">片头</option><option value="outro">片尾</option></select></label>
+        <label>画面配色<select id="theme"><option value="dark">深色</option><option value="light">浅色</option></select></label>
+        <label>结束停留<select id="hold"><option value="0">不额外停留</option><option value="0.25" selected>0.25 秒 · 默认</option><option value="0.5">0.50 秒</option></select></label>
+        <label>运动方向<select id="direction"><option value="in">品牌显现</option><option value="out">品牌退出</option></select></label>
+        <label id="speed-label" hidden>动作节奏<select id="speed"><option value="fast">快速</option><option value="standard" selected>标准</option><option value="slow">舒缓</option></select></label>
+      </div>
+      <p class="timing" id="timing">成形 1.35 秒 + 停留 0.25 秒</p>
+      <div class="actions"><button class="primary" id="download" disabled>保存模板配置 ↓</button><button id="copy" disabled>复制模板链接</button></div>
+      <p id="action-status" class="action-status" aria-live="polite"></p>
+    </aside>
+  </div>
+  <section class="browse" aria-label="全部模板">
+    <div class="filter-line"><div class="filters" role="group" aria-label="模板分组"><button data-group="all" aria-pressed="true">全部 36</button><button data-group="brand" aria-pressed="false">品牌动画 12</button><button data-group="reveal" aria-pressed="false">出现方式 24</button></div><input id="search" type="search" placeholder="搜索粒子、擦入、字标…" aria-label="搜索模板"></div>
+    <div class="count-row"><span id="result-count">36 条模板</span><span>统一字标与对齐 · 默认停留 0.25 秒</span></div>
+    <div id="cards" class="cards"></div><p id="empty" hidden>没有匹配的模板，试试其他关键词。</p>
+  </section>
+  <footer><span>Okou 官方字标 · 16:9 · 无声</span><div><a href="manifest.json" download>下载模板目录</a><a href="video-motion-templates-v1.zip" download>下载模板源文件包 ↓</a></div></footer>
+</main><script src="manifest.js?v=1619dd59726d"></script><script src="gallery.js?v=9c7ba168c898"></script></body></html>

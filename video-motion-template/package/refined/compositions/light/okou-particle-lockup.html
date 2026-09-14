@@ -1,0 +1,516 @@
+<!doctype html>
+<!-- hyperframes-registry-item: code-particle-assemble -->
+<!--
+  Modified from the pinned HyperFrames Registry source listed in SOURCES.md.
+  Changes: Astri artwork and palette, system-sans wordmark drawing, tighter
+  particle settling, and a high-resolution texture handoff for the final hold.
+-->
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Astri — Particle Lockup</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #FAF5F3;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      #gl {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    .apl-lockup{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:52px;z-index:2;opacity:0}.apl-mark path{stroke:#242121;fill:none;stroke-linecap:round}.apl-wordmark{display:flex;color:#242121}.apl-wordmark span{display:inline-block}#gl{z-index:1}
+#root{font-family:"Okou Motion",sans-serif!important}
+.msl-clip,.msl-stage,.sdl-clip,.sdl-stage,.plr-clip,.plr-stage,.cbl-clip,.cbl-stage,.ils-clip,.ils-stage,.lcc-clip,.lcc-stage,.ibl-clip,.ibl-stage,.ssl-clip,.ssl-stage,.fml-clip,.fml-stage,.apl-clip,.apl-stage,.wtl-clip,.wtl-stage{padding:0!important}
+.msl-brand-row,.sdl-brand-row,.plr-brand-row,.cbl-brand-row,.ils-brand-row,.lcc-brand-row,.ibl-brand-row,.ssl-brand-row,.fml-brand-row,.apl-brand-row,.msl-brand-row,.plr-lockup,.sdl-lockup,.wtl-final-row,.wtl-fragment-lockup{gap:52px!important}
+.msl-wordmark,.sdl-wordmark,.plr-wordmark,.cbl-wordmark,.ils-wordmark,.lcc-wordmark,.ibl-wordmark,.ssl-wordmark,.fml-wordmark,.apl-wordmark,.wtl-final-wordmark,.wtl-fragment-wordmark,#parts-assemble-lockup-wordmark{font-family:"Okou Motion",sans-serif!important;font-size:260px!important;font-weight:500!important;line-height:1.14!important;letter-spacing:-.04em!important;min-height:0!important;margin:0!important}
+.msl-mark,.plr-mark,.cbl-mark,.ils-mark,.lcc-mark,.ibl-mark,.ssl-mark,.fml-mark,.apl-mark,.sdl-mark-stage,.wtl-final-mark,.wtl-fragment-mark,#parts-assemble-lockup-mark-stage{position:relative!important;width:156px!important;height:156px!important;flex:0 0 auto;top:22.94px!important;margin:0!important}
+.msl-mark path,.plr-mark path,.cbl-mark path,.ils-mark path,.lcc-mark path,.ibl-mark path,.ssl-mark path,.fml-mark path,.apl-mark path,.wtl-final-mark path,.wtl-fragment-mark path{stroke-width:28!important}
+.cbl-lockup{flex-direction:row!important;width:auto!important;gap:52px!important}
+.cbl-mark{overflow:visible}
+.ils-ring{width:220px;height:220px;left:calc(50% - 391.078125px);top:calc(50% - 87.06px);border-width:2px}
+.ils-flash,.ibl-grain,.wtl-noise,#parts-assemble-lockup-glow{display:none!important}
+.fml-mesh-stage{width:320px;height:320px;left:800px;top:380px}
+.wtl-grid-stage{width:900px;height:360px;left:510px;top:360px}
+.wtl-grid{border:0; background:transparent}
+.wtl-tile{box-shadow:none}
+.wtl-fragment-surface,.wtl-fragment-lockup{width:900px;height:360px}
+.parts-assemble-lockup-lockup{flex-direction:row!important;gap:52px;min-width:0!important;max-width:none!important;padding:0!important;transform:none!important}
+.parts-assemble-lockup-letter{min-width:0!important;text-align:left!important}
+.parts-assemble-lockup-part path{stroke-width:28!important;vector-effect:none!important}
+
+@font-face{font-family:"Okou Motion";src:url(data:font/otf;base64,T1RUTwAJAIAAAwAQQ0ZGIPuJeM8AAANgAAAB709TLzJYMlcOAAABAAAAAGBjbWFwAUsAtAAAAvQAAABMaGVhZC9iMl4AAACcAAAANmhoZWEFqwI+AAAA1AAAACRobXR4ChUAAAAABVAAAAAUbWF4cAAFUAAAAAD4AAAABm5hbWXz/fR3AAABYAAAAZJwb3N0AAMAAAAAA0AAAAAgAAEAAAABAADWfUPeXw889QADA+gAAAAA5s13YQAAAADmzXdhAAAAAAKxArwAAAADAAIAAAAAAAAAAQAAAvj/EAAAAygAAAAAArEAAQAAAAAAAAAAAAAAAAAAAAUAAFAAAAUAAAADAoUB9AAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAABPS09VAAAAIAB1Avj/EAAAAvgA8AAAAAAAAAAAArwCvAAAACAAAAAAAAwAlgABAAAAAAABAAsAAAABAAAAAAACAAYACwABAAAAAAADABUAEQABAAAAAAAEABIAJgABAAAAAAAFAAsAOAABAAAAAAAGABEAQwADAAEECQABABYAVAADAAEECQACAAwAagADAAEECQADACoAdgADAAEECQAEACQAoAADAAEECQAFABYAxAADAAEECQAGACIA2k9rb3UgTW90aW9uTWVkaXVtT2tvdU1vdGlvbi1NZWRpdW0tMS4wT2tvdSBNb3Rpb24gTWVkaXVtVmVyc2lvbiAxLjBPa291TW90aW9uLU1lZGl1bQBPAGsAbwB1ACAATQBvAHQAaQBvAG4ATQBlAGQAaQB1AG0ATwBrAG8AdQBNAG8AdABpAG8AbgAtAE0AZQBkAGkAdQBtAC0AMQAuADAATwBrAG8AdQAgAE0AbwB0AGkAbwBuACAATQBlAGQAaQB1AG0AVgBlAHIAcwBpAG8AbgAgADEALgAwAE8AawBvAHUATQBvAHQAaQBvAG4ALQBNAGUAZABpAHUAbQAAAAAAAgAAAAMAAAAUAAMAAQAAABQABAA4AAAACgAIAAIAAgAgAGsAbwB1//8AAAAgAGsAbwB1////4f+X/5T/jwABAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAEAgABAQEST2tvdU1vdGlvbi1NZWRpdW0AAQEBGfgbAvgcA/gXBIuL+UX5UAXnD4v4gxLwEQACAQETHk9rb3UgTW90aW9uIE1lZGl1bU9rb3UgTW90aW9uAAAAAAEATABQAFYABQIAAQAFAAoAhgDmAXyLixYO9+iLFg75VaP5OBX3JgaYlYF+H/s2B2O+eaSrHvcw91wFkpGTj5Qb9wYGmJWBfh8vB4KIgoaEHvsG+ywFf3uLdpZ79wf7MhiQhI6CghooB36BgX4e+wUGgoOPkoUf+yP3VQVvsk12Wxr7Kwd+gIF+HvslBn6AlZgf+PAHmJaVmB4O+Wz46PhqFfcT+xny+zn7OfsZJPsTZpdnoGwej4SLg4eFCHZrf2hlGvsT9xok9zj3OfcZ8vcTsYCudqseh5GLk4+SCKCqlq6xGvsm+wUVOEdHNzhHz97fz8/e389HNx4O+bz4PfkqFftBB19pZl+JHl6KZa+5GvdDB5aClIAe+3QGgIKCgB/7ywf7Uvcr+zH3Uoke91OJ9zH3MPdTGvfPB5aClIAe+3QGgIKCgB86++wV49PN4ZMfVgcuQEAuLz/W6B7ABzaU00jiG/t3BPsh+wb3BvchH74H+xmV9wMj9xob9xv3A/P3GZUfWAf7IfsH+wb7IR4OAAAAAAABVAAAAsEAAALYAAADKAAA) format("opentype");font-weight:500;font-style:normal;font-display:block;}
+#root{font-family:"Okou Motion",sans-serif!important}
+.msl-brand-row,.sdl-brand-row,.plr-brand-row,.cbl-brand-row,.ils-brand-row,.lcc-brand-row,.ibl-brand-row,.ssl-brand-row,.fml-brand-row,.apl-brand-row,.plr-lockup,.sdl-lockup,.cbl-lockup,.apl-lockup,.wtl-final-row,.wtl-fragment-lockup,.parts-assemble-lockup-lockup{gap:26.35px!important}
+.msl-wordmark,.sdl-wordmark,.plr-wordmark,.cbl-wordmark,.ils-wordmark,.lcc-wordmark,.ibl-wordmark,.ssl-wordmark,.fml-wordmark,.apl-wordmark,.wtl-final-wordmark,.wtl-fragment-wordmark,#parts-assemble-lockup-wordmark{font-family:"Okou Motion",sans-serif!important;font-size:222.86px!important;font-weight:500!important;line-height:1!important;letter-spacing:normal!important}
+.msl-mark,.plr-mark,.cbl-mark,.ils-mark,.lcc-mark,.ibl-mark,.ssl-mark,.fml-mark,.apl-mark,.sdl-mark-stage,.wtl-final-mark,.wtl-fragment-mark,#parts-assemble-lockup-mark-stage{width:153.77px!important;height:156.0px!important;top:-20.06px!important;color:#242121!important}
+.msl-mark path,.plr-mark path,.cbl-mark path,.ils-mark path,.lcc-mark path,.ibl-mark path,.ssl-mark path,.fml-mark path,.apl-mark path,.sdl-mark-stage path,.wtl-final-mark path,.wtl-fragment-mark path,#parts-assemble-lockup-mark-stage path{fill:#242121!important;stroke:none!important;stroke-width:0!important}
+.sdl-mark-stage .sdl-outline{fill:none!important;stroke:#242121!important;stroke-width:6!important}
+.parts-assemble-lockup-part{overflow:visible}
+.parts-assemble-lockup-part:nth-of-type(1){clip-path:inset(0 0 66.7% 0)}
+.parts-assemble-lockup-part:nth-of-type(2){clip-path:inset(33.3% 0 33.3% 0)}
+.parts-assemble-lockup-part:nth-of-type(3){clip-path:inset(66.7% 0 0 0)}
+</style>
+  <script>function okouBrandBitmap(root, word, mark) {
+  const bitmap=document.createElement('canvas');bitmap.width=1920;bitmap.height=1080;
+  const context=bitmap.getContext('2d',{willReadFrequently:true}),rootBox=root.getBoundingClientRect();
+  for(const letter of word.children){
+    const box=letter.getBoundingClientRect(),s=getComputedStyle(letter);
+    context.font=s.fontWeight+' '+s.fontSize+' "Okou Motion"';context.fillStyle=s.color;
+    const m=context.measureText(letter.textContent);
+    const baseline=box.top-rootBox.top+(parseFloat(s.lineHeight)-m.fontBoundingBoxAscent-m.fontBoundingBoxDescent)/2+m.fontBoundingBoxAscent;
+    context.fillText(letter.textContent,box.left-rootBox.left,baseline);
+  }
+  const m=mark.getBoundingClientRect();context.save();context.translate(m.left-rootBox.left,m.top-rootBox.top);context.scale(m.width/138,m.height/140);
+  context.strokeStyle=getComputedStyle(mark.querySelector('path')).stroke;context.lineWidth=28;context.lineCap='round';context.beginPath();
+  context.moveTo(120,30);context.lineTo(120,210);context.moveTo(42,75);context.lineTo(198,165);context.moveTo(42,165);context.lineTo(198,75);context.stroke();context.restore();
+  return bitmap;
+}
+</script><script>function okouBrandBitmap(root, word, mark) {
+  const bitmap=document.createElement('canvas');bitmap.width=1920;bitmap.height=1080;
+  const context=bitmap.getContext('2d',{willReadFrequently:true}),rootBox=root.getBoundingClientRect();
+  for(const letter of word.children){
+    const box=letter.getBoundingClientRect(),s=getComputedStyle(letter);
+    context.font=s.fontWeight+' '+s.fontSize+' "Okou Motion"';context.fillStyle=s.color;
+    const m=context.measureText(letter.textContent);
+    const baseline=box.top-rootBox.top+(parseFloat(s.lineHeight)-m.fontBoundingBoxAscent-m.fontBoundingBoxDescent)/2+m.fontBoundingBoxAscent;
+    context.fillText(letter.textContent,box.left-rootBox.left,baseline);
+  }
+  const m=mark.getBoundingClientRect(),icon=new Path2D(window.OKOU_ICON_PATH);
+  context.save();context.translate(m.left-rootBox.left,m.top-rootBox.top);context.scale(m.width/138,m.height/140);
+  const painted=mark.querySelector('path');
+  context.fillStyle=painted?getComputedStyle(painted).fill:getComputedStyle(mark).color;
+  context.fill(icon);context.restore();
+  return bitmap;
+}
+window.OKOU_ICON_PATH="M137.9 69.622C137.9 60.7513 133.387 52.9503 126.538 48.3584C125.299 47.5235 124.686 45.9972 125.012 44.5362C126.929 36.2264 124.646 27.147 118.176 20.6766C111.901 14.4018 103.187 12.0798 95.0992 13.6713C93.612 13.9714 92.0988 13.28 91.29 11.9885C86.7764 4.78757 78.7666 0 69.622 0C60.4773 0 52.9503 4.51362 48.3584 11.3623C47.5235 12.6016 45.9972 13.2147 44.5361 12.8886C36.2264 10.971 27.147 13.2539 20.6766 19.7243C14.4018 25.999 12.0798 34.7132 13.6713 42.8012C13.9714 44.2883 13.28 45.8015 11.9885 46.6103C4.78757 51.124 0 59.1467 0 68.2783C0 77.4099 4.51362 84.95 11.3623 89.5419C12.6016 90.3768 13.2147 91.9031 12.8886 93.3642C10.971 101.674 13.2539 110.753 19.7243 117.224C25.999 123.498 34.7132 125.821 42.8011 124.229C44.2883 123.929 45.8015 124.62 46.6103 125.912C51.137 133.113 59.1467 137.9 68.2914 137.9C77.436 137.9 84.9631 133.387 89.555 126.538C90.3899 125.299 91.9161 124.686 93.3772 125.012C101.687 126.929 110.766 124.646 117.237 118.176C123.511 111.901 125.834 103.187 124.242 95.0992C123.942 93.612 124.633 92.0988 125.925 91.29C133.126 86.7633 137.913 78.7536 137.913 69.6089L137.9 69.622ZM63.3864 98.3344C58.9771 97.4473 54.9201 95.621 51.4109 93.0772C48.6323 91.0552 46.219 88.5896 44.2622 85.7719C41.7706 82.1975 40.0225 78.0622 39.2398 73.5877C38.9398 71.8658 38.7702 70.0916 38.7702 68.2783C38.7702 66.6216 38.9006 64.991 39.1615 63.3994C39.9051 58.7684 41.6793 54.4766 44.2622 50.7848C46.2059 47.9801 48.6193 45.5276 51.3718 43.5186C55.1419 40.7661 59.5642 38.8485 64.3648 38.0527C66.0215 37.7788 67.7043 37.6222 69.4393 37.6222C71.1743 37.6222 72.8702 37.7788 74.5269 38.0527C79.4189 38.8746 83.9195 40.8444 87.7417 43.6882C90.4681 45.7233 92.8554 48.2018 94.773 51.0196C97.4342 54.9201 99.2084 59.4598 99.8345 64.3648C100.004 65.6563 100.095 66.9608 100.095 68.2914C100.095 70.4308 99.8737 72.505 99.4562 74.5139C98.4909 79.1841 96.4558 83.4759 93.625 87.1025C91.5248 89.7898 88.994 92.1249 86.1241 93.9903C82.4193 96.4037 78.1665 98.0343 73.5877 98.6605C72.231 98.8431 70.8352 98.9475 69.4263 98.9475C67.3521 98.9475 65.3432 98.7388 63.3864 98.3474V98.3344Z";
+</script></head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="okou-particle-lockup"
+      data-start="0"
+      data-duration="2.15"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="apl-lockup" role="img" aria-label="kou"><svg class="apl-mark" viewBox="0 0 138 140" aria-hidden="true"><path d="M137.9 69.622C137.9 60.7513 133.387 52.9503 126.538 48.3584C125.299 47.5235 124.686 45.9972 125.012 44.5362C126.929 36.2264 124.646 27.147 118.176 20.6766C111.901 14.4018 103.187 12.0798 95.0992 13.6713C93.612 13.9714 92.0988 13.28 91.29 11.9885C86.7764 4.78757 78.7666 0 69.622 0C60.4773 0 52.9503 4.51362 48.3584 11.3623C47.5235 12.6016 45.9972 13.2147 44.5361 12.8886C36.2264 10.971 27.147 13.2539 20.6766 19.7243C14.4018 25.999 12.0798 34.7132 13.6713 42.8012C13.9714 44.2883 13.28 45.8015 11.9885 46.6103C4.78757 51.124 0 59.1467 0 68.2783C0 77.4099 4.51362 84.95 11.3623 89.5419C12.6016 90.3768 13.2147 91.9031 12.8886 93.3642C10.971 101.674 13.2539 110.753 19.7243 117.224C25.999 123.498 34.7132 125.821 42.8011 124.229C44.2883 123.929 45.8015 124.62 46.6103 125.912C51.137 133.113 59.1467 137.9 68.2914 137.9C77.436 137.9 84.9631 133.387 89.555 126.538C90.3899 125.299 91.9161 124.686 93.3772 125.012C101.687 126.929 110.766 124.646 117.237 118.176C123.511 111.901 125.834 103.187 124.242 95.0992C123.942 93.612 124.633 92.0988 125.925 91.29C133.126 86.7633 137.913 78.7536 137.913 69.6089L137.9 69.622ZM63.3864 98.3344C58.9771 97.4473 54.9201 95.621 51.4109 93.0772C48.6323 91.0552 46.219 88.5896 44.2622 85.7719C41.7706 82.1975 40.0225 78.0622 39.2398 73.5877C38.9398 71.8658 38.7702 70.0916 38.7702 68.2783C38.7702 66.6216 38.9006 64.991 39.1615 63.3994C39.9051 58.7684 41.6793 54.4766 44.2622 50.7848C46.2059 47.9801 48.6193 45.5276 51.3718 43.5186C55.1419 40.7661 59.5642 38.8485 64.3648 38.0527C66.0215 37.7788 67.7043 37.6222 69.4393 37.6222C71.1743 37.6222 72.8702 37.7788 74.5269 38.0527C79.4189 38.8746 83.9195 40.8444 87.7417 43.6882C90.4681 45.7233 92.8554 48.2018 94.773 51.0196C97.4342 54.9201 99.2084 59.4598 99.8345 64.3648C100.004 65.6563 100.095 66.9608 100.095 68.2914C100.095 70.4308 99.8737 72.505 99.4562 74.5139C98.4909 79.1841 96.4558 83.4759 93.625 87.1025C91.5248 89.7898 88.994 92.1249 86.1241 93.9903C82.4193 96.4037 78.1665 98.0343 73.5877 98.6605C72.231 98.8431 70.8352 98.9475 69.4263 98.9475C67.3521 98.9475 65.3432 98.7388 63.3864 98.3474V98.3344Z"/></svg><div class="apl-wordmark"><span>k</span><span>o</span><span>u</span></div></div><canvas id="gl" width="1920" height="1080"></canvas>
+    </div>
+    <script>
+      window.__TOKENS = {
+        assemble: {
+          lang: "js",
+          theme: "github-dark",
+          bg: "#24292e",
+          fg: "#e1e4e8",
+          states: [
+            {
+              code: "* Astri",
+              tokens: [
+                {
+                  key: "astri-mark",
+                  content: "*",
+                  color: "#242121",
+                  astriMark: true,
+                  fontStyle: 0,
+                },
+                {
+                  key: "astri-space",
+                  content: " ",
+                  color: "#E1E4E8",
+                  fontStyle: 0,
+                },
+                {
+                  key: "astri-a",
+                  content: "A",
+                  color: "#242121",
+                  fontStyle: 0,
+                },
+                {
+                  key: "astri-s",
+                  content: "s",
+                  color: "#242121",
+                  fontStyle: 0,
+                },
+                {
+                  key: "astri-t",
+                  content: "t",
+                  color: "#242121",
+                  fontStyle: 0,
+                },
+                {
+                  key: "astri-r",
+                  content: "r",
+                  color: "#242121",
+                  fontStyle: 0,
+                },
+                {
+                  key: "astri-i",
+                  content: "i",
+                  color: "#242121",
+                  fontStyle: 0,
+                },
+              ],
+            },
+          ],
+        },
+      };
+      window.__BLOCK = {
+        id: "okou-particle-lockup",
+        effect: "particles",
+        seq: "assemble",
+        duration: 8,
+        seed: 23,
+      };
+    </script>
+    <script>
+      // hf-code-anim-gl.js — WebGL code-animation engine for the "crazy" Code Animations blocks.
+      //
+      // Bridges the baked Shiki tokens (window.__TOKENS) into Three.js: the tokens are drawn once
+      // to an offscreen 2D canvas (a CanvasTexture), which then drives a lit 3D slab, a dissolve
+      // shader, or a GPU particle system. Determinism per the project contract:
+      //   - render only via tl.eventCallback("onUpdate", …) + one initial render() — never rAF
+      //   - all randomness from a seeded mulberry32 — never Math.random / Date.now
+      //   - system-font canvas metrics are captured synchronously during setup
+      //   - paused GSAP timeline registered on window.__timelines[id]; HF seeks it per frame
+      //
+      // Each block sets window.__BLOCK = { id, effect, seq, duration, seed } and includes this engine.
+      (async function () {
+        "use strict";
+ await document.fonts.load('500 222.86px "Okou Motion"');
+ const timingRoot=document.getElementById("root");
+ const holdInput=new URLSearchParams(location.search).get("hold");
+ const holdValue=holdInput===null?.25:Number(holdInput);
+ const hold=Number.isFinite(holdValue)?Math.max(0,Math.min(1,holdValue)):.25;
+ window.__brandTiming={entry:1.9,hold:hold,total:1.9+hold};
+ timingRoot.dataset.duration=String(window.__brandTiming.total);
+ timingRoot.querySelectorAll('.clip').forEach(e=>e.dataset.duration=String(window.__brandTiming.total));
+
+        var T = window.__TOKENS || {};
+
+        // ---- seeded PRNG (no Math.random) -----------------------------------------
+        function mulberry32(a) {
+          return function () {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            var t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+
+        // ---- split a token state into lines of {content,color} --------------------
+        function splitLines(state) {
+          var lines = [[]];
+          for (var i = 0; i < state.tokens.length; i++) {
+            var t = state.tokens[i];
+            if (t.content === "\n") {
+              lines.push([]);
+              continue;
+            }
+            lines[lines.length - 1].push(t);
+          }
+          while (lines.length && lines[lines.length - 1].length === 0)
+            lines.pop();
+          return lines;
+        }
+
+        // ---- THE BRIDGE: draw baked tokens to an offscreen 2D canvas ---------------
+        // Returns { canvas, W, H, lines, lineH, padY, fontPx } so effects can sample it.
+        function drawCodeToCanvas(){
+          var root=document.getElementById('root');
+          var canvas=okouBrandBitmap(root,root.querySelector('.apl-wordmark'),root.querySelector('.apl-mark'));
+          return {canvas:canvas,W:1920,H:1080};
+        }
+        function fxParticles(
+          THREE,
+          scene,
+          camera,
+          renderer,
+          state,
+          st,
+          tl,
+          dur,
+          seed,
+        ) {
+          scene.background = new THREE.Color("#FAF5F3");
+          var code = drawCodeToCanvas(state, {
+            fontPx: 150,
+            lineH: 180,
+            padX: 100,
+            padY: 82,
+            weight: 600,
+          });
+          var cw = code.W;
+          var ch = code.H;
+          var data = code.canvas
+            .getContext("2d")
+            .getImageData(0, 0, cw, ch).data;
+          var rng = mulberry32(((seed || 1) * 2654435761) >>> 0);
+
+          var worldW = 13.0;
+          var worldH = worldW * (ch / cw);
+
+          // Draw the settled lockup at 4x resolution on a transparent canvas.
+          // It shares the particle target's proportions, so the handoff is seamless.
+          var crispCode = drawCodeToCanvas(state, {
+            fontPx: 600,
+            lineH: 720,
+            padX: 400,
+            padY: 328,
+            weight: 600,
+            transparent: true,
+          });
+
+          // sample glyph pixels (brighter than the dark bg) on a fixed grid
+          var step = 4;
+          var tx = [];
+          var col = [];
+          for (var y = 0; y < ch; y += step) {
+            for (var x = 0; x < cw; x += step) {
+              var idx = (y * cw + x) * 4;
+              var r = data[idx];
+              var g = data[idx + 1];
+              var b = data[idx + 2];
+              if (data[idx+3] < 180) continue; // skip background
+              tx.push((x / cw - 0.5) * worldW, -(y / ch - 0.5) * worldH, 0);
+              col.push(r / 255, g / 255, b / 255);
+            }
+          }
+          var n = tx.length / 3;
+
+          var positions = new Float32Array(n * 3);
+          var aOrigin = new Float32Array(n * 3);
+          var aTarget = new Float32Array(tx);
+          var aColor = new Float32Array(col);
+          var aDelay = new Float32Array(n);
+          for (var i = 0; i < n; i++) {
+            var sx = tx[i*3] + (rng()*2-1)*1.8;
+            var sy = tx[i*3+1] + (rng()*2-1)*1.2;
+            var sz = (rng() * 2 - 1) * 3.0 - 1.0;
+            aOrigin[i * 3] = sx;
+            aOrigin[i * 3 + 1] = sy;
+            aOrigin[i * 3 + 2] = sz;
+            positions[i * 3] = sx;
+            positions[i * 3 + 1] = sy;
+            positions[i * 3 + 2] = sz;
+            aDelay[i] = rng();
+          }
+
+          var geo = new THREE.BufferGeometry();
+          geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          geo.setAttribute("aOrigin", new THREE.BufferAttribute(aOrigin, 3));
+          geo.setAttribute("aTarget", new THREE.BufferAttribute(aTarget, 3));
+          geo.setAttribute("aColor", new THREE.BufferAttribute(aColor, 3));
+          geo.setAttribute("aDelay", new THREE.BufferAttribute(aDelay, 1));
+
+          var uniforms = {
+            uProgress: { value: 0 },
+            uSize: { value: 1.0 },
+            uAlpha: { value: 1 },
+          };
+          var mat = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            transparent: true,
+            depthTest: false,
+            depthWrite: false,
+            blending: THREE.NormalBlending,
+            vertexShader: [
+              "attribute vec3 aOrigin; attribute vec3 aTarget; attribute vec3 aColor; attribute float aDelay;",
+              "uniform float uProgress; uniform float uSize;",
+              "varying vec3 vColor; varying float vP;",
+              "void main(){",
+              "  float span = 0.62;",
+              "  float p = clamp((uProgress - aDelay*(1.0-span)) / span, 0.0, 1.0);",
+              "  p = p*p*(3.0-2.0*p);",
+              "  vec3 pos = mix(aOrigin, aTarget, p);",
+              "  vec4 mv = modelViewMatrix * vec4(pos, 1.0);",
+              "  gl_Position = projectionMatrix * mv;",
+              "  gl_PointSize = uSize * (60.0 / -mv.z) * mix(0.62, 0.32, p);",
+              "  vColor = aColor; vP = p;",
+              "}",
+            ].join("\n"),
+            fragmentShader: [
+              "precision highp float; uniform float uAlpha;",
+              "varying vec3 vColor; varying float vP;",
+              "void main(){",
+              "  vec2 d = gl_PointCoord - 0.5;",
+              "  float r2 = dot(d, d);",
+              "  if (r2 > 0.25) discard;",
+              "  float a = smoothstep(0.25, 0.02, r2);",
+              // brighter & whiter in flight, resolves to true color as it lands
+              "  vec3 c = mix(vColor + vec3(0.06)*(1.0-vP), vColor, vP);",
+              "  gl_FragColor = vec4(c, a * (0.7 + 0.3*vP) * uAlpha);",
+              "}",
+            ].join("\n"),
+          });
+
+          var pts = new THREE.Points(geo, mat);
+          pts.renderOrder = 1;
+          scene.add(pts);
+
+          var crispTexture = new THREE.CanvasTexture(crispCode.canvas);
+          crispTexture.minFilter = THREE.LinearFilter;
+          crispTexture.magFilter = THREE.LinearFilter;
+          crispTexture.generateMipmaps = false;
+          var crispMat = new THREE.MeshBasicMaterial({
+            map: crispTexture,
+            transparent: true,
+            opacity: 0,
+            depthTest: false,
+            depthWrite: false,
+          });
+          var crispPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(worldW, worldH),
+            crispMat,
+          );
+          crispPlane.renderOrder = 2;
+          scene.add(crispPlane);
+
+          camera.position.set(0, 0, 10);
+          var vfov = (camera.fov * Math.PI) / 180;
+          var sa = 1920 / 1080;
+          var fitH = worldH / 2 / Math.tan(vfov / 2);
+          var fitW = worldW / 2 / (Math.tan(vfov / 2) * sa);
+          camera.position.z = Math.max(fitH, fitW);
+          camera.lookAt(0, 0, 0);
+
+          tl.to(
+            uniforms.uProgress,
+            { value: 1.0, duration: 1.65, ease: "power2.out" },
+            0,
+          );
+          tl.to(
+            uniforms.uAlpha,
+            { value: 0, duration: 0.2, ease: "power2.in" },
+            1.65,
+          );
+          tl.to(
+            crispMat,
+            { opacity: 1, duration: 0.2, ease: "power2.out" },
+            1.65,
+          );
+
+          // uProgress is tweened by GSAP; the boot loop's render() draws once per frame.
+          return function () {};
+        }
+
+        // ---- dispatch + boot ------------------------------------------------------
+        function buildEffect(THREE, scene, camera, renderer, spec, st, tl) {
+          var state = T[spec.seq].states[0];
+          var dur = spec.duration;
+          if (spec.effect === "particles")
+            return fxParticles(
+              THREE,
+              scene,
+              camera,
+              renderer,
+              state,
+              st,
+              tl,
+              dur,
+              spec.seed,
+            );
+          return function () {};
+        }
+
+        // Free GPU resources (renderer, geometries, materials, textures) on page teardown.
+        // One-shot renders exit per job so nothing leaks there; this guards long-lived
+        // Studio/player sessions that reload. Fires only on unload — never during capture.
+        function disposeGL(renderer, scene) {
+          scene.traverse(function (o) {
+            if (o.geometry && o.geometry.dispose) o.geometry.dispose();
+            var mats = o.material
+              ? Array.isArray(o.material)
+                ? o.material
+                : [o.material]
+              : [];
+            mats.forEach(function (m) {
+              if (m.map && m.map.dispose) m.map.dispose();
+              if (
+                m.uniforms &&
+                m.uniforms.uTex &&
+                m.uniforms.uTex.value &&
+                m.uniforms.uTex.value.dispose
+              ) {
+                m.uniforms.uTex.value.dispose();
+              }
+              if (m.dispose) m.dispose();
+            });
+          });
+          if (renderer.dispose) renderer.dispose();
+        }
+
+        function go() {
+          var spec = window.__BLOCK;
+          var root = document.getElementById("root");
+          var glcanvas = document.getElementById("gl");
+          var W = 1920;
+          var H = 1080;
+          window.__timelines = window.__timelines || {};
+          var tl = gsap.timeline({ paused: true });
+
+
+          var THREE = window.THREE;
+          var renderer = new THREE.WebGLRenderer({
+            canvas: glcanvas,
+            antialias: true,
+            alpha: false,
+            preserveDrawingBuffer: true,
+          });
+          renderer.setPixelRatio(1);
+          renderer.setSize(W, H, false);
+          var scene = new THREE.Scene();
+          var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 200);
+          var st = {};
+
+          var renderFn = buildEffect(
+            THREE,
+            scene,
+            camera,
+            renderer,
+            spec,
+            st,
+            tl,
+          );
+          function render() {
+            renderFn();
+            renderer.render(scene, camera);
+          }
+          tl.eventCallback("onUpdate", render);
+          tl.set(root.querySelector('.apl-lockup'),{opacity:1},1.9);
+          tl.set(glcanvas,{opacity:0},1.9);
+          tl.seek(0);render();
+          timingRoot.querySelector(".msl-reveal .msl-wordmark,.sdl-wordmark,.plr-wordmark,.cbl-wordmark,.ils-wordmark,.lcc-wordmark,.ibl-wordmark,.ssl-wordmark,.fml-wordmark,.apl-wordmark,.wtl-final-wordmark,#parts-assemble-lockup-wordmark").setAttribute('data-brand-wordmark','');
+ timingRoot.querySelector(".msl-reveal .msl-mark,.plr-mark,.cbl-mark,.ils-mark,.lcc-mark,.ibl-mark,.ssl-mark,.fml-mark,.apl-mark,.sdl-mark-stage,.wtl-final-mark,#parts-assemble-lockup-mark-stage").setAttribute('data-brand-mark','');
+ tl.to({clock:0},{clock:1,duration:window.__brandTiming.total,ease:"none"},0);
+ window.__timelines[spec.id]= tl;
+          window.addEventListener("beforeunload", function () {
+            disposeGL(renderer, scene);
+          });
+        }
+
+        go();
+      })();
+    </script>
+  </body>
+</html>
