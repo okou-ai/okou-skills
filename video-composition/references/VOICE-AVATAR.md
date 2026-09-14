@@ -8,7 +8,7 @@ Before starting external generation, lock one narration beat per scene:
 
 `scene-id | narration text | Router layout id | media: voice|talking-avatar|silent | presenter position | viewer outcome`
 
-The narration text, scene IDs, selected layouts, language, one voice ID, and the set of talking-avatar scenes are shared prerequisites. Resolve the voice once and reuse it across voice-only and talking-avatar scenes. Do not guess final seconds. Do not change the script after dispatch unless the media job is intentionally restarted.
+The narration text, scene IDs, selected layouts, language, one voice ID, and the set of talking-avatar scenes are shared prerequisites. Resolve the voice once and reuse it across voice-only and talking-avatar scenes. Check feasibility against any binding duration before dispatch; estimates are not final media timing. Preserve user-locked wording unchanged. Do not change editable narration after dispatch unless the media job is intentionally restarted under the applicable retry authorization.
 
 ## Run two lanes concurrently
 
@@ -75,7 +75,7 @@ node <SKILL_DIR>/scripts/bootstrap-project.mjs \
 
 ## Join once, from real media timing
 
-Measure each returned media file with `ffprobe`; prefer the provider's returned word timings when available. The actual voice or talking-avatar duration wins. Silent scenes retain their planned duration. Add only an intentional bounded pause, never a speculative percentage buffer.
+Measure each returned media file with `ffprobe`; prefer the provider's returned word timings when available. Actual media timing replaces provisional scene estimates, not a binding total duration or preservation constraint. If the media cannot fit those constraints with the permitted edits, resolve the conflict before rendering; do not silently change locked wording, source audio, or the required duration. Silent scenes retain their planned duration. Add only an intentional bounded pause, never a speculative percentage buffer.
 
 Finalize the existing host and frames with exact seconds; this updates cumulative starts, full-window clip durations, and motion sidecars without rebuilding or overwriting authored scene content:
 

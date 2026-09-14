@@ -77,7 +77,7 @@ node scripts/review-project.mjs --project . --phase release
 - A later `preview` compares shared and per-scene fingerprints. It reuses the result when nothing changed, checks only changed scenes when shared sources did not change, and falls back to full coverage when a shared dependency changed.
 - `release` reuses current successful Preview coverage; changed or incomplete coverage triggers the required check.
 
-Each phase writes `report.json` and `summary.md`. Run a manual `--scenes id,id` only when deliberately overriding automatic selection. Start one persistent preview after Preview succeeds, and run native HyperFrames render only after user approval.
+Each phase writes `report.json` and `summary.md`. Run a manual `--scenes id,id` only when deliberately overriding automatic selection. Start one persistent preview after Preview succeeds, then follow the managed render path in [the main skill](../SKILL.md). Wait for preview approval only when the user requested that gate.
 
 ## Boundaries
 

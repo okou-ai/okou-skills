@@ -27,9 +27,9 @@ CRITICAL ON-SCREEN TEXT (display literally):
 
 ## Why the skeleton looks like this
 
-- A cropped head is a fit problem: a near-square studio look fitted to the frame width (`cover`) loses the top of the head, the same look fitted inside the frame (`contain`) keeps it, and a landscape look with a baked-in environment keeps it under either fit; the environment comes from the look image. Video Agent exposes no fit field, so a good presenter scene comes from a landscape look the agent derives during planning, and a bad one from the raw studio look on a plain background filled to the width. The presenter sentences make the agent plan that derivation; the adaptation directive asks for it by name and tells the agent to keep the presenter inside the frame.
-- The script-mode directive keeps the agent composing instead of assembling; prompts without it, and long scene-by-scene prompts with `Media:` blocks, revert to the cutout, the cropped head, and invented on-screen details.
-- The FRAMING NOTE and BACKGROUND NOTE describe the correction the agent should make; on their own they are ignored, together with the sentences and the directive they are followed.
+- Filling the output width with a near-square studio look can crop the head. Fitting it inside the frame or deriving a look suited to the output reduces that risk. Video Agent exposes no fit field, so the presenter sentences and adaptation directive describe the requested composition.
+- In observed runs, incomplete prompts and long scene-by-scene prompts with `Media:` blocks produced cutout presenters, cropped heads, or invented on-screen details. Keep the script-mode directive and the complete skeleton.
+- The FRAMING NOTE and BACKGROUND NOTE complement the presenter sentences and adaptation directive. They guide composition without guaranteeing the rendered result.
 - One narration paragraph, one length, one topic: every extra structure is a chance for the agent to fall back to templates.
 
 ## Slots
@@ -40,9 +40,11 @@ CRITICAL ON-SCREEN TEXT (display literally):
 4. **Attachment sentences** (English), one per `show` attachment: `Use the attached <what> as B-roll when <topic>.` `Display the attached logo in the intro and the end card.` An attached file without a usage sentence is ignored.
 5. **Production lines** (English, only what changes the result): media types by content (`Use motion graphics for the statistics; use the attached screenshot rather than stock footage for the product.`), brand colors as hex, logo placement, then always the text legibility line. No style paragraph when a `style_id` is passed; the style is named once in the brief paragraph.
 6. **Directives** (English literals, verbatim): the script-mode directive (adapt, source-only, or verbatim), one pronunciation hint per brand term a transcript would misspell, and the translation-ready framing when the user plans to translate or asked for a direct-to-camera message.
-7. **Presenter notes** (English literals, verbatim, always last, FRAMING before BACKGROUND), chosen from the look classification in [catalogs](catalogs.md): `photo_avatar` with a real environment gets no BACKGROUND NOTE and a FRAMING NOTE only when its orientation does not match the output; `studio_avatar`, `digital_twin`, or any transparent, solid, or empty preview gets the FRAMING NOTE when `cropRisk` is high, then the BACKGROUND NOTE.
+7. **Presenter notes** (English literals, subject to the explicit framing override below, always last, FRAMING before BACKGROUND), chosen from the look classification in [catalogs](catalogs.md): `photo_avatar` with a real environment gets no BACKGROUND NOTE and a FRAMING NOTE only when its orientation does not match the output; `studio_avatar`, `digital_twin`, or any transparent, solid, or empty preview gets the FRAMING NOTE when `cropRisk` is high, then the BACKGROUND NOTE.
 
 ## Fixed literals
+
+The framing clauses below express the default `framing: safe` goal. If the user explicitly requests another composition, adapt only those clauses consistently across the presenter sentences, adaptation directive, and FRAMING NOTE; keep the selected identity and script-mode directive intact.
 
 **Presenter sentences** (brief paragraph, every presenter run; fill the placeholders, keep the wording):
 
@@ -110,15 +112,15 @@ FRAMING NOTE: The selected avatar image is in square (1:1) orientation but this 
 BACKGROUND NOTE: The selected avatar has no background or a transparent backdrop. Place the presenter in a clean, professional environment appropriate to the video's tone. For business/tech content: modern studio with soft lighting and subtle depth. For casual content: bright, minimal space with natural light. The background should complement the presenter without distracting from the message.
 ```
 
-The notes guide the agent; `POST /v3/video-agents` has no background, crop, scale, position, or safe-area field, so report these notes as guidance when you describe what was controlled. A note is written only when the look's orientation and the output's differ.
+The notes guide the agent; `POST /v3/video-agents` has no background, crop, scale, position, or safe-area field. Apply the independent triggers in Slots above: FRAMING follows the look's crop-risk/orientation condition; BACKGROUND follows the absence of a real environment. Matching the output orientation does not suppress BACKGROUND for a transparent, solid, or empty preview.
 
 ## Rules
 
-- Build the whole skeleton. The presenter sentences, the script-mode directive and the notes work as one set, and the notes alone are ignored.
-- Keep it plain, not short. No per-scene `Media:` blocks, no production paragraphs, no style manifesto — those are what send the agent back to templates. Length itself is not the defect: a 60-second English narration needs about 700 characters and a 120-second one about 1,400, and the prompt simply gets that much longer. Never trim the narration to hit a character count; the narration is sized by the target duration.
-- One approximate length only. Caps written into the prompt, such as `no longer than 30 seconds`, are ignored. For a soft preference set the target below the ceiling (about 18 seconds for a 30-second one) and size the narration to that target; a ceiling the deliverable genuinely must not exceed is a controlled-route requirement, not a wording problem.
-- Measure the narration against the stated length before submitting: count the characters or words in the `Narration:` block and convert them at the pace in [brief](brief.md). If they exceed the stated length, trim the narration or restate the length — never submit a prompt that asks for more words than its own length holds, because HeyGen honours the length and cuts the closing sentence.
-- End the narration on the ask or recap as a complete sentence. An end card or CTA line repeats that thought on screen; the narration is what completes it.
+- Build the whole skeleton. Use the presenter sentences, script-mode directive, and triggered notes together; notes supplement the prompt rather than replacing those sections.
+- Keep it plain, not short. No per-scene `Media:` blocks, no production paragraphs, no style manifesto. Keep the narration whole except for editable adapt-mode copy that needs to fit the duration estimate or provider prompt limit; verbatim copy stays unchanged.
+- In adapt mode, state one approximate length; native verbatim mode uses the script-following directive instead. Prompt wording such as `no longer than 30 seconds` cannot enforce a cap. Size editable narration to the target estimate; a ceiling the deliverable must not exceed selects the controlled route.
+- Estimate narration length before submitting, using the pace in [brief](brief.md). In adapt mode, trim editable narration or revise an inferred target if they do not fit. In verbatim mode, preserve the script and follow the brief's timing rule. A mismatch may affect pacing or content, but it does not predict a particular cut or guarantee the final duration.
+- For authored or adapted narration, end on the ask or recap as a complete sentence. An end card or CTA line repeats that thought on screen. Do not add or rewrite a closing sentence in verbatim copy.
 - Positive framing: describe what to show, not what to avoid. Restrictive lists make the agent play safe.
 - No per-scene timestamps and no layout coordinates. Describe motion with verbs (counts up, slides in, draws itself) only when a description is needed at all.
 - With `avatar_id`, say "the selected presenter"; the look supplies hair, clothing, and everything else about the person.

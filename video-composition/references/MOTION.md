@@ -60,7 +60,7 @@ Do not run a universal fade-and-slide timeline across every scene. Text, chart, 
 - Finish all settled scenes, then run `node scripts/review-project.mjs --project . --phase static`.
 - After motion, run `node scripts/review-project.mjs --project . --phase preview`. The first call derives explicit scene midpoints and runs one complete HyperFrames check with contrast. Later calls automatically check only changed scenes when shared inputs are stable, reuse the result when nothing changed, and fall back to full coverage after shared changes.
 - Hand over one persistent preview after that pass; do not repeat a sequence-wide check for every edit.
-- After visual approval and immediately before final render, run `node scripts/review-project.mjs --project . --phase release`. It reuses an unchanged successful full Preview report; changed sources trigger another check.
+- After Preview checks pass and any user-requested preview approval is received, run `node scripts/review-project.mjs --project . --phase release` immediately before final render. It reuses an unchanged successful full Preview report; changed sources trigger another check.
 - Do not run separate `npm run check` or standalone lint around this flow; Preflight already owns lint and Preview owns browser QA.
 - Sample the opening to confirm the background and presenter are already settled.
 - Sample every semantic build boundary: each text tier, chart axis and mark, value landing, connector activation, comparison handoff, and final hold.

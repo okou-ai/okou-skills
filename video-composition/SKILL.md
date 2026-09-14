@@ -17,7 +17,7 @@ Record one semantic or narration beat per scene:
 
 `scene-id | Router layout id | presenter: off|talking-avatar | viewer outcome`
 
-Fix silent/static scene timing now. For voice or a talking avatar, open [VOICE-AVATAR.md](references/VOICE-AVATAR.md) and generate media alongside draft assembly: authoring runs on provisional windows while media generates, then both join on measured seconds. Real media duration wins. Dispatch media first; that ordering is the saving.
+Fix silent/static scene timing now. For voice or a talking avatar, open [VOICE-AVATAR.md](references/VOICE-AVATAR.md) and generate media alongside draft assembly: authoring runs on provisional windows while media generates, then both join on measured seconds. Measured media replaces provisional estimates; it does not override a binding duration or preservation constraint. Dispatch media first once those constraints have a feasible plan.
 
 ### 2. Select from the executable layout library
 
@@ -96,7 +96,7 @@ npx hyperframes@<pinned> preview --background
 
 Preview runs the full check with contrast; a later call checks only changed scenes, or reuses the result. Give the user the Studio URL, and keep Preview alive.
 
-Render after the user approves. The composition renders through Okou's managed cloud, the same path the intro-video controlled route uses. Check `okou video render --help` once; if the command or platform access is missing, report that rather than rendering locally.
+If the user requested preview approval before rendering, wait for that approval. Otherwise, an authorized video-creation request or `intro-video` handoff proceeds to rendering after the checks pass, without an additional approval gate. The composition renders through Okou's managed cloud, the same path the intro-video controlled route uses. Check `okou video render --help` once; if the command or platform access is missing, report that rather than rendering locally.
 
 ```bash
 node <SKILL_DIR>/scripts/review-project.mjs --project . --phase release

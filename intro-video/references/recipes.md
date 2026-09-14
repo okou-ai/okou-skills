@@ -44,7 +44,7 @@ Use these roles to structure the script. They are writing tools, not prompt labe
 
 Style tags are preferences for `Let Okou choose`; an explicit style always wins.
 
-A duration band is where a finished video of this kind should land, not a target to pick from — least of all its low end. The number written into the brief comes from the narration actually drafted, converted at the pace in [brief](brief.md); the band only bounds it. A band never reaches the user as a requirement: when no duration was requested, say the inferred length is your inference.
+For an inferred adapt-mode target, estimate the drafted narration at the pace in [brief](brief.md) and use the recipe band as a planning bound. An explicit user duration takes precedence over that default band. Verbatim copy follows the brief's unchanged-script timing rule, even when its estimate falls outside the band. When no duration was requested, identify the length as an estimate rather than a user requirement.
 
 ## The narrative frame comes first
 
@@ -52,10 +52,10 @@ Before compiling any prompt, fill the brief's five answers: claim, conflict, tur
 
 ## Script rules
 
-These come from HeyGen's own prompting experiments and from the arcs above. They apply to both routes.
+These guide narration authored or adapted by Okou on either route. Preserve user-locked verbatim scripts unchanged; plan the duration and visuals around them instead of applying these writing edits.
 
 - The script is the biggest quality lever. Write for the ear: short sentences, active voice, contractions, one idea per video.
-- Write the narration to the target, not to the material. Material always outruns the time available; drop the weakest key messages here, deliberately, instead of letting the agent drop the closing sentence at render time.
+- Fit editable narration to the target estimate. When material exceeds the available time, drop the weakest key messages before submission; do not assume which words the provider would omit.
 - Stories beat lists. First person and a concrete case ("we lost the evening enquiries") beat neutral summaries.
 - Front-load the hook. The first sentence carries the claim or the conflict.
 - Use the arc as an order, and never as timestamps. Per-scene timestamps make the delivery robotic; that is the one point HeyGen's prompting guide and its own effectiveness research agree on, so they are banned at every length on both routes.

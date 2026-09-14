@@ -28,7 +28,7 @@ presenter:                      # or none
   avatar_type: studio_avatar    # studio_avatar | photo_avatar | digital_twin, from the form or the catalog
   preview: { width: 1080, height: 1080, environment: transparent }   # size from the form or the catalog record; environment: real | transparent | solid | empty
   scene: any                    # any | integrated (a real environment behind the presenter is a hard requirement)
-  framing: safe                 # always safe: the complete head with margin is required in every frame, and no user instruction relaxes it
+  framing: safe                 # default prompt goal: full head with margin; not a verified output property
 facts: open                     # open | source-only (only facts from the request and sources may appear)
 voice: default                  # default | { voice_id } | auto | original | none
 orientation: landscape          # landscape | portrait
@@ -55,24 +55,24 @@ The entry form never asks for intent, duration, language, tone, or CTA. Infer ea
 | tone | user wording | recipe default | "confident and conversational" |
 | audience | user wording | inferred from material | the recipe's audience |
 | presenter.scene | the user requires a real setting behind the presenter, or rejects a cut-out on a plain background ("in an office/studio", "must have a background", "no green-screen cut-out") → integrated | | any |
-| presenter.framing | not inferred: always `safe`. A cropped head is never delivered, so "crop is fine" changes nothing about what ships — treat it as permission to pick a different look, not to crop | | safe |
+| presenter.framing | the user's explicit composition preference | | `safe`: request the full head with margin; a prompt goal, verified only when targeted review applies |
 | facts | the user forbids anything beyond the supplied material ("source only", "use only the given facts", "do not add anything"), or an attached report is the sole source → source-only | | open |
 | output.min_resolution | "1080p", "full HD", broadcast use → 1080p | | 720p |
 
-Duration and narration are decided together, in both modes: draft the narration first, measure it with the calibration below, record the result as `narration_seconds`, and derive `target_seconds` from it. A recipe's duration entry is the band the finished video should land in, not a menu to pick from; never fix the target at a band's low end and then write more narration than that target holds. A number the user actually asked for is the one exception, and then the narration is cut to fit it.
+In adapt mode, draft the editable narration first, estimate it with the calibration below, record `narration_seconds`, and derive `target_seconds` from it. A recipe's duration entry bounds the inferred target; do not choose its low end independently of the narration. When the user supplies a duration, edit only the adaptable narration to fit the estimate. Verbatim copy is never cut or expanded to fit a target; use the verbatim rule below.
 
 | Narration language | Initial pace for estimates |
 | --- | --- |
 | English | about 150 words per minute |
 | Chinese | about 220 characters per minute |
 
-In adapt mode, count the drafted narration, convert it at that pace, and round the target **up** to the nearest five seconds. Up, because the opening, the transitions and the end card occupy timeline the narration does not, so a target at or below the spoken length leaves the agent no room: it compresses, and what it drops is the last sentence — the ask or the recap. A narration longer than the target it ships with is never submitted; cut key messages until it fits, or raise the target if the recipe band allows.
+In adapt mode, count the drafted narration, convert it at that pace, and round an inferred target **up** to the nearest five seconds to leave room for the opening, transitions, and end card. If the estimate exceeds the target, trim the editable narration or raise an inferred target within the recipe band. This is planning headroom, not a guarantee of the provider's pace, duration, or ending.
 
-A narration well short of the target is a mismatch too. With a target you derived, lower it to the narration. With a duration the user fixed, size the narration just under that number and let the material cover it: `facts: open` lets the agent expand to fill the length, but under `facts: source-only` it may only restate the source, so a thin source cannot reach a long target. Say that before submitting — the material supports about this many seconds, so either shorten the duration or allow facts beyond the source — and let the user choose. Do not pad, invent facts, or submit a narration you already know is short: it renders under the QA duration floor with the ending intact but the video hollow.
+In adapt mode, narration well short of the target is a mismatch too. With an inferred target, lower it to the narration. With a duration the user fixed, size the editable narration just under that number using the available material: `facts: open` permits expansion, while `facts: source-only` permits only restating or connecting supplied facts. If the source cannot support the requested length, explain the estimated length it supports and resolve the constraint before submission. Do not invent facts or assume the provider will fill the gap.
 
-In verbatim mode the duration follows the script: estimate it from the script length at the pace above, record the estimate as both `narration_seconds` and the expected length, and do not state a different target.
+In verbatim mode, preserve the script unchanged and estimate `narration_seconds` and the expected length from it. For native generation, use the script-following directive instead of a separate numeric target in the prompt; report a material difference from the user's approximate duration before submitting. Exact wording plus exact timing selects the controlled route: plan the audio and timeline around the unchanged script, and resolve an infeasible timing constraint rather than silently editing the copy.
 
-These are starting estimates; the transcript of the finished video is the actual measurement.
+These are starting estimates; the rendered media provides the actual duration. Transcription is used only when the targeted checks in [QA](qa.md) require it.
 
 ## Mapping the entry form
 
@@ -97,7 +97,7 @@ The form's configuration block maps one-to-one onto the brief:
 
 `silent` anywhere in the request means no audio track at all and also selects the controlled route.
 
-A hard `scene: integrated`, the standing `framing: safe`, or `min_resolution: 1080p` is settled before submission by the presenter capability check in SKILL.md, so it never becomes a post-render surprise. Settled does not always mean routed away: a hard 1080p goes to controlled composition, while a real environment and safe framing are what the complete native prompt is for, and the user is told before generation that both are prompt-guided.
+A hard `min_resolution: 1080p` selects controlled composition. Native scene and framing requests are carried into the complete prompt; catalog preflight establishes the selected look's properties, not the rendered result. Verify output framing only when targeted review applies, and report any confirmed issue under the same delivery policy as other failed checks.
 
 ## Script mode cues
 
