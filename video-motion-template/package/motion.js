@@ -68,7 +68,20 @@ function render(canvas,id,p,mode='light',options={}){
  case 'spring':{const f=step(q,0,.92),spring=1-Math.exp(-f*7)*Math.cos(f*10);c.save();c.translate(480,270+45*(1-e));c.scale(.2+.8*spring,1.55-.55*spring);stamp(c,im,-LW/2,-LH/2,LW,LH,step(q,0,.16));c.restore();break}
  case 'ribbon':{const n=9,w=LW/n;for(let i=0;i<n;i++){const f=ease(step(q,i*.038,i*.038+.65));region(c,im,L+i*w,T,w,LH,0,(i%2?1:-1)*(1-f)*100,1,f,(i%2?1:-1)*(1-f)*.12,f)}break}
  case 'liquid':{const y=mix(T+LH+35,T-45,smooth(q));c.save();c.beginPath();c.moveTo(0,H);for(let x=0;x<=W;x+=8)c.lineTo(x,y+Math.sin(x*.019-q*6)*14*Math.sin(q*Math.PI));c.lineTo(W,H);c.closePath();c.clip();stamp(c,im);c.restore();c.strokeStyle=accent;c.globalAlpha=Math.sin(q*Math.PI)*.3;c.lineWidth=1;c.beginPath();for(let x=L-50;x<L+LW+50;x+=6){const yy=y+Math.sin(x*.019-q*6)*14*Math.sin(q*Math.PI);if(x===L-50)c.moveTo(x,yy);else c.lineTo(x,yy)}c.stroke();break}
- case 'light':{stamp(c,im,L,T,LW,LH,.035);const x=mix(L-140,L+LW+120,e);clipRect(c,0,0,x,H,()=>stamp(c,im));tc.clearRect(0,0,W,H);tc.globalCompositeOperation='source-over';tc.drawImage(im,L,T,LW,LH);tc.globalCompositeOperation='source-in';const gr=tc.createLinearGradient(x-100,0,x+25,0);gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(.65,'rgba(255,255,255,.85)');gr.addColorStop(1,'rgba(255,255,255,0)');tc.fillStyle=gr;tc.fillRect(0,0,W,H);tc.globalCompositeOperation='source-over';c.drawImage(temp,0,0);break}
+ case 'light':{
+  const x=mix(L-150,L+LW+130,e);
+  tc.globalCompositeOperation='source-over';tc.clearRect(0,0,W,H);tc.drawImage(im,L,T,LW,LH);
+  tc.globalCompositeOperation='destination-in';
+  let gr=tc.createLinearGradient(x-86,0,x,0);
+  gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');
+  tc.fillStyle=gr;tc.fillRect(0,0,W,H);tc.globalCompositeOperation='source-over';
+  c.drawImage(temp,0,0);
+  tc.clearRect(0,0,W,H);tc.drawImage(im,L,T,LW,LH);tc.globalCompositeOperation='source-in';
+  gr=tc.createLinearGradient(x-104,0,x+26,0);
+  gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(.66,'rgba(255,255,255,.8)');
+  gr.addColorStop(1,'rgba(255,255,255,0)');tc.fillStyle=gr;tc.fillRect(0,0,W,H);
+  tc.globalCompositeOperation='source-over';c.drawImage(temp,0,0);break;
+ }
  case 'glass':{const x=mix(L-100,L+LW+100,e);clipRect(c,0,0,x,H,()=>stamp(c,im));clipRect(c,x-48,T-14,78,LH+28,()=>base(c,im,q,1.075,-8,0,.85));const gr=c.createLinearGradient(x-48,0,x+30,0);gr.addColorStop(0,rgba(accent,0));gr.addColorStop(.35,rgba(accent,.19));gr.addColorStop(.7,'rgba(255,255,255,.64)');gr.addColorStop(1,rgba(accent,0));c.fillStyle=gr;rounded(c,x-48,T-32,78,LH+64,30);c.fill();break}
  case 'focus':{c.filter='blur('+(1-e)*25+'px)';base(c,im,q,mix(1.17,1,e),0,0,smooth(step(q,0,.65)));c.filter='none';break}
  case 'depth':{const a=(1-e)*1.46;c.save();c.translate(480,270);c.transform(Math.cos(a),-.08*Math.sin(a),0,1,0,0);for(let i=12;i>0;i--){c.globalAlpha=(1-e)*.12;stamp(c,im,-LW/2-i*2.1*Math.sin(a),-LH/2+i*.4)}c.globalAlpha=step(q,0,.15);stamp(c,im,-LW/2,-LH/2);c.restore();break}
