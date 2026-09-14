@@ -40,13 +40,13 @@ okou __intro-video-presenter --avatar-id LOOK_ID --avatar-group-id GROUP_ID \
 
 It returns a landscape transparent WebM and accepts at most 600 seconds of audio per take; split longer narratives at narration boundaries. Because it has no script input, speech must finish before the take can start: that dependency is serial inside the media lane, and it is the reason the script-driven command above is the default. The visual lane runs concurrently either way.
 
-**Voice only, no person on screen.** Synthesize the scene-keyed narration:
+**Voice only, no person on screen.** For a short cohesive narrative, synthesize one continuous script while authoring its scenes:
 
 ```bash
 okou __intro-video-voice --voice-id VOICE_ID --text "FINAL_SCRIPT" --json
 ```
 
-The returned files are already scene segments; keep their ID-keyed durations and word timings. Split only for the command's 5,000-character limit.
+This command returns one audio file per request with its URL, file ID, and duration; it does not promise scene segments or word timestamps. Keep the scene-to-script mapping separately. Use separate requests only when independent takes serve the brief or the command's 5,000-character limit requires a split. Save each result immediately and reuse the accepted voice ID on revisions. Download via the exact returned URL or file ID; do not infer a file ID from an artifact alias. Long or quote-sensitive scripts must be passed as one safely quoted `--text` argument; this command does not accept stdin.
 
 **An existing long track.** Keep one source file, voice or avatar, and derive scene boundaries from its transcript or word timings, mounting ranges out of that single source rather than re-encoding a file per scene.
 
@@ -75,7 +75,16 @@ node <SKILL_DIR>/scripts/bootstrap-project.mjs \
 
 ## Join once, from real media timing
 
-Measure each returned media file with `ffprobe`; prefer the provider's returned word timings when available. Actual media timing replaces provisional scene estimates, not a binding total duration or preservation constraint. If the media cannot fit those constraints with the permitted edits, resolve the conflict before rendering; do not silently change locked wording, source audio, or the required duration. Silent scenes retain their planned duration. Add only an intentional bounded pause, never a speculative percentage buffer.
+Measure each downloaded media file with `ffprobe`; use returned word timings only when actually present. For continuous speech without timestamps, transcribe once to identify semantic cuts; if the segments are coarse, local silence detection can refine those boundaries without another transcription. Preserve the original generated speaking rate when it fits. Actual media timing replaces provisional scene estimates, not a binding total duration or preservation constraint. If the media cannot fit those constraints with the permitted edits, resolve the conflict before rendering; do not silently change locked wording, source audio, or the required duration. Silent scenes retain their planned duration. Add only an intentional bounded pause, never a speculative percentage buffer.
+
+**Prepare any permitted speech-speed adjustment before finalizing timing.** Runtime `data-playback-rate` can disagree with the media-fit check, which reads the file's intrinsic duration. If a pace adjustment is appropriate for editable generated narration, produce one pitch-preserving derivative with FFmpeg `atempo`, leaving the source intact. Probe that derivative, map cuts to its timing, and mount it at playback rate 1. Do not retime locked original audio or a talking-avatar take independently of its performance. Preflight rejects non-unit audio playback rates on this composition path.
+
+```bash
+ffmpeg -n -i narration-original.mp3 -vn -af atempo=0.88 -c:a pcm_s16le narration-paced.wav
+ffprobe -v error -show_entries format=duration -of json narration-paced.wav
+```
+
+The rate above is an example, not a default. At rate 1, the audio window is the measured file duration minus any intentional source offset; its end is `data-start + data-duration`. Confirm it fits the host before Static or Preview. After a derivative replaces a source, keep only the referenced derivative inside the render package and retain the original outside it.
 
 Finalize the existing host and frames with exact seconds; this updates cumulative starts, full-window clip durations, and motion sidecars without rebuilding or overwriting authored scene content:
 

@@ -7,7 +7,7 @@ description: "Compose a video with HyperFrames from an executable layout library
 
 ## Workflow ownership
 
-This owns the workflow after HyperFrames. Work from the brief and sources alone, and edit the starter-based scenes inline.
+This owns the workflow after HyperFrames. Work from the brief and sources alone, and edit the starter-based scenes inline. For a revision, retain the accepted project, scene sources, palette, voice ID, complete content font, and pinned runtime. Update the scene contract and narration for the requested change; use the existing-project path in [AUTHORING.md](references/AUTHORING.md) instead of bootstrapping again.
 
 ## Fast production workflow
 
@@ -31,7 +31,7 @@ Read only [ROUTER.md](references/ROUTER.md) with this file; it maps all 40 layou
 
 - Presenter `off`: no presenter DOM or reserved bay.
 - Presenter `talking-avatar`: a generated transparent take, staged with bootstrap `--presenter on`; the composition supplies the background, so follow the fast path rather than any avatar output with a scene behind it.
-- For `zh`, `ja`, or `ko`, pass one licensed local `--content-font`.
+- For `zh`, `ja`, or `ko`, reuse a complete licensed local `--content-font`. If only a font collection or source font is available, follow the short font preparation section in [AUTHORING.md](references/AUTHORING.md). Avoid a hand-picked character subset before the visible copy is complete.
 - Choose one palette: `navy-cobalt`, `monumental-minimal`, `black-gold`, `obsidian-champagne`, `petrol-brass`, `parchment-oxblood`, `porcelain-carbon`, `custom`. Geometry is identical across them, so this is tone: a light field for dense figures, a dark one for a single claim, `custom` for brand colours. Name the choice before generating; define custom palettes through [STYLE.md](references/STYLE.md).
 
 ### 4. Bootstrap once
@@ -53,6 +53,8 @@ node <SKILL_DIR>/scripts/bootstrap-project.mjs \
 ```
 
 Bootstrap initializes HyperFrames, stages starters, installs deduplicated official items, isolates blocks, creates host/scene/motion contracts, records `COLOR-SYSTEM.json`, and propagates the palette; layout choice, content, and rendering stay with you.
+
+New projects use HyperFrames **0.8.38**; revisions keep the existing project's pinned version.
 
 For a supplied collection, use `--color-system custom --color-tokens <CSS_FILE>`; geometry is unchanged.
 
@@ -89,12 +91,15 @@ Preflight combines the package contract and font checks with HyperFrames lint, s
 After all static content is complete:
 
 ```bash
-node <SKILL_DIR>/scripts/review-project.mjs --project . --phase static
-node <SKILL_DIR>/scripts/review-project.mjs --project . --phase preview
-npx hyperframes@<pinned> preview --background
+node <SKILL_DIR>/scripts/review-job.mjs start --project . --phase static
+node <SKILL_DIR>/scripts/review-job.mjs status --project . --job JOB_ID
 ```
 
-Preview runs the full check with contrast; a later call checks only changed scenes, or reuses the result. Give the user the Studio URL, and keep Preview alive.
+The local review job survives the calling tool session and returns its own ID, log path, and state. Wait for `passed`, inspect the scene contact sheet, then start `--phase preview` with the same helper and follow its returned ID. Do not edit inputs or start another phase while a check is active. Read status at reasonable intervals while doing independent work; if interrupted, inspect the existing job log before explicitly starting another check. An old PASS report is not the state of the new job.
+
+Preview runs the full check with contrast; a later call checks only changed scenes, or reuses the result. A changed narration file also invalidates cached review. Reports record `startedAt`, `completedAt`, and `durationMs` so tool execution can be separated from time between commands.
+
+Start `npx hyperframes@<pinned> preview --background` only when interactive Studio review is needed and the environment provides a user-accessible URL. An unattended cloud-render build needs no local Studio server; a sandbox-local URL is not a deliverable.
 
 If the user requested preview approval before rendering, wait for that approval. Otherwise, an authorized video-creation request or `intro-video` handoff proceeds to rendering after the checks pass, without an additional approval gate. The composition renders through Okou's managed cloud, the same path the intro-video controlled route uses. Check `okou video render --help` once; if the command or platform access is missing, report that rather than rendering locally.
 

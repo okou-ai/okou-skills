@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { resolveHyperframesPackage } from "./review-project.mjs";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const layoutCatalog = fs.readFileSync(path.join(skillRoot, "references/LAYOUT-CATALOG.md"), "utf8");
@@ -325,6 +326,7 @@ function mappedRegistryItems() {
 
 function installMappedRegistryItems() {
   const command = process.platform === "win32" ? "npx.cmd" : "npx";
+  const hyperframesPackage = resolveHyperframesPackage(projectRoot);
   const existing = alreadyInstalledRegistryItems();
   for (const item of mappedRegistryItems()) {
     const previous = previousInstallResults.get(item);
@@ -336,7 +338,7 @@ function installMappedRegistryItems() {
       continue;
     }
     const run = spawnSync(command, [
-      "hyperframes", "add", item,
+      "--yes", hyperframesPackage, "add", item,
       "--dir", projectRoot,
       "--json",
       "--no-clipboard",
@@ -448,8 +450,8 @@ function buildSelectionReference() {
     "- Keep a full presenter at the template standard size. If it does not fit, use the grounded soft-fade `head-shoulders` treatment, move it to a divider, or omit it from that scene.",
     "- Keep the background and presenter settled; use the mapped item's semantic content motion.",
     ...(args.install ? ["- Read `REGISTRY-INSTALLS.json` only when a starter dependency is missing. Scaffolding copies every official dependency per scene and marks its only editable content slot."] : []),
-    "- Review through `--phase preflight`, `--phase static`, then one full `--phase preview`; use `--scenes id,id` for a targeted correction. `--phase release` reuses unchanged successful Preview QA.",
-    "- Preflight already runs deterministic contract checks plus HyperFrames lint. Render only after user approval.",
+    "- Run Preflight through review-project.mjs; use review-job.mjs start/status for Static and Preview so checks survive tool-session interruption. Wait for each job before the next phase. Release reuses unchanged successful Preview QA.",
+    "- Preflight includes deterministic contract checks and HyperFrames lint. An authorized creation request proceeds to rendering after QA; wait for preview approval only when the user requested that gate.",
     "",
     "## Selected layouts",
     "",
@@ -481,6 +483,7 @@ else copy("assets/runtime/custom-color-system.css", "assets/video-composition/cu
 writeColorSystemReceipt();
 writeContentFont();
 copy("scripts/review-project.mjs", "scripts/review-project.mjs");
+copy("scripts/review-job.mjs", "scripts/review-job.mjs");
 copy("scripts/scaffold-scenes.mjs", "scripts/scaffold-scenes.mjs");
 copy("scripts/finalize-timing.mjs", "scripts/finalize-timing.mjs");
 copy("scripts/set-color-system.mjs", "scripts/set-color-system.mjs");
@@ -551,7 +554,7 @@ if (args.presenterMode === "off") {
   console.log("Plan recurring but non-continuous presenter scenes. Keep full presenters at the template standard size; when one does not fit, use a grounded bottom-corner head-and-shoulders treatment, move the person to a divider, or omit the person from that scene.");
 }
 console.log("Use scaffold-scenes.mjs with --layout-map so IDs, durations, official mounts, and motion sidecars remain aligned.");
-console.log("Finish all settled static scenes, then use scripts/review-project.mjs for preflight, static, preview, and release review.");
+console.log("Finish all settled static scenes, then use review-project.mjs for Preflight and review-job.mjs start/status for Static and Preview. Follow each returned job ID before starting another phase.");
 if (args.mediaMode !== "none") console.log("Keep media generation running while draft scenes are authored; finalize their timing once from measured media durations.");
 console.log("Preflight includes HyperFrames lint; Preview performs the only full browser check and automatically narrows a correction rerun when safe.");
 if (skipped.length) console.log("Use --force only when you intend to refresh the managed kit files.");
