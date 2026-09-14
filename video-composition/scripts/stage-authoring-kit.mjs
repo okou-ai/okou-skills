@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { resolveHyperframesPackage } from "./review-project.mjs";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const layoutCatalog = fs.readFileSync(path.join(skillRoot, "references/LAYOUT-CATALOG.md"), "utf8");
@@ -325,6 +326,7 @@ function mappedRegistryItems() {
 
 function installMappedRegistryItems() {
   const command = process.platform === "win32" ? "npx.cmd" : "npx";
+  const hyperframesPackage = resolveHyperframesPackage(projectRoot);
   const existing = alreadyInstalledRegistryItems();
   for (const item of mappedRegistryItems()) {
     const previous = previousInstallResults.get(item);
@@ -336,7 +338,7 @@ function installMappedRegistryItems() {
       continue;
     }
     const run = spawnSync(command, [
-      "hyperframes", "add", item,
+      "--yes", hyperframesPackage, "add", item,
       "--dir", projectRoot,
       "--json",
       "--no-clipboard",

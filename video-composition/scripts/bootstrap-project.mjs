@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const hyperframesVersion = "0.8.38";
 
 function usage(exitCode = 0) {
   const out = exitCode ? console.error : console.log;
@@ -14,7 +15,7 @@ function usage(exitCode = 0) {
     "  node scripts/bootstrap-project.mjs --project <dir> --host-id <id> --presenter <off|on> --media-mode <none|voice|talking-avatar> --language <tag> --scenes id:<seconds|auto>,id:<seconds|auto> --layout-map id=family/layout,id=family/layout [--color-system <built-in-name|custom>] [--color-tokens file] [--presenter-scenes id,id] [--content-font file] [--force]",
     "  node scripts/bootstrap-project.mjs --prepare-only --project <dir> --presenter <off|on> --media-mode <voice|talking-avatar> --language <tag> --layout-map id=family/layout,id=family/layout [--color-system <built-in-name|custom>] [--color-tokens file] [--content-font file] [--force]",
     "",
-    "Initializes when necessary and stages/installs selected official items once. Use --hyperframes-version <exact-version> to select a new project's runtime; otherwise resolve it once. Existing projects keep their pin.",
+    `Initializes new projects with HyperFrames ${hyperframesVersion} and stages/installs selected official items once. Existing projects keep their pin.`,
     "Full mode creates executable scene starters; auto uses provisional authoring windows, while prepare-only leaves timing and the host untouched.",
     "It never researches the subject, chooses layouts, writes content, or renders video.",
   ].join("\n"));
@@ -34,7 +35,7 @@ function parseArgs(argv) {
       args.prepareOnly = true;
       continue;
     }
-    if (["--project", "--host-id", "--presenter", "--media-mode", "--language", "--scenes", "--layout-map", "--presenter-scenes", "--content-font", "--color-system", "--color-tokens", "--hyperframes-version"].includes(token)) {
+    if (["--project", "--host-id", "--presenter", "--media-mode", "--language", "--scenes", "--layout-map", "--presenter-scenes", "--content-font", "--color-system", "--color-tokens"].includes(token)) {
       const value = argv[index + 1];
       if (!value) usage(1);
       if (token === "--project") args.project = value;
@@ -48,7 +49,6 @@ function parseArgs(argv) {
       if (token === "--content-font") args.contentFont = value;
       if (token === "--color-system") args.colorSystem = value;
       if (token === "--color-tokens") args.colorTokens = value;
-      if (token === "--hyperframes-version") args.hyperframesVersion = value;
       index += 1;
       continue;
     }
@@ -110,25 +110,15 @@ function main() {
     if (fs.existsSync(path.join(projectRoot, "index.html"))) {
       throw new Error("Refusing to initialize over an existing index.html without a HyperFrames project. Restore its project configuration first.");
     }
-    let version = args.hyperframesVersion;
-    if (!version) {
-      const npm = process.platform === "win32" ? "npm.cmd" : "npm";
-      const result = spawnSync(npm, ["view", "hyperframes", "version"], { encoding: "utf8" });
-      if (result.error || result.status !== 0) throw new Error("Could not resolve the HyperFrames version; use --hyperframes-version with an exact version.");
-      version = result.stdout.trim();
-    }
-    if (!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(version)) throw new Error("HyperFrames requires an exact --hyperframes-version, not a range or tag.");
     fs.mkdirSync(path.dirname(projectRoot), { recursive: true });
-    run(npx, ["--yes", `hyperframes@${version}`, "init", projectRoot, "--non-interactive", "--example=blank"], path.dirname(projectRoot), "HyperFrames init");
+    run(npx, ["--yes", `hyperframes@${hyperframesVersion}`, "init", projectRoot, "--non-interactive", "--example=blank"], path.dirname(projectRoot), "HyperFrames init");
     // Trust only the exact blank host created by this invocation, not a changing template comment.
     const receiptDir = path.join(projectRoot, ".hyperframes", "video-composition");
     fs.mkdirSync(receiptDir, { recursive: true });
     fs.writeFileSync(path.join(receiptDir, "bootstrap.json"), JSON.stringify({
-      hyperframesVersion: version,
+      hyperframesVersion,
       blankIndexSha256: crypto.createHash("sha256").update(fs.readFileSync(path.join(projectRoot, "index.html"))).digest("hex"),
     }, null, 2) + "\n");
-  } else if (args.hyperframesVersion) {
-    throw new Error("--hyperframes-version only selects a new project's runtime. Existing projects keep their recorded version.");
   }
 
   const stageArgs = [

@@ -54,7 +54,7 @@ node <SKILL_DIR>/scripts/bootstrap-project.mjs \
 
 Bootstrap initializes HyperFrames, stages starters, installs deduplicated official items, isolates blocks, creates host/scene/motion contracts, records `COLOR-SYSTEM.json`, and propagates the palette; layout choice, content, and rendering stay with you.
 
-For a new project, it resolves one exact HyperFrames version before init; `--hyperframes-version <exact-version>` can select it explicitly. It records the initial host hash so an unchanged blank starter can be scaffolded even when the upstream template changes. After a partial bootstrap failure, reuse that project and receipt; an authored host still requires intentional replacement. Never use `--force` merely to bypass a failed blank-host check.
+New projects use HyperFrames **0.8.38**; revisions keep the existing project's pinned version.
 
 For a supplied collection, use `--color-system custom --color-tokens <CSS_FILE>`; geometry is unchanged.
 
