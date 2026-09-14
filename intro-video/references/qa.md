@@ -1,12 +1,19 @@
 # QA: accept or reject against the brief
 
-A rendered file is a candidate, not an accepted one — but it is already the user's file. Hand it over first, name any defect you already know of in one sentence, and run these checks after that. QA decides what to say about the video and whether to propose a retry; it never decides whether the user may see it. Compare the output with the brief, keep the evidence in the workspace, and never repeat a job automatically.
+A completed render is already the user's file. Deliver its permanent URL first, name any known defect in one sentence, and keep routine QA to the technical check below. Keep evidence in the workspace and never repeat a generation job automatically.
 
-## Inspect
+## Default technical check
 
-- Probe the file: container, duration, dimensions, frame rate, audio tracks, decodability.
-- Extract frames from the opening, the closing, each scene transition, every presenter shot, and every text-dense scene. Use `okou video frames --at ...` on the managed artifact URL or a local decode.
-- Transcribe when wording, language, silence, or brand names matter: `okou video transcribe` gives timestamped segments. Verbatim mode, non-default languages, and briefs with brand terms always transcribe. Every narrated output transcribes at least its closing segment, because narration completeness cannot be judged from the duration or the frames.
+- Make one lightweight media probe for container, duration, dimensions, frame rate, and audio-track presence, plus a short decode sample. Reuse available metadata and the managed artifact URL where supported; a full-file decode is not a default requirement.
+- Report the actual duration and any material mismatch. An approximate duration mismatch alone calls for disclosure, not automatic transcription, speed changes, padding, subtitle work, or re-export.
+- For ordinary native videos, stop here. This check establishes basic file readability and parameters; it does not certify every frame, spoken word, or subtitle.
+
+## Targeted review
+
+Inspect further only for an explicit review request, a binding wording, timing, or preservation requirement, or a concrete observed problem. Select the relevant checks below instead of running the whole gate. Reuse existing evidence and stop once the required check or specific issue is resolved.
+
+- Extract only frames needed for the requested visual check or observed issue, using `okou video frames --at ...` or a local decode. Routine delivery does not scan every scene transition, presenter shot, or text-dense scene.
+- Use `okou video transcribe` for verbatim fidelity, an explicitly requested narration or subtitle review, or an observed audio problem. Reuse the transcript; neither narration being present, a non-default language, nor brand terms alone requires transcription. Ambiguous recognition is uncertainty to report, not proof of a missing word or a reason for repeated variant exports.
 - Read the recorded request: `style_id`, `avatar_id`, `voice_id`, `orientation`, script mode, the look classification from the capability check, and the prompt actually submitted.
 - When a presenter scene looks wrong and a read-only HeyGen credential is available, `GET /v3/videos/{video_id}/scenes` shows whether the presenter scenes used a derived landscape look with a baked-in environment or the raw studio look on a color background; record which one, with the look dimensions, in the workspace. A session lookup can return not found while the video and scenes endpoints work, so verify by video ID.
 
@@ -18,6 +25,8 @@ A rendered file is a candidate, not an accepted one — but it is already the us
 
 ## Native gate
 
+Use only the rows relevant to the targeted review. A technical pass alone is not a claim that this entire gate passed.
+
 | Check | Pass condition | Tier on failure |
 | --- | --- | --- |
 | Narration language | in the brief's language | A |
@@ -27,7 +36,7 @@ A rendered file is a candidate, not an accepted one — but it is already the us
 | Presenter presence | on camera where the recipe says; a native job always has a presenter, since `presenter: none` routes to controlled composition and its absence is checked by the controlled gate | A |
 | Orientation | requested landscape or portrait | A |
 | Decode | audio and video decode cleanly; no long silences (transcript gaps over a few seconds) | A |
-| Narration completeness | the transcript's last sentence is grammatically complete and carries the brief's ask or recap. Duration alone never settles this, so transcribe before judging, and always when the video came in under about 0.9× the target: a short video usually means the agent compressed a narration longer than its target and dropped the ending, which a retry with the same narration repeats | A |
+| Narration completeness | when this check is needed, the closing audio and transcript support a complete sentence carrying the brief's ask or recap; record ambiguous recognition as unverified. A short duration alone does not establish a truncated ending or trigger transcription | A when truncation is confirmed |
 | Duration, approximate | 0.8× to 1.4× the target passes; 1.4× to 1.75× is B with the overrun stated; above 1.75× or below 0.8× is A | A or B as stated |
 | Duration, verbatim | within about 20% of the pre-submission estimate | A |
 | Resolution | at least 1280×720 landscape or 720×1280 portrait; record the actual value. 1080p is a gate only on the controlled route or when the provider exposes a resolution field | B when below the baseline |
@@ -37,7 +46,7 @@ A rendered file is a candidate, not an accepted one — but it is already the us
 
 ## Controlled gate
 
-When the build was handed to `video-composition`, its four-phase review owns the composition mechanics — lint, layout, contrast, motion and the render itself — and is not repeated here. What stays with this gate on either controlled path is everything the brief fixed: the checks above, plus: no presenter in any frame when the brief says `presenter: none` — the reason that requirement routes here, so it is checked on the frames rather than assumed from the composition; every required page or segment present, in order, unstretched and uncropped; no covered text; no duplicate audio from a presenter take; original audio retained when required; the transparent presenter take has real alpha and fits without cropping essential content; the composition renders at the resolved 1920×1080 or 1080×1920. On this route presenter scene, framing, and resolution are Tier A because Okou controls them.
+When the build was handed to `video-composition`, its four-phase review owns the composition mechanics — lint, layout, contrast, motion and the render itself — and is not repeated here. Reuse that evidence for the relevant checks above and everything the brief fixed: no presenter in any frame when the brief says `presenter: none` — the reason that requirement routes here, so it is checked on the frames rather than assumed from the composition; every required page or segment present, in order, unstretched and uncropped; no covered text; no duplicate audio from a presenter take; original audio retained when required; the transparent presenter take has real alpha and fits without cropping essential content; the composition renders at the resolved 1920×1080 or 1080×1920. On this route presenter scene, framing, and resolution are Tier A because Okou controls them.
 
 ## When it fails
 
