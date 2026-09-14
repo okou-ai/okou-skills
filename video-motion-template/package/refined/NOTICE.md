@@ -1,3 +1,5 @@
+> This release re-cuts the twelve identity compositions to the official Okou brand: the wordmark uses the Okou logotype outlines (`assets/okou-motion.otf`), the mark uses the official Okou icon contour, and the palette is #242121 / #FAF5F3 / #F8A101. References to Astri below describe the earlier reviewed preset these compositions were refined under.
+
 # Notice
 
 This directory contains project-authored branding-motion work and modified portions of HyperFrames source code.
@@ -53,4 +55,4 @@ Apache-2.0 does not grant permission to use trade names, trademarks, service mar
 
 ## 2026-09-14 visual refinement
 
-The twelve compositions in this directory refine all twelve identity examples from the recovered Astri library. Changes include Geist Medium typography, two restrained colourways, shared optical geometry, revised entry timing, a continuous wordmark reveal, particles sampled from the real glyphs, and an original/refined comparison player. The font is redistributed under the license in Geist-LICENSE.txt. The recovered originals remain unchanged under ../brand-original/.
+The twelve compositions in this directory refine all twelve identity examples from the recovered Astri library. Changes include the official Okou logotype and icon, two restrained colourways, shared optical geometry, revised entry timing, a continuous wordmark reveal, particles sampled from the real glyphs, and an original/refined comparison player. The Okou logotype face in assets/okou-motion.otf is built from the official Okou brand assets. The recovered originals remain unchanged under ../brand-original/.
