@@ -84,7 +84,7 @@ The form's configuration block maps one-to-one onto the brief:
 | `HeyGen style: Let Okou choose` | resolve a concrete public style through catalogs.md; record the reason |
 | `Avatar: <name> (<look id>)` plus group / default voice lines | `presenter.avatar_id`, `presenter.group_id`; `avatar_type`, preview size, and preferred orientation from the form's `HeyGen avatar type` / `preview size` / `preferred orientation` lines when present, otherwise from the catalog preflight |
 | `Avatar: No avatar` | `presenter: none` → native: omit `avatar_id` and carry the exclusion in the prompt's no-presenter directive, which must include HeyGen's own documented line `No avatar needed, only voice-over.` — their guide states an avatar-free video requires saying so explicitly in the prompt. QA checks the rendered frames. Controlled only when the user needs the exclusion guaranteed before rendering |
-| `Avatar: Auto` (older form revision) | resolve to one concrete public look; never submit without `avatar_id` |
+| `Avatar: Auto` (older form revision), or a request that leaves the look to Okou | resolve it to one concrete public look and pass that `avatar_id`. Never submit it with the ID omitted: an omitted ID is the `No avatar` signal above, and HeyGen reads it as automatic selection, so the two would collapse into one submission |
 | `Voice: Default — follow <avatar> (<voice id>)` | `voice: default` → that look's actual default voice ID |
 | `Voice: <name> (<id>)` | exact `voice_id` |
 | `Voice: Let Okou choose` | a public voice filtered by `language` |
