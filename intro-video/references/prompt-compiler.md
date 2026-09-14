@@ -60,7 +60,7 @@ The selected presenter delivers the narration in a <tone> tone. Use the selected
 Use the selected <style name> style. This video has no on-screen presenter and no digital human at any point: it is a voice-over-only film. No avatar needed, only voice-over. Every scene is carried entirely by <footage and imagery appropriate to the subject> and motion graphics, with a <language> voice-over narrating over the visuals from beginning to end.
 ```
 
-Send no adaptation directive, FRAMING NOTE, or BACKGROUND NOTE with it; each of those describes a look, and there is none. The exclusion is a prompt direction rather than an API contract, so it is verified on the rendered frames under [QA](qa.md), not assumed.
+Keep `No avatar needed, only voice-over.` exactly as written: it is HeyGen's own documented phrasing for an avatar-free video, and their guide states the exclusion must be said explicitly in the prompt. Send no adaptation directive, FRAMING NOTE, or BACKGROUND NOTE with it; each of those describes a look, and there is none. The exclusion is a prompt direction rather than an API contract, so it is verified on the rendered frames under [QA](qa.md), not assumed.
 
 **Presenter adaptation directive** (own paragraph after the brief paragraph; every look that is not already a landscape or portrait image with a real environment; fill in `16:9 landscape` or `9:16 portrait`; never name an engine):
 
