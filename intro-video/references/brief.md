@@ -64,9 +64,7 @@ Duration and narration are decided together, in both modes: draft the narration 
 | Narration language | Initial pace for estimates |
 | --- | --- |
 | English | about 150 words per minute |
-| Chinese | about 330 characters per minute, provisional |
-
-Use the Chinese pace as the shared starting estimate for all voices and generation routes. For Chinese-only narration, count spoken Chinese characters, excluding punctuation and whitespace, and calculate `narration_seconds = character_count * 60 / 330`. Record the pace with the duration estimate, and refine the estimate from measured output when available.
+| Chinese | about 330 characters per minute |
 
 In adapt mode, count the drafted narration, convert it at that pace, and round the target **up** to the nearest five seconds. Up, because the opening, the transitions and the end card occupy timeline the narration does not, so a target at or below the spoken length leaves the agent no room: it compresses, and what it drops is the last sentence — the ask or the recap. A narration longer than the target it ships with is never submitted; cut key messages until it fits, or raise the target if the recipe band allows.
 
@@ -74,7 +72,7 @@ A narration well short of the target is a mismatch too. With a target you derive
 
 In verbatim mode the duration follows the script: estimate it from the script length at the pace above, record the estimate as both `narration_seconds` and the expected length, and do not state a different target.
 
-These are starting estimates. Estimate from the narration that will actually be submitted; when the user locks wording, use that verbatim script and recalculate after any user-approved edit. Measure finished duration from the media and check the actual transcript, including the ending. If the provider rewrites narration, keep the submitted and spoken character counts separate when recalibrating; the draft's character count is not the output's count. Exact timing still selects the controlled route.
+These are starting estimates; the transcript of the finished video is the actual measurement.
 
 ## Mapping the entry form
 
