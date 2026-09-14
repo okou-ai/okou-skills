@@ -73,7 +73,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/mask-sweep-lockup.jpg",
+   "previewImage": "previews/mask-sweep-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -137,7 +137,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/stroke-draw-lockup.jpg",
+   "previewImage": "previews/stroke-draw-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -201,7 +201,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/particle-logo-reveal.jpg",
+   "previewImage": "previews/particle-logo-reveal.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -265,7 +265,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/parts-assemble-lockup.jpg",
+   "previewImage": "previews/parts-assemble-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -329,7 +329,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/impact-logo-sting.jpg",
+   "previewImage": "previews/impact-logo-sting.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -393,7 +393,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/letter-cascade-close.jpg",
+   "previewImage": "previews/letter-cascade-close.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -457,7 +457,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/calm-brand-lockup.jpg",
+   "previewImage": "previews/calm-brand-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -521,7 +521,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/ink-bleed-lockup.jpg",
+   "previewImage": "previews/ink-bleed-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -585,7 +585,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/slit-scan-lockup.jpg",
+   "previewImage": "previews/slit-scan-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -649,7 +649,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/facet-morph-lockup.jpg",
+   "previewImage": "previews/facet-morph-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -713,7 +713,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/wordmark-tiles-lockup.jpg",
+   "previewImage": "previews/wordmark-tiles-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -777,7 +777,7 @@
    "speeds": [
     "standard"
    ],
-   "previewImage": "previews/okou-particle-lockup.jpg",
+   "previewImage": "previews/okou-particle-lockup.jpg?v=okou1",
    "sourceReview": "../#refined",
    "provenance": {
     "upstream": "vm0-ai/Template-artifact",
@@ -841,7 +841,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/mask.jpg",
+   "previewImage": "previews/mask.jpg?v=okou1",
    "sourceReview": "../#study=mask",
    "provenance": {
     "kind": "original-study",
@@ -907,7 +907,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/iris.jpg",
+   "previewImage": "previews/iris.jpg?v=okou1",
    "sourceReview": "../#study=iris",
    "provenance": {
     "kind": "original-study",
@@ -972,7 +972,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/stroke.jpg",
+   "previewImage": "previews/stroke.jpg?v=okou1",
    "sourceReview": "../#study=stroke",
    "provenance": {
     "kind": "original-study",
@@ -1037,7 +1037,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/negative.jpg",
+   "previewImage": "previews/negative.jpg?v=okou1",
    "sourceReview": "../#study=negative",
    "provenance": {
     "kind": "original-study",
@@ -1102,7 +1102,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/particles.jpg",
+   "previewImage": "previews/particles.jpg?v=okou1",
    "sourceReview": "../#study=particles",
    "provenance": {
     "kind": "original-study",
@@ -1167,7 +1167,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/dissolve.jpg",
+   "previewImage": "previews/dissolve.jpg?v=okou1",
    "sourceReview": "../#study=dissolve",
    "provenance": {
     "kind": "original-study",
@@ -1232,7 +1232,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/shards.jpg",
+   "previewImage": "previews/shards.jpg?v=okou1",
    "sourceReview": "../#study=shards",
    "provenance": {
     "kind": "original-study",
@@ -1298,7 +1298,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/tiles.jpg",
+   "previewImage": "previews/tiles.jpg?v=okou1",
    "sourceReview": "../#study=tiles",
    "provenance": {
     "kind": "original-study",
@@ -1363,7 +1363,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/monogram.jpg",
+   "previewImage": "previews/monogram.jpg?v=okou1",
    "sourceReview": "../#study=monogram",
    "provenance": {
     "kind": "original-study",
@@ -1428,7 +1428,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/letters.jpg",
+   "previewImage": "previews/letters.jpg?v=okou1",
    "sourceReview": "../#study=letters",
    "provenance": {
     "kind": "original-study",
@@ -1493,7 +1493,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/spring.jpg",
+   "previewImage": "previews/spring.jpg?v=okou1",
    "sourceReview": "../#study=spring",
    "provenance": {
     "kind": "original-study",
@@ -1559,7 +1559,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/ribbon.jpg",
+   "previewImage": "previews/ribbon.jpg?v=okou1",
    "sourceReview": "../#study=ribbon",
    "provenance": {
     "kind": "original-study",
@@ -1625,7 +1625,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/liquid.jpg",
+   "previewImage": "previews/liquid.jpg?v=okou1",
    "sourceReview": "../#study=liquid",
    "provenance": {
     "kind": "original-study",
@@ -1690,7 +1690,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/light.jpg",
+   "previewImage": "previews/light.jpg?v=okou1",
    "sourceReview": "../#study=light",
    "provenance": {
     "kind": "original-study",
@@ -1755,7 +1755,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/glass.jpg",
+   "previewImage": "previews/glass.jpg?v=okou1",
    "sourceReview": "../#study=glass",
    "provenance": {
     "kind": "original-study",
@@ -1820,7 +1820,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/focus.jpg",
+   "previewImage": "previews/focus.jpg?v=okou1",
    "sourceReview": "../#study=focus",
    "provenance": {
     "kind": "original-study",
@@ -1886,7 +1886,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/depth.jpg",
+   "previewImage": "previews/depth.jpg?v=okou1",
    "sourceReview": "../#study=depth",
    "provenance": {
     "kind": "original-study",
@@ -1952,7 +1952,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/orbit.jpg",
+   "previewImage": "previews/orbit.jpg?v=okou1",
    "sourceReview": "../#study=orbit",
    "provenance": {
     "kind": "original-study",
@@ -2017,7 +2017,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/portal.jpg",
+   "previewImage": "previews/portal.jpg?v=okou1",
    "sourceReview": "../#study=portal",
    "provenance": {
     "kind": "original-study",
@@ -2083,7 +2083,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/fold.jpg",
+   "previewImage": "previews/fold.jpg?v=okou1",
    "sourceReview": "../#study=fold",
    "provenance": {
     "kind": "original-study",
@@ -2149,7 +2149,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/flash.jpg",
+   "previewImage": "previews/flash.jpg?v=okou1",
    "sourceReview": "../#study=flash",
    "provenance": {
     "kind": "original-study",
@@ -2214,7 +2214,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/glitch.jpg",
+   "previewImage": "previews/glitch.jpg?v=okou1",
    "sourceReview": "../#study=glitch",
    "provenance": {
     "kind": "original-study",
@@ -2279,7 +2279,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/scan.jpg",
+   "previewImage": "previews/scan.jpg?v=okou1",
    "sourceReview": "../#study=scan",
    "provenance": {
     "kind": "original-study",
@@ -2344,7 +2344,7 @@
     "standard",
     "slow"
    ],
-   "previewImage": "previews/echo.jpg",
+   "previewImage": "previews/echo.jpg?v=okou1",
    "sourceReview": "../#study=echo",
    "provenance": {
     "kind": "original-study",
