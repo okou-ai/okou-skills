@@ -61,15 +61,12 @@ The entry form never asks for intent, duration, language, tone, or CTA. Infer ea
 
 Duration and narration are decided together, in both modes: draft the narration first, measure it with the calibration below, record the result as `narration_seconds`, and derive `target_seconds` from it. A recipe's duration entry is the band the finished video should land in, not a menu to pick from; never fix the target at a band's low end and then write more narration than that target holds. A number the user actually asked for is the one exception, and then the narration is cut to fit it.
 
-| Narration scope | Initial pace for estimates |
+| Narration language | Initial pace for estimates |
 | --- | --- |
-| Native HeyGen Video Agent, Chinese, voice `de650d5d1a7f46c4a6e1549d127d250c` (the observed default for Minho in Blue shirt, `Minho_public_6`) | about 330 characters per minute, provisional |
 | English | about 150 words per minute |
-| Chinese without a matching voice-and-route calibration | about 220 characters per minute |
+| Chinese | about 330 characters per minute, provisional |
 
-Resolve `voice: default` to the selected look's actual voice ID before choosing a pace. Apply the Minho estimate only when the route, language, and voice ID all match; a presenter name alone is not a match, and this estimate does not apply to controlled-route speech generation. Record the selected pace and its basis with the duration estimate. For Chinese-only narration, count spoken Chinese characters, excluding punctuation and whitespace, and calculate `narration_seconds = character_count * 60 / characters_per_minute`.
-
-The provisional 330 rate comes from one native Ancestral Paper-Cut run: about 118 transcribed Chinese characters over 21.21 seconds, roughly 334 characters per minute. That run allowed rewriting and had an incomplete ending; this is a rough rate over the whole clip, not a verified verbatim or speech-only measurement. Refine it with comparable finished outputs using the same route, language, and voice. It is an estimation input, not a provider speed setting or a duration guarantee.
+Use the Chinese pace as the shared starting estimate for all voices and generation routes. For Chinese-only narration, count spoken Chinese characters, excluding punctuation and whitespace, and calculate `narration_seconds = character_count * 60 / 330`. Record the pace with the duration estimate, and refine the estimate from measured output when available.
 
 In adapt mode, count the drafted narration, convert it at that pace, and round the target **up** to the nearest five seconds. Up, because the opening, the transitions and the end card occupy timeline the narration does not, so a target at or below the spoken length leaves the agent no room: it compresses, and what it drops is the last sentence — the ask or the recap. A narration longer than the target it ships with is never submitted; cut key messages until it fits, or raise the target if the recipe band allows.
 
