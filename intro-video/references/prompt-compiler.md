@@ -5,8 +5,8 @@ The prompt is HeyGen Video Agent's whole content interface. `style_id`, `avatar_
 ## Skeleton
 
 ```text
-<brief paragraph>
-<presenter adaptation directive, for any look without a baked-in environment>
+<brief paragraph, with the presenter sentences or the no-presenter directive>
+<presenter adaptation directive, for any look without a baked-in environment; omitted with no presenter>
 
 Narration:
 “<script, or one narration paragraph written from the key messages, in the narration language>”
@@ -25,6 +25,8 @@ CRITICAL ON-SCREEN TEXT (display literally):
 <BACKGROUND NOTE, only when triggered>
 ```
 
+With `presenter: none`, the brief paragraph takes the no-presenter directive in place of the three presenter sentences, and the adaptation directive, FRAMING NOTE, and BACKGROUND NOTE are all omitted: there is no look, so none of them has a subject. Every other slot is unchanged.
+
 ## Why the skeleton looks like this
 
 - Filling the output width with a near-square studio look can crop the head. Fitting it inside the frame or deriving a look suited to the output reduces that risk. Video Agent exposes no fit field, so the presenter sentences and adaptation directive describe the requested composition.
@@ -34,7 +36,7 @@ CRITICAL ON-SCREEN TEXT (display literally):
 
 ## Slots
 
-1. **Brief paragraph** (English). One format sentence: kind of video, one approximate length, orientation, narration language, audience; in verbatim mode say `The narration length follows the script below.` instead of a length. Then the three presenter sentences below, in that order — every native prompt is a presenter run, because `presenter: none` routes to controlled composition. Optionally one placement sentence (`The selected presenter opens and closes on camera.`). Refer to the presenter only as "the selected presenter". For any look without a baked-in environment (`studio_avatar`, `digital_twin`, or a transparent, solid, or empty preview) add the presenter adaptation directive as its own paragraph right after the brief paragraph, with the output orientation filled in.
+1. **Brief paragraph** (English). One format sentence: kind of video, one approximate length, orientation, narration language, audience; in verbatim mode say `The narration length follows the script below.` instead of a length. Then either the three presenter sentences below, in that order, or — with `presenter: none` — the no-presenter directive in their place. Optionally one placement sentence (`The selected presenter opens and closes on camera.`). Refer to the presenter only as "the selected presenter". For any look without a baked-in environment (`studio_avatar`, `digital_twin`, or a transparent, solid, or empty preview) add the presenter adaptation directive as its own paragraph right after the brief paragraph, with the output orientation filled in.
 2. **Narration** (narration language). Adapt mode: `Narration:` followed by the script or one flowing paragraph composed from the key messages in arc order, in quotation marks, with no scene labels and no timestamps at any length. The skeleton is the default form; HeyGen's scene-by-scene level is a deliberate departure from it, with the cost recorded in [recipes](recipes.md). Verbatim mode: `Script (narrate exactly as written):` followed by the script unchanged.
 3. **CRITICAL ON-SCREEN TEXT** block: one quoted string per line from `on_screen_text`. Without it the agent rephrases numbers and quotes; long strings get split across cards.
 4. **Attachment sentences** (English), one per `show` attachment: `Use the attached <what> as B-roll when <topic>.` `Display the attached logo in the intro and the end card.` An attached file without a usage sentence is ignored.
@@ -51,6 +53,14 @@ The framing clauses below express the default `framing: safe` goal. If the user 
 ```text
 The selected presenter delivers the narration in a <tone> tone. Use the selected <style name> style. Keep the entire head and hair visible in every presenter shot.
 ```
+
+**No-presenter directive** (brief paragraph, `presenter: none` only, in place of the three presenter sentences; fill the placeholders, keep the wording):
+
+```text
+Use the selected <style name> style. This video has no on-screen presenter and no digital human at any point: it is a voice-over-only film. No avatar needed, only voice-over. Every scene is carried entirely by <footage and imagery appropriate to the subject> and motion graphics, with a <language> voice-over narrating over the visuals from beginning to end.
+```
+
+Keep `No avatar needed, only voice-over.` exactly as written: it is HeyGen's own documented phrasing for an avatar-free video, and their guide states the exclusion must be said explicitly in the prompt. Send no adaptation directive, FRAMING NOTE, or BACKGROUND NOTE with it; each of those describes a look, and there is none. The exclusion is a prompt direction rather than an API contract, so it is verified on the rendered frames under [QA](qa.md), not assumed.
 
 **Presenter adaptation directive** (own paragraph after the brief paragraph; every look that is not already a landscape or portrait image with a real environment; fill in `16:9 landscape` or `9:16 portrait`; never name an engine):
 
@@ -123,7 +133,7 @@ The notes guide the agent; `POST /v3/video-agents` has no background, crop, scal
 - For authored or adapted narration, end on the ask or recap as a complete sentence. An end card or CTA line repeats that thought on screen. Do not add or rewrite a closing sentence in verbatim copy.
 - Positive framing: describe what to show, not what to avoid. Restrictive lists make the agent play safe.
 - No per-scene timestamps and no layout coordinates. Describe motion with verbs (counts up, slides in, draws itself) only when a description is needed at all.
-- With `avatar_id`, say "the selected presenter"; the look supplies hair, clothing, and everything else about the person.
+- With `avatar_id`, say "the selected presenter"; the look supplies hair, clothing, and everything else about the person. With `presenter: none`, name no person at all and let the production lines carry every scene.
 - One topic per video; split multi-topic requests.
 - Narration and on-screen strings in the brief's language; every directive, note, and production line in English.
 - Name the selected style once, in the brief paragraph.
