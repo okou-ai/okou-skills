@@ -13,6 +13,14 @@ Read `okou video camera --help` for the installed interface; it requires `ffmpeg
 
 `droppedOutOfFrameClicks` is the floor for what any plan can cover: those clicks landed outside the captured content and no framing brings them back.
 
+A desktop capture is usually variable frame rate: `avg_frame_rate` and `r_frame_rate` disagree and the real frame count sits well below duration × nominal fps. Any later frame-index work must put an `fps=` filter ahead of the selection, or indices computed from the timeline address frames the file does not contain and the extraction silently comes up short:
+
+```bash
+ffmpeg -i recording.mp4 -vf "fps=30,select='eq(n\,150)+eq(n\,420)'" -vsync 0 frame_%03d.jpg
+```
+
+The sidecar carries two different geometries and only one of them is pixel-accurate. `clicks[].frame` is the click position the renderer consumes. `clicks[].element.frame` is accessibility geometry and has been observed tens of pixels off the rendered pixels on a macOS capture, so do not compose against it.
+
 ## Step 2 — Render the automatic first cut
 
 ```bash
@@ -26,6 +34,16 @@ Keep this cut. It is the algorithm's own answer, it costs nothing to deliver alo
 ## Step 3 — Review the first cut on frames, not on counts
 
 Open the checkpoint frames named in the review manifest. They are the acceptance evidence: `clicksOutsideFrame` says nothing about whether the clicked control is legible, whether a dialog's edge spills into the page behind it, or whether the payoff frame keeps the text the video exists to show.
+
+Open them in batches. A 3×3 tile of nine output frames scaled to 2560px wide stays legible down to button labels, because the camera move has already magnified them 1.6–2.5×; one look covers a whole pass, where reading them singly costs a round trip each. Unmagnified source frames take a 2×2 at the same width. Reserve a full-size read for the one or two frames the tile shows as wrong.
+
+```bash
+ffmpeg -i cp-005-output.jpg -i cp-013-output.jpg -i cp-018-output.jpg \
+       -i cp-026-output.jpg -i cp-033-output.jpg -i cp-041-output.jpg \
+       -i cp-046-output.jpg -i cp-051-output.jpg -i cp-059-output.jpg \
+  -filter_complex "[0:v][1:v][2:v]hstack=3[a];[3:v][4:v][5:v]hstack=3[b];\
+[6:v][7:v][8:v]hstack=3[c];[a][b][c]vstack=3,scale=2560:-2" -frames:v 1 tile.jpg
+```
 
 Read the manifest's `clicks[].inFrame` against the Step 1 floor: matching `droppedOutOfFrameClicks` is a pass, anything above it is a framing to fix. A click can be flagged while plainly visible — the check wants margin, not mere containment, measured in output pixels, so a click near the top of the frame needs a tighter shot to clear it.
 
@@ -47,6 +65,14 @@ Each `shots[].keys[]` entry is one move: it starts at `startMs`, runs for `durat
 - `baseZoom` is where the camera sits before the first key and after a pull-back.
 
 Edit for rest, not for coverage: group clicks that share a region under one framing, hold it while the interface responds, and spend the moves on the beats that carry meaning — the choice being made, the state that changed, the final screen. Align each shot's edges to the thing being shown (a dialog's own border, the full chip, the button and its label) so nothing important is half-cut. Re-render, then re-read the same checkpoint frames; a plan that no longer flags a click can still have introduced a worse composition.
+
+Measure those edges; do not estimate them by eye. One row of greyscale pixels names every card gap, dialog border and padding edge to the pixel, and a column does the same for top and bottom:
+
+```bash
+ffmpeg -ss <t> -i recording.mp4 -frames:v 1 -vf "crop=<width>:1:0:<y>,format=gray" -f rawvideo -
+```
+
+Runs of bright values are the gaps between cards and the dialog's own background; runs of dark values are thumbnails and text rows; the first long run of pure black at the right names `content`'s edge and cross-checks the sidecar. Eyes are for judging whether a composition reads, not for reading coordinates off a frame.
 
 ## Step 5 — Add audio only if the brief asks for it
 
