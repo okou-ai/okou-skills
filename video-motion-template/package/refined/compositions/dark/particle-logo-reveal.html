@@ -10,9 +10,10 @@
 .parts-assemble-lockup-part:nth-of-type(1){clip-path:inset(0 0 66.7% 0)}
 .parts-assemble-lockup-part:nth-of-type(2){clip-path:inset(33.3% 0 33.3% 0)}
 .parts-assemble-lockup-part:nth-of-type(3){clip-path:inset(66.7% 0 0 0)}
-</style><script>function okouBrandBitmap(root, word, mark) {
-  const bitmap=document.createElement('canvas');bitmap.width=1920;bitmap.height=1080;
+</style><script>function okouBrandBitmap(root, word, mark, scale = 1, crop = { x: 0, y: 0, width: 1920, height: 1080 }) {
+  const bitmap=document.createElement('canvas');bitmap.width=Math.round(crop.width*scale);bitmap.height=Math.round(crop.height*scale);
   const context=bitmap.getContext('2d',{willReadFrequently:true}),rootBox=root.getBoundingClientRect();
+  context.setTransform(scale,0,0,scale,-crop.x*scale,-crop.y*scale);
   for(const letter of word.children){
     const box=letter.getBoundingClientRect(),s=getComputedStyle(letter);
     context.font=s.fontWeight+' '+s.fontSize+' "Okou Motion"';context.fillStyle=s.color;
@@ -276,12 +277,11 @@ window.OKOU_ICON_PATH="M137.9 69.622C137.9 60.7513 133.387 52.9503 126.538 48.35
             var wordmark = readText(vars.wordmark, "kou") || "kou";
             var tagline = readText(vars.tagline, "");
             var url = readText(vars.url, "");
-            var direction = "ltr";
             var exit =
               vars.exit === "fade" || vars.exit === "up" ? vars.exit : "none";
-            var densityCounts = { low: 700, med: 1400, high: 2200 };
+            var densityCells = { low: 12, med: 8, high: 6 };
             var density = Object.prototype.hasOwnProperty.call(
-              densityCounts,
+              densityCells,
               vars.density,
             )
               ? vars.density
@@ -347,137 +347,143 @@ window.OKOU_ICON_PATH="M137.9 69.622C137.9 60.7513 133.387 52.9503 126.538 48.35
             var box = root.getBoundingClientRect();
             var cssWidth = Math.max(1, Math.round(box.width) || 1920);
             var cssHeight = Math.max(1, Math.round(box.height) || 1080);
-            canvas.width = Math.round(cssWidth * dpr);
-            canvas.height = Math.round(cssHeight * dpr);
             var context = canvas.getContext("2d");
-            var minDimension = Math.min(canvas.width, canvas.height);
-            var count = densityCounts[density];
 
 
-            // Sample the actual settled glyphs and original mark, once at setup.
-            // Particles belong to the identity instead of a full-frame dot field.
-            var glyphCanvas=document.createElement("canvas");glyphCanvas.width=cssWidth;glyphCanvas.height=cssHeight;
-            var glyphContext=glyphCanvas.getContext("2d",{willReadFrequently:true});
-            var rootBox=root.getBoundingClientRect();
-            Array.from(wordmarkElement.children).forEach(function(letter){
-              var r=letter.getBoundingClientRect(),st=getComputedStyle(letter);
-              glyphContext.font=st.fontWeight+" "+st.fontSize+' "Okou Motion"';glyphContext.fillStyle=st.color;
-              var m=glyphContext.measureText(letter.textContent),asc=m.fontBoundingBoxAscent,desc=m.fontBoundingBoxDescent;
-              var baseline=r.top-rootBox.top+(parseFloat(st.lineHeight)-asc-desc)/2+asc;
-              glyphContext.fillText(letter.textContent,r.left-rootBox.left,baseline);
-            });
-            var mr=root.querySelector(".plr-mark").getBoundingClientRect();
-            glyphContext.save();glyphContext.translate(mr.left-rootBox.left,mr.top-rootBox.top);glyphContext.scale(mr.width/138,mr.height/140);
-            glyphContext.fillStyle=markColor;glyphContext.fill(new Path2D(window.OKOU_ICON_PATH));glyphContext.restore();
-            var glyphData=glyphContext.getImageData(0,0,cssWidth,cssHeight).data,glyphSamples=[];
-            var glyphLeft=cssWidth,glyphRight=0;
-            for(var gy=0;gy<cssHeight;gy+=4)for(var gx=0;gx<cssWidth;gx+=4){
-              var gi=(gy*cssWidth+gx)*4;if(glyphData[gi+3]>180){glyphSamples.push({x:gx/cssWidth,y:gy/cssHeight,color:"rgb("+glyphData[gi]+","+glyphData[gi+1]+","+glyphData[gi+2]+")"});glyphLeft=Math.min(glyphLeft,gx/cssWidth);glyphRight=Math.max(glyphRight,gx/cssWidth);}
-            }
-            if(!glyphSamples.length)throw new Error("Brand glyph sampling produced no points");
-            var particles = (function () {
-              var state = 0x50a71c1e;
 
-              function next() {
-                state = (Math.imul(1664525, state) + 1013904223) >>> 0;
-                return state / 4294967296;
-              }
-
-              var rows = [];
-              for (var index = 0; index < count; index += 1) {
-                var target=glyphSamples[Math.floor(next()*glyphSamples.length)];
-                var targetX = target.x;
-                var targetY = target.y;
-                var key =
-                  direction === "center"
-                    ? Math.min(
-                        1,
-                        Math.hypot(targetX - 0.5, targetY - 0.5) / 0.7071,
-                      )
-                    : (targetX-glyphLeft)/(glyphRight-glyphLeft);
-                var arrive = 0.24 + 0.66 * key + 0.04 * next();
-                var travel = 0.2 + 0.12 * next();
-                var fade = 0.05 + 0.04 * next();
-                var angle;
-                if (direction === "center") {
-                  angle = Math.atan2(targetY - 0.5, targetX - 0.5);
-                  if (targetX === 0.5 && targetY === 0.5)
-                    angle = next() * Math.PI * 2;
-                } else {
-                  angle = Math.PI + (next() - 0.5) * (Math.PI / 2);
+            // Both the travelling particles and the solid reveal use the same
+            // settled Okou bitmap. Coordinates remain in CSS pixels at any DPR.
+            var glyphCanvas = okouBrandBitmap(root, wordmarkElement, root.querySelector(".plr-mark"));
+            var glyphData = glyphCanvas.getContext("2d", { willReadFrequently: true })
+              .getImageData(0, 0, cssWidth, cssHeight).data;
+            var cellSize = densityCells[density];
+            var samples = [], glyphLeft = cssWidth, glyphRight = 0, glyphTop = cssHeight, glyphBottom = 0;
+            for (var gy = 0; gy < cssHeight; gy += cellSize) {
+              for (var gx = 0; gx < cssWidth; gx += cellSize) {
+                var best = null, bestDistance = Infinity;
+                for (var py = gy; py < Math.min(gy + cellSize, cssHeight); py++) {
+                  for (var px = gx; px < Math.min(gx + cellSize, cssWidth); px++) {
+                    var gi = (py * cssWidth + px) * 4;
+                    if (!glyphData[gi + 3]) continue;
+                    var distance = Math.hypot(px - gx - cellSize / 2, py - gy - cellSize / 2);
+                    if (distance < bestDistance) {
+                      bestDistance = distance;
+                      best = { x: px, y: py, color: "rgb(" + glyphData[gi] + "," + glyphData[gi + 1] + "," + glyphData[gi + 2] + ")" };
+                    }
+                  }
                 }
-                rows.push({
-                  color: target.color,
-                  targetX: targetX,
-                  targetY: targetY,
-                  arrive: Math.min(0.94, arrive),
-                  birth: Math.max(0, arrive - travel),
-                  fade: fade,
-                  offset: (0.035 + 0.055 * next()) * minDimension,
-                  offsetX: Math.cos(angle),
-                  offsetY: Math.sin(angle),
-                  radius: (0.85 + 0.55 * next()) * (minDimension / 1080),
-                  dim: 0.55 + 0.45 * next(),
-                });
+                if (best) {
+                  samples.push(best);
+                  glyphLeft = Math.min(glyphLeft, best.x);
+                  glyphRight = Math.max(glyphRight, best.x);
+                  glyphTop = Math.min(glyphTop, best.y);
+                  glyphBottom = Math.max(glyphBottom, best.y);
+                }
               }
-              return rows;
-            })();
+            }
+            if (!samples.length) throw new Error("Brand glyph sampling produced no points");
 
-            function clamp01(value) {
-              return value < 0 ? 0 : value > 1 ? 1 : value;
+            // Rasterise only the identity and its short travel margin. Full-frame
+            // masks multiply the cost of every frame on high-density displays.
+            var inkBounds = { x: glyphLeft - cellSize, y: glyphTop - cellSize,
+              width: glyphRight - glyphLeft + cellSize * 2 + 1,
+              height: glyphBottom - glyphTop + cellSize * 2 + 1 };
+            var inkBitmap = okouBrandBitmap(root, wordmarkElement,
+              root.querySelector(".plr-mark"), dpr, inkBounds);
+            glyphCanvas = null;
+            glyphData = null;
+            var canvasBounds = { x: inkBounds.x - 112, y: inkBounds.y - 112,
+              width: inkBounds.width + 224, height: inkBounds.height + 224 };
+            canvas.width = Math.round(canvasBounds.width * dpr);
+            canvas.height = Math.round(canvasBounds.height * dpr);
+            Object.assign(canvas.style, { inset: "auto", left: canvasBounds.x + "px",
+              top: canvasBounds.y + "px", width: canvasBounds.width + "px", height: canvasBounds.height + "px" });
+
+            var revealMask = document.createElement("canvas");
+            var solidInk = document.createElement("canvas");
+            revealMask.width = solidInk.width = inkBitmap.width;
+            revealMask.height = solidInk.height = inkBitmap.height;
+            var maskContext = revealMask.getContext("2d");
+            var inkContext = solidInk.getContext("2d");
+            maskContext.setTransform(dpr, 0, 0, dpr, -inkBounds.x * dpr, -inkBounds.y * dpr);
+            context.setTransform(dpr, 0, 0, dpr, -canvasBounds.x * dpr, -canvasBounds.y * dpr);
+
+            // Every occupied cell has one particle: no duplicate random samples
+            // and no uncovered parts of the identity at the handoff.
+            var seed = 0x50a71c1e;
+            function next() {
+              seed = (Math.imul(1664525, seed) + 1013904223) >>> 0;
+              return seed / 4294967296;
+            }
+            var particles = samples.map(function (target) {
+              var key = (target.x - glyphLeft) / Math.max(1, glyphRight - glyphLeft);
+              var arrive = 0.20 + 0.52 * key + 0.12 * next();
+              var travel = 0.22 + 0.14 * next();
+              var angle = Math.PI + (next() - 0.5) * Math.PI * 0.65;
+              var offset = 48 + 56 * next();
+              return {
+                targetX: target.x, targetY: target.y, color: target.color,
+                arrive: arrive, birth: Math.max(0, arrive - travel),
+                offsetX: Math.cos(angle) * offset, offsetY: Math.sin(angle) * offset,
+                radius: 1.05 + 0.50 * next(), dim: 0.72 + 0.28 * next(),
+              };
+            });
+
+            function clamp01(value) { return Math.max(0, Math.min(1, value)); }
+            function smooth(value) {
+              value = clamp01(value);
+              return value * value * (3 - 2 * value);
             }
 
             function paint(timeSeconds) {
-              context.clearRect(0, 0, canvas.width, canvas.height);
               var progress = IN > 0 ? clamp01(timeSeconds / IN) : 1;
-              var endClamp = clamp01((1 - progress) / 0.05);
-              if (endClamp === 0) return;
-              var thin = 1 - 0.4 * clamp01((progress - 0.72) / 0.28);
-              context.fillStyle = markColor;
-              for (var index = 0; index < particles.length; index += 1) {
+              var handoff = smooth((progress - 0.95) / 0.05);
+              // By 94% every cell is solid. Put the identical DOM artwork below
+              // it before fading the canvas, avoiding a complementary-alpha dip.
+              lockup.style.opacity = progress >= 0.95 ? "1" : "0";
+              context.clearRect(canvasBounds.x, canvasBounds.y, canvasBounds.width, canvasBounds.height);
+              if (handoff === 1) return;
+              maskContext.clearRect(inkBounds.x, inkBounds.y, inkBounds.width, inkBounds.height);
+              maskContext.fillStyle = "#fff";
+              for (var index = 0; index < particles.length; index++) {
                 var row = particles[index];
-                var travel = clamp01(
-                  (progress - row.birth) /
-                    Math.max(0.001, row.arrive - row.birth),
-                );
-                if (travel <= 0) continue;
-                var settled = clamp01((progress - row.arrive) / row.fade);
-                var alpha =
-                  clamp01(travel / 0.14) *
-                  (1 - settled) *
-                  endClamp *
-                  thin *
-                  row.dim *
-                  0.92;
+                var settled = smooth((progress - row.arrive) / 0.10);
+                if (settled <= 0) continue;
+                maskContext.globalAlpha = settled;
+                maskContext.beginPath();
+                maskContext.arc(row.targetX, row.targetY,
+                  row.radius + cellSize * 1.45 * settled, 0, Math.PI * 2);
+                maskContext.fill();
+              }
+              maskContext.globalAlpha = 1;
+              inkContext.clearRect(0, 0, solidInk.width, solidInk.height);
+              inkContext.globalCompositeOperation = "source-over";
+              inkContext.drawImage(inkBitmap, 0, 0);
+              inkContext.globalCompositeOperation = "destination-in";
+              inkContext.drawImage(revealMask, 0, 0);
+              inkContext.globalCompositeOperation = "source-over";
+              context.globalAlpha = 1 - handoff;
+              context.drawImage(solidInk, inkBounds.x, inkBounds.y, inkBounds.width, inkBounds.height);
+
+              for (var index = 0; index < particles.length; index++) {
+                var row = particles[index];
+                var travel = clamp01((progress - row.birth) / Math.max(0.001, row.arrive - row.birth));
+                var settled = smooth((progress - row.arrive) / 0.10);
+                var alpha = smooth(travel / 0.20) * (1 - settled) * row.dim * (1 - handoff);
                 if (alpha <= 0.002) continue;
-                var eased = 1 - Math.pow(1 - travel, 3);
-                var x =
-                  row.targetX * canvas.width +
-                  row.offsetX * row.offset * (1 - eased);
-                var y =
-                  row.targetY * canvas.height +
-                  row.offsetY * row.offset * (1 - eased);
-                var radius = row.radius * dpr * (0.6 + 0.4 * (1 - settled));
-                context.fillStyle=row.color;
+                var remaining = Math.pow(1 - travel, 3);
+                context.fillStyle = row.color;
                 context.globalAlpha = alpha;
                 context.beginPath();
-                context.arc(x, y, radius, 0, Math.PI * 2);
+                context.arc(row.targetX + row.offsetX * remaining,
+                  row.targetY + row.offsetY * remaining, row.radius, 0, Math.PI * 2);
                 context.fill();
               }
               context.globalAlpha = 1;
             }
 
-            var clipFrom =
-              direction === "center"
-                ? "circle(0% at 50% 50%)"
-                : "inset(0% 100% 0% 0%)";
-            var clipTo =
-              direction === "center"
-                ? "circle(75% at 50% 50%)"
-                : "inset(0% 0% 0% 0%)";
-
             gsap.set(stage, { opacity: 1, y: "0cqh" });
-            gsap.set(lockup, { opacity: 0, clipPath: clipFrom });
+            gsap.set(lockup, { opacity: 0, clipPath: "none" });
 
             var tl = gsap.timeline({
               paused: true,
@@ -491,14 +497,6 @@ window.OKOU_ICON_PATH="M137.9 69.622C137.9 60.7513 133.387 52.9503 126.538 48.35
               { progress: 1, duration: duration, ease: "none" },
               0,
             );
-            tl.set(lockup,{opacity:1},IN*.18);
-            tl.fromTo(
-              lockup,
-              { clipPath: clipFrom },
-              { clipPath: clipTo, duration: IN * 0.74, ease: "power2.inOut" },
-              IN * 0.22,
-            );
-
             if (exit === "up") {
               tl.to(
                 stage,
