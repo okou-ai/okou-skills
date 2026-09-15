@@ -24,7 +24,7 @@ Preparation does not select the route. File extensions, MIME types, and source m
 | Existing HyperFrames project | If the user explicitly asks to preserve, edit, or render the project, read and validate it for controlled composition. Otherwise extract useful facts and assets for native generation; Video Agent reads the supported reference formats below, not an editable timeline. |
 | Other or corrupt file | Try the available reader/converter. Name the specific unreadable input, and continue only if it is nonessential to a faithful result. |
 
-A screen recording is an ordinary video input. With a synchronized same-stem `.clicks.json` sidecar, use `okou video camera --help` for the existing camera plan/review flow; the flow runs on a real sidecar the recording shipped with.
+A screen recording is an ordinary video input, with one exception: a synchronized same-stem `.clicks.json` sidecar selects the camera route in SKILL.md Step 2, and [screen recording](screen-recording.md) owns its preparation and execution. Without such a sidecar, prepare the recording under the video row above.
 
 ## Keep limits attached to their actual endpoint
 

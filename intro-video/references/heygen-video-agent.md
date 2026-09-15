@@ -21,6 +21,8 @@ With `avatar_id` resolved, use the look classification from [managed catalogs](c
 - `studio_avatar`, `digital_twin`, or any transparent, solid, or visually empty preview → BACKGROUND NOTE, plus the matching FRAMING NOTE when `cropRisk` is high;
 - preserve the exact avatar, group, voice, style, and orientation IDs. Resolve an unavailable voice under the delegated-choice rules in [catalogs](catalogs.md); a rejected default voice is not permission to replace it.
 
+Keep an explicitly chosen look even when it is near-square — that is the look the agent fits to the width when nothing tells it otherwise, so it gets the adaptation directive and the FRAMING NOTE, not a substitution. An explicit look is never swapped, not even for another look of the same person: looks in one group differ in shape, so name the wider alternative in the pre-generation sentence and let the user decide. With a delegated presenter, take the widest low-crop look available. Record the classification (`avatar_type`, environment, crop risk) with the brief, since a revision reuses it rather than recomputing it.
+
 The note texts live only in the [prompt compiler](prompt-compiler.md); append the triggered notes at the very end of the prompt, FRAMING before BACKGROUND. They guide Video Agent but do not guarantee the result: `POST /v3/video-agents` has no background, crop, scale, position, or safe-area fields. A hard 1080p requirement selects controlled composition; native scene and framing goals remain prompt-guided, with output findings reported only when targeted QA establishes them.
 
 ## Compile the prompt once

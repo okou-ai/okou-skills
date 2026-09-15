@@ -9,6 +9,8 @@ After rendering completes, run the default technical check and any applicable ta
 - For ordinary native videos, deliver after this check and finish. This check establishes basic file readability and parameters; it does not certify every frame, spoken word, or subtitle. Unchecked content has no pass/fail result.
 - **With `presenter: none`, add the no-presenter frame check before delivering.** Sample the whole video densely enough that no shot can hide between samples — 2 frames per second covers a video of ordinary intro length — and inspect the samples for a digital human. A contact sheet keeps this to one or two images: `ffmpeg -i <file> -vf "fps=2,scale=300:-1,tile=7x6" -frames:v 1 sheet.png`. Record the sheet and the sampling rate in the workspace. This is the only content check that runs without a targeted trigger, because it is the sole evidence that the prompt's exclusion held.
 
+On the camera route, add two checks to the same probe: the rendered duration still matches the source recording, and the paired checkpoint frames named in the review manifest show each click's target legible and in frame. `clicksOutsideFrame` above the sidecar's own `droppedOutOfFrameClicks` is a framing defect to fix in the plan, not a finding to deliver.
+
 ## Targeted review
 
 Inspect further only for an explicit review request, a binding wording, timing, or preservation requirement, or a problem found by a performed check or reported by the user. Select the relevant checks below instead of running the whole gate. Reuse existing evidence and stop once the required check or specific issue is resolved.
