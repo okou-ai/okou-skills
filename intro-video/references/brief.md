@@ -64,7 +64,7 @@ In adapt mode, draft the editable narration first, estimate it with the calibrat
 | Narration language | Initial pace for estimates |
 | --- | --- |
 | English | about 150 words per minute |
-| Chinese | about 220 characters per minute |
+| Chinese | about 330 characters per minute |
 
 In adapt mode, count the drafted narration, convert it at that pace, and round an inferred target **up** to the nearest five seconds to leave room for the opening, transitions, and end card. If the estimate exceeds the target, trim the editable narration or raise an inferred target within the recipe band. This is planning headroom, not a guarantee of the provider's pace, duration, or ending.
 
