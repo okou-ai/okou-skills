@@ -232,22 +232,53 @@ def measure_spacing(lines, body_key, col_left, col_right):
 
     col_mid = (col_left + col_right) / 2
     heads = {}
+
+    # Baseline-to-baseline distance is what the PDF actually records. Turning it
+    # into Word's before/after needs a model of the natural stacking, and there
+    # is no exact one: the 15.9pt advance measured here is the generator's
+    # leading setting, not a consequence of the font metrics (this document's
+    # CJK face reports ascender - descender = 1.0, i.e. 10.5pt for a 15.9pt
+    # advance). So state one model and use it in both directions.
+    #
+    # Natural gap between two lines = the mean of their line advances. A
+    # cluster's own advance is measured when it wraps, and scaled from the body
+    # otherwise, since a heading is rarely more than one line.
+    def adv_of(key):
+        L = [l for l in lines if l["key"] == key and not l["filler"]]
+        dl = [round(b["y"] - a["y"], 1) for a, b in zip(L, L[1:])
+              if a["page"] == b["page"] and 0 < b["y"] - a["y"] < key[0] * 3]
+        if dl:
+            c = collections.Counter(dl).most_common(1)[0]
+            if c[1] >= 2:
+                return c[0]
+        return adv * key[0] / body_key[0]
+
     # A gap this large is not paragraph spacing, it is white space on a cover or
     # section-break page. Left in, the median lands in the hundreds of points.
     cap = adv * 6
     for key in {l["key"] for l in lines if l["key"][0] > body_key[0] + 0.4}:
         idx = [i for i, l in enumerate(lines) if l["key"] == key]
-        before = [g for g in (lines[i]["y"] - lines[i - 1]["y"] - adv for i in idx
-                              if i > 0 and lines[i]["page"] == lines[i - 1]["page"])
-                  if g <= cap]
-        after = [g for g in (lines[i + 1]["y"] - lines[i]["y"] - key[0] * 1.2 for i in idx
-                             if i + 1 < len(lines) and lines[i + 1]["page"] == lines[i]["page"])
-                 if g <= cap]
+        mine = adv_of(key)
+        before, after, raw_b, raw_a = [], [], [], []
+        for i in idx:
+            if i > 0 and lines[i]["page"] == lines[i - 1]["page"]:
+                g = lines[i]["y"] - lines[i - 1]["y"]
+                if g <= cap:
+                    raw_b.append(g)
+                    before.append(g - (adv_of(lines[i - 1]["key"]) + mine) / 2)
+            if i + 1 < len(lines) and lines[i + 1]["page"] == lines[i]["page"]:
+                g = lines[i + 1]["y"] - lines[i]["y"]
+                if g <= cap:
+                    raw_a.append(g)
+                    after.append(g - (mine + adv_of(lines[i + 1]["key"])) / 2)
         off = statistics.median([abs((lines[i]["x0"] + lines[i]["x1"]) / 2 - col_mid) for i in idx])
         left_off = statistics.median([abs(lines[i]["x0"] - col_left) for i in idx])
         heads[key] = {
-            "space_before_pt": round(max(0, statistics.median(before)), 1) if before else 0.0,
-            "space_after_pt": round(max(0, statistics.median(after)), 1) if after else 0.0,
+            "space_before_pt": round(max(0, statistics.median(before)), 1) if before else None,
+            "space_after_pt": round(max(0, statistics.median(after)), 1) if after else None,
+            "baseline_gap_before_pt": round(statistics.median(raw_b), 1) if raw_b else None,
+            "baseline_gap_after_pt": round(statistics.median(raw_a), 1) if raw_a else None,
+            "own_line_advance_pt": round(mine, 1),
             "align": "center" if off < 6 and left_off > 12 else "left",
         }
     return body, heads
@@ -443,8 +474,12 @@ def report(r, chars, body):
               + (f" = {b['first_line_indent_em']} em" if fi else " (none)"))
         for h in r["headings"]:
             if "space_before_pt" in h:
-                print(f"  H{h['level']}    before {h['space_before_pt']}pt  "
-                      f"after {h['space_after_pt']}pt  align {h['align']}")
+                fmt = lambda v: "n/a" if v is None else f"{v}pt"
+                print(f"  H{h['level']}    before {fmt(h['space_before_pt']):>7}  "
+                      f"after {fmt(h['space_after_pt']):>7}  align {h['align']}"
+                      f"   (baseline gaps {fmt(h.get('baseline_gap_before_pt'))} / "
+                      f"{fmt(h.get('baseline_gap_after_pt'))}, own advance "
+                      f"{fmt(h.get('own_line_advance_pt'))})")
 
     m, s = r["margins_measured_cm"], r["margins_suggested_cm"]
     print(f"\n[margins]  measured != defined; use the suggested row")

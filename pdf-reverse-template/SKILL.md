@@ -111,6 +111,9 @@ The exit code must be 0. It catches dangling style references and reconciles
 the output's size, colour, spacing, indent and alignment against the inferred
 values.
 
+Fields the analysis could not measure are skipped rather than compared, so a
+`NOT MEASURED` space-after is not a failure.
+
 ### 7. Package and deliver
 
 ```bash
@@ -160,4 +163,5 @@ reference check and drops that comparison.
 | The default body candidate is a table or an index | Expected; that is what step 2 exists to catch |
 | Body text splits into several clusters | Clusters merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |
 | Space after reads NOT MEASURED | Every paragraph is followed by a table, list or heading, so no gap exists to measure; the template keeps pandoc's default |
+| Heading before/after look off | They are derived, not recorded. The report prints the raw baseline gaps beside them; override with `set_style.py --before/--after` and re-verify using `--structure-only` |
 | Verify fails after editing a style by hand | Expected; re-run it with `--structure-only` |
