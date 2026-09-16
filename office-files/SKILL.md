@@ -33,10 +33,7 @@ pandoc report.md --reference-doc=theme.docx --toc --toc-depth=2 -o report.docx  
 
 The exception is a request that explicitly needs a header, footer or page numbers. None of those can be expressed in Markdown, so build a minimal reference doc first with python-docx — set `section.header`, and add a `PAGE` field to `section.footer` — then pass that file with `--reference-doc`.
 
-Two traps:
-
-- **Missing styles fail silently.** Pandoc writes `<w:pStyle w:val="Heading1">` but does not add the style definition, so Word quietly falls back to Normal and the document still opens fine. If you supply a user's docx as the reference, verify the styles it defines. Commonly missing and therefore dangling: `heading 1`–`heading 9`, `Body Text`, `First Paragraph`, `Compact`, `Title`, `Subtitle`, `Author`, `Date`, `Block Text`, `Table Caption`, `Hyperlink`, `Table`.
-- Styles match on `<w:name>`, not `<w:styleId>`. A Chinese-locale Word file with `styleId="1"` still works as long as `w:name` is `heading 1`. Never rewrite styleIds.
+One trap: styles match on `<w:name>`, not `<w:styleId>`. A Chinese-locale Word file with `styleId="1"` still works as long as `w:name` is `heading 1`. Never rewrite styleIds.
 
 ## PDF
 
