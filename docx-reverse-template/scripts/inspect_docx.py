@@ -15,6 +15,37 @@ TWIP = lambda t: int(t) / 1440 * 2.54          # twips -> cm
 TWIP2PT = lambda t: round(int(t) / 20, 1)      # twips -> pt
 
 
+SIMPLE_FIELD = re.compile(r"<w:fldSimple\b[^>]*?w:instr=\"([^\"]*)\".*?</w:fldSimple>", re.S)
+INSTR_TEXT = re.compile(r"<w:instrText[^>]*>([^<]*)</w:instrText>")
+
+
+def split_hf(xml):
+    """Separate literal text from field results in a header or footer.
+
+    A field result is whatever Word recomputes on open (PAGE, NUMPAGES,
+    STYLEREF). What matters for review is the literal text, because that is
+    copied verbatim into every document made from the template.
+
+    Both encodings occur: <w:fldSimple w:instr="PAGE"> wrapping its cached
+    result, and the fldChar begin/separate/end run sequence with <w:instrText>.
+    """
+    fields = [f.strip().split()[0] for f in SIMPLE_FIELD.findall(xml) if f.strip()]
+    fields += [f.strip().split()[0] for f in INSTR_TEXT.findall(xml) if f.strip()]
+    xml = SIMPLE_FIELD.sub("", xml)          # drop cached fldSimple results
+
+    literal, depth = [], 0
+    for m in re.finditer(r"<w:fldChar[^>]*w:fldCharType=\"(\w+)\"[^>]*/>"
+                         r"|<w:t[^>]*>([^<]*)</w:t>", xml):
+        if m.group(1):
+            if m.group(1) == "separate":
+                depth += 1
+            elif m.group(1) == "end":
+                depth = max(0, depth - 1)
+        elif depth == 0 and m.group(2).strip():
+            literal.append(m.group(2))
+    return " ".join(literal).strip(), sorted(set(fields))
+
+
 def styles_in(z):
     """{lowercased w:name: styleId}. Keyed by name because Pandoc matches on it."""
     try:
@@ -69,14 +100,24 @@ def main(path):
     hdrs = [n for n in names if re.match(r"word/header\d+\.xml", n)]
     ftrs = [n for n in names if re.match(r"word/footer\d+\.xml", n)]
     print("[header/footer]  carried into every output document by --reference-doc")
+    literals = []
     for tag, parts in (("header", hdrs), ("footer", ftrs)):
         if not parts:
             print(f"  {tag}: none")
             continue
         for p in parts:
-            txt = " ".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", z.read(p).decode("utf-8", "replace")))
-            img = "+image" if b"<w:drawing" in z.read(p) or b"<v:imagedata" in z.read(p) else ""
-            print(f"  {tag} {p.split('/')[-1]}: {txt.strip()[:60] or '(no text)'} {img}")
+            raw = z.read(p)
+            txt, fields = split_hf(raw.decode("utf-8", "replace"))
+            img = " +image" if b"<w:drawing" in raw or b"<v:imagedata" in raw else ""
+            fl = f"  [fields: {', '.join(fields)}]" if fields else ""
+            print(f"  {tag} {p.split('/')[-1]}: {txt[:70] or '(no literal text)'}{img}{fl}")
+            if txt:
+                literals.append(txt)
+    if literals:
+        print("  REVIEW: the literal text above is copied verbatim into every document")
+        print("          generated from this template. Document numbers, versions, owners")
+        print("          and dates belonging to the source must be replaced or removed:")
+        print("          set_header_footer.py <ref> --footer '...' --page-number")
 
     # --- page setup ---
     doc = z.read("word/document.xml").decode("utf-8", "replace")

@@ -24,9 +24,15 @@ Requires pandoc 3.x. The script checks for it or installs it; run the
 python3 scripts/inspect_docx.py <source.docx>
 ```
 
-Note three things from the report: which required styles are missing, the
-header and footer text, and the paper size and margins. Ignore the exit code
-and continue.
+Note from the report: which required styles are missing, the paper size and
+margins, and — if a `REVIEW` block appears — the literal header and footer text.
+
+That literal text is copied verbatim into every document made from the template.
+Document numbers, versions, owners and dates belonging to the source have to be
+replaced in step 3. Page numbers and section names shown as `[fields: ...]` are
+computed by Word and need no action.
+
+Ignore the exit code and continue.
 
 ### 2. Build the template
 
@@ -38,9 +44,14 @@ Missing styles are filled in automatically. The output splits them into
 "derived" and "using pandoc's default spacing". Only the second group may need
 step 3; otherwise go straight to step 4.
 
-### 3. Adjust styles (optional)
+### 3. Set the paper size, and adjust styles
+
+Set the paper size whenever step 2 printed `ACTION REQUIRED`. Everything else in
+this step is optional.
 
 ```bash
+python3 scripts/set_header_footer.py reference.docx --paper A4
+
 python3 scripts/set_style.py reference.docx --list
 
 python3 scripts/set_style.py reference.docx "Block Text" \
@@ -49,8 +60,11 @@ python3 scripts/set_style.py reference.docx "Block Text" \
 python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
 
 python3 scripts/set_header_footer.py reference.docx \
-        --header "Company name" --footer "Confidential - page " --page-number
+        --footer "Confidential - page " --page-number
 ```
+
+`set_header_footer.py` replaces only the kind it is given, so setting a footer
+leaves a logo in the header alone.
 
 Pass the `w:name` of the style (`heading 2`, `Body Text`), case-insensitive.
 Add `--create` for a style the template does not define.
@@ -66,8 +80,13 @@ Return to step 4 afterwards.
 python3 scripts/verify_reference.py reference.docx
 ```
 
-The exit code must be 0. On failure the report lists the dangling style names;
-go back to step 2.
+The exit code must be 0. Two things fail it:
+
+- **dangling style names** — go back to step 2
+- **no paper size** — the source document never set one, so output would follow
+  the reader's locale default (A4 in most of the world, Letter in the US) and
+  the page count would differ per machine. Fix it in step 3 with
+  `set_header_footer.py reference.docx --paper A4`
 
 **Do not skip this step**: a missing style raises no error, Word simply renders
 the text as Normal.
@@ -95,4 +114,5 @@ Hand over the whole directory, not just `reference.docx`.
 | Headings render like body text | Run step 4; it names the dangling styles |
 | CJK text falls back to a serif font | Use `set_style.py --font`, which also writes `w:eastAsia` |
 | Code block appearance will not change | `set_style.py reference.docx "Source Code" --create` |
+| Output carries the source document's number or owner | Literal header/footer text; replace it with `set_header_footer.py` |
 | A docx saved by WPS fails to parse | Ask a person to re-save it from Word, then restart at step 1 |

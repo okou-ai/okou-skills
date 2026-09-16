@@ -33,7 +33,20 @@ rather than guessing from font size.
 
 "No text layer" means a scan; OCR it first and come back.
 
-### 2. Assign heading levels — human decision
+### 2. Confirm the body cluster — human decision
+
+Read `[body candidates]`. The chosen cluster drives every paragraph metric, so a
+wrong pick silently corrupts line spacing, space after and the heading size
+threshold.
+
+Clusters whose lines hold several spans are marked `table?  yes` and skipped —
+a dense table otherwise outvotes real prose on character count. Dotted table-of-
+contents leaders are removed before counting for the same reason.
+
+Check that the `sample` text of the chosen row reads like body prose. If not,
+re-run with `--body <rank>`.
+
+### 3. Assign heading levels — human decision
 
 Read the `sample` column under `[inferred styles]` and decide what each cluster
 actually is:
@@ -54,40 +67,51 @@ Write it as an argument; the right side takes `Title`, `Subtitle`,
 
 Skipping this shifts every level by one.
 
-### 3. Set the bottom margin — human decision
+### 4. Set the bottom margin — human decision
 
-Read `[margins]`. Take the left, right and top values from the `suggested` row,
-not the `measured` row.
+Read `[margins]` and take the whole `suggested` row, not the `measured` row.
 
-The bottom margin is only bounded, never measured. Use the top margin value and
-confirm it sits below the bound, or override it with `--bottom <cm>`.
+The bottom margin is only bounded, never measured. The report resolves it one of
+two ways and says which:
 
-### 4. Build the template
+- the top margin fits under the bound, so the layout is consistent with being
+  symmetric and the top value is suggested
+- the top margin **exceeds** the bound, so the layout is not symmetric and the
+  rounded bound is suggested instead
+
+Override either with `--bottom <cm>`.
+
+### 5. Build the template
 
 ```bash
 python3 scripts/build_reference.py styles.json reference.docx \
         --map 1=Heading1,2=Title,3=Heading2
 ```
 
-### 5. Verify
+### 6. Verify
 
 ```bash
-python3 scripts/verify_roundtrip.py reference.docx styles.json
+python3 scripts/verify_roundtrip.py reference.docx styles.json \
+        --map 1=Heading1,2=Title,3=Heading2
 ```
+
+Pass the same `--map`. Without it the cluster-to-style match is guessed from
+size and colour, which reports a false failure when two clusters resolve to one
+style.
 
 The exit code must be 0. It catches dangling style references and reconciles
 the output's size, colour, spacing, indent and alignment against the inferred
 values.
 
-### 6. Package and deliver
+### 7. Package and deliver
 
 ```bash
 python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output dir> \
         --map 1=Heading1,2=Title,3=Heading2
 ```
 
-Pass `--map` and `--bottom` through verbatim; they are recorded in the "Human
-decisions" section of the README.
+Pass `--map`, `--bottom` and `--body` through verbatim; they are recorded in the
+"Human decisions" section of the README.
 
 Hand over the whole directory.
 
@@ -100,11 +124,11 @@ python3 scripts/set_style.py reference.docx "Source Code" --create --font "Conso
 python3 scripts/set_header_footer.py reference.docx --header "Company" --footer "Page " --page-number
 ```
 
-Re-run step 5, then step 6.
+Re-run step 6, then step 7.
 
 ## Rules
 
-- Steps 2 and 3 are human decisions; do not let a script stand in for them.
+- Steps 2, 3 and 4 are human decisions; do not let a script stand in for them.
 - Take margins from the `suggested` row, never the `measured` row.
 - The source PDF's header and footer are not carried over. Add them with
   `set_header_footer.py` if the recurring content reported in step 1 matters.
@@ -118,4 +142,5 @@ Re-run step 5, then step 6.
 | Every heading level is off by one | Redo step 2 using the `sample` column |
 | The right margin reads far too large | No line fills the column; round to a common value by hand |
 | A single-page PDF gives bad margins | Running heads cannot be detected; measure all four by hand |
-| Body text splits into several clusters | Mixed fonts in the source; keep the largest cluster and drop the rest with `--map <n>=skip` |
+| Paragraph metrics look implausible | The wrong body cluster was picked; re-run step 2 with `--body <rank>` |
+| Body text splits into several clusters | Clusters merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |

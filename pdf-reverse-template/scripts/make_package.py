@@ -235,6 +235,25 @@ def build(pdf, ref, jpath, outdir, mapping, bottom):
         rev.append("> If the source PDF has a separate document title it took Heading1 "
                    "and shifted every level by one. Check the sample text for each "
                    "cluster in `report.txt`.")
+    cands = d.get("body_candidates") or []
+    chosen = next((c for c in cands if c.get("chosen")), None)
+    if chosen and len(cands) > 1:
+        rev.append("")
+        rev.append(f"**Body cluster**: rank {chosen['rank']} "
+                   f"({chosen['font']} {chosen['size']}pt #{chosen['color']}, "
+                   f"{chosen['chars']} characters)"
+                   + (f", chosen explicitly with --body {d['body_pick']}"
+                      if d.get("body_pick") else
+                      ". Higher-ranked clusters were skipped as tabular." if
+                      any(c["tabular"] for c in cands if c["rank"] < chosen["rank"])
+                      else ". It had the most characters."))
+        rev.append("")
+        rev.append("| Rank | Font | Size | Chars | Table-like | Sample |")
+        rev.append("|---|---|---|---|---|---|")
+        for c in cands:
+            mark = " **<- chosen**" if c["chosen"] else ""
+            rev.append(f"| {c['rank']} | {c['font']} | {c['size']}pt | {c['chars']} "
+                       f"| {'yes' if c['tabular'] else '-'} | {c['sample'][:24]}{mark} |")
     rev.append("")
     if bottom is not None:
         rev.append(f"**Bottom margin**: set by hand to {bottom} cm.")
@@ -248,8 +267,9 @@ def build(pdf, ref, jpath, outdir, mapping, bottom):
 
     here = os.path.dirname(os.path.abspath(__file__))
     rep = []
+    map_args = ["--map", ",".join(f"{k}={v}" for k, v in mapping.items())] if mapping else []
     for script, args in (("analyze_pdf.py", [pdf]),
-                         ("verify_roundtrip.py", [ref, jpath])):
+                         ("verify_roundtrip.py", [ref, jpath] + map_args)):
         r = subprocess.run([sys.executable, os.path.join(here, script)] + args,
                            capture_output=True, text=True)
         rep.append(f"$ python3 {script} ...\n(exit={r.returncode})\n{r.stdout}")

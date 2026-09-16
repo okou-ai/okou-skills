@@ -214,6 +214,13 @@ def build(src_path, out_path):
     print(f"  kept: {', '.join(kept) or '(no theme or numbering)'}"
           + (f", {len(hf)} header/footer parts" if hf else ", no header/footer"))
     print(f"  body replaced with a style sampler")
+    if "<w:pgSz" not in sect_xml:
+        # Pandoc's own default reference.docx has none either, so this is common.
+        # Verification treats it as a failure because without a paper size the
+        # layout follows the reader's locale and the page count varies per machine.
+        print("  ACTION REQUIRED  the source sets no paper size, so neither does this "
+              "template.\n                   Verification will fail until you set one:")
+        print(f"                   set_header_footer.py {os.path.basename(out_path)} --paper A4")
     if unavailable:
         print(f"  .   {', '.join(unavailable)}: absent from pandoc's default template "
               f"too; the writer generates them, nothing to add")

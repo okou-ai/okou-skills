@@ -7,8 +7,8 @@ The failure this catches: when a style is missing, Pandoc still writes
 <w:pStyle w:val="Heading1"> but adds no definition. The document opens fine and
 the heading quietly renders as Normal, which is easy to miss by eye.
 
-Exit code 0 means it passed; 1 means dangling style references, or a lost
-header/footer or page setup.
+Exit code 0 means it passed; 1 means dangling style references, a lost
+header/footer, or a missing paper size.
 """
 import sys, os, re, zipfile, subprocess, tempfile
 
@@ -122,8 +122,17 @@ def main(ref, keep=None):
     print(f"\n[header/footer] output has {len(hdr)} header(s) / {len(ftr)} footer(s); "
           f"sectPr references: header {'yes' if 'headerReference' in s else 'no'}, "
           f"footer {'yes' if 'footerReference' in s else 'no'}")
-    print(f"[page setup] pgSz {'yes' if 'pgSz' in s else 'MISSING'}, "
+    no_paper = "pgSz" not in s
+    print(f"[page setup] pgSz {'yes' if not no_paper else 'MISSING'}, "
           f"pgMar {'yes' if 'pgMar' in s else 'MISSING'}")
+    if no_paper:
+        # Without a paper size Word falls back to the reader's locale default:
+        # A4 in most of the world, Letter in the US. The text block then changes
+        # width and height, so line breaks, page breaks and the total page count
+        # differ per machine from the same Markdown.
+        print("  FAIL  no paper size, so output depends on the reader's locale default")
+        print("        (A4 vs Letter changes the text block and therefore the page count)")
+        print(f"        set_header_footer.py {os.path.basename(ref)} --paper A4")
 
     rz = zipfile.ZipFile(ref)
     ref_hf = [n for n in rz.namelist() if re.match(r"word/(header|footer)\d+\.xml", n)]
@@ -135,7 +144,7 @@ def main(ref, keep=None):
     if keep:
         print(f"\nProbe output kept at: {out}")
     print()
-    ok = not dangling and not lost
+    ok = not dangling and not lost and not no_paper
     print("Result: " + ("PASS — ready to ship" if ok else "FAIL — see the markers above"))
     return 0 if ok else 1
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add or replace the header and footer in reference.docx. No Word required.
+"""Edit the page-level settings of reference.docx: header, footer, paper size.
 
 Usage:
   python3 set_header_footer.py <reference.docx> --header "Company" --footer "Confidential"
@@ -14,6 +14,7 @@ Options:
   --align L          left | center | right (default: header right, footer center)
   --size PT          font size (default 9)
   --color RRGGBB     colour (default 808080)
+  --paper NAME       paper size: A4 | A5 | A3 | Letter | Legal
   --out PATH         write elsewhere; default is in place
 
 Pandoc carries the header and footer into every document produced with
@@ -29,6 +30,9 @@ CT_HDR = ("application/vnd.openxmlformats-officedocument."
 CT_FTR = ("application/vnd.openxmlformats-officedocument."
           "wordprocessingml.footer+xml")
 REL = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/"
+# twips
+PAPER = {"A4": (11906, 16838), "A5": (8391, 11906), "A3": (16838, 23811),
+         "LETTER": (12240, 15840), "LEGAL": (12240, 20160)}
 
 
 def esc(s):
@@ -92,8 +96,12 @@ def main():
     opt = lambda k: a[a.index(k) + 1] if k in a else None
     clear = "--clear" in a
     header, footer = opt("--header"), opt("--footer")
-    if not clear and header is None and footer is None:
-        print("Nothing to do: pass --header / --footer / --clear / --show.")
+    paper = (opt("--paper") or "").upper() or None
+    if paper and paper not in PAPER:
+        print(f"Unknown paper size {paper!r}. Choose from: {', '.join(PAPER)}")
+        return 2
+    if not clear and header is None and footer is None and not paper:
+        print("Nothing to do: pass --header / --footer / --paper / --clear / --show.")
         return 2
 
     size = float(opt("--size") or 9)
@@ -105,11 +113,21 @@ def main():
     rels = blob["word/_rels/document.xml.rels"].decode()
     doc = blob["word/document.xml"].decode()
 
-    # drop existing header/footer parts, relationships and references
-    drop = {fn for fn in blob if re.match(r"word/(header|footer)\d+\.xml", fn)}
-    ct = re.sub(r'<Override PartName="/word/(header|footer)\d+\.xml"[^>]*/>', "", ct)
-    rels = re.sub(r'<Relationship[^>]*Target="(header|footer)\d+\.xml"[^>]*/>', "", rels)
-    doc = re.sub(r"<w:(header|footer)Reference\b[^>]*/>", "", doc)
+    # Replace only the kind being set. Wiping both would delete a brand logo
+    # sitting in the header just because a footer was requested.
+    kinds = ["header", "footer"] if clear else \
+            ([] + (["header"] if header is not None else [])
+                + (["footer"] if footer is not None else []))
+    drop = set()
+    for kind in kinds:
+        existing = [fn for fn in blob if re.match(rf"word/{kind}\d+\.xml", fn)]
+        if len(existing) > 1 or "<w:titlePg" in doc:
+            print(f"  NOTE  replacing {len(existing)} {kind} part(s) with one; a distinct "
+                  f"first page or odd/even variant is collapsed")
+        drop |= set(existing)
+        ct = re.sub(rf'<Override PartName="/word/{kind}\d+\.xml"[^>]*/>', "", ct)
+        rels = re.sub(rf'<Relationship[^>]*Target="{kind}\d+\.xml"[^>]*/>', "", rels)
+        doc = re.sub(rf"<w:{kind}Reference\b[^>]*/>", "", doc)
 
     new_parts, added = {}, []
     if not clear:
@@ -139,6 +157,19 @@ def main():
             added.append(f"{tag} {text!r}"
                          f"{' +page number' if pagenum and kind == 'ftr' else ''}")
 
+    if paper:
+        w, h = PAPER[paper]
+        pg = f'<w:pgSz w:w="{w}" w:h="{h}"/>'
+        if "<w:pgSz" in doc:
+            doc = re.sub(r"<w:pgSz\b[^>]*/>", pg, doc, count=1)
+        elif "<w:sectPr>" in doc:
+            doc = doc.replace("<w:sectPr>", "<w:sectPr>" + pg, 1)
+        elif re.search(r"<w:sectPr\b[^>]*/>", doc):
+            doc = re.sub(r"<w:sectPr\b[^>]*/>", f"<w:sectPr>{pg}</w:sectPr>", doc, 1)
+        else:
+            doc = doc.replace("</w:body>", f"<w:sectPr>{pg}</w:sectPr></w:body>")
+        added.append(f"paper {paper}")
+
     out = opt("--out") or path
     tmp = out + ".tmp"
     with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
@@ -156,7 +187,8 @@ def main():
             z.writestr(fn, data)
     shutil.move(tmp, out)
 
-    print("Cleared header and footer." if clear else "Set: " + ", ".join(added))
+    print("Cleared header and footer." if clear and not added
+          else "Set: " + ", ".join(added))
     print(f"  -> {out}")
     with zipfile.ZipFile(out) as z:
         show([(i.filename, z.read(i.filename)) for i in z.infolist()])

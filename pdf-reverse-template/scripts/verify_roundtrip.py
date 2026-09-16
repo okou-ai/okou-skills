@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """Accept the reference.docx produced from a PDF.
 
-Usage:  python3 verify_roundtrip.py reference.docx styles.json
+Usage:  python3 verify_roundtrip.py reference.docx styles.json [--map 1=Heading1,2=Title]
+
+Pass the same --map that build_reference.py was given. Without it the cluster to
+style match is guessed from size and colour, which reports a false failure when
+two clusters resolve to one style.
 
 Two checks:
   1. Convert a probe document and look for dangling style references. A missing
@@ -85,7 +89,8 @@ def style_props(xml, sid):
     return out
 
 
-def main(ref, jpath):
+def main(ref, jpath, mapping=None):
+    mapping = mapping or {}
     d = json.load(open(jpath))
     tmp = tempfile.mkdtemp()
     md, out = os.path.join(tmp, "p.md"), os.path.join(tmp, "p.docx")
@@ -114,6 +119,12 @@ def main(ref, jpath):
     with zipfile.ZipFile(ref) as rz:
         rxml = rz.read("word/styles.xml").decode("utf-8", "replace")
     for h in d["headings"]:
+        if mapping:
+            sid = mapping.get(str(h["level"]), f"Heading{h['level']}")
+            if sid.lower() in ("skip", "none", "-"):
+                continue            # deliberately dropped, nothing was written
+            targets.append((sid, h))
+            continue
         for sid in ("Title", f"Heading{h['level']}", "Heading1", "Heading2", "Heading3"):
             p = style_props(rxml, sid)
             if p and p.get("size") == h["size"] and (p.get("color") or "").upper() == h["color"]:
@@ -161,6 +172,12 @@ def main(ref, jpath):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    a = sys.argv
+    if len(a) < 3:
         print(__doc__); sys.exit(2)
-    sys.exit(main(sys.argv[1], sys.argv[2]))
+    mapping = {}
+    if "--map" in a:
+        for kv in a[a.index("--map") + 1].split(","):
+            k, v = kv.split("=")
+            mapping[k.strip()] = v.strip()
+    sys.exit(main(a[1], a[2], mapping))

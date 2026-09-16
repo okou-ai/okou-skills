@@ -134,7 +134,9 @@ def build(json_path, out_path, mapping, bottom_override):
     b = d["body"]
     ppr = ""
     sp = []
-    if b.get("space_after_pt"):
+    # 0 is a measured value ("no extra space"), not a missing one. Skipping it
+    # would leave pandoc's default spacing in place and contradict the report.
+    if b.get("space_after_pt") is not None:
         sp.append(f'w:after="{PT2TWIP(b["space_after_pt"])}"')
     if b.get("line_advance_pt"):
         # atLeast rather than exact; exact clips tall glyphs
@@ -163,14 +165,16 @@ def build(json_path, out_path, mapping, bottom_override):
         bold = bool(re.search(r"bold|black|heavy|semibold", h["font"], re.I))
         hp = ""
         hsp = []
-        if h.get("space_before_pt"):
+        if h.get("space_before_pt") is not None:
             hsp.append(f'w:before="{PT2TWIP(h["space_before_pt"])}"')
-        if h.get("space_after_pt"):
+        if h.get("space_after_pt") is not None:
             hsp.append(f'w:after="{PT2TWIP(h["space_after_pt"])}"')
         if hsp:
             hp += f'<w:spacing {" ".join(hsp)}/>'
-        if h.get("align") == "center":
-            hp += '<w:jc w:val="center"/>'
+        # "left" is a measured value too. Pandoc's default Title is centered, so
+        # leaving alignment unwritten silently overrides the measurement.
+        if h.get("align"):
+            hp += f'<w:jc w:val="{h["align"]}"/>'
         styles, ok = patch_style(styles, target,
                                  rpr(h["font"], h["size"], h["color"], bold), hp)
         applied.append((target + ("" if ok else " NOT FOUND"),

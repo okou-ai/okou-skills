@@ -4,18 +4,19 @@
 Usage:
   python3 analyze_pdf.py source.pdf                   # human-readable report
   python3 analyze_pdf.py source.pdf --json out.json   # input for build_reference.py
+  python3 analyze_pdf.py source.pdf --body 2           # pick a different body cluster
 
 Requires: pip install pymupdf
 
 A PDF has no style layer, only "draw this glyph at this coordinate in this font
-and colour". So this clusters every text span by (font, size, colour): the
+and colour". So this clusters every text span by (size, colour, weight): the
 cluster with the most characters is body text, and anything larger becomes a
 heading candidate, ordered by size.
 
 Fonts, sizes, colours and paragraph metrics come out of the coordinates and are
 reliable. Heading levels and the bottom margin are not — both need a human.
 """
-import sys, json, math, collections, statistics
+import sys, json, math, re, collections, statistics
 
 try:
     import pymupdf
@@ -26,6 +27,31 @@ CM = lambda pt: pt / 72 * 2.54
 COMMON_CM = [1.0, 1.27, 1.5, 1.8, 2.0, 2.2, 2.5, 2.54, 3.0, 3.17, 3.5, 4.0]
 PAPERS = {"A4": (595.3, 841.9), "A3": (841.9, 1190.6), "A5": (420.9, 595.3),
           "Letter": (612.0, 792.0), "Legal": (612.0, 1008.0)}
+BOLD_NAME = re.compile(r"bold|black|heavy|semibold|demibold", re.I)
+FILLER_CHARS = set(".·•‧…-_–—~*")
+
+
+def is_filler(text):
+    """True for a leader or rule run: the dot leaders in a table of contents,
+    a row of dashes, and similar.
+
+    These are the single biggest source of a wrong body cluster. A dotted ToC
+    packs hundreds of characters into a handful of spans, so counting raw
+    characters hands "body text" to the leader dots and every downstream
+    metric — line advance, space after, the heading size threshold — is then
+    computed against the wrong cluster.
+    """
+    t = re.sub(r"\s+", "", text)
+    if len(t) < 6:
+        return False
+    common = collections.Counter(t).most_common(1)[0]
+    return common[0] in FILLER_CHARS and common[1] / len(t) >= 0.9
+
+
+def is_bold(span):
+    # bit 4 of the span flags, with the font name as a fallback for fonts that
+    # do not set it
+    return bool(span.get("flags", 0) & 16) or bool(BOLD_NAME.search(span["font"]))
 
 
 def collect(doc):
@@ -37,8 +63,20 @@ def collect(doc):
                     if s["text"].strip():
                         spans.append(dict(font=s["font"], size=round(s["size"], 1),
                                           color="%06X" % s["color"], bbox=s["bbox"],
-                                          text=s["text"], page=page.number))
+                                          text=s["text"], page=page.number,
+                                          bold=is_bold(s), filler=is_filler(s["text"])))
     return spans
+
+
+def skey(s):
+    """Merge key: size, colour and weight — deliberately not the font name.
+
+    One heading is routinely split across two runs when it mixes scripts, e.g.
+    "1.1" in a Latin face and the title text in a CJK face at the same size and
+    colour. Keying on the font name would leave them as separate clusters that
+    both map to the same Word style, which no --map can reconcile.
+    """
+    return (s["size"], s["color"], s["bold"])
 
 
 def paper_name(w, h):
@@ -107,21 +145,22 @@ def to_lines(spans):
         out.append(dict(page=pg, y=y,
                         x0=round(min(s["bbox"][0] for s in ss), 1),
                         x1=round(max(s["bbox"][2] for s in ss), 1),
-                        key=(first["font"], first["size"], first["color"])))
+                        key=skey(first),
+                        filler=all(s["filler"] for s in ss)))
     out.sort(key=lambda l: (l["page"], l["y"]))
     return out
 
 
 def measure_spacing(lines, body_key, col_left, col_right):
     """Line advance, space after, first-line indent, heading spacing, alignment."""
-    B = [l for l in lines if l["key"] == body_key]
+    B = [l for l in lines if l["key"] == body_key and not l["filler"]]
     if len(B) < 4:
         return {}, {}
 
     # Line advance = the mode of the y delta between consecutive body lines.
     # Paragraph gaps are the minority, so the mode excludes them for free.
     dl = [round(b["y"] - a["y"], 1) for a, b in zip(B, B[1:])
-          if a["page"] == b["page"] and 0 < b["y"] - a["y"] < body_key[1] * 3]
+          if a["page"] == b["page"] and 0 < b["y"] - a["y"] < body_key[0] * 3]
     if not dl:
         return {}, {}
     adv = collections.Counter(dl).most_common(1)[0][0]
@@ -140,19 +179,24 @@ def measure_spacing(lines, body_key, col_left, col_right):
 
     gaps = [round(B[i]["y"] - B[i - 1]["y"] - adv, 1) for i in sorted(starts)
             if i > 0 and B[i]["page"] == B[i - 1]["page"] and B[i]["y"] - B[i - 1]["y"] < adv * 4]
-    body = {"line_advance_pt": adv, "line_ratio": round(adv / body_key[1], 2),
+    body = {"line_advance_pt": adv, "line_ratio": round(adv / body_key[0], 2),
             "space_after_pt": round(statistics.median(gaps), 1) if gaps else 0.0,
             "first_line_indent_pt": indent,
-            "first_line_indent_em": round(indent / body_key[1], 2) if indent else 0.0}
+            "first_line_indent_em": round(indent / body_key[0], 2) if indent else 0.0}
 
     col_mid = (col_left + col_right) / 2
     heads = {}
-    for key in {l["key"] for l in lines if l["key"][1] > body_key[1] + 0.4}:
+    # A gap this large is not paragraph spacing, it is white space on a cover or
+    # section-break page. Left in, the median lands in the hundreds of points.
+    cap = adv * 6
+    for key in {l["key"] for l in lines if l["key"][0] > body_key[0] + 0.4}:
         idx = [i for i, l in enumerate(lines) if l["key"] == key]
-        before = [lines[i]["y"] - lines[i - 1]["y"] - adv for i in idx
-                  if i > 0 and lines[i]["page"] == lines[i - 1]["page"]]
-        after = [lines[i + 1]["y"] - lines[i]["y"] - key[1] * 1.2 for i in idx
-                 if i + 1 < len(lines) and lines[i + 1]["page"] == lines[i]["page"]]
+        before = [g for g in (lines[i]["y"] - lines[i - 1]["y"] - adv for i in idx
+                              if i > 0 and lines[i]["page"] == lines[i - 1]["page"])
+                  if g <= cap]
+        after = [g for g in (lines[i + 1]["y"] - lines[i]["y"] - key[0] * 1.2 for i in idx
+                             if i + 1 < len(lines) and lines[i + 1]["page"] == lines[i]["page"])
+                 if g <= cap]
         off = statistics.median([abs((lines[i]["x0"] + lines[i]["x1"]) / 2 - col_mid) for i in idx])
         left_off = statistics.median([abs(lines[i]["x0"] - col_left) for i in idx])
         heads[key] = {
@@ -163,7 +207,7 @@ def measure_spacing(lines, body_key, col_left, col_right):
     return body, heads
 
 
-def analyze(path):
+def analyze(path, body_pick=None):
     doc = pymupdf.open(path)
     page = doc[0]
     W, H = page.rect.width, page.rect.height
@@ -174,16 +218,40 @@ def analyze(path):
     tagged = doc.xref_get_key(doc.pdf_catalog(), "StructTreeRoot")[0] != "null"
     hf, hf_method = running_heads(spans, doc.page_count, H)
     body_spans = [s for i, s in enumerate(spans) if i not in hf]
+    content = [s for s in body_spans if not s["filler"]]
+    filler_count = len(body_spans) - len(content)
 
     chars = collections.Counter()
-    for s in body_spans:
-        chars[(s["font"], s["size"], s["color"])] += len(s["text"].strip())
-    body = chars.most_common(1)[0][0]
-    heads = sorted([k for k in chars if k[1] > body[1] + 0.4], key=lambda k: -k[1])
+    fonts = collections.defaultdict(collections.Counter)
+    for s in content:
+        chars[skey(s)] += len(s["text"].strip())
+        fonts[skey(s)][s["font"]] += len(s["text"].strip())
+    if not chars:
+        sys.exit("Every span looks like a leader or rule. Nothing to infer.")
+
+    # Spans per distinct line, which separates prose from table cells: a table
+    # row puts one span in every column, prose puts one or two on a line. Raw
+    # character count alone hands "body text" to a dense table, and every
+    # paragraph metric is then measured against table geometry.
+    tabular = {}
+    for k in chars:
+        S = [s for s in content if skey(s) == k]
+        rows = len({(s["page"], round(s["bbox"][1], 1)) for s in S})
+        tabular[k] = (len(S) / rows) >= 2.0 if rows else False
+
+    ranked = [k for k, _ in chars.most_common()]
+    prose = [k for k in ranked if not tabular[k]]
+    body = (prose or ranked)[0]
+    if body_pick is not None:
+        if not 1 <= body_pick <= len(ranked):
+            sys.exit(f"--body must be between 1 and {len(ranked)}")
+        body = ranked[body_pick - 1]
+    heads = sorted([k for k in chars if k[0] > body[0] + 0.4], key=lambda k: -k[0])
+
+    font_of = lambda k: fonts[k].most_common(1)[0][0]
 
     def sample(key):
-        return next(s["text"].strip() for s in body_spans
-                    if (s["font"], s["size"], s["color"]) == key)
+        return next((s["text"].strip() for s in content if skey(s) == key), "")
 
     # Left: the mode of line start x, steadier than taking the minimum.
     lefts = collections.Counter(round(s["bbox"][0]) for s in body_spans)
@@ -204,19 +272,32 @@ def analyze(path):
             per_page[s["page"]] = max(per_page[s["page"]], s["bbox"][3])
     bottom_bound_pt = (H - max(per_page.values())) if per_page else None
 
-    geom_notes = []
+    top_cm = snap(CM(top_pt))[0]
+    bottom_suggested, geom_notes = None, []
+    if filler_count:
+        geom_notes.append(f"{filler_count} leader or rule spans were excluded from "
+                          f"clustering; counting them would hand the body cluster to a "
+                          f"dotted table of contents")
     if not not_first:
         geom_notes.append("single page: the top margin may include a title block "
                           "and read too large")
     if bottom_bound_pt is None:
         geom_notes.append("single page: the bottom margin cannot be measured at all")
     else:
-        geom_notes.append(
-            f"the bottom margin is an upper bound (real value <= "
-            f"{CM(bottom_bound_pt):.2f}cm) because page breaks rarely land at the "
-            f"bottom of the text block. Use the top margin value "
-            f"{snap(CM(top_pt))[0]}cm — layouts are almost always vertically "
-            f"symmetric — after confirming it is below the bound")
+        bound_cm = CM(bottom_bound_pt)
+        if top_cm <= bound_cm:
+            bottom_suggested = top_cm
+            geom_notes.append(
+                f"the bottom margin is an upper bound (real value <= {bound_cm:.2f}cm). "
+                f"The top margin {top_cm}cm fits under it, so the layout is consistent "
+                f"with being vertically symmetric — that value is the suggestion")
+        else:
+            bottom_suggested = snap(bound_cm)[0]
+            geom_notes.append(
+                f"the bottom margin is an upper bound (real value <= {bound_cm:.2f}cm), "
+                f"and the top margin {top_cm}cm EXCEEDS it — this layout is NOT "
+                f"vertically symmetric, so do not mirror the top margin. The suggestion "
+                f"is the rounded bound; pass --bottom to override it")
 
     lines = to_lines(body_spans)
     col_right = W - right_pt
@@ -229,17 +310,22 @@ def analyze(path):
                  "w_cm": round(CM(W), 2), "h_cm": round(CM(H), 2),
                  "paper": paper_name(W, H)},
         "tagged": tagged,
-        "body": dict({"font": body[0], "size": body[1], "color": body[2],
-                      "leading_pt": leading}, **body_sp),
-        "headings": [dict({"level": i, "font": h[0], "size": h[1], "color": h[2],
-                           "sample": sample(h)}, **head_sp.get(h, {}))
+        "filler_spans_excluded": filler_count,
+        "body_candidates": [{"rank": i, "font": font_of(k), "size": k[0], "color": k[1],
+                             "bold": k[2], "chars": chars[k], "tabular": tabular[k],
+                             "sample": sample(k), "chosen": k == body}
+                            for i, k in enumerate(ranked[:6], 1)],
+        "body_pick": body_pick,
+        "body": dict({"font": font_of(body), "size": body[0], "color": body[1],
+                      "bold": body[2], "leading_pt": leading}, **body_sp),
+        "headings": [dict({"level": i, "font": font_of(h), "size": h[0], "color": h[1],
+                           "bold": h[2], "sample": sample(h)}, **head_sp.get(h, {}))
                      for i, h in enumerate(heads, 1)],
         "margins_measured_cm": {k: (round(CM(v), 2) if v is not None else None) for k, v in
                                 (("left", left_pt), ("right", right_pt),
                                  ("top", top_pt), ("bottom", bottom_bound_pt))},
-        "margins_suggested_cm": {k: (snap(CM(v))[0] if v is not None else None) for k, v in
-                                 (("left", left_pt), ("right", right_pt),
-                                  ("top", top_pt), ("bottom", None))},
+        "margins_suggested_cm": {"left": snap(CM(left_pt))[0], "right": snap(CM(right_pt))[0],
+                                 "top": top_cm, "bottom": bottom_suggested},
         "geometry_notes": geom_notes,
         "running_heads": sorted({s["text"].strip() for i, s in enumerate(spans) if i in hf})[:6],
         "running_heads_method": hf_method,
@@ -264,15 +350,28 @@ def report(r, chars, body):
         print("[running head/foot] single page, cannot be determined by recurrence; "
               "any header or footer will distort the top and bottom margins")
 
-    print(f"\n[inferred styles]  exact: font/size/colour | inferred: level")
-    print(f"{'role':<7}{'font':<30}{'size':>6}{'colour':>9}{'chars':>7}  sample")
+    cands = r.get("body_candidates") or []
+    if len(cands) > 1:
+        print(f"\n[body candidates]  the chosen one drives every paragraph metric; "
+              f"override with --body <rank>")
+        print(f"{'rank':<6}{'font':<26}{'size':>6}{'colour':>9}{'chars':>7}{'table?':>8}  sample")
+        for c in cands:
+            mark = " <- chosen" if c["chosen"] else ""
+            print(f"{c['rank']:<6}{c['font']:<26}{c['size']:>6}{'#'+c['color']:>9}"
+                  f"{c['chars']:>7}{('yes' if c['tabular'] else '-'):>8}  "
+                  f"{c['sample'][:22]}{mark}")
+
+    print(f"\n[inferred styles]  clustered by size + colour + weight, so one heading "
+          f"split\n across scripts stays a single cluster. Exact: size/colour/weight. "
+          f"Inferred: level.")
+    print(f"{'role':<7}{'font':<26}{'size':>6}{'colour':>9}{'wt':>4}{'chars':>7}  sample")
     b = r["body"]
-    print(f"{'body':<7}{b['font']:<30}{b['size']:>6}{'#'+b['color']:>9}"
-          f"{chars[(b['font'],b['size'],b['color'])]:>7}")
+    print(f"{'body':<7}{b['font']:<26}{b['size']:>6}{'#'+b['color']:>9}"
+          f"{('B' if b['bold'] else '-'):>4}{chars[(b['size'],b['color'],b['bold'])]:>7}")
     for h in r["headings"]:
-        key = (h["font"], h["size"], h["color"])
-        print(f"{'H'+str(h['level']):<7}{h['font']:<30}{h['size']:>6}{'#'+h['color']:>9}"
-              f"{chars[key]:>7}  {h['sample'][:18]}")
+        key = (h["size"], h["color"], h["bold"])
+        print(f"{'H'+str(h['level']):<7}{h['font']:<26}{h['size']:>6}{'#'+h['color']:>9}"
+              f"{('B' if h['bold'] else '-'):>4}{chars[key]:>7}  {h['sample'][:18]}")
 
     if b.get("line_advance_pt"):
         print(f"\n[paragraph metrics]  computed from coordinates, same confidence as fonts")
@@ -294,15 +393,14 @@ def report(r, chars, body):
     mb = "-" if m["bottom"] is None else f"<={m['bottom']}"
     print(f"{'measured':<10}" + "".join(f"{fmt(m[k]):>8}" for k in ("left", "right", "top"))
           + f"{mb:>8}")
-    sb = "-" if s["top"] is None else f"={s['top']}"
-    print(f"{'suggested':<10}" + "".join(f"{fmt(s[k]):>8}" for k in ("left", "right", "top"))
-          + f"{sb:>8}")
+    print(f"{'suggested':<10}" + "".join(f"{fmt(s[k]):>8}" for k in
+                                         ("left", "right", "top", "bottom")))
     for n in r.get("geometry_notes", []):
         print(f"  .  {n}")
 
     print("\n[needs a human]")
     print("  1. Levels: a document title and an H1 are both just large text in a PDF;")
-    print("     clustering cannot separate them.")
+    print("     clustering cannot separate them. Read the sample column.")
     print("  2. Margins: right/top/bottom measure where content reaches, not where the")
     print("     text block is defined. Feeding measurements back in accumulates drift.")
 
@@ -310,7 +408,8 @@ def report(r, chars, body):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(__doc__); sys.exit(2)
-    r, chars, body = analyze(sys.argv[1])
+    pick = int(sys.argv[sys.argv.index("--body") + 1]) if "--body" in sys.argv else None
+    r, chars, body = analyze(sys.argv[1], pick)
     if "--json" in sys.argv:
         out = sys.argv[sys.argv.index("--json") + 1]
         json.dump(r, open(out, "w"), ensure_ascii=False, indent=2)
