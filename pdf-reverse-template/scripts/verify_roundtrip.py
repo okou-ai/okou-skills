@@ -2,6 +2,12 @@
 """Accept the reference.docx produced from a PDF.
 
 Usage:  python3 verify_roundtrip.py reference.docx styles.json [--map 1=Heading1,2=Title]
+        python3 verify_roundtrip.py reference.docx styles.json --structure-only
+
+--structure-only drops the value reconciliation and keeps the dangling-reference
+check. Use it after deliberately editing a style with set_style.py: the
+reconciliation asks "did the builder write what was measured", which stops being
+a meaningful question once a human has overridden a value on purpose.
 
 Pass the same --map that build_reference.py was given. Without it the cluster to
 style match is guessed from size and colour, which reports a false failure when
@@ -89,7 +95,7 @@ def style_props(xml, sid):
     return out
 
 
-def main(ref, jpath, mapping=None):
+def main(ref, jpath, mapping=None, structure_only=False):
     mapping = mapping or {}
     d = json.load(open(jpath))
     tmp = tempfile.mkdtemp()
@@ -111,6 +117,11 @@ def main(ref, jpath, mapping=None):
     print(f"[style references] {len(used)} used, {len(defined)} defined")
     print("  OK  no dangling references" if not dangling
           else f"  FAIL  {len(dangling)} dangling: {', '.join(dangling)}")
+
+    if structure_only:
+        print("\n[reconciliation] skipped (--structure-only)")
+        print(f"\nResult: " + ("PASS" if not dangling else "FAIL"))
+        return 0 if not dangling else 1
 
     print(f"\n[reconciliation] output docx vs values inferred from the PDF")
     print(f"{'style':<14}{'field':<10}{'from PDF':<24}{'in docx':<24}")
@@ -145,8 +156,8 @@ def main(ref, jpath, mapping=None):
                   ("line_advance_pt", "line"), ("first_line_indent_pt", "indent"),
                   ("align", "align")]
         for k, label in checks:
-            if k not in want:
-                continue
+            if k not in want or want[k] is None:
+                continue        # None means it was never measured, not zero
             w, g = want[k], got.get(k)
             norm = lambda v: None if v in (0, 0.0, None, "") else v
             ok = str(norm(w)).upper() == str(norm(g)).upper()
@@ -180,4 +191,4 @@ if __name__ == "__main__":
         for kv in a[a.index("--map") + 1].split(","):
             k, v = kv.split("=")
             mapping[k.strip()] = v.strip()
-    sys.exit(main(a[1], a[2], mapping))
+    sys.exit(main(a[1], a[2], mapping, "--structure-only" in a))

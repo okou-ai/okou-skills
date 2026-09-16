@@ -63,6 +63,7 @@ def collect(doc):
                     if s["text"].strip():
                         spans.append(dict(font=s["font"], size=round(s["size"], 1),
                                           color="%06X" % s["color"], bbox=s["bbox"],
+                                          base=round(s["origin"][1], 2),
                                           text=s["text"], page=page.number,
                                           bold=is_bold(s), filler=is_filler(s["text"])))
     return spans
@@ -106,7 +107,7 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
         by_y = collections.defaultdict(list)
         for i, s in enumerate(spans):
             if band(s):
-                by_y[round(s["bbox"][1])].append(i)
+                by_y[round(s["base"])].append(i)
 
         need = max(2, math.ceil(npages * 0.6))
         hits = set()
@@ -138,11 +139,11 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
             if advance:
                 gaps = []
                 for i in idx:
-                    pg, sy = spans[i]["page"], spans[i]["bbox"][1]
-                    below = [s["bbox"][1] for s in spans
-                             if s["page"] == pg and s["bbox"][1] > sy + 1]
-                    above = [s["bbox"][3] for s in spans
-                             if s["page"] == pg and s["bbox"][3] < sy - 1]
+                    pg, sy = spans[i]["page"], spans[i]["base"]
+                    below = [s["base"] for s in spans
+                             if s["page"] == pg and s["base"] > sy + 1]
+                    above = [s["base"] for s in spans
+                             if s["page"] == pg and s["base"] < sy - 1]
                     if sy < page_h / 2 and below:
                         gaps.append(min(below) - sy)
                     elif sy >= page_h / 2 and above:
@@ -168,10 +169,17 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
 
 def to_lines(spans):
     """Group spans into lines. PyMuPDF blocks are not paragraphs — in practice
-    each block often holds a single line — so paragraphs are segmented here."""
+    each block often holds a single line — so paragraphs are segmented here.
+
+    Grouping is by baseline, not by the top of the bounding box. A heading that
+    mixes scripts puts "1.1" and the CJK title on one baseline but at different
+    box tops, because the two faces have different ascents; keying on the top
+    splits one heading into two lines, halves the sample for its spacing, and
+    turns the gaps that straddle the split into negative numbers.
+    """
     byline = collections.defaultdict(list)
     for s in spans:
-        byline[(s["page"], round(s["bbox"][1], 1))].append(s)
+        byline[(s["page"], s["base"])].append(s)
     out = []
     for (pg, y), ss in byline.items():
         first = min(ss, key=lambda s: s["bbox"][0])
@@ -212,8 +220,13 @@ def measure_spacing(lines, body_key, col_left, col_right):
 
     gaps = [round(B[i]["y"] - B[i - 1]["y"] - adv, 1) for i in sorted(starts)
             if i > 0 and B[i]["page"] == B[i - 1]["page"] and B[i]["y"] - B[i - 1]["y"] < adv * 4]
+    # None, not 0.0: "no usable sample" and "measured as zero" are different
+    # claims. Every paragraph here may be followed by a table, a list or a
+    # heading, in which case nothing was measured and the builder must not
+    # write a value it never obtained.
     body = {"line_advance_pt": adv, "line_ratio": round(adv / body_key[0], 2),
-            "space_after_pt": round(statistics.median(gaps), 1) if gaps else 0.0,
+            "space_after_pt": round(statistics.median(gaps), 1) if gaps else None,
+            "space_after_samples": len(gaps),
             "first_line_indent_pt": indent,
             "first_line_indent_em": round(indent / body_key[0], 2) if indent else 0.0}
 
@@ -256,7 +269,7 @@ def analyze(path, body_pick=None):
         if not s["filler"]:
             prelim[s["size"]] += len(s["text"].strip())
     body_size = prelim.most_common(1)[0][0] if prelim else None
-    pb = sorted((s["page"], round(s["bbox"][1], 1)) for s in spans
+    pb = sorted((s["page"], s["base"]) for s in spans
                 if s["size"] == body_size and not s["filler"])
     pdl = [round(b[1] - a[1], 1) for a, b in zip(pb, pb[1:])
            if a[0] == b[0] and 0 < b[1] - a[1] < (body_size or 12) * 3]
@@ -351,7 +364,7 @@ def analyze(path, body_pick=None):
         "filler_spans_excluded": filler_count,
         "body_candidates": [{"rank": i, "font": font_of(k), "size": k[0], "color": k[1],
                              "bold": k[2], "chars": chars[k],
-                             "lines": len({(s["page"], round(s["bbox"][1], 1))
+                             "lines": len({(s["page"], s["base"])
                                            for s in content if skey(s) == k}),
                              "pages": len({s["page"] for s in content if skey(s) == k}),
                              "sample": sample(k), "chosen": k == body}
@@ -419,7 +432,12 @@ def report(r, chars, body):
         print(f"\n[paragraph metrics]  computed from coordinates, same confidence as fonts")
         print(f"  body  line advance {b['line_advance_pt']}pt "
               f"= {b['line_ratio']}x the font size")
-        print(f"        space after  {b['space_after_pt']}pt")
+        sa = b.get("space_after_pt")
+        print(f"        space after  " + (f"{sa}pt  ({b.get('space_after_samples', 0)} samples)"
+              if sa is not None else
+              "NOT MEASURED — every paragraph is followed by a table, list or\n"
+              "                     heading, so no paragraph-to-paragraph gap exists.\n"
+              "                     The template will keep pandoc's default."))
         fi = b.get("first_line_indent_pt") or 0
         print(f"        first indent {fi}pt"
               + (f" = {b['first_line_indent_em']} em" if fi else " (none)"))

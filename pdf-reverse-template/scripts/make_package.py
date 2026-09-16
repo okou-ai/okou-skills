@@ -143,7 +143,7 @@ Confidence by field:
 | Spacing / line height / indent / alignment | Computed from coordinates | High |
 | Heading levels | Assigned by hand (above) | Depends on the review |
 | Top / left / right margins | Measured, then rounded | Medium |
-| Bottom margin | Not measurable; mirrors the top margin | Low |
+| Bottom margin | Only bounded, never measured | Low |
 
 ## 5. FAQ
 
@@ -258,11 +258,15 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
         rev.append(f"**Bottom margin**: set by hand to {bottom} cm.")
     else:
         mb = d["margins_measured_cm"].get("bottom")
-        rev.append(f"**Bottom margin**: not specified, so it mirrors the top margin at "
-                   f"{mg['top']} cm."
-                   + (f" (Measurement only yields an upper bound of <={mb} cm — page "
-                      f"breaks rarely land at the bottom of the text block, so the "
-                      f"measured value always reads too large.)" if mb else ""))
+        sug = mg.get("bottom")
+        rev.append(f"**Bottom margin**: {sug} cm, taken from the analyzer's suggestion"
+                   + (f" (it mirrors the top margin of {mg['top']} cm, which fits under "
+                      f"the measured upper bound of <={mb} cm)"
+                      if sug == mg.get("top") and mb else
+                      f" (the top margin of {mg['top']} cm exceeds the measured upper "
+                      f"bound of <={mb} cm, so this layout is not vertically symmetric "
+                      f"and the bound was rounded instead)" if mb else "")
+                   + ".")
 
     here = os.path.dirname(os.path.abspath(__file__))
     rep = []

@@ -138,40 +138,38 @@ def main():
 
     opt = lambda k: a[a.index(k) + 1] if k in a else None
 
+    # --replace edits the existing parts in place. It runs as a pass over
+    # members rather than its own exit path, so it composes with --paper and
+    # the rest in one invocation.
     pairs = [a[i + 1] for i, v in enumerate(a) if v == "--replace" and i + 1 < len(a)]
-    if pairs:
-        subs = []
-        for pr in pairs:
-            if "=" not in pr:
-                print(f"--replace needs OLD=NEW, got {pr!r}")
-                return 2
-            subs.append(tuple(pr.split("=", 1)))
-        out = opt("--out") or path
-        hits = collections.Counter()
-        tmp = out + ".tmp"
-        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
-            for fn, data in members:
-                if re.match(r"word/(header|footer)\d+\.xml", fn):
-                    t = data.decode("utf-8", "replace")
-                    for old, new in subs:
-                        # only inside <w:t>, so element names and attributes are safe
-                        def sub(m, old=old, new=new):
-                            if old not in m.group(2):
-                                return m.group(0)
-                            hits[old] += m.group(2).count(old)
-                            return m.group(1) + m.group(2).replace(old, esc(new)) + m.group(3)
-                        t = re.sub(r"(<w:t[^>]*>)([^<]*)(</w:t>)", sub, t)
-                    data = t.encode("utf-8")
-                z.writestr(fn, data)
-        shutil.move(tmp, out)
+    subs, hits, missed = [], collections.Counter(), []
+    for pr in pairs:
+        if "=" not in pr:
+            print(f"--replace needs OLD=NEW, got {pr!r}")
+            return 2
+        subs.append(tuple(pr.split("=", 1)))
+    if subs:
+        patched = []
+        for fn, data in members:
+            if re.match(r"word/(header|footer)\d+\.xml", fn):
+                t = data.decode("utf-8", "replace")
+                for old, new in subs:
+                    # only inside <w:t>, so element names and attributes are safe
+                    def sub(m, old=old, new=new):
+                        if old not in m.group(2):
+                            return m.group(0)
+                        hits[old] += m.group(2).count(old)
+                        return m.group(1) + m.group(2).replace(old, esc(new)) + m.group(3)
+                    t = re.sub(r"(<w:t[^>]*>)([^<]*)(</w:t>)", sub, t)
+                data = t.encode("utf-8")
+            patched.append((fn, data))
+        members = patched
         for old, new in subs:
             n = hits[old]
             print(f"  {'replaced' if n else 'NOT FOUND'}  {old!r} -> {new!r}"
                   + (f"  ({n}x)" if n else ""))
-        print(f"  -> {out}")
-        with zipfile.ZipFile(out) as z:
-            show([(i.filename, z.read(i.filename)) for i in z.infolist()])
-        return 0 if all(hits[o] for o, _ in subs) else 1
+            if not n:
+                missed.append(old)
 
     clear = "--clear" in a
     header, footer = opt("--header"), opt("--footer")
@@ -179,7 +177,7 @@ def main():
     if paper and paper not in PAPER:
         print(f"Unknown paper size {paper!r}. Choose from: {', '.join(PAPER)}")
         return 2
-    if not clear and header is None and footer is None and not paper:
+    if not clear and header is None and footer is None and not paper and not subs:
         print("Nothing to do: pass --replace / --header / --footer / --paper / "
               "--clear / --show.")
         return 2
@@ -254,12 +252,14 @@ def main():
             z.writestr(fn, data)
     shutil.move(tmp, out)
 
-    print("Cleared header and footer." if clear and not added
-          else "Set: " + ", ".join(added))
+    if added:
+        print("Set: " + ", ".join(added))
+    elif clear:
+        print("Cleared header and footer.")
     print(f"  -> {out}")
     with zipfile.ZipFile(out) as z:
         show([(i.filename, z.read(i.filename)) for i in z.infolist()])
-    return 0
+    return 1 if missed else 0
 
 
 if __name__ == "__main__":

@@ -134,7 +134,11 @@ python3 scripts/set_style.py reference.docx "Source Code" --create --font "Conso
 python3 scripts/set_header_footer.py reference.docx --header "Company" --footer "Page " --page-number
 ```
 
-Re-run step 6, then step 7.
+Re-run step 6 with `--structure-only`, then step 7.
+
+The full reconciliation compares the template against `styles.json`, so it fails
+on any value you deliberately changed. `--structure-only` keeps the dangling
+reference check and drops that comparison.
 
 ## Rules
 
@@ -155,3 +159,5 @@ Re-run step 6, then step 7.
 | Paragraph metrics look implausible | The wrong body cluster was picked; re-run step 2 with `--body <rank>` |
 | The default body candidate is a table or an index | Expected; that is what step 2 exists to catch |
 | Body text splits into several clusters | Clusters merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |
+| Space after reads NOT MEASURED | Every paragraph is followed by a table, list or heading, so no gap exists to measure; the template keeps pandoc's default |
+| Verify fails after editing a style by hand | Expected; re-run it with `--structure-only` |

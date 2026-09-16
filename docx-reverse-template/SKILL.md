@@ -50,7 +50,8 @@ Set the paper size whenever step 2 printed `ACTION REQUIRED`. Everything else in
 this step is optional.
 
 ```bash
-python3 scripts/set_header_footer.py reference.docx --paper A4
+python3 scripts/set_header_footer.py reference.docx --paper A4 \
+        --replace "DOC-2026-001=[DOC ID]" --replace "Jane Doe=[OWNER]"
 
 python3 scripts/set_style.py reference.docx --list
 
@@ -59,13 +60,12 @@ python3 scripts/set_style.py reference.docx "Block Text" \
 
 python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
 
-python3 scripts/set_header_footer.py reference.docx \
-        --replace "DOC-2026-001=PLACEHOLDER" --replace "Jane Doe=TBD"
 ```
 
 When step 1 flagged literal header or footer text, swap the values with
 `--replace`. It edits the text in place, so tab columns, border rules, a
-first-page variant and any table in the footer survive.
+first-page variant and any table in the footer survive. It exits non-zero when a
+value is not found, and composes with the other flags in one invocation.
 
 `--header` / `--footer` rebuild the part from scratch and flatten all of that.
 Use them only for a template whose header and footer are plain text, or when
