@@ -1,170 +1,187 @@
 # Trigger Setup
 
-Read this after [automation management](automation-management.md). It maps user intent to current `okou workflow automation` kinds and records requirements that are easy to miss. Use `okou workflow automation add --help` and `update --help` for the live flag surface; do not invent a kind or carry forward a retired alias.
-
 ## Contents
 
-- [Schedules](#schedules)
+- [Requirement mapping](#requirement-mapping)
+- [Fixed schedule](#fixed-schedule)
+- [One-time scheduled run](#one-time-scheduled-run)
+- [Fixed interval](#fixed-interval)
 - [Chat run finished](#chat-run-finished)
-- [Gmail](#gmail)
-- [Webhook](#webhook)
-- [GitHub](#github)
-- [Google Calendar](#google-calendar)
-- [Google Forms](#google-forms)
-- [Google Meet](#google-meet)
-- [Notion](#notion)
+- [New email](#new-email)
+- [Email label](#email-label)
+- [Web trigger](#web-trigger)
+- [GitHub label](#github-label)
+- [Google Calendar event created](#google-calendar-event-created)
+- [Google Forms response submitted](#google-forms-response-submitted)
 
-## Schedules
+## Requirement Mapping
 
-### Fixed schedule: `cron`
+Map friendly trigger choices to CLI kinds:
 
-Collect cadence, wall-clock time, timezone, and business-day assumptions. Convert natural language to cron yourself. If timezone is known from context, use it; otherwise ask when timing matters.
+- Fixed schedule -> `cron`
+- One-time scheduled run -> `once`
+- Fixed interval -> `loop`
+- Chat run completion -> `chat-run-finished`
+- Web trigger -> `webhook`
+- New email -> `gmail-new-message`
+- Email label -> `gmail-label-applied`
+- GitHub label -> `github-label-applied`
+- New Google Calendar event -> `google-calendar-event-created`
+- New Google Forms response -> `google-forms-response-submitted`
+
+## Fixed Schedule
+
+Ask for cadence, wall-clock time, timezone, and business-day assumptions. Convert
+the answer to a cron expression yourself. If the user says "daily" and their
+timezone is known from context, use it. If timezone is missing and timing matters,
+ask.
+
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> cron --expr "0 9 * * *" -z Asia/Shanghai
-okou workflow automation update <automation-id> --expr "0 9 * * *" -z Asia/Shanghai
+okou workflow trigger add <workflow> cron --expr "0 9 * * *" -z Asia/Shanghai
+okou workflow trigger update <trigger-id> --expr "0 9 * * *" -z Asia/Shanghai
 ```
 
-### One future run: `once`
+## One-Time Scheduled Run
 
-Collect the exact date, time, and timezone. Resolve relative wording such as “tomorrow” to a concrete date in the confirmation.
+Use this when the user wants it to run once at a future time, not recur.
+
+Ask for the exact date, time, and timezone. If the user uses relative wording
+such as "tomorrow", resolve it to a concrete date in the final confirmation.
+
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> once --at "2026-06-10T09:00" -z Asia/Shanghai
-okou workflow automation update <automation-id> --at "2026-06-10T09:00" -z Asia/Shanghai
+okou workflow trigger add <workflow> once --at "2026-06-10T09:00" -z Asia/Shanghai
+okou workflow trigger update <trigger-id> --at "2026-06-10T09:00" -z UTC
 ```
 
-### Fixed interval: `loop`
+## Fixed Interval
 
-Convert natural language to a supported duration such as `15m`, `1h`, or `90s`.
+Ask for the interval in natural language. Convert it to a CLI duration such as
+`15m`, `1h`, or `90s`.
+
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> loop --every 15m
-okou workflow automation update <automation-id> --every 10m
+okou workflow trigger add <workflow> loop --every 15m
+okou workflow trigger update <trigger-id> --every 10m
 ```
 
 ## Chat Run Finished
 
-Kind: `chat-run-finished`.
+Collect the watched web chat thread, optional terminal statuses, and optional
+final-output pattern. This trigger watches future runs in the thread, not one
+run ID, and the thread must belong to the automation owner. When a matching run
+reaches `completed`, `failed`, or `cancelled`, it starts a new run in the
+workflow's automation thread; it does not resume the watched run.
 
-Collect the user-owned watched web-chat thread, optional terminal statuses, and optional final-output pattern. It watches future runs in that thread, not one run ID. A match starts a new run in the workflow's automation thread; it does not resume the watched run. The enabled automation remains active for later matching completions.
+Omit `--run-status` to match all terminal statuses. `--output-pattern` uses a
+case-insensitive `*` wildcard against final assistant text; a run without final
+assistant text cannot match a pattern.
 
-Omit `--run-status` to match all terminal statuses. Supported statuses are `completed`, `failed`, and `cancelled`. `--output-pattern` uses a case-insensitive `*` wildcard against final assistant text; a run without final assistant text cannot match a pattern.
-
-```bash
-okou workflow automation add <workflow> chat-run-finished --chat-thread-id <thread-id>
-okou workflow automation add <workflow> chat-run-finished --chat-thread-id <thread-id> --run-status completed,failed --output-pattern "*deploy failed*"
-```
-
-Current update help does not replace the watched thread, statuses, or output pattern. To change them, add a replacement and remove or disable the old automation only when authorized.
-
-## Gmail
-
-### New message: `gmail-new-message`
-
-Collect only the inbound matching needed: sender, recipient, cc, subject, or body. A rule with no text filters matches all inbound messages, so use it only when the user explicitly requested that scope.
-
-Simple filters use flags such as:
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> gmail-new-message --from-contains "@example.com"
-okou workflow automation add <workflow> gmail-new-message --subject-contains "invoice"
+okou workflow trigger add <workflow> chat-run-finished --chat-thread-id <thread-id>
+okou workflow trigger add <workflow> chat-run-finished --chat-thread-id <thread-id> --run-status completed,failed --output-pattern "*deploy failed*"
 ```
 
-For complex matching, pass a JSON object through `--config`. It has a top-level `match` object; current fields are `from`, `subject`, `body`, `to`, and `cc`, with `contains`, `containsAny`, `doesNotContain`, and `doesNotContainAny` matchers.
+## New Email
 
-### Label applied: `gmail-label-applied`
+Ask what incoming Gmail messages should match. Supported natural-language fields
+are sender, recipient, cc, subject, and body. Avoid matching every inbound email
+unless the user explicitly confirms that broad scope.
 
-Collect the exact label, workflow behavior, allowed side effects, and whether a missing label may be created. Check that the Gmail label exists before adding the automation. Create a missing label only when the request authorizes it.
+For simple matching, use flags:
 
 ```bash
-okou workflow automation add <workflow> gmail-label-applied --label "Support"
-okou workflow automation update <automation-id> --label "Support"
+okou workflow trigger add <workflow> gmail-new-message --from-contains "@example.com"
+okou workflow trigger add <workflow> gmail-new-message --subject-contains "invoice"
 ```
 
-## Webhook
+For complex matching, create a temporary config file and pass `--config`. The
+config must be a JSON object with a top-level `match` object. Supported fields:
+`from`, `subject`, `body`, `to`, `cc`. Supported matchers: `contains`,
+`containsAny`, `doesNotContain`, `doesNotContainAny`.
 
-Kind: `webhook`.
+## Email Label
 
-Ask what will call it, the expected payload, and whether the caller can store and sign with the secret.
+Ask only for missing details:
+
+1. Which exact Gmail label should trigger the workflow?
+2. What should happen when that label is applied?
+3. What side effects are allowed?
+4. If the label does not exist, may it be created?
+
+Before adding the trigger, check whether the Gmail label exists. If it is missing
+and the user already allowed creation, create the label first, then add the
+trigger. If creation was not approved, stop and ask. This avoids creating a
+workflow, failing the trigger bind, then doing a label-creation retry.
+
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> webhook
+okou workflow trigger add <workflow> gmail-label-applied --label "Support"
+okou workflow trigger update <trigger-id> --label "Support"
 ```
 
-Preserve creation output because the signing secret is printed only once. Share the webhook URL in the normal response; reveal signing details only when the implementer asks and the destination is appropriate. To replace webhook binding material, create a replacement rather than inventing update flags.
+## Web Trigger
 
-## GitHub
+Ask who or what will call the webhook, what payload shape they expect to send,
+and whether they can store and sign with the webhook secret.
 
-Current kinds include:
+After creating the trigger, preserve the creation output because the signing
+secret is printed only once. In the normal user response, share only the webhook
+URL and say that signing details are available if they need to wire it up. If the
+user is the implementer and asks for details, provide the signing instructions
+without exposing the secret to channels where it does not belong.
 
-- `github-pull-request`
-- `github-workflow-run-completed`
-- `github-workflow-job-completed`
-- `github-pull-request-review-submitted`
-- `github-deployment-status-created`
-- `github-issue-comment-created`
-
-Collect the repository first, then only the event-specific filters shown by current add help. Examples:
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> github-pull-request --repository vm0-ai/okou --action closed --merged yes --base-branch main
-okou workflow automation add <workflow> github-pull-request --repository vm0-ai/okou --action labeled --label triage
-okou workflow automation add <workflow> github-workflow-run-completed --repository vm0-ai/okou --workflow Turbo --conclusion failure,timed_out --branch main
+okou workflow trigger add <workflow> webhook
 ```
 
-Use the workflow/job, review-state, deployment, or comment filters from current help for the other kinds. Omitted filters broaden the match, so state that scope before creation when the request did not already establish it. GitHub automations require the workspace GitHub App installation; on an authorization failure use connector diagnosis rather than guessing.
+## GitHub Label
 
-The `github-label-applied` kind is not exposed by current help. For pull-request label events use `github-pull-request --action labeled --label <name>`. Do not claim an issue-label trigger that the current CLI does not expose.
+Ask for the GitHub label, whether it should apply to issues, pull requests, or
+both, and whether only the user's own label actions should count or anyone's.
 
-## Google Calendar
-
-Kinds: `google-calendar-event-created`, `google-calendar-event-updated`, and `google-calendar-event-cancelled`.
-
-Collect the calendar. Default to `primary` only when the user's wording clearly means their main calendar.
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> google-calendar-event-created --calendar-id primary
-okou workflow automation add <workflow> google-calendar-event-updated --calendar-id primary
-okou workflow automation add <workflow> google-calendar-event-cancelled --calendar-id primary
+okou workflow trigger add <workflow> github-label-applied --label "triage" --subject both --actor me
+okou workflow trigger update <trigger-id> --label "triage" --subject pull-requests --actor anyone
 ```
 
-Current update help does not change the calendar binding. Create a replacement and remove or disable the old automation only when authorized.
+GitHub label triggers require the GitHub App installation in the workspace. If
+the command fails for authorization, use the GitHub connector doctor flow instead
+of guessing.
 
-## Google Forms
+## Google Calendar Event Created
 
-Kind: `google-forms-response-submitted`.
+Ask which calendar should be watched. Default to the primary calendar only when
+the user's wording clearly implies their own main calendar.
 
-Ask: “Please open the form's edit page and copy the link from the address bar.”
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> google-forms-response-submitted --form-url "https://docs.google.com/forms/d/<form-id>/edit"
+okou workflow trigger add <workflow> google-calendar-event-created --calendar-id primary
 ```
 
-Current update help does not change the form binding; use an authorized replacement.
+Current CLI behavior does not support updating this trigger kind. If the user
+wants to change the calendar, create a replacement trigger and remove/disable the
+old one only with user approval.
 
-## Google Meet
+## Google Forms Response Submitted
 
-Kind: `google-meet-transcript-generated`.
+Ask for the Google Form link using this exact wording: "Please open the form's
+edit page and copy the link from the address bar."
+
+Command shape:
 
 ```bash
-okou workflow automation add <workflow> google-meet-transcript-generated
+okou workflow trigger add <workflow> google-forms-response-submitted --form-url "https://docs.google.com/forms/d/<form-id>/edit"
 ```
-
-It runs when a meeting organized by the connected user generates a transcript. Do not promise coverage for meetings they do not organize.
-
-## Notion
-
-Kinds and binding inputs:
-
-- `notion-child-page-created` with `--parent-page-url`
-- `notion-database-item-created` with `--database-url`
-- `notion-page-content-updated` with either `--page-url` or `--database-url`
-
-```bash
-okou workflow automation add <workflow> notion-child-page-created --parent-page-url "<notion-page-url>"
-okou workflow automation add <workflow> notion-database-item-created --database-url "<notion-database-url>"
-okou workflow automation add <workflow> notion-page-content-updated --page-url "<notion-page-url>"
-```
-
-Use exactly one supported binding for the chosen kind. Current update help does not replace these bindings; create a replacement and alter the old automation only when authorized.
