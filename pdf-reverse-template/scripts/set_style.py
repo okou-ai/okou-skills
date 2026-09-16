@@ -89,6 +89,7 @@ def describe(style_xml):
     g = lambda pat, src: (lambda m: m.group(1) if m else None)(re.search(pat, src))
     sz = g(r'<w:sz w:val="(\d+)"', r)
     ind = g(r'<w:ind[^>]*w:firstLine="(\d+)"', p)
+    left = g(r'<w:ind[^>]*w:left="(\d+)"', p)
     bits = []
     if g(r'w:ascii="([^"]*)"', r):
         bits.append(g(r'w:ascii="([^"]*)"', r))
@@ -104,6 +105,8 @@ def describe(style_xml):
             bits.append(f"{label} {TWIP2PT(v)}")
     if ind:
         bits.append(f"indent {TWIP2PT(ind)}")
+    if left:
+        bits.append(f"left {TWIP2PT(left)}")
     jc = g(r'<w:jc w:val="([a-z]+)"', p)
     if jc:
         bits.append(jc)

@@ -60,11 +60,24 @@ python3 scripts/set_style.py reference.docx "Block Text" \
 python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
 
 python3 scripts/set_header_footer.py reference.docx \
+        --replace "DOC-2026-001=PLACEHOLDER" --replace "Jane Doe=TBD"
+```
+
+When step 1 flagged literal header or footer text, swap the values with
+`--replace`. It edits the text in place, so tab columns, border rules, a
+first-page variant and any table in the footer survive.
+
+`--header` / `--footer` rebuild the part from scratch and flatten all of that.
+Use them only for a template whose header and footer are plain text, or when
+adding one that does not exist:
+
+```bash
+python3 scripts/set_header_footer.py reference.docx \
         --footer "Confidential - page " --page-number
 ```
 
-`set_header_footer.py` replaces only the kind it is given, so setting a footer
-leaves a logo in the header alone.
+Either way only the kind being set is touched, so a logo in the header survives
+a footer change.
 
 Pass the `w:name` of the style (`heading 2`, `Body Text`), case-insensitive.
 Add `--create` for a style the template does not define.

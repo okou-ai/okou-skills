@@ -11,8 +11,9 @@ size, but a document title and an H1 are both just large text in a PDF, so the
 mapping has to be stated explicitly. The left side is the cluster number from
 the analysis report; the right side is a Word style name.
 
---bottom overrides the bottom margin (analyze_pdf can only bound it; the
-default is to reuse the top margin).
+--bottom overrides the bottom margin. By default the analyzer's own suggestion
+is used, which mirrors the top margin only when the layout measures as
+vertically symmetric.
 
 Requires pandoc on PATH.
 """
@@ -184,7 +185,11 @@ def build(json_path, out_path, mapping, bottom_override):
 
     # --- page ---
     p, mg = d["page"], d["margins_suggested_cm"]
-    bottom = bottom_override if bottom_override is not None else mg.get("top")
+    # Take the analyzer's own bottom suggestion. Mirroring the top margin is
+    # wrong whenever the layout is not vertically symmetric, and the report
+    # prints a warning in exactly that case.
+    bottom = bottom_override if bottom_override is not None else \
+        (mg.get("bottom") if mg.get("bottom") is not None else mg.get("top"))
     sect = (f'<w:sectPr><w:pgSz w:w="{CM2TWIP(p["w_cm"])}" w:h="{CM2TWIP(p["h_cm"])}"/>'
             f'<w:pgMar w:top="{CM2TWIP(mg["top"])}" w:right="{CM2TWIP(mg["right"])}" '
             f'w:bottom="{CM2TWIP(bottom)}" w:left="{CM2TWIP(mg["left"])}" '
@@ -205,7 +210,7 @@ def build(json_path, out_path, mapping, bottom_override):
         print(f"{sid:<20}{f:<22}{s:>6}{'#'+c:>9}  {spm}")
     print(f"\npage {p['w_cm']}x{p['h_cm']}cm  margins left {mg['left']} right {mg['right']} "
           f"top {mg['top']} bottom {bottom}cm"
-          + ("  (bottom = top, no --bottom given)" if bottom_override is None else ""))
+          + ("  (bottom from the analyzer's suggestion)" if bottom_override is None else ""))
     if not mapping:
         print("\nNOTE  no --map given; headings were assigned Heading1/2/3... by size.")
         print("  If the PDF has a separate document title it takes Heading1 and shifts")

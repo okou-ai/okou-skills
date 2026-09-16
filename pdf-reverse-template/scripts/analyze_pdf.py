@@ -94,7 +94,7 @@ def snap(cm):
     return (best, True) if abs(best - cm) < 0.25 else (round(cm, 2), False)
 
 
-def running_heads(spans, npages, page_h):
+def running_heads(spans, npages, page_h, body_size=None, advance=None):
     """Indices of spans belonging to a running header or footer.
 
     Multi-page: same y position recurring across pages. Reliable.
@@ -102,22 +102,55 @@ def running_heads(spans, npages, page_h):
     that the report flags as unreliable.
     """
     if npages >= 2:
-        # Conditions: inside the top/bottom 12% band, and the same y appears on
-        # >= 60% of pages. Text equality is deliberately not required — page
-        # numbers differ on every page but are still a footer. The band is what
-        # keeps ordinary body lines out: equal-length paragraphs land on the
-        # same baseline across pages.
         band = lambda s: s["bbox"][1] < page_h * 0.12 or s["bbox"][3] > page_h * 0.88
-        pages_of = collections.defaultdict(set)
-        for s in spans:
+        by_y = collections.defaultdict(list)
+        for i, s in enumerate(spans):
             if band(s):
-                pages_of[round(s["bbox"][1])].add(s["page"])
-        # ceil, not int: with int(4 * 0.6) == 2, two chapter headings that happen
-        # to share a y would be mistaken for a running head.
+                by_y[round(s["bbox"][1])].append(i)
+
         need = max(2, math.ceil(npages * 0.6))
-        rep = {y for y, pgs in pages_of.items() if len(pgs) >= need}
-        return {i for i, s in enumerate(spans)
-                if band(s) and round(s["bbox"][1]) in rep}, "recurring across pages"
+        hits = set()
+        for y, idx in by_y.items():
+            pages = {spans[i]["page"] for i in idx}
+            if len(pages) < need:
+                continue
+            texts = [spans[i]["text"].strip() for i in idx]
+            # Chrome repeats itself; content does not. Two forms qualify:
+            #   - the same words on most pages (a title, a confidentiality note)
+            #   - a short token that counts up (a page number)
+            # Position alone is not enough: a section heading printed at the top
+            # of every page sits at the same y with different words each time,
+            # and dropping it removes real headings from the style clusters.
+            # Chrome is never set larger than the body text. A section heading
+            # printed at the top of every page repeats a position but not a
+            # size: dropping it would delete real headings from the clusters.
+            if body_size is not None and \
+                    max(spans[i]["size"] for i in idx) > body_size + 0.4:
+                continue
+            common = collections.Counter(texts).most_common(1)[0][1]
+            repeats = common / len(texts) >= 0.6
+            numeric = all(len(t) <= 6 and re.fullmatch(r"[\divxlcIVXLC/第页共\-–—.]+", t)
+                          for t in texts)
+            # A header showing the current chapter changes its words every page,
+            # so neither test above catches it. What it does have is a clear gap
+            # to the text block; the first line of a paragraph does not.
+            isolated = False
+            if advance:
+                gaps = []
+                for i in idx:
+                    pg, sy = spans[i]["page"], spans[i]["bbox"][1]
+                    below = [s["bbox"][1] for s in spans
+                             if s["page"] == pg and s["bbox"][1] > sy + 1]
+                    above = [s["bbox"][3] for s in spans
+                             if s["page"] == pg and s["bbox"][3] < sy - 1]
+                    if sy < page_h / 2 and below:
+                        gaps.append(min(below) - sy)
+                    elif sy >= page_h / 2 and above:
+                        gaps.append(sy - max(above))
+                isolated = bool(gaps) and statistics.median(gaps) > advance * 1.8
+            if repeats or numeric or isolated:
+                hits |= set(idx)
+        return hits, "recurring across pages"
 
     order = sorted(range(len(spans)), key=lambda i: spans[i]["bbox"][1])
     ys = [spans[i]["bbox"][1] for i in order]
@@ -216,7 +249,19 @@ def analyze(path, body_pick=None):
         sys.exit("No text layer in this PDF — it is probably a scan. OCR it first.")
 
     tagged = doc.xref_get_key(doc.pdf_catalog(), "StructTreeRoot")[0] != "null"
-    hf, hf_method = running_heads(spans, doc.page_count, H)
+    # Two passes: estimate the body size from every span first, so the running
+    # head test can use "never larger than the body" as its size guard.
+    prelim = collections.Counter()
+    for s in spans:
+        if not s["filler"]:
+            prelim[s["size"]] += len(s["text"].strip())
+    body_size = prelim.most_common(1)[0][0] if prelim else None
+    pb = sorted((s["page"], round(s["bbox"][1], 1)) for s in spans
+                if s["size"] == body_size and not s["filler"])
+    pdl = [round(b[1] - a[1], 1) for a, b in zip(pb, pb[1:])
+           if a[0] == b[0] and 0 < b[1] - a[1] < (body_size or 12) * 3]
+    advance = collections.Counter(pdl).most_common(1)[0][0] if pdl else None
+    hf, hf_method = running_heads(spans, doc.page_count, H, body_size, advance)
     body_spans = [s for i, s in enumerate(spans) if i not in hf]
     content = [s for s in body_spans if not s["filler"]]
     filler_count = len(body_spans) - len(content)
@@ -354,7 +399,7 @@ def report(r, chars, body):
         print(f"  drives every paragraph metric. Override with --body <rank>.")
         print(f"  {'rank':<5}{'size':>6}{'colour':>9}{'chars':>7}{'lines':>7}{'pages':>7}  sample")
         for c in cands:
-            mark = "  <- default" if c["chosen"] else ""
+            mark = "  <- chosen" if c["chosen"] else ""
             print(f"  {c['rank']:<5}{c['size']:>6}{'#'+c['color']:>9}{c['chars']:>7}"
                   f"{c['lines']:>7}{c['pages']:>7}  {c['sample'][:40]}{mark}")
 

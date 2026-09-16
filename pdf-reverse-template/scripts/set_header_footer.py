@@ -8,6 +8,11 @@ Usage:
   python3 set_header_footer.py <reference.docx> --clear
 
 Options:
+  --replace OLD=NEW  replace literal text inside the existing header and footer
+                     parts, leaving their layout untouched. Repeatable. Use this
+                     to swap a document number or owner out of a branded footer:
+                     rebuilding it with --footer would flatten the tab columns,
+                     border rules, first-page variant and any table it contains.
   --header TEXT      header text (omit to leave the header untouched)
   --footer TEXT      footer text
   --page-number      append an automatic PAGE field after the footer text
@@ -21,7 +26,7 @@ Pandoc carries the header and footer into every document produced with
 --reference-doc. Image logos are out of scope here: they need extra media parts
 and relationships, which is easier to do in Word.
 """
-import sys, os, re, shutil, zipfile
+import sys, os, re, shutil, zipfile, collections
 
 NS = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
       'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"')
@@ -33,6 +38,44 @@ REL = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/"
 # twips
 PAPER = {"A4": (11906, 16838), "A5": (8391, 11906), "A3": (16838, 23811),
          "LETTER": (12240, 15840), "LEGAL": (12240, 20160)}
+# CT_SectPr is an ordered sequence. Inserting pgSz at the head of sectPr puts it
+# before the header/footer references and breaks that order.
+SECTPR_ORDER = ["headerReference", "footerReference", "footnotePr", "endnotePr",
+                "type", "pgSz", "pgMar", "paperSrc", "pgBorders", "lnNumType",
+                "pgNumType", "cols", "formProt", "vAlign", "noEndnote", "titlePg",
+                "textDirection", "bidi", "rtlGutter", "docGrid", "printerSettings",
+                "sectPrChange"]
+
+
+def merge_sectpr(inner, new_elems):
+    """Replace same-named children and re-sort into CT_SectPr order."""
+    rank = {n: i for i, n in enumerate(SECTPR_ORDER)}
+    items = []
+    for m in re.finditer(r"<w:([a-zA-Z]+)\b[^>]*?/>|<w:([a-zA-Z]+)\b[^>]*?>.*?</w:\2>",
+                         inner or "", re.S):
+        items.append(((m.group(1) or m.group(2)), m.group(0)))
+    single = {k: v for k, v in new_elems.items() if k != "headerReference"
+              and k != "footerReference"}
+    items = [(n, v) for n, v in items if n not in single]
+    items += list(single.items())
+    for k in ("headerReference", "footerReference"):
+        if k in new_elems:
+            items.insert(0, (k, new_elems[k]))
+    items.sort(key=lambda kv: rank.get(kv[0], len(SECTPR_ORDER)))
+    return "".join(v for _, v in items)
+
+
+def put_in_sectpr(doc, elems):
+    """Merge elements into the body sectPr, creating one when absent."""
+    m = re.search(r"<w:sectPr\b[^>]*>(.*?)</w:sectPr>", doc, re.S)
+    if m:
+        return doc[:m.start()] + f"<w:sectPr>{merge_sectpr(m.group(1), elems)}</w:sectPr>" \
+               + doc[m.end():]
+    m = re.search(r"<w:sectPr\b[^>]*/>", doc)
+    body = merge_sectpr("", elems)
+    if m:
+        return doc[:m.start()] + f"<w:sectPr>{body}</w:sectPr>" + doc[m.end():]
+    return doc.replace("</w:body>", f"<w:sectPr>{body}</w:sectPr></w:body>")
 
 
 def esc(s):
@@ -94,6 +137,42 @@ def main():
         return 0
 
     opt = lambda k: a[a.index(k) + 1] if k in a else None
+
+    pairs = [a[i + 1] for i, v in enumerate(a) if v == "--replace" and i + 1 < len(a)]
+    if pairs:
+        subs = []
+        for pr in pairs:
+            if "=" not in pr:
+                print(f"--replace needs OLD=NEW, got {pr!r}")
+                return 2
+            subs.append(tuple(pr.split("=", 1)))
+        out = opt("--out") or path
+        hits = collections.Counter()
+        tmp = out + ".tmp"
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+            for fn, data in members:
+                if re.match(r"word/(header|footer)\d+\.xml", fn):
+                    t = data.decode("utf-8", "replace")
+                    for old, new in subs:
+                        # only inside <w:t>, so element names and attributes are safe
+                        def sub(m, old=old, new=new):
+                            if old not in m.group(2):
+                                return m.group(0)
+                            hits[old] += m.group(2).count(old)
+                            return m.group(1) + m.group(2).replace(old, esc(new)) + m.group(3)
+                        t = re.sub(r"(<w:t[^>]*>)([^<]*)(</w:t>)", sub, t)
+                    data = t.encode("utf-8")
+                z.writestr(fn, data)
+        shutil.move(tmp, out)
+        for old, new in subs:
+            n = hits[old]
+            print(f"  {'replaced' if n else 'NOT FOUND'}  {old!r} -> {new!r}"
+                  + (f"  ({n}x)" if n else ""))
+        print(f"  -> {out}")
+        with zipfile.ZipFile(out) as z:
+            show([(i.filename, z.read(i.filename)) for i in z.infolist()])
+        return 0 if all(hits[o] for o, _ in subs) else 1
+
     clear = "--clear" in a
     header, footer = opt("--header"), opt("--footer")
     paper = (opt("--paper") or "").upper() or None
@@ -101,7 +180,8 @@ def main():
         print(f"Unknown paper size {paper!r}. Choose from: {', '.join(PAPER)}")
         return 2
     if not clear and header is None and footer is None and not paper:
-        print("Nothing to do: pass --header / --footer / --paper / --clear / --show.")
+        print("Nothing to do: pass --replace / --header / --footer / --paper / "
+              "--clear / --show.")
         return 2
 
     size = float(opt("--size") or 9)
@@ -147,27 +227,14 @@ def main():
                                 f'<Relationship Id="{rid}" Type="{reltype}" '
                                 f'Target="{part}"/></Relationships>')
             tag = "header" if kind == "hdr" else "footer"
-            ref = f'<w:{tag}Reference w:type="default" r:id="{rid}"/>'
-            if "<w:sectPr>" in doc:
-                doc = doc.replace("<w:sectPr>", "<w:sectPr>" + ref, 1)
-            elif re.search(r"<w:sectPr\b[^>]*/>", doc):
-                doc = re.sub(r"<w:sectPr\b[^>]*/>", f"<w:sectPr>{ref}</w:sectPr>", doc, 1)
-            else:
-                doc = doc.replace("</w:body>", f"<w:sectPr>{ref}</w:sectPr></w:body>")
+            doc = put_in_sectpr(doc, {f"{tag}Reference":
+                                      f'<w:{tag}Reference w:type="default" r:id="{rid}"/>'})
             added.append(f"{tag} {text!r}"
                          f"{' +page number' if pagenum and kind == 'ftr' else ''}")
 
     if paper:
         w, h = PAPER[paper]
-        pg = f'<w:pgSz w:w="{w}" w:h="{h}"/>'
-        if "<w:pgSz" in doc:
-            doc = re.sub(r"<w:pgSz\b[^>]*/>", pg, doc, count=1)
-        elif "<w:sectPr>" in doc:
-            doc = doc.replace("<w:sectPr>", "<w:sectPr>" + pg, 1)
-        elif re.search(r"<w:sectPr\b[^>]*/>", doc):
-            doc = re.sub(r"<w:sectPr\b[^>]*/>", f"<w:sectPr>{pg}</w:sectPr>", doc, 1)
-        else:
-            doc = doc.replace("</w:body>", f"<w:sectPr>{pg}</w:sectPr></w:body>")
+        doc = put_in_sectpr(doc, {"pgSz": f'<w:pgSz w:w="{w}" w:h="{h}"/>'})
         added.append(f"paper {paper}")
 
     out = opt("--out") or path

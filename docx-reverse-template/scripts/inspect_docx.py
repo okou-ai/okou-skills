@@ -116,8 +116,10 @@ def main(path):
     if literals:
         print("  REVIEW: the literal text above is copied verbatim into every document")
         print("          generated from this template. Document numbers, versions, owners")
-        print("          and dates belonging to the source must be replaced or removed:")
-        print("          set_header_footer.py <ref> --footer '...' --page-number")
+        print("          and dates belonging to the source must be replaced:")
+        print("          set_header_footer.py <ref> --replace 'OKOU-2026-001=PLACEHOLDER'")
+        print("          Swap the values in place. Rebuilding with --footer would flatten")
+        print("          tab columns, border rules, a first-page variant and any table.")
 
     # --- page setup ---
     doc = z.read("word/document.xml").decode("utf-8", "replace")

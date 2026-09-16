@@ -85,7 +85,9 @@ two ways and says which:
 - the top margin **exceeds** the bound, so the layout is not symmetric and the
   rounded bound is suggested instead
 
-Override either with `--bottom <cm>`.
+Override either with `--bottom <cm>`. `build_reference.py` uses this suggestion
+by default, so a non-symmetric layout no longer needs the flag — pass it only to
+disagree with the report.
 
 ### 5. Build the template
 
@@ -113,11 +115,13 @@ values.
 
 ```bash
 python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output dir> \
-        --map 1=Heading1,2=Title,3=Heading2
+        --map 1=Heading1,2=Title,3=Heading2 --body 2
 ```
 
-Pass `--map`, `--bottom` and `--body` through verbatim; they are recorded in the
-"Human decisions" section of the README.
+Pass `--map`, `--bottom` and `--body` through verbatim. They are recorded in the
+"Human decisions" section of the README, and `--body` is replayed when the
+report is regenerated — omitting it makes `report.txt` re-analyse with the
+default cluster and contradict the template shipped beside it.
 
 Hand over the whole directory.
 
