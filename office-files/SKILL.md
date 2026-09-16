@@ -16,6 +16,14 @@ If the install fails, deliver Markdown or a hosted HTML view instead and say the
 
 ## Pick your flow
 
+Every deliverable is **rendered from a source you author**. You never write a `.docx` or a `.pdf` directly:
+
+```
+prose  →  you write doc.md  →  pandoc  →  .docx
+                             →  pandoc → typst  →  .pdf
+data   →  you build rows in Python  →  openpyxl  →  .xlsx
+```
+
 | Situation | Flow |
 | --- | --- |
 | Word document, user supplied a template | `pandoc doc.md --reference-doc=theirs.docx -o out.docx` — see **docx** |
@@ -25,7 +33,7 @@ If the install fails, deliver Markdown or a hosted HTML view instead and say the
 | Spreadsheet | openpyxl — see **xlsx** |
 | Edit a file the user sent | **Start from the user's file** first, then the matching row above |
 
-The rule behind the table: **author Markdown for prose and structured data for spreadsheets; styling comes from a `.docx` or from openpyxl, never from the content you write.** Never author a spreadsheet as a Markdown table, and never hand-build docx XML.
+Styling never comes from the source you author — it comes from a `.docx` passed to pandoc, or from openpyxl. Never author a spreadsheet as a Markdown table, and never hand-build docx XML.
 
 ## Start from the user's file
 
@@ -36,6 +44,10 @@ pandoc theirs.docx -t markdown --wrap=none > doc.md
 Edit the Markdown, then render it back with the same `.docx` as `--reference-doc` so their styling survives the round trip. For xlsx, read with openpyxl — pandoc lists xlsx as an input format but fails on many real files.
 
 ## docx
+
+**Step 1 — write the content as Markdown into `doc.md`.** Headings become Word heading styles, Markdown tables become Word tables, and `**bold**` becomes bold. This file is the source of truth; the docx is a render of it.
+
+**Step 2 — render it:**
 
 ```bash
 pandoc doc.md --reference-doc=theme.docx -o out.docx
@@ -55,6 +67,8 @@ pandoc --print-default-data-file reference.docx > theme.docx
 Then open `theme.docx` with python-docx, set `section.header`, add a `PAGE` field to `section.footer`, save, and pass it with `--reference-doc`. A blank `python-docx.Document()` lacks the styles pandoc emits, so Word silently renders them as Normal.
 
 ## PDF
+
+Same `doc.md` as the docx flow — write the Markdown first, then render through typst:
 
 ```bash
 pandoc doc.md -t typst -o doc.typ
