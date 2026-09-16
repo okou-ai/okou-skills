@@ -7,9 +7,13 @@ description: Produce and edit real Office deliverables — docx, xlsx and PDF �
 
 ```bash
 pip install --break-system-packages --quiet pypandoc_binary typst openpyxl python-docx
+export PATH="$(python3 -c 'import pypandoc,os;print(os.path.dirname(pypandoc.get_pandoc_path()))'):$PATH"
 ```
 
-About 6 seconds. Nothing is preinstalled. `--break-system-packages` is required: the system Python is PEP 668 externally managed and the install fails without it.
+About 6 seconds. Nothing is preinstalled, and both lines are required:
+
+- `--break-system-packages` — the system Python is PEP 668 externally managed and the install fails without it.
+- the `PATH` export — the wheel ships the pandoc binary inside the package directory (`site-packages/pypandoc/files/pandoc`), not on `PATH`. Skip it and every `pandoc` call below is `command not found`.
 
 ## Pick the contract before you write anything
 
@@ -31,7 +35,13 @@ pandoc report.md --reference-doc=theme.docx --toc --toc-depth=2 -o report.docx  
 
 **When there is no reference doc**, omit the flag — `pandoc report.md -o report.docx` uses pandoc's built-in default and produces a clean but unbranded file with no header, no footer and no page number. Say that in one line when you deliver it, and offer to match their house style if they send you a Word file.
 
-The exception is a request that explicitly needs a header, footer or page numbers. None of those can be expressed in Markdown, so build a minimal reference doc first with python-docx — set `section.header`, and add a `PAGE` field to `section.footer` — then pass that file with `--reference-doc`.
+The exception is a request that explicitly needs a header, footer or page numbers. None of those can be expressed in Markdown, so build a reference doc first — starting from pandoc's own, never from a blank document:
+
+```bash
+pandoc --print-default-data-file reference.docx > theme.docx
+```
+
+Then open `theme.docx` with python-docx, set `section.header`, add a `PAGE` field to `section.footer`, save, and pass it with `--reference-doc`. A blank `python-docx.Document()` does not define the styles pandoc emits, so `Compact`, `FirstParagraph`, `BlockText`, `Table` and `VerbatimChar` end up as dangling references that Word silently renders as Normal.
 
 One trap: styles match on `<w:name>`, not `<w:styleId>`. A Chinese-locale Word file with `styleId="1"` still works as long as `w:name` is `heading 1`. Never rewrite styleIds.
 
