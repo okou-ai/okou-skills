@@ -176,9 +176,11 @@ Check the heading level mapping in section 4 first. Levels are the one thing a
 PDF does not record.
 
 **I need a header or footer.**
-The original PDF's header and footer were **not** carried over — in a PDF they
-are ordinary text. Add them in Word, or with `set_header_footer.py` from the
-skill. Either way they then flow into every output document.
+Section 3 lists what this template carries. A PDF stores its running content as
+ordinary text, so nothing is carried over automatically — whatever is listed was
+added deliberately when the template was built. Add or change one in Word, or
+with `set_header_footer.py` from the skill; either way it flows into every
+output document.
 
 ## 6. Package contents
 
@@ -203,22 +205,50 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
 
     d = json.load(open(jpath))
     st = styles_of(ref)
-    names = ["Title", "heading 1", "heading 2", "heading 3",
-             "Body Text", "First Paragraph", "Compact", "Block Text"]
-    rows = "\n".join(row(st, n) for n in names)
+    # Every style the reader is told about, plus anything else the template
+    # actually defines. A fixed list would omit a style created during the
+    # optional step — Source Code is the usual one — while the FAQ still
+    # explains how to create it.
+    names = ["Title", "Subtitle", "heading 1", "heading 2", "heading 3",
+             "Body Text", "First Paragraph", "Compact", "Block Text", "Source Code"]
+    names += [n for _, n in MD_MAP if n not in names]
+    rows = "\n".join(row(st, n) for n in names if n.lower() in st)
     md = "\n".join(f"| {a} | `{b}` |" for a, b in MD_MAP)
 
     p, mg = d["page"], d["margins_suggested_cm"]
+    # Read the margins back out of the template rather than recomputing them.
+    # Recomputing is how section 3 and section 4 came to disagree, and how a
+    # value that is in neither the template nor the decision log got printed.
+    with zipfile.ZipFile(ref) as z:
+        rdoc = z.read("word/document.xml").decode("utf-8", "replace")
+        rparts = z.namelist()
+        rhf = []
+        for part in sorted(x for x in rparts if re.match(r"word/(header|footer)\d+\.xml", x)):
+            raw = z.read(part)
+            t = " ".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>",
+                                    raw.decode("utf-8", "replace"))).strip()
+            kind = "Header" if "header" in part else "Footer"
+            extra = []
+            if b"PAGE" in raw:
+                extra.append("automatic page number")
+            if b"<w:drawing" in raw or b"<v:imagedata" in raw:
+                extra.append("image")
+            rhf.append(f"{kind}: {t or '(no literal text)'}"
+                       + (f" + {', '.join(extra)}" if extra else ""))
+    cm = lambda t: round(int(t) / 1440 * 2.54, 2)
+    mar = dict(re.findall(r'w:(top|right|bottom|left)="(-?\d+)"', rdoc))
     page = [f"- Paper: {p['w_cm']} x {p['h_cm']} cm"
-            + (f" ({p['paper']})" if p.get("paper") else ""),
-            "- Margins: top {top} / bottom {bot} / left {left} / right {right} cm".format(
-                top=mg["top"], bot=bottom if bottom is not None else mg["top"],
-                left=mg["left"], right=mg["right"])]
-    if d.get("running_heads"):
+            + (f" ({p['paper']})" if p.get("paper") else "")]
+    if mar:
+        page.append("- Margins: top {top} / bottom {bottom} / left {left} / "
+                    "right {right} cm".format(**{k: cm(v) for k, v in mar.items()}))
+    if rhf:
+        page += [f"- {h}" for h in rhf]
+    elif d.get("running_heads"):
         page.append(f"- Recurring content in the source PDF (header/footer/page number): "
                     f"{' / '.join(d['running_heads'])}\n"
                     f"  This was **not** carried into the template — in a PDF it is "
-                    f"ordinary text. Add a header or footer in Word if you need one.")
+                    f"ordinary text. Add one with `set_header_footer.py` or in Word.")
 
     rev = []
     if mapping:
