@@ -64,7 +64,7 @@ On the camera route the recording's length is already fixed, so any narration th
 
 Prepare the selected route only. Cache downloads, probes, extractions, conversions, catalog records, and generated assets, and read them back during prompt assembly and recovery.
 
-- **Camera:** probe the recording and its sidecar, render the automatic first cut, review it on the paired checkpoint frames, refine the plan, and re-render. Deliver the refined cut with the automatic one.
+- **Camera:** probe the recording and its sidecar, render the cut, check every framing on one tile of click-moment frames, fix only the ones that do not read, then add narration if the brief asks for it. The command decides the camera work; leave the framings that already work.
 - **Native:** choose the [recipe](references/recipes.md) for the inferred intent, extract and verify facts, prepare only the references the request needs, resolve exact IDs through [catalogs](references/catalogs.md), classify the selected look and compile the prompt with the [prompt compiler](references/prompt-compiler.md) — the presenter path when the brief carries a look, the no-presenter path when it does not — check the assembled narration against the stated length one last time, and submit once. Poll the same durable job, then verify with [QA](references/qa.md).
 - **Controlled:** lock the timeline and preservation plan. With nothing to preserve, hand that plan to the `video-composition` skill, which owns the layout library and the media orchestration. Otherwise prepare visuals, narration audio, and the HyperFrames project concurrently. A speaking presenter waits only for finalized narration audio. Assemble, validate, render once, then apply the controlled gate.
 
