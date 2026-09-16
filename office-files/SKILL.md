@@ -19,8 +19,8 @@ If the install fails, deliver Markdown or a hosted HTML view instead and say the
 Every deliverable is **rendered from a source you author**. You never write a `.docx` or a `.pdf` directly:
 
 ```
-prose  →  you write doc.md  →  pandoc  →  .docx
-                             →  pandoc → typst  →  .pdf
+prose  →  you write doc.md  →  pandoc                →  .docx
+                             →  pandoc -t typst  →  .pdf
 data   →  you build rows in Python  →  openpyxl  →  .xlsx
 ```
 
@@ -29,7 +29,7 @@ data   →  you build rows in Python  →  openpyxl  →  .xlsx
 | Word document, user supplied a template | `pandoc doc.md --reference-doc=theirs.docx -o out.docx` — see **docx** |
 | Word document, no template | `pandoc doc.md -o out.docx` — see **docx** |
 | Word document needing a header, footer or page number, no template | build a reference doc first — see **docx** |
-| PDF | `pandoc doc.md -t typst` then `typst.compile` — see **PDF** |
+| PDF | `pandoc doc.md -t typst -s -V papersize=a4` then `typst.compile` — see **PDF** |
 | Spreadsheet | openpyxl — see **xlsx** |
 | Edit a file the user sent | **Start from the user's file** first, then the matching row above |
 
@@ -136,6 +136,6 @@ r._r.addnext(f)
 d.save("theme.docx")
 PY
 pandoc report.md --reference-doc=theme.docx --toc --toc-depth=2 -o report.docx
-pandoc report.md -t typst -o report.typ
+pandoc report.md -t typst -s -V papersize=a4 -o report.typ
 python3 -c "import typst; typst.compile('report.typ', output='report.pdf')"
 ```
