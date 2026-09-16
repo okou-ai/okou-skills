@@ -229,19 +229,12 @@ def analyze(path, body_pick=None):
     if not chars:
         sys.exit("Every span looks like a leader or rule. Nothing to infer.")
 
-    # Spans per distinct line, which separates prose from table cells: a table
-    # row puts one span in every column, prose puts one or two on a line. Raw
-    # character count alone hands "body text" to a dense table, and every
-    # paragraph metric is then measured against table geometry.
-    tabular = {}
-    for k in chars:
-        S = [s for s in content if skey(s) == k]
-        rows = len({(s["page"], round(s["bbox"][1], 1)) for s in S})
-        tabular[k] = (len(S) / rows) >= 2.0 if rows else False
-
+    # Ranked by character count, nothing more. Which cluster is body text is a
+    # reading decision, not an arithmetic one: a dense table or an index can
+    # hold more characters than the prose around it. The report prints every
+    # candidate with its sample text so the caller can judge and pass --body.
     ranked = [k for k, _ in chars.most_common()]
-    prose = [k for k in ranked if not tabular[k]]
-    body = (prose or ranked)[0]
+    body = ranked[0]
     if body_pick is not None:
         if not 1 <= body_pick <= len(ranked):
             sys.exit(f"--body must be between 1 and {len(ranked)}")
@@ -312,9 +305,12 @@ def analyze(path, body_pick=None):
         "tagged": tagged,
         "filler_spans_excluded": filler_count,
         "body_candidates": [{"rank": i, "font": font_of(k), "size": k[0], "color": k[1],
-                             "bold": k[2], "chars": chars[k], "tabular": tabular[k],
+                             "bold": k[2], "chars": chars[k],
+                             "lines": len({(s["page"], round(s["bbox"][1], 1))
+                                           for s in content if skey(s) == k}),
+                             "pages": len({s["page"] for s in content if skey(s) == k}),
                              "sample": sample(k), "chosen": k == body}
-                            for i, k in enumerate(ranked[:6], 1)],
+                            for i, k in enumerate(ranked[:8], 1)],
         "body_pick": body_pick,
         "body": dict({"font": font_of(body), "size": body[0], "color": body[1],
                       "bold": body[2], "leading_pt": leading}, **body_sp),
@@ -352,14 +348,15 @@ def report(r, chars, body):
 
     cands = r.get("body_candidates") or []
     if len(cands) > 1:
-        print(f"\n[body candidates]  the chosen one drives every paragraph metric; "
-              f"override with --body <rank>")
-        print(f"{'rank':<6}{'font':<26}{'size':>6}{'colour':>9}{'chars':>7}{'table?':>8}  sample")
+        print(f"\n[body candidates]  ranked by character count only — READ THE SAMPLES.")
+        print(f"  The default is simply the largest cluster, which is wrong whenever a")
+        print(f"  table, an index or a caption block outweighs the prose. The choice")
+        print(f"  drives every paragraph metric. Override with --body <rank>.")
+        print(f"  {'rank':<5}{'size':>6}{'colour':>9}{'chars':>7}{'lines':>7}{'pages':>7}  sample")
         for c in cands:
-            mark = " <- chosen" if c["chosen"] else ""
-            print(f"{c['rank']:<6}{c['font']:<26}{c['size']:>6}{'#'+c['color']:>9}"
-                  f"{c['chars']:>7}{('yes' if c['tabular'] else '-'):>8}  "
-                  f"{c['sample'][:22]}{mark}")
+            mark = "  <- default" if c["chosen"] else ""
+            print(f"  {c['rank']:<5}{c['size']:>6}{'#'+c['color']:>9}{c['chars']:>7}"
+                  f"{c['lines']:>7}{c['pages']:>7}  {c['sample'][:40]}{mark}")
 
     print(f"\n[inferred styles]  clustered by size + colour + weight, so one heading "
           f"split\n across scripts stays a single cluster. Exact: size/colour/weight. "

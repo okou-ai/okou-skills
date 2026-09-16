@@ -243,17 +243,15 @@ def build(pdf, ref, jpath, outdir, mapping, bottom):
                    f"({chosen['font']} {chosen['size']}pt #{chosen['color']}, "
                    f"{chosen['chars']} characters)"
                    + (f", chosen explicitly with --body {d['body_pick']}"
-                      if d.get("body_pick") else
-                      ". Higher-ranked clusters were skipped as tabular." if
-                      any(c["tabular"] for c in cands if c["rank"] < chosen["rank"])
-                      else ". It had the most characters."))
+                      if d.get("body_pick")
+                      else ". It was the largest cluster, accepted as the default."))
         rev.append("")
-        rev.append("| Rank | Font | Size | Chars | Table-like | Sample |")
+        rev.append("| Rank | Font | Size | Chars | Lines | Sample |")
         rev.append("|---|---|---|---|---|---|")
         for c in cands:
             mark = " **<- chosen**" if c["chosen"] else ""
             rev.append(f"| {c['rank']} | {c['font']} | {c['size']}pt | {c['chars']} "
-                       f"| {'yes' if c['tabular'] else '-'} | {c['sample'][:24]}{mark} |")
+                       f"| {c.get('lines', '-')} | {c['sample'][:28]}{mark} |")
     rev.append("")
     if bottom is not None:
         rev.append(f"**Bottom margin**: set by hand to {bottom} cm.")

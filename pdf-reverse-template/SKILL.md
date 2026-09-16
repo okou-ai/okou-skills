@@ -33,18 +33,24 @@ rather than guessing from font size.
 
 "No text layer" means a scan; OCR it first and come back.
 
-### 2. Confirm the body cluster — human decision
+### 2. Pick the body cluster — human decision
 
-Read `[body candidates]`. The chosen cluster drives every paragraph metric, so a
-wrong pick silently corrupts line spacing, space after and the heading size
-threshold.
+Read `[body candidates]` and decide which cluster is the running prose. The
+default is just the largest one by character count, which loses whenever a table,
+an index or a caption block holds more characters than the text around it.
 
-Clusters whose lines hold several spans are marked `table?  yes` and skipped —
-a dense table otherwise outvotes real prose on character count. Dotted table-of-
-contents leaders are removed before counting for the same reason.
+This choice drives every paragraph metric — line advance, space after, first-line
+indent, and the size threshold that decides what counts as a heading. A wrong
+pick corrupts all of them and nothing downstream complains.
 
-Check that the `sample` text of the chosen row reads like body prose. If not,
-re-run with `--body <rank>`.
+```
+rank   size   colour  chars  lines  pages  sample
+1       9.4  #242121    789     65      6  指标                      <- default
+2      10.5  #242121    737     33      5  本报告覆盖试点项目第一阶段的交付范围…   <- the real body
+```
+
+Rank 1 there is a table column header; rank 2 is prose. Judge it from the sample
+text, not the character count, and re-run with `--body 2`.
 
 ### 3. Assign heading levels — human decision
 
@@ -143,4 +149,5 @@ Re-run step 6, then step 7.
 | The right margin reads far too large | No line fills the column; round to a common value by hand |
 | A single-page PDF gives bad margins | Running heads cannot be detected; measure all four by hand |
 | Paragraph metrics look implausible | The wrong body cluster was picked; re-run step 2 with `--body <rank>` |
+| The default body candidate is a table or an index | Expected; that is what step 2 exists to catch |
 | Body text splits into several clusters | Clusters merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |
