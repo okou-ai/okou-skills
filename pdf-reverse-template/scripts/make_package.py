@@ -1,0 +1,281 @@
+#!/usr/bin/env python3
+"""Assemble the deliverable: template, source PDF, report and usage notes.
+
+Usage:
+  python3 make_package.py <source.pdf> <reference.docx> <styles.json> <output dir> \
+          [--map 1=Heading1,2=Title] [--bottom 3.0]
+
+Pass --map and --bottom through verbatim; they are recorded in the "Human
+decisions" section of the README, which is the only record of why the template
+holds the values it does.
+"""
+import sys, os, re, json, shutil, zipfile, subprocess, datetime
+
+HALF2PT = lambda h: round(int(h) / 2, 1)
+TWIP2PT = lambda t: round(int(t) / 20, 1)
+
+MD_MAP = [
+    ("`# Heading 1`", "heading 1"), ("`## Heading 2`", "heading 2"),
+    ("`### Heading 3`", "heading 3"),
+    ("Ordinary paragraph", "Body Text"), ("`> Block quote`", "Block Text"),
+    ("Fenced code block", "Source Code"),
+    ("Pipe table", "Table"),
+    ("`title:` in the YAML header", "Title"),
+]
+
+
+def styles_of(path):
+    with zipfile.ZipFile(path) as z:
+        x = z.read("word/styles.xml").decode("utf-8", "replace")
+    out = {}
+    for m in re.finditer(r"<w:style\b[^>]*?w:styleId=\"([^\"]+)\"[^>]*>(.*?)</w:style>", x, re.S):
+        sid, inner = m.group(1), m.group(2)
+        n = re.search(r"<w:name\s+w:val=\"([^\"]*)\"", inner)
+        if not n:
+            continue
+        rpr = re.search(r"<w:rPr>.*?</w:rPr>", inner, re.S)
+        r = rpr.group(0) if rpr else ""
+        ppr = re.search(r"<w:pPr>.*?</w:pPr>", inner, re.S)
+        p = ppr.group(0) if ppr else ""
+        g = lambda pat, conv, src: (lambda mm: conv(mm.group(1)) if mm else None)(
+            re.search(pat, src))
+        ind = re.search(r'<w:ind[^>]*w:firstLine="(\d+)"', p)
+        jc = re.search(r'<w:jc w:val="([a-z]+)"', p)
+        out[n.group(1).lower()] = dict(
+            id=sid,
+            font=g(r'w:ascii="([^"]*)"', str, r),
+            size=g(r'<w:sz w:val="(\d+)"', HALF2PT, r),
+            color=g(r'<w:color w:val="([0-9A-Fa-f]{6})"', lambda v: v.upper(), r),
+            before=g(r'<w:spacing[^>]*w:before="(\d+)"', TWIP2PT, p),
+            after=g(r'<w:spacing[^>]*w:after="(\d+)"', TWIP2PT, p),
+            line=g(r'<w:spacing[^>]*w:line="(\d+)"', TWIP2PT, p),
+            indent=TWIP2PT(ind.group(1)) if ind else None,
+            align=jc.group(1) if jc else None,
+        )
+    return out
+
+
+def row(st, name):
+    s = st.get(name.lower())
+    if not s:
+        return f"| {name} | not defined | - | - | - |"
+    look = " ".join(v for v in (s["font"],
+                                f"{s['size']}pt" if s["size"] else "",
+                                f"#{s['color']}" if s["color"] else "") if v)
+    sp = " ".join(v for v in (f"before {s['before']}" if s["before"] else "",
+                              f"after {s['after']}" if s["after"] else "",
+                              f"line {s['line']}" if s["line"] else "") if v)
+    indent = f"{s['indent']}pt" if s["indent"] else "-"
+    return (f"| {name} | {look or 'inherited from Normal'} | {sp or '-'} | "
+            f"{indent} | {s['align'] or '-'} |")
+
+
+README = """# {name} document template
+
+A Word template reverse-engineered from a PDF. Use it to convert Markdown into
+documents that match the original layout.
+
+## 1. Quick start
+
+```bash
+# Install pandoc
+brew install pandoc                                  # macOS
+sudo apt install pandoc                              # Debian / Ubuntu
+winget install --id JohnMacFarlane.Pandoc            # Windows
+
+# Convert
+pandoc your-document.md --reference-doc=reference.docx -o output.docx
+```
+
+For a PDF, open the resulting .docx in Word and export from there.
+
+No administrator rights? Pandoc ships a portable build. Download the archive
+matching **your OS and CPU architecture** from
+<https://github.com/jgm/pandoc/releases> (Apple Silicon: `arm64-macOS.zip`,
+Intel Mac: `x86_64-macOS.zip`, Windows: `windows-x86_64.zip`, Linux:
+`linux-amd64` or `linux-arm64.tar.gz`), unpack it, and add its `bin` directory
+to PATH.
+
+## 2. Writing Markdown that picks up these styles
+
+| Markdown construct | Style it maps to |
+|---|---|
+{md_map}
+
+Put the document title in the YAML header:
+
+```markdown
+---
+title: Document title
+author: Author
+---
+
+# Chapter one
+
+Body text.
+```
+
+## 3. What this template contains
+
+### Fonts and spacing (pt)
+
+| Style | Font / size / colour | Spacing | First-line indent | Alignment |
+|---|---|---|---|---|
+{styles}
+
+### Page
+
+{page}
+
+## 4. Human decisions
+
+A PDF has no style layer, so this template was **measured and inferred**. Two
+choices were made by hand when it was built; start here if any value looks off:
+
+{review}
+
+Confidence by field:
+
+| Field | Source | Confidence |
+|---|---|---|
+| Font / size / colour | Recorded exactly in the PDF | High |
+| Spacing / line height / indent / alignment | Computed from coordinates | High |
+| Heading levels | Assigned by hand (above) | Depends on the review |
+| Top / left / right margins | Measured, then rounded | Medium |
+| Bottom margin | Not measurable; mirrors the top margin | Low |
+
+## 5. FAQ
+
+**The fonts look wrong.**
+The PDF stores embedded subset names; the script restores the system name, but
+the font still has to be installed locally. Install it — the template does not
+need changing.
+
+**How do I adjust a style?**
+Open `reference.docx` in Word and use **right-click the style in the Styles
+pane -> Modify**. Editing the **style definition** is what matters; selecting
+text and changing its font is direct formatting and does not affect the
+template.
+
+Without Word, or for bulk edits, use `set_style.py` from the skill that
+generated this package:
+`python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12`
+
+**I created my own style and nothing happens.**
+Pandoc only uses a fixed set of style names — the ones in the table above.
+Modify the existing ones.
+
+**I cannot change how code blocks look.**
+`Source Code` is generated by Pandoc on output. Create a paragraph style with
+that exact name — in Word via **Styles -> New Style**, or with the script:
+`python3 set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9`
+
+**The layout does not match the original PDF.**
+Check the heading level mapping in section 4 first. Levels are the one thing a
+PDF does not record.
+
+**I need a header or footer.**
+The original PDF's header and footer were **not** carried over — in a PDF they
+are ordinary text. Add them in Word, or with `set_header_footer.py` from the
+skill. Either way they then flow into every output document.
+
+## 6. Package contents
+
+| File | Purpose |
+|---|---|
+| `reference.docx` | **The template.** Point `--reference-doc` at this |
+| `{orig}` | The source PDF. Keep it for comparison |
+| `styles.json` | The raw inferred values, useful when editing the template |
+| `report.txt` | Analysis and verification output from when this was built |
+| `README.md` | This file |
+
+---
+Generated by the pdf-reverse-template skill on {date}
+"""
+
+
+def build(pdf, ref, jpath, outdir, mapping, bottom):
+    os.makedirs(outdir, exist_ok=True)
+    shutil.copy(ref, os.path.join(outdir, "reference.docx"))
+    shutil.copy(pdf, os.path.join(outdir, os.path.basename(pdf)))
+    shutil.copy(jpath, os.path.join(outdir, "styles.json"))
+
+    d = json.load(open(jpath))
+    st = styles_of(ref)
+    names = ["Title", "heading 1", "heading 2", "heading 3",
+             "Body Text", "First Paragraph", "Compact", "Block Text"]
+    rows = "\n".join(row(st, n) for n in names)
+    md = "\n".join(f"| {a} | `{b}` |" for a, b in MD_MAP)
+
+    p, mg = d["page"], d["margins_suggested_cm"]
+    page = [f"- Paper: {p['w_cm']} x {p['h_cm']} cm"
+            + (f" ({p['paper']})" if p.get("paper") else ""),
+            "- Margins: top {top} / bottom {bot} / left {left} / right {right} cm".format(
+                top=mg["top"], bot=bottom if bottom is not None else mg["top"],
+                left=mg["left"], right=mg["right"])]
+    if d.get("running_heads"):
+        page.append(f"- Recurring content in the source PDF (header/footer/page number): "
+                    f"{' / '.join(d['running_heads'])}\n"
+                    f"  This was **not** carried into the template — in a PDF it is "
+                    f"ordinary text. Add a header or footer in Word if you need one.")
+
+    rev = []
+    if mapping:
+        rev.append("**Heading level mapping** (`--map " +
+                   ",".join(f"{k}={v}" for k, v in mapping.items()) + "`):\n")
+        rev.append("| Cluster in the analysis | Sample text | Assigned to |")
+        rev.append("|---|---|---|")
+        for h in d["headings"]:
+            tgt = mapping.get(str(h["level"]), f"Heading{h['level']}")
+            rev.append(f"| #{h['level']} - {h['size']}pt - #{h['color']} "
+                       f"| {h.get('sample', '')[:20]} | `{tgt}` |")
+    else:
+        rev.append("**Heading levels**: no `--map` was given, so clusters were assigned "
+                   "Heading1/2/3... by size.\n")
+        rev.append("> If the source PDF has a separate document title it took Heading1 "
+                   "and shifted every level by one. Check the sample text for each "
+                   "cluster in `report.txt`.")
+    rev.append("")
+    if bottom is not None:
+        rev.append(f"**Bottom margin**: set by hand to {bottom} cm.")
+    else:
+        mb = d["margins_measured_cm"].get("bottom")
+        rev.append(f"**Bottom margin**: not specified, so it mirrors the top margin at "
+                   f"{mg['top']} cm."
+                   + (f" (Measurement only yields an upper bound of <={mb} cm — page "
+                      f"breaks rarely land at the bottom of the text block, so the "
+                      f"measured value always reads too large.)" if mb else ""))
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    rep = []
+    for script, args in (("analyze_pdf.py", [pdf]),
+                         ("verify_roundtrip.py", [ref, jpath])):
+        r = subprocess.run([sys.executable, os.path.join(here, script)] + args,
+                           capture_output=True, text=True)
+        rep.append(f"$ python3 {script} ...\n(exit={r.returncode})\n{r.stdout}")
+    open(os.path.join(outdir, "report.txt"), "w").write("\n\n".join(rep))
+
+    open(os.path.join(outdir, "README.md"), "w").write(README.format(
+        name=os.path.splitext(os.path.basename(pdf))[0],
+        md_map=md, styles=rows, page="\n".join(page),
+        review="\n".join(rev), orig=os.path.basename(pdf),
+        date=datetime.date.today().isoformat()))
+
+    print(f"Package written to {outdir}/")
+    for f in sorted(os.listdir(outdir)):
+        print(f"  {f}")
+    print("\nHand over the whole directory; README.md explains how to use it.")
+
+
+if __name__ == "__main__":
+    a = sys.argv
+    if len(a) < 5:
+        print(__doc__); sys.exit(2)
+    mapping, bottom = {}, None
+    if "--map" in a:
+        for kv in a[a.index("--map") + 1].split(","):
+            k, v = kv.split("=")
+            mapping[k.strip()] = v.strip()
+    if "--bottom" in a:
+        bottom = float(a[a.index("--bottom") + 1])
+    build(a[1], a[2], a[3], a[4], mapping, bottom)
