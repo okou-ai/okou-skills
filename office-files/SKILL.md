@@ -1,82 +1,117 @@
 ---
 name: office-files
-description: Produce and edit real Office deliverables — docx, xlsx and PDF — with one verified toolchain instead of hand-rolled code.
+description: Generate or edit docx, xlsx and PDF deliverables — Word documents, spreadsheets, reports — including editing a file the user uploaded.
 ---
 
-## Setup — run once per run, before authoring
+## Setup — run these two lines first
 
 ```bash
 pip install --break-system-packages --quiet pypandoc_binary typst openpyxl python-docx
 export PATH="$(python3 -c 'import pypandoc,os;print(os.path.dirname(pypandoc.get_pandoc_path()))'):$PATH"
 ```
 
-About 6 seconds. Nothing is preinstalled, and both lines are required:
+Takes about 6 seconds; nothing is preinstalled. Both lines are required — the system Python is PEP 668 externally managed, and the wheel ships the pandoc binary inside the package directory rather than on `PATH`.
 
-- `--break-system-packages` — the system Python is PEP 668 externally managed and the install fails without it.
-- the `PATH` export — the wheel ships the pandoc binary inside the package directory (`site-packages/pypandoc/files/pandoc`), not on `PATH`. Skip it and every `pandoc` call below is `command not found`.
+If the install fails, deliver Markdown or a hosted HTML view instead and say the toolchain was unavailable. Never ship a worse format without saying so.
 
-## Pick the contract before you write anything
+## Pick your flow
 
-| Deliverable | Content contract | Style / structure contract |
-| --- | --- | --- |
-| Prose (docx, PDF) | **Markdown** you author | **a `.docx`** passed as `--reference-doc`, or pandoc's default when there is none |
-| Data (xlsx) | **structured data** you build | **openpyxl** — formulas, sheets, validation |
+| Situation | Flow |
+| --- | --- |
+| Word document, user supplied a template | `pandoc doc.md --reference-doc=theirs.docx -o out.docx` — see **docx** |
+| Word document, no template | `pandoc doc.md -o out.docx` — see **docx** |
+| Word document needing a header, footer or page number, no template | build a reference doc first — see **docx** |
+| PDF | `pandoc doc.md -t typst` then `typst.compile` — see **PDF** |
+| Spreadsheet | openpyxl — see **xlsx** |
+| Edit a file the user sent | **Start from the user's file** first, then the matching row above |
 
-Never author a spreadsheet as a Markdown table, and never hand-build docx XML.
+The rule behind the table: **author Markdown for prose and structured data for spreadsheets; styling comes from a `.docx` or from openpyxl, never from the content you write.** Never author a spreadsheet as a Markdown table, and never hand-build docx XML.
+
+## Start from the user's file
+
+```bash
+pandoc theirs.docx -t markdown --wrap=none > doc.md
+```
+
+Edit the Markdown, then render it back with the same `.docx` as `--reference-doc` so their styling survives the round trip. For xlsx, read with openpyxl — pandoc lists xlsx as an input format but fails on many real files.
 
 ## docx
 
 ```bash
-pandoc report.md --reference-doc=theme.docx -o report.docx
-pandoc report.md --reference-doc=theme.docx --toc --toc-depth=2 -o report.docx   # with a table of contents
+pandoc doc.md --reference-doc=theme.docx -o out.docx
+pandoc doc.md --reference-doc=theme.docx --toc --toc-depth=2 -o out.docx   # with a table of contents
 ```
 
-`--reference-doc` is where headers, footers, page numbers, margins, paper size, fonts and numbering come from — the output inherits `word/header1.xml` and `word/footer1.xml`, including a live `PAGE` field. **Do not write headers, footers or page numbers into the Markdown.** When the user uploaded their own Word file, use that file as the reference doc: their branding comes across for free.
+`--reference-doc` is where headers, footers, page numbers, margins, paper size, fonts and numbering come from: the output inherits `word/header1.xml` and `word/footer1.xml`, including a live `PAGE` field. **Never write headers, footers or page numbers into the Markdown.**
 
-**When there is no reference doc**, omit the flag — `pandoc report.md -o report.docx` uses pandoc's built-in default and produces a clean but unbranded file with no header, no footer and no page number. Say that in one line when you deliver it, and offer to match their house style if they send you a Word file.
-
-The exception is a request that explicitly needs a header, footer or page numbers. None of those can be expressed in Markdown, so build a reference doc first — starting from pandoc's own, never from a blank document:
+- **User supplied a Word file** — use it as the reference doc. Their branding comes across for free.
+- **No template** — omit the flag. The result is clean but unbranded, with no header, footer or page number. Say that in one line when you deliver it, and offer to match their house style if they send you a Word file.
+- **No template, but the request needs a header, footer or page numbers** — build one from pandoc's own default, never from a blank document:
 
 ```bash
 pandoc --print-default-data-file reference.docx > theme.docx
 ```
 
-Then open `theme.docx` with python-docx, set `section.header`, add a `PAGE` field to `section.footer`, save, and pass it with `--reference-doc`. A blank `python-docx.Document()` does not define the styles pandoc emits, so `Compact`, `FirstParagraph`, `BlockText`, `Table` and `VerbatimChar` end up as dangling references that Word silently renders as Normal.
-
-One trap: styles match on `<w:name>`, not `<w:styleId>`. A Chinese-locale Word file with `styleId="1"` still works as long as `w:name` is `heading 1`. Never rewrite styleIds.
+Then open `theme.docx` with python-docx, set `section.header`, add a `PAGE` field to `section.footer`, save, and pass it with `--reference-doc`. A blank `python-docx.Document()` lacks the styles pandoc emits, so Word silently renders them as Normal.
 
 ## PDF
 
 ```bash
-pandoc report.md -t typst -o report.typ
-python3 -c "import typst; typst.compile('report.typ', output='report.pdf')"
+pandoc doc.md -t typst -o doc.typ
+python3 -c "import typst; typst.compile('doc.typ', output='doc.pdf')"
 ```
 
-**`--reference-doc` does not apply to PDF** — only docx, pptx and ODT support it. This path gives a clean but unbranded PDF. When the user needs their branding on a PDF, produce the docx with their reference doc and say that the PDF export has to happen on their side; the sandbox cannot convert docx to PDF.
+**`--reference-doc` does not apply to PDF** — only docx, pptx and ODT support it, so this path produces a clean but unbranded PDF. When the user needs their branding on a PDF, produce the docx with their reference doc and tell them the PDF export has to happen on their side; the sandbox cannot convert docx to PDF.
 
 ## xlsx
 
-Use openpyxl. Write formulas as strings (`ws["D2"] = "=C2-B2"`) — Excel evaluates them on open, so if the file must already contain computed values, compute them yourself and write both. Use `wb.create_sheet("Notes")` for multiple sheets.
+```python
+import openpyxl
 
-## Reading files back in
-
-```bash
-pandoc input.docx -t markdown --wrap=none    # edit a document the user sent
+wb = openpyxl.Workbook()
+ws = wb.active
+ws.title = "Q3"
+ws.append(["Region", "Q2", "Q3", "Delta"])
+ws.append(["APAC", 120, 148])
+ws["D2"] = "=C2-B2"          # formulas are written as strings
+wb.create_sheet("Notes")
+wb.save("book.xlsx")
 ```
 
-For xlsx, read with openpyxl. Pandoc lists xlsx as an input format but fails on many real files — do not rely on it.
+Excel evaluates formulas when the file opens, so when the file itself must already carry computed values, compute them yourself and write both the formula and the number.
 
-## Delivery
+## Deliver
 
 `okou web upload-file`. When prose is final and being sent onward, attach both the PDF and the docx source: the recipient gets something fixed and something they can still edit.
 
-## Do not use
+## Never use
 
 - `soffice` / LibreOffice conversion — the sandbox installs only `libreoffice-impress` and `libreoffice-draw`, so the Writer and Calc filters do not exist and every convert fails with `Error: source file could not be loaded`.
 - `chromium --headless --print-to-pdf` — produces no file.
 - `weasyprint` as a pandoc `--pdf-engine` — exits non-zero.
 - `pandoc -o out.xlsx` — pandoc has no xlsx writer.
 
-## If the install fails
+## Worked example — one report delivered as docx and PDF
 
-Deliver Markdown or a hosted HTML view instead and tell the user the toolchain was unavailable. Never ship a worse format without saying so.
+```bash
+pandoc --print-default-data-file reference.docx > theme.docx
+python3 - <<'PY'
+import docx
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+
+d = docx.Document("theme.docx")
+s = d.sections[0]
+s.header.paragraphs[0].text = "ACME — Internal"
+p = s.footer.paragraphs[0]
+p.text = "Page "
+r = p.add_run()
+f = OxmlElement("w:fldSimple")
+f.set(qn("w:instr"), "PAGE")
+r._r.addnext(f)
+d.save("theme.docx")
+PY
+pandoc report.md --reference-doc=theme.docx --toc --toc-depth=2 -o report.docx
+pandoc report.md -t typst -o report.typ
+python3 -c "import typst; typst.compile('report.typ', output='report.pdf')"
+```
