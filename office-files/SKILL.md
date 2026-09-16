@@ -15,7 +15,7 @@ About 6 seconds. Nothing is preinstalled. `--break-system-packages` is required:
 
 | Deliverable | Content contract | Style / structure contract |
 | --- | --- | --- |
-| Prose (docx, PDF) | **Markdown** you author | **a `.docx`** passed as `--reference-doc` |
+| Prose (docx, PDF) | **Markdown** you author | **a `.docx`** passed as `--reference-doc`, or pandoc's default when there is none |
 | Data (xlsx) | **structured data** you build | **openpyxl** — formulas, sheets, validation |
 
 Never author a spreadsheet as a Markdown table, and never hand-build docx XML.
@@ -28,6 +28,10 @@ pandoc report.md --reference-doc=theme.docx --toc --toc-depth=2 -o report.docx  
 ```
 
 `--reference-doc` is where headers, footers, page numbers, margins, paper size, fonts and numbering come from — the output inherits `word/header1.xml` and `word/footer1.xml`, including a live `PAGE` field. **Do not write headers, footers or page numbers into the Markdown.** When the user uploaded their own Word file, use that file as the reference doc: their branding comes across for free.
+
+**When there is no reference doc**, omit the flag — `pandoc report.md -o report.docx` uses pandoc's built-in default and produces a clean but unbranded file with no header, no footer and no page number. Say that in one line when you deliver it, and offer to match their house style if they send you a Word file.
+
+The exception is a request that explicitly needs a header, footer or page numbers. None of those can be expressed in Markdown, so build a minimal reference doc first with python-docx — set `section.header`, and add a `PAGE` field to `section.footer` — then pass that file with `--reference-doc`.
 
 Two traps:
 
