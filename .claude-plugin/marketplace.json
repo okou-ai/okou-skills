@@ -1,0 +1,157 @@
+{
+  "name": "vm0-skills",
+  "owner": {
+    "name": "vm0.ai",
+    "email": "support@vm0.ai"
+  },
+  "metadata": {
+    "description": "Reusable VM0 skills for Claude Code",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "github-copilot",
+      "description": "GitHub Copilot REST API via curl. Use this skill to manage Copilot subscriptions and retrieve usage metrics.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./github-copilot"
+      ]
+    },
+    {
+      "name": "hackernews",
+      "description": "Hacker News API via curl. Use this skill to fetch top stories, new posts, comments, and user profiles from Hacker News.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./hackernews"
+      ]
+    },
+    {
+      "name": "nintendo-play-activity",
+      "description": "Nintendo Play Activity API for connected Nintendo Account profile, play history, and playtime. Use this skill to read Nintendo Account profile data, Nintendo Switch play activity, recently played games, and playtime from Nintendo Store / My Nintendo app.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./nintendo-play-activity"
+      ]
+    },
+    {
+      "name": "notion-illustration",
+      "description": "Notion-editorial-style hand-drawn spot illustration generation with locked reference anchors via fal-ai/nano-banana-2/edit.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./notion-illustration"
+      ]
+    },
+    {
+      "name": "rss-fetch",
+      "description": "Fetch RSS/Atom feeds via curl. Use this skill to gather news and articles from RSS sources.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./rss-fetch"
+      ]
+    },
+    {
+      "name": "vm0",
+      "description": "VM0 API for running AI agents in secure sandboxes. Use this skill to execute agents, manage runs, and download outputs (artifacts) and inputs (volumes) via the VM0 platform API.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./vm0",
+        "./vm0-cli",
+        "./vm0-agent"
+      ]
+    },
+    {
+      "name": "finance-accounting",
+      "description": "Financial accounting toolkit — GAAP-compliant statements, journal entries, reconciliations, month-end close, variance analysis, and audit preparation.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./gaap-reporting",
+        "./journal-entries",
+        "./account-reconciliation",
+        "./period-close",
+        "./flux-analysis",
+        "./audit-readiness"
+      ]
+    },
+    {
+      "name": "legal-compliance",
+      "description": "Legal operations toolkit — contract redlining, NDA screening, privacy compliance (GDPR/CCPA), risk scoring, and meeting briefings with action tracking.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./contract-redline",
+        "./nda-screening",
+        "./privacy-compliance",
+        "./legal-risk-scoring",
+        "./legal-briefing"
+      ]
+    },
+    {
+      "name": "marketing-content",
+      "description": "Marketing toolkit — copywriting across channels, brand voice guidelines, campaign strategy, paid ads operation, performance analytics, and stakeholder communications.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./copywriting",
+        "./brand-guidelines",
+        "./campaign-strategy",
+        "./paid-ads-operator",
+        "./marketing-analytics",
+        "./status-updates"
+      ]
+    },
+    {
+      "name": "customer-support",
+      "description": "Customer support toolkit — issue triage and prioritization, customer reply drafting, response templates, escalation briefs, and knowledge base authoring.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./issue-triage",
+        "./customer-reply",
+        "./reply-templates",
+        "./escalation-brief",
+        "./kb-authoring"
+      ]
+    },
+    {
+      "name": "product-management",
+      "description": "Product management toolkit — PRD writing, roadmap planning with RICE/ICE scoring, product metrics and OKRs, and competitive analysis matrices.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./prd-writing",
+        "./roadmap-planning",
+        "./product-metrics",
+        "./competitor-matrix"
+      ]
+    },
+    {
+      "name": "data-analysis",
+      "description": "Data analysis toolkit — multi-dialect SQL patterns, statistical methods, dataset profiling, and analysis quality assurance.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./sql-cookbook",
+        "./stats-methods",
+        "./data-profiling",
+        "./analysis-qa"
+      ]
+    },
+    {
+      "name": "user-research",
+      "description": "User research toolkit — customer intelligence gathering with confidence scoring, and research synthesis for personas, themes, and opportunity prioritization.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./customer-intel",
+        "./research-synthesis"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- Executable layout starter. Edit only the marked official content slot. -->
+<html lang="en" data-layout-id="media/regional-map">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/runtime/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/video-composition/stage.css" />
+    <link rel="stylesheet" href="assets/video-composition/content-font.css" />
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--palette-field); }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--palette-field); }
+      .official-mount { position: absolute; inset: 0; z-index: 1; width: 1920px; height: 1080px; overflow: hidden; --bg: var(--stage-bg); --fg: var(--stage-ink); --surface: var(--stage-panel); --border: var(--stage-support); --muted: var(--stage-muted); --brand: var(--stage-accent); --accent: var(--stage-accent); --accent-2: var(--stage-signal); --font-display: var(--stage-font-display); --font-body: var(--stage-font-body); --font-mono: var(--stage-font-mono); }
+      #root[data-presenter="on"][data-presenter-side="right"] .official-mount { left: 0; right: auto; width: 1340px; }
+      #root[data-presenter="on"][data-presenter-side="left"] .official-mount { left: auto; right: 0; width: 1340px; }
+      .presenter-slot { position: absolute; z-index: 2; bottom: 0; right: 36px; width: 520px; height: 900px; display: grid; align-items: end; justify-items: center; pointer-events: none; }
+      .presenter-slot .presenter-media { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
+    </style>
+  </head>
+  <body>
+    <main id="root" class="vc-frame vc-layout-root" data-color-system="navy-cobalt" data-composition-id="vc-layout-media-regional-map" data-duration="12" data-width="1920" data-height="1080" data-presenter="off" data-presenter-side="right" data-presenter-policy="none" data-registry-code="B" data-registry-item="us-map">
+      <!-- CONTENT_SLOT_BEGIN: keep the official mount; replace its variable values or edit its scene-specific official source. -->
+      <div
+              id="vc-official-mount" data-vc-content-slot="official"
+              class="official-mount clip mount-map"
+              data-layout-id="media/regional-map"
+              data-registry-item="us-map"
+              data-composition-id="us-map"
+              data-composition-src="compositions/us-map.html"
+              data-start="0"
+              data-duration="12"
+              data-track-index="1"
+              data-width="1920"
+              data-height="1080"
+            ></div>
+      <!-- CONTENT_SLOT_END -->
+      <!-- PRESENTER_SLOT_BEGIN -->
+      <aside class="presenter-slot" data-vc-presenter-slot="right" data-presenter-media="pending"><div class="presenter-media" data-presenter-media="pending"></div></aside>
+      <!-- PRESENTER_SLOT_END -->
+    </main>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["vc-layout-media-regional-map"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

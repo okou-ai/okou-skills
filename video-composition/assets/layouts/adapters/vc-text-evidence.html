@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- content adapter preserving line-by-line-slide and inline-highlight semantics. -->
+<html
+  lang="en"
+  data-composition-duration="5"
+  data-composition-variables='[
+    { "id": "kicker", "type": "string", "role": "content", "label": "Kicker", "default": "VERIFIED READING" },
+    { "id": "lines", "type": "string", "role": "content", "label": "Lines", "description": "Pipe-separated hierarchy lines.", "default": "Decision confirmed|Implementation begins|Public guidance follows" },
+    { "id": "body_pre", "type": "string", "role": "content", "label": "Body before", "default": "The published measure applies from " },
+    { "id": "highlight", "type": "string", "role": "content", "label": "Highlighted evidence", "default": "1 October" },
+    { "id": "body_post", "type": "string", "role": "content", "label": "Body after", "default": " across all listed services." },
+    { "id": "source", "type": "string", "role": "content", "label": "Source", "default": "OFFICIAL NOTICE · SECTION 4" }
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="assets/runtime/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/video-composition/content-font.css" />
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: transparent; }
+      #root { position: absolute; inset: 0; overflow: hidden; background: var(--bg, #16243b); color: var(--fg, #fff); font-family: var(--stage-font-display, Inter, system-ui, sans-serif); }
+      .text-field { position: absolute; inset: 0; display: grid; align-content: center; gap: 54px; padding: 80px 92px; }
+      .kicker, .source { color: var(--muted, #c6d0e0); font-family: var(--stage-font-mono, ui-monospace, monospace); font-size: 24px; font-weight: 700; letter-spacing: .12em; }
+      .hf-catalog-line-by-line-slide { display: grid; gap: 15px; overflow: hidden; color: var(--fg, #fff); font-family: var(--stage-font-display, Inter, system-ui, sans-serif); font-size: 72px; font-weight: 800; line-height: 1.02; letter-spacing: -.035em; }
+      .hf-catalog-line-by-line-slide span { display: block; transform: translate(var(--hf-line-x, 0px), var(--hf-line-y, 0px)); filter: blur(var(--hf-line-blur, 0px)); will-change: transform, filter, opacity; }
+      .evidence { max-width: 1120px; color: var(--muted, #c6d0e0); font-size: 31px; font-weight: 500; line-height: 1.45; }
+      .hf-inline-highlight { --hf-highlight-scale: 0; position: relative; display: inline; z-index: 0; color: var(--fg, #fff); font-weight: 800; }
+      .hf-inline-highlight::after { content: ""; position: absolute; left: -.08em; right: -.08em; bottom: .04em; height: .34em; background: var(--accent, #f0a03a); transform: scaleX(var(--hf-highlight-scale)); transform-origin: left center; z-index: -1; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="vc-text-evidence" data-duration="5" data-width="1920" data-height="1080" data-fps="30">
+      <div id="text-evidence-field" class="text-field clip" data-start="0" data-duration="5" data-track-index="0">
+        <div class="kicker"></div>
+        <div class="hf-catalog-line-by-line-slide"></div>
+        <p class="evidence"><span class="body-pre"></span><span class="hf-inline-highlight"></span><span class="body-post"></span></p>
+        <div class="source"></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        "use strict";
+        var vars = window.__hyperframes && window.__hyperframes.getVariables ? window.__hyperframes.getVariables() : {};
+        var lineSource = vars.lines == null ? "Decision confirmed|Implementation begins|Public guidance follows" : String(vars.lines);
+        var stack = document.querySelector(".hf-catalog-line-by-line-slide");
+        lineSource.split("|").map(function (line) { return line.trim(); }).filter(Boolean).forEach(function (line) {
+          var span = document.createElement("span");
+          span.textContent = line;
+          stack.appendChild(span);
+        });
+        document.querySelector(".kicker").textContent = vars.kicker || "VERIFIED READING";
+        document.querySelector(".body-pre").textContent = vars.body_pre || "";
+        document.querySelector(".hf-inline-highlight").textContent = vars.highlight || "";
+        document.querySelector(".body-post").textContent = vars.body_post || "";
+        document.querySelector(".source").textContent = vars.source || "";
+
+        var tl = gsap.timeline({ paused: true });
+        tl.fromTo(
+          ".hf-catalog-line-by-line-slide span",
+          { opacity: 0, "--hf-line-x": "-36px", "--hf-line-y": "18px", "--hf-line-blur": "6px" },
+          { opacity: 1, "--hf-line-x": "0px", "--hf-line-y": "0px", "--hf-line-blur": "0px", duration: .34, stagger: .08, ease: "power3.out" },
+          .35
+        );
+        tl.fromTo(".evidence", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .35, ease: "power2.out" }, 1.05);
+        tl.to(".hf-inline-highlight", { "--hf-highlight-scale": 1, duration: .55, ease: "power2.out" }, 1.42);
+        tl.fromTo(".source", { opacity: 0 }, { opacity: 1, duration: .3 }, 1.65);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["vc-text-evidence"] = tl;
+      })();
+    </script>
+  </body>
+</html>

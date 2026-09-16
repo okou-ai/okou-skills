@@ -1,0 +1,1 @@
+(function(){function fit(){document.querySelectorAll(".preview").forEach(function(p){var f=p.querySelector("iframe");if(f)f.style.transform="scale("+(p.clientWidth/1920)+")"})}window.addEventListener("resize",fit);window.addEventListener("load",fit);fit()})();

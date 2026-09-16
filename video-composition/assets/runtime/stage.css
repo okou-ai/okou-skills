@@ -1,0 +1,328 @@
+@import url("./color-system.css");
+@import url("./custom-color-system.css");
+
+@font-face {
+  font-family: VcBody;
+  src: url("fonts/body.woff2") format("woff2");
+  font-display: block;
+}
+
+@font-face {
+  font-family: VcEditorial;
+  src: url("fonts/editorial.woff2") format("woff2");
+  font-display: block;
+}
+
+@font-face {
+  font-family: VcCondensed;
+  src: url("fonts/condensed.woff2") format("woff2");
+  font-display: block;
+}
+
+@font-face {
+  font-family: VcMono;
+  src: url("fonts/mono.woff2") format("woff2");
+  font-display: block;
+}
+
+#root {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+
+.vc-frame {
+  --stage-font-body: VcBody, Arial, sans-serif;
+  --stage-font-display: VcBody, Arial, sans-serif;
+  --stage-font-editorial: VcEditorial, Georgia, serif;
+  --stage-font-mono: VcMono, monospace;
+  --stage-bg: var(--palette-field);
+  --stage-ink: var(--palette-ink);
+  --stage-accent: var(--palette-accent);
+  --stage-support: var(--palette-line);
+  --stage-muted: var(--palette-muted);
+  --stage-panel: var(--palette-surface);
+  --stage-signal: var(--palette-signal);
+  --stage-safe-x: 96px;
+  --stage-safe-y: 72px;
+  --presenter-full-width: 500px;
+  --presenter-full-height: 900px;
+  --presenter-lane-width: 560px;
+  --presenter-content-gap: 56px;
+  --presenter-head-size: 430px;
+  --presenter-head-position: center 20%;
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--stage-bg);
+  color: var(--stage-ink);
+  font-family: var(--stage-font-body);
+}
+
+.vc-content-stage {
+  position: absolute;
+  z-index: 4;
+  inset: var(--stage-safe-y) var(--stage-safe-x);
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+}
+
+.vc-content-stage > .vc-content {
+  width: min(100%, var(--stage-content-max-width, 1728px));
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.vc-official-mount,
+.vc-content-stage[data-content-fit="full-canvas"] {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: visible;
+}
+
+.vc-frame[data-presenter="off"] .presenter-slot,
+.vc-frame:not([data-presenter="on"]) .presenter-slot {
+  display: none;
+}
+
+[data-video-presenter="off"] .presenter-slot {
+  display: none !important;
+}
+
+.vc-frame[data-presenter="on"][data-presenter-layout="divider-left"] .vc-content-stage,
+.vc-frame[data-presenter="on"][data-presenter-layout="side-left"] .vc-content-stage {
+  left: calc(var(--stage-safe-x) + var(--presenter-lane-width) + var(--presenter-content-gap));
+  right: var(--stage-safe-x);
+}
+
+.vc-frame[data-presenter="on"][data-presenter-layout="divider-right"] .vc-content-stage,
+.vc-frame[data-presenter="on"][data-presenter-layout="side-right"] .vc-content-stage {
+  left: var(--stage-safe-x);
+  right: calc(var(--stage-safe-x) + var(--presenter-lane-width) + var(--presenter-content-gap));
+}
+
+.vc-frame[data-title-chrome="off"] .vc-scene-title,
+.vc-frame:not([data-title-chrome="on"]) .vc-scene-title {
+  display: none;
+}
+
+.vc-frame,
+.vc-frame * {
+  box-sizing: border-box;
+}
+
+.vc-frame h1,
+.vc-frame h2,
+.vc-frame p,
+.vc-frame blockquote {
+  margin: 0;
+}
+
+.vc-palette-slate {
+  --stage-bg: var(--palette-field);
+  --stage-ink: var(--palette-ink);
+  --stage-accent: var(--palette-accent);
+  --stage-support: var(--palette-line);
+  --stage-muted: var(--palette-muted);
+  --stage-panel: var(--palette-surface);
+  --stage-signal: var(--palette-signal);
+}
+
+.vc-palette-civic {
+  --stage-bg: var(--palette-field);
+  --stage-ink: var(--palette-ink);
+  --stage-accent: var(--palette-accent);
+  --stage-support: var(--palette-line);
+  --stage-muted: var(--palette-muted);
+  --stage-panel: var(--palette-surface);
+  --stage-signal: var(--palette-signal);
+}
+
+.vc-palette-night {
+  --stage-bg: var(--palette-field);
+  --stage-ink: var(--palette-ink);
+  --stage-accent: var(--palette-accent);
+  --stage-support: var(--palette-line);
+  --stage-muted: var(--palette-muted);
+  --stage-panel: var(--palette-surface);
+  --stage-signal: var(--palette-signal);
+}
+
+.vc-field {
+  position: absolute;
+  background: var(--stage-accent);
+  color: var(--palette-on-accent);
+  transform-origin: left center;
+  will-change: transform, opacity;
+}
+
+.vc-decision-surface {
+  background: var(--palette-contrast-field);
+  color: var(--palette-contrast-ink);
+}
+
+.vc-deadline-signal {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  background: var(--stage-signal);
+  color: var(--palette-on-signal);
+  font-family: var(--stage-font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  will-change: transform, opacity;
+}
+
+.vc-kicker,
+.vc-mono {
+  font-family: var(--stage-font-mono);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.vc-kicker {
+  color: var(--stage-support);
+  font-size: 22px;
+}
+
+.vc-display {
+  font-family: var(--stage-font-display);
+  font-size: 112px;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+  will-change: transform, opacity;
+}
+
+.vc-body {
+  color: var(--stage-muted);
+  font-family: var(--stage-font-body);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.42;
+}
+
+.vc-fact {
+  will-change: transform, opacity;
+}
+
+.vc-public-rail {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 84px;
+  padding: 0 104px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  background: var(--stage-accent);
+  color: var(--palette-on-accent);
+  font-family: var(--stage-font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform-origin: left center;
+  will-change: transform, opacity;
+}
+
+.vc-public-rail strong {
+  padding-right: 28px;
+  border-right: 2px solid currentColor;
+}
+
+.presenter-slot {
+  position: absolute;
+  z-index: 8;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  will-change: transform, opacity;
+}
+
+.vc-frame[data-presenter="on"] .presenter-slot[data-presenter-crop="full"] {
+  width: var(--presenter-full-width);
+  height: var(--presenter-full-height);
+  bottom: 0;
+}
+
+.vc-frame[data-presenter="on"] .presenter-slot[data-presenter-crop="head-shoulders"] {
+  width: var(--presenter-head-size);
+  height: var(--presenter-head-size);
+  bottom: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(circle at 50% 56%, #000 0 62%, rgba(0, 0, 0, 0.94) 68%, rgba(0, 0, 0, 0.52) 75%, transparent 84%);
+  mask-image: radial-gradient(circle at 50% 56%, #000 0 62%, rgba(0, 0, 0, 0.94) 68%, rgba(0, 0, 0, 0.52) 75%, transparent 84%);
+}
+
+.vc-frame[data-presenter="on"][data-presenter-layout="divider-left"] .presenter-slot,
+.vc-frame[data-presenter="on"][data-presenter-layout="side-left"] .presenter-slot {
+  left: var(--stage-safe-x);
+  right: auto;
+}
+
+.vc-frame[data-presenter="on"][data-presenter-layout="divider-right"] .presenter-slot,
+.vc-frame[data-presenter="on"][data-presenter-layout="side-right"] .presenter-slot {
+  right: var(--stage-safe-x);
+  left: auto;
+}
+
+.vc-frame[data-presenter="on"][data-presenter-layout="corner-left"] .presenter-slot[data-presenter-crop="head-shoulders"] {
+  left: var(--stage-safe-x);
+  right: auto;
+}
+
+.vc-frame[data-presenter="on"][data-presenter-layout="corner-right"] .presenter-slot[data-presenter-crop="head-shoulders"] {
+  right: var(--stage-safe-x);
+  left: auto;
+}
+
+.presenter-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(22px 12px 34px var(--palette-shadow));
+}
+
+.presenter-crop-full,
+.presenter-slot[data-presenter-crop="full"] {
+  overflow: visible;
+}
+
+.presenter-crop-full .presenter-media,
+.presenter-slot[data-presenter-crop="full"] .presenter-media {
+  object-fit: contain;
+  transform: none;
+  transform-origin: center bottom;
+}
+
+.presenter-crop-head-shoulders .presenter-media,
+.presenter-slot[data-presenter-crop="head-shoulders"] .presenter-media {
+  object-fit: cover;
+  object-position: var(--presenter-head-position);
+  transform: none;
+  transform-origin: center bottom;
+}

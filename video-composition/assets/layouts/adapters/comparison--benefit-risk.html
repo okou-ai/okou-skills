@@ -1,0 +1,229 @@
+<!doctype html>
+<!-- Content-ready content adapter. Official HyperFrames behavior origins: split-tilt-cards. -->
+<html lang="en" data-composition-id="vc-adapter-comparison--benefit-risk" data-composition-duration="4" data-vc-content-ready="true" data-registry-origin="split-tilt-cards" data-composition-variables='[{"id": "kicker", "type": "string", "role": "content", "label": "Kicker", "description": "", "default": "TWO-SIDED READING"}, {"id": "title", "type": "string", "role": "content", "label": "Shared question", "description": "", "default": "The rollout has real benefits and real risks"}, {"id": "summary", "type": "string", "role": "content", "label": "Shared basis", "description": "", "default": "TRADEOFF · SAME EVIDENCE STANDARD"}, {"id": "left_label", "type": "string", "role": "content", "label": "Left label", "description": "", "default": "Benefits"}, {"id": "left_items", "type": "string", "role": "content", "label": "Left content", "description": "", "default": "Faster access;Clearer ownership;Comparable reporting"}, {"id": "right_label", "type": "string", "role": "content", "label": "Right label", "description": "", "default": "Risks"}, {"id": "right_items", "type": "string", "role": "content", "label": "Right content", "description": "", "default": "Migration errors;Team capacity gaps;Short-term cost pressure"}, {"id": "condition", "type": "string", "role": "content", "label": "Condition or conclusion", "description": "", "default": "Unresolved condition · team readiness must remain above 85%."}, {"id": "source", "type": "string", "role": "content", "label": "Source", "description": "", "default": "ROLLOUT REVIEW · VERIFIED"}]'>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="vc-adapter-comparison--benefit-risk" data-duration="4" data-width="1920" data-height="1080" data-fps="30">
+        <style>@import url("assets/runtime/vc-layout-adapter.css");</style>
+        <section id="comparison--benefit-risk-stage" class="vc-adapter-stage clip" data-vc-adapter-stage data-kind="compare" data-timeline-key="vc-adapter-comparison--benefit-risk" data-start="0" data-duration="4" data-track-index="0">
+          <div class="ab-frame"><header class="ab-header"><p class="ab-kicker" data-bind="kicker" data-optional></p><h1 class="ab-title" data-bind="title" data-motion="primary"></h1><p class="ab-summary" data-bind="summary" data-optional data-motion="secondary"></p></header><section class="ab-compare-grid"><article class="ab-panel" data-motion="item"><p class="ab-label" data-bind="left_label"></p><ul class="ab-panel-list" data-list="left_items"></ul></article><article class="ab-panel" data-motion="item"><p class="ab-label" data-bind="right_label"></p><ul class="ab-panel-list" data-list="right_items"></ul></article></section><p class="ab-condition" data-bind="condition"></p><p class="ab-source" data-bind="source" data-optional data-motion="secondary"></p></div>
+        </section>
+        <script>
+(function () {
+  "use strict";
+
+  var stage = document.querySelector("[data-vc-adapter-stage]");
+  if (!stage) return;
+  var root = stage.parentElement;
+  var vars = window.__hyperframes && window.__hyperframes.getVariables
+    ? window.__hyperframes.getVariables()
+    : {};
+
+  function value(key, fallback) {
+    return vars[key] == null ? (fallback == null ? "" : String(fallback)) : String(vars[key]);
+  }
+
+  stage.querySelectorAll("[data-bind]").forEach(function (element) {
+    var text = value(element.dataset.bind, element.textContent);
+    element.textContent = text;
+    if (element.hasAttribute("data-optional") && text.trim() === "") element.hidden = true;
+  });
+
+  function records(key) {
+    return value(key).split(";").map(function (item) { return item.trim(); }).filter(Boolean);
+  }
+
+  stage.querySelectorAll("[data-cards]").forEach(function (container) {
+    var items = records(container.dataset.cards);
+    var columns = Math.max(1, Math.min(4, Number(container.dataset.columns || items.length || 1)));
+    container.style.setProperty("--ab-columns", columns);
+    items.forEach(function (record, index) {
+      var fields = record.split("|").map(function (item) { return item.trim(); });
+      var card = document.createElement("article");
+      card.className = "ab-card";
+      card.setAttribute("data-motion", "item");
+      card.innerHTML = '<span class="ab-card-index">' + String(index + 1).padStart(2, "0") + '</span><strong class="ab-label"></strong><p class="ab-body"></p>';
+      card.querySelector(".ab-label").textContent = fields[0] || "";
+      card.querySelector(".ab-body").textContent = fields.slice(1).join(" · ");
+      container.appendChild(card);
+    });
+  });
+
+  stage.querySelectorAll("[data-list]").forEach(function (container) {
+    records(container.dataset.list).forEach(function (record) {
+      var fields = record.split("|").map(function (item) { return item.trim(); });
+      var item = document.createElement("li");
+      item.setAttribute("data-motion", "item");
+      if (container.classList.contains("ab-checklist")) {
+        var strong = document.createElement("strong");
+        strong.textContent = fields[0] || "";
+        var copy = document.createElement("span");
+        copy.textContent = fields.slice(1).join(" · ");
+        var wrap = document.createElement("div");
+        wrap.appendChild(strong);
+        if (copy.textContent) wrap.appendChild(copy);
+        item.appendChild(wrap);
+      } else {
+        item.textContent = fields.join(" — ");
+      }
+      container.appendChild(item);
+    });
+  });
+
+  stage.querySelectorAll("[data-table-head]").forEach(function (row) {
+    value(row.dataset.tableHead).split("|").map(function (item) { return item.trim(); }).filter(Boolean).forEach(function (cell) {
+      var th = document.createElement("th");
+      th.textContent = cell;
+      row.appendChild(th);
+    });
+  });
+
+  stage.querySelectorAll("[data-table-rows]").forEach(function (body) {
+    var highlight = Number(value(body.dataset.highlightKey || "highlight_row", "-1"));
+    records(body.dataset.tableRows).forEach(function (record, index) {
+      var tr = document.createElement("tr");
+      tr.setAttribute("data-motion", "item");
+      if (index === highlight) tr.dataset.highlight = "true";
+      record.split("|").forEach(function (cell) {
+        var td = document.createElement("td");
+        td.textContent = cell.trim();
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  });
+
+  stage.querySelectorAll("[data-bars]").forEach(function (container) {
+    var parsed = records(container.dataset.bars).map(function (record) {
+      var fields = record.split("|").map(function (item) { return item.trim(); });
+      return { label: fields[0] || "", value: Number(fields[1]) || 0, display: fields[2] || fields[1] || "" };
+    });
+    var max = Math.max.apply(null, parsed.map(function (item) { return item.value; }).concat([1]));
+    parsed.forEach(function (entry) {
+      var row = document.createElement("div");
+      row.className = "ab-bar-row";
+      row.setAttribute("data-motion", "item");
+      row.innerHTML = '<span class="ab-bar-label"></span><span class="ab-bar-track"><span class="ab-bar-fill"></span></span><span class="ab-bar-value"></span>';
+      row.querySelector(".ab-bar-label").textContent = entry.label;
+      row.querySelector(".ab-bar-value").textContent = entry.display;
+      row.querySelector(".ab-bar-fill").dataset.ratio = String(entry.value / max);
+      container.appendChild(row);
+    });
+  });
+
+  stage.querySelectorAll("[data-steps]").forEach(function (container) {
+    var items = records(container.dataset.steps);
+    container.style.setProperty("--ab-count", Math.min(4, Math.max(1, items.length)));
+    items.forEach(function (record, index) {
+      var fields = record.split("|").map(function (item) { return item.trim(); });
+      var item = document.createElement("article");
+      item.className = "ab-step";
+      item.setAttribute("data-motion", "item");
+      item.innerHTML = '<span class="ab-date"></span><strong class="ab-label"></strong><p class="ab-body"></p>';
+      item.querySelector(".ab-date").textContent = fields[0] || String(index + 1).padStart(2, "0");
+      item.querySelector(".ab-label").textContent = fields[1] || fields[0] || "";
+      item.querySelector(".ab-body").textContent = fields.slice(2).join(" · ");
+      container.appendChild(item);
+    });
+  });
+
+  stage.querySelectorAll("[data-lanes]").forEach(function (container) {
+    var periods = value(container.dataset.periods).split("|").map(function (item) { return item.trim(); }).filter(Boolean);
+    var head = document.createElement("div");
+    head.className = "ab-lane ab-lane-head";
+    head.style.setProperty("--ab-period-count", periods.length);
+    head.appendChild(document.createElement("span"));
+    periods.forEach(function (period) { var cell = document.createElement("span"); cell.textContent = period; head.appendChild(cell); });
+    container.appendChild(head);
+    records(container.dataset.lanes).forEach(function (record) {
+      var fields = record.split("|").map(function (item) { return item.trim(); });
+      var row = document.createElement("div");
+      row.className = "ab-lane";
+      row.style.setProperty("--ab-period-count", periods.length);
+      row.setAttribute("data-motion", "item");
+      fields.forEach(function (text, index) {
+        var cell = document.createElement("span");
+        if (index === 0) cell.className = "ab-lane-label";
+        cell.textContent = text;
+        row.appendChild(cell);
+      });
+      while (row.children.length < periods.length + 1) row.appendChild(document.createElement("span"));
+      container.appendChild(row);
+    });
+  });
+
+  var ring = stage.querySelector(".ab-ring");
+  if (ring) {
+    var fixedProgress = ring.dataset.fixedProgress;
+    var progress = fixedProgress === undefined
+      ? Number(value("progress", value("value", "0").replace(/[^0-9.-]/g, "")))
+      : Number(fixedProgress);
+    ring.dataset.progress = String(Number.isFinite(progress) ? Math.max(0, Math.min(100, progress)) : 0);
+  }
+
+  var network = stage.querySelector("[data-network]");
+  if (network) {
+    var nodes = value(network.dataset.network).split("|").map(function (item) { return item.trim(); }).filter(Boolean);
+    var positions = [];
+    nodes.forEach(function (label, index) {
+      var angle = -Math.PI / 2 + index * (Math.PI * 2 / Math.max(1, nodes.length));
+      var x = 50 + Math.cos(angle) * 34;
+      var y = 50 + Math.sin(angle) * 34;
+      positions.push({ x: x, y: y });
+      var node = document.createElement("div");
+      node.className = "ab-network-node";
+      node.setAttribute("data-motion", "item");
+      node.style.left = "calc(" + x + "% - 7cqw)";
+      node.style.top = "calc(" + y + "% - 3.25cqh)";
+      node.textContent = label;
+      network.appendChild(node);
+    });
+    var svg = network.querySelector("svg");
+    records(network.dataset.edges).forEach(function (edge) {
+      var pair = edge.split(">").map(function (item) { return item.trim(); });
+      var from = nodes.indexOf(pair[0]);
+      var to = nodes.indexOf(pair[1]);
+      if (from < 0 || to < 0) return;
+      var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", String(positions[from].x));
+      line.setAttribute("y1", String(positions[from].y));
+      line.setAttribute("x2", String(positions[to].x));
+      line.setAttribute("y2", String(positions[to].y));
+      line.setAttribute("pathLength", "1");
+      line.setAttribute("data-motion", "connector");
+      svg.appendChild(line);
+    });
+  }
+
+  stage.querySelectorAll("[data-media]").forEach(function (image) {
+    image.src = value(image.dataset.media, image.getAttribute("src"));
+  });
+
+  var duration = Math.max(0.001, Number(root.dataset.duration || stage.dataset.duration || 5));
+  var tl = gsap.timeline({ paused: true });
+  var primary = stage.querySelectorAll('[data-motion="primary"]');
+  var secondary = stage.querySelectorAll('[data-motion="secondary"]');
+  var items = stage.querySelectorAll('[data-motion="item"]');
+  var connectors = stage.querySelectorAll('[data-motion="connector"]');
+  var media = stage.querySelectorAll('[data-motion="media"]');
+  if (primary.length) tl.fromTo(primary, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: Math.min(.55, duration * .16), ease: "power3.out" }, .12);
+  if (secondary.length) tl.fromTo(secondary, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: Math.min(.42, duration * .13), stagger: .07, ease: "power2.out" }, Math.min(.52, duration * .16));
+  if (media.length) tl.fromTo(media, { opacity: 0, clipPath: "inset(0 100% 0 0)" }, { opacity: 1, clipPath: "inset(0 0% 0 0)", duration: Math.min(.85, duration * .24), ease: "power2.inOut" }, Math.min(.3, duration * .1));
+  if (connectors.length) tl.fromTo(connectors, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: Math.min(.65, duration * .18), stagger: .06, ease: "power2.out" }, Math.min(.55, duration * .16));
+  if (items.length) tl.fromTo(items, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: Math.min(.38, duration * .11), stagger: Math.min(.1, duration * .025), ease: "power2.out" }, Math.min(.72, duration * .2));
+  stage.querySelectorAll(".ab-bar-fill").forEach(function (bar, index) {
+    tl.fromTo(bar, { scaleX: 0 }, { scaleX: Number(bar.dataset.ratio || 0), duration: Math.min(.7, duration * .2), ease: "power2.out" }, Math.min(.78 + index * .08, duration * .45));
+  });
+  if (ring) tl.fromTo(ring, { "--ab-progress": 0 }, { "--ab-progress": Number(ring.dataset.progress || 0), duration: Math.min(1.05, duration * .3), ease: "power2.out" }, Math.min(.35, duration * .1));
+  var divider = stage.querySelector(".ab-compare-grid");
+  if (divider) tl.fromTo(divider, { "--ab-divider": 0 }, { "--ab-divider": 1, duration: Math.min(.55, duration * .16), ease: "power2.out" }, Math.min(.48, duration * .14));
+  tl.set(stage, { opacity: 1 }, Math.max(0, duration - .02));
+  window.__timelines = window.__timelines || {};
+  window.__timelines[stage.dataset.timelineKey] = tl;
+})();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

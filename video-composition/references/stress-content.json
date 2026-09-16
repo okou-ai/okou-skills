@@ -1,0 +1,31 @@
+{
+  "style": "navy-cobalt",
+  "domain": "News & Public Affairs",
+  "cases": {
+    "short_headline": "A decision with a deadline.",
+    "long_headline": "A decision with a deadline. State what changes, who is affected, and what happens next.",
+    "dense_evidence": "Scope: 12 SEP · Date: 4 SECTORS · Composition: NATIONAL",
+    "quote": "The measure begins with large institutions before expanding nationwide.",
+    "identity": {
+      "name": "OFFICIAL STATEMENT",
+      "role": "18:00"
+    },
+    "values": [
+      "12 SEP",
+      "4 SECTORS",
+      "NATIONAL"
+    ],
+    "disclosure": "Illustrative content for layout, capacity, and replacement testing; not a factual claim.",
+    "presenter_assets": []
+  },
+  "quality_target": {
+    "canvas": "1920x1080",
+    "visible_language": "en",
+    "archetype_cards": 12,
+    "static_frames": 12,
+    "approved_style_masters": 2,
+    "presenter_variation": "mixed",
+    "no_pagination_ui": true,
+    "static_sources_only": true
+  }
+}

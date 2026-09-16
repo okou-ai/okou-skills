@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" data-composition-id="vc-scene" data-composition-duration="6">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Centered content scene</title>
+  </head>
+  <body>
+    <template>
+      <style>
+        #root .scene-copy {
+          --stage-content-max-width: 1680px;
+          display: grid;
+          justify-items: center;
+          gap: 48px;
+          text-align: center;
+        }
+
+        #root .vc-display {
+          max-width: 1600px;
+          font-size: 184px;
+          text-wrap: balance;
+        }
+
+        #root .vc-body {
+          width: min(100%, 1400px);
+          font-size: 48px;
+          text-wrap: balance;
+        }
+
+        #root .vc-content-line {
+          display: block;
+          transform: translate(var(--hf-line-x, 0px), var(--hf-line-y, 0px));
+          filter: blur(var(--hf-line-blur, 0px));
+          will-change: transform, filter, opacity;
+        }
+      </style>
+
+      <div id="root" data-composition-id="vc-scene" data-width="1920" data-height="1080" data-duration="6">
+        <main class="vc-frame" data-color-system="navy-cobalt" data-presenter="off" data-title-chrome="off">
+          <section class="vc-content-stage">
+            <div class="vc-content scene-copy">
+              <p class="vc-kicker vc-content-line">Public service briefing</p>
+              <h1 class="vc-display">
+                <span class="vc-content-line">Make the deadline</span>
+                <span class="vc-content-line">unmistakable.</span>
+              </h1>
+              <p class="vc-body vc-content-line">State what changes, who is affected, and what the public should do next.</p>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <script>
+        (() => {
+          "use strict";
+          const root = document.currentScript.previousElementSibling;
+          const tl = gsap.timeline({ paused: true });
+
+          // HyperFrames Registry behavior: line-by-line-slide, adapted to
+          // centered typography. The background remains settled.
+          tl.fromTo(
+            root.querySelectorAll(".vc-content-line"),
+            { opacity: 0, "--hf-line-x": "0px", "--hf-line-y": "24px", "--hf-line-blur": "6px" },
+            {
+              opacity: 1,
+              "--hf-line-x": "0px",
+              "--hf-line-y": "0px",
+              "--hf-line-blur": "0px",
+              duration: 0.34,
+              stagger: 0.08,
+              ease: "power3.out",
+            },
+            0,
+          );
+
+          window.__timelines["vc-scene"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

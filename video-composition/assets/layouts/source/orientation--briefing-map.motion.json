@@ -1,0 +1,10 @@
+{
+  "duration": 14,
+  "assertions": [
+    {
+      "kind": "appearsBy",
+      "selector": "#vc-official-mount",
+      "bySec": 1
+    }
+  ]
+}

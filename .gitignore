@@ -1,0 +1,4 @@
+artifact/
+.env
+.env.local
+tmp/

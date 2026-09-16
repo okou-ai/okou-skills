@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" data-composition-id="vc-presenter-scene" data-composition-duration="6">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Adaptive presenter scene</title>
+  </head>
+  <body>
+    <template>
+      <style>
+        #root .scene-copy {
+          --stage-content-max-width: 1100px;
+          display: grid;
+          justify-items: start;
+          gap: 40px;
+          text-align: left;
+        }
+
+        #root .vc-display {
+          max-width: 1080px;
+          font-size: 126px;
+          text-wrap: balance;
+        }
+
+        #root .vc-body {
+          width: min(100%, 1060px);
+          font-size: 40px;
+          text-wrap: balance;
+        }
+
+        #root .vc-content-line {
+          display: block;
+          transform: translate(var(--hf-line-x, 0px), var(--hf-line-y, 0px));
+          filter: blur(var(--hf-line-blur, 0px));
+          will-change: transform, filter, opacity;
+        }
+      </style>
+
+      <div id="root" data-composition-id="vc-presenter-scene" data-width="1920" data-height="1080" data-duration="6">
+        <main
+          class="vc-frame" data-color-system="navy-cobalt"
+          data-presenter="on"
+          data-presenter-layout="side-right"
+          data-title-chrome="off"
+        >
+          <section class="vc-content-stage">
+            <div class="vc-content scene-copy">
+              <p class="vc-kicker vc-content-line">Public service briefing</p>
+              <h1 class="vc-display">
+                <span class="vc-content-line">Put the explanation</span>
+                <span class="vc-content-line">beside the speaker.</span>
+              </h1>
+              <p class="vc-body vc-content-line">The shared stage reserves a proportional presenter lane while the complete content remains vertically centered in the available region.</p>
+            </div>
+          </section>
+
+          <div class="presenter-slot" data-presenter-crop="full" data-face-safe="true" data-presenter-media="pending">
+            <div class="presenter-media" data-presenter-media="pending"></div>
+          </div>
+        </main>
+      </div>
+
+      <script>
+        (() => {
+          "use strict";
+          const root = document.currentScript.previousElementSibling;
+          const tl = gsap.timeline({ paused: true });
+
+          // The presenter is spatially settled from frame one. Only the
+          // semantic text layer uses the Registry-derived reveal behavior.
+          tl.fromTo(
+            root.querySelectorAll(".vc-content-line"),
+            { opacity: 0, "--hf-line-x": "0px", "--hf-line-y": "24px", "--hf-line-blur": "6px" },
+            {
+              opacity: 1,
+              "--hf-line-x": "0px",
+              "--hf-line-y": "0px",
+              "--hf-line-blur": "0px",
+              duration: 0.34,
+              stagger: 0.08,
+              ease: "power3.out",
+            },
+            0,
+          );
+
+          window.__timelines["vc-presenter-scene"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
