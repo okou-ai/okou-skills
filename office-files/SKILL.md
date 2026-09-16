@@ -71,9 +71,19 @@ Then open `theme.docx` with python-docx, set `section.header`, add a `PAGE` fiel
 Same `doc.md` as the docx flow — write the Markdown first, then render through typst:
 
 ```bash
-pandoc doc.md -t typst -o doc.typ
+pandoc doc.md -t typst -s -V papersize=a4 -o doc.typ
 python3 -c "import typst; typst.compile('doc.typ', output='doc.pdf')"
 ```
+
+For Chinese, Japanese or Korean text, add the matching font — `-V mainfont="Noto Sans CJK SC"` (use `JP` or `KR` for those languages).
+
+Three things that fail quietly here:
+
+- **`-s` is mandatory for any `-V` to apply.** Without it pandoc emits a fragment whose `.typ` contains no `set page` or `set text` at all, so every variable you pass is silently dropped.
+- **Pin `papersize`.** Without `-s` you get typst's own default of A4; with `-s` and no `papersize` you get pandoc's template default of `us-letter`. Same document, different paper.
+- **CJK without `mainfont` renders in the wrong script.** Chinese text falls back to `NotoSansCJKjp`, so you get Japanese glyph forms with no error and no missing characters. Verify with `pdffonts doc.pdf` — the embedded name must end in `sc` for Simplified Chinese.
+
+Variable names come from `pandoc --print-default-template=typst`: `mainfont`, `mathfont`, `codefont`, `fontsize`, `papersize`.
 
 **`--reference-doc` does not apply to PDF** — only docx, pptx and ODT support it, so this path produces a clean but unbranded PDF. When the user needs their branding on a PDF, produce the docx with their reference doc and tell them the PDF export has to happen on their side; the sandbox cannot convert docx to PDF.
 
