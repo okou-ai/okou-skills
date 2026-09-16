@@ -69,4 +69,4 @@ For xlsx, read with openpyxl. Pandoc lists xlsx as an input format but fails on 
 
 ## If the install fails
 
-Deliver Markdown or a hosted HTML view instead and tell the user the toolchain was unavailable. Do not fall back to LibreOffice, and do not silently ship a worse format without saying so.
+Deliver Markdown or a hosted HTML view instead and tell the user the toolchain was unavailable. Never ship a worse format without saying so.
