@@ -183,6 +183,33 @@ def build(json_path, out_path, mapping, bottom_override):
                         fmt_sp(h.get("space_after_pt"), None, None,
                                h.get("space_before_pt"), h.get("align"))))
 
+    # --- heading levels the source never used ---
+    # Only the levels named in --map get written, so the rest keep pandoc's
+    # defaults. Those can be larger than a mapped level below them and in a
+    # colour that appears nowhere in the source, so a ### would render bigger
+    # than a ## and off-brand. Extend the mapped levels into a descending
+    # ladder instead. These sizes are derived, not measured.
+    written = {}
+    for h in d["headings"]:
+        t = mapping.get(str(h["level"]), f"Heading{h['level']}")
+        m = re.fullmatch(r"Heading(\d)", t)
+        if m:
+            written[int(m.group(1))] = h
+    derived = []
+    if written:
+        deepest = max(written)
+        ref_h = written[deepest]
+        bold = bool(re.search(r"bold|black|heavy|semibold", ref_h["font"], re.I))
+        for lvl in range(deepest + 1, 10):
+            size = max(round(ref_h["size"] * (0.92 ** (lvl - deepest)) * 2) / 2,
+                       d["body"]["size"])
+            styles, ok = patch_style(styles, f"Heading{lvl}",
+                                     rpr(ref_h["font"], size, ref_h["color"], bold), "")
+            if ok:
+                derived.append((f"Heading{lvl}", size))
+                applied.append((f"Heading{lvl}", clean_font(ref_h["font"]), size,
+                                ref_h["color"], "derived"))
+
     # --- page ---
     p, mg = d["page"], d["margins_suggested_cm"]
     # Take the analyzer's own bottom suggestion. Mirroring the top margin is
@@ -211,6 +238,12 @@ def build(json_path, out_path, mapping, bottom_override):
     print(f"\npage {p['w_cm']}x{p['h_cm']}cm  margins left {mg['left']} right {mg['right']} "
           f"top {mg['top']} bottom {bottom}cm"
           + ("  (bottom from the analyzer's suggestion)" if bottom_override is None else ""))
+    if derived:
+        print(f"\nNOTE  the source used {max(written)} heading level(s). Levels "
+              f"{derived[0][0][-1]}-9 were extended from it as a descending ladder "
+              f"({', '.join(f'{n} {s}pt' for n, s in derived[:3])}...).")
+        print("      These sizes are derived, not measured. Without this they would keep")
+        print("      pandoc's defaults, which can be larger than the level above them.")
     if not mapping:
         print("\nNOTE  no --map given; headings were assigned Heading1/2/3... by size.")
         print("  If the PDF has a separate document title it takes Heading1 and shifts")
