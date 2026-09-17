@@ -33,11 +33,7 @@ A style sheet drops those silently. Publish the file and stop here.
 okou presentation screenshot --input <source.pdf> --out package/pages
 ```
 
-`package/` holds three things and nothing else. `SKILL.md` and
-`design-system.md` are both required and neither may be empty — publish rejects
-the archive otherwise.
-
-`package/SKILL.md`, how a later run uses the template:
+Write `package/SKILL.md` and put nothing else in `package/`:
 
 ````markdown
 ---
@@ -55,10 +51,7 @@ Replace the content, keep the composition:
 `pages/` holds the source's rendered pages in order.
 ````
 
-`package/design-system.md`, what the pages show: the regions and where they sit,
-the type hierarchy, the colour roles, the repeated blocks.
-
-Read both off the rendered pages, and write nothing they do not show.
+Name the entries off the rendered pages, and write nothing they do not show.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
