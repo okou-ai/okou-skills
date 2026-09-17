@@ -107,13 +107,21 @@ description: {desc}
 Produce Word documents in this house style. `reference.docx` carries the
 styles; `{src}` is the document they were reverse-engineered from.
 
+Two different jobs, and only the first one stops at the next section:
+
+- **Converting Markdown you already have** — one command, below.
+- **Writing the content as well** — read "Writing a new document in this
+  style" first. The template holds no content at all, so the sections, the
+  wording that has to stay fixed, and the terminology all come from `{src}`.
+
 ## Convert
 
 ```bash
 pandoc your-document.md --reference-doc=reference.docx -o output.docx
 ```
 
-That single command applies the whole template. Nothing else is required.
+That single command applies every style in the template. It does not supply
+any content — see the section below for that.
 
 No pandoc? `brew install pandoc`, `sudo apt install pandoc`, or
 `winget install --id JohnMacFarlane.Pandoc`. Without administrator rights,
