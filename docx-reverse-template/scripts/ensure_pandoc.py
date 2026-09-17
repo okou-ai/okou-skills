@@ -129,9 +129,9 @@ def main():
     sep = ";" if platform.system() == "Windows" else ":"
     print(f"\nAdd it to PATH for the current shell:")
     if platform.system() == "Windows":
-        print(f'   set PATH={os.path.dirname(b)}{sep}%PATH%')
+        print(f'   set PATH={os.path.abspath(os.path.dirname(b))}{sep}%PATH%')
     else:
-        print(f'   export PATH="{os.path.dirname(b)}{sep}$PATH"')
+        print(f'   export PATH="{os.path.abspath(os.path.dirname(b))}{sep}$PATH"')
     return 0
 
 

@@ -56,6 +56,23 @@ def outline(path):
     return out
 
 
+def norm(x):
+    return re.sub(r"\s+/>", "/>", re.sub(r"\s+", " ", x))
+
+
+def docdefault_size(path):
+    """Body size in points from docDefaults, where a style that inherits
+    everything gets it from. No other script in the toolchain reads it, so a
+    heading smaller than the body went unnoticed."""
+    with zipfile.ZipFile(path) as z:
+        x = norm(z.read("word/styles.xml").decode("utf-8", "replace"))
+    m = re.search(r"<w:docDefaults>.*?</w:docDefaults>", x, re.S)
+    if not m:
+        return None
+    sz = re.search(r'<w:sz w:val="(\d+)"', m.group(0))
+    return HALF2PT(sz.group(1)) if sz else None
+
+
 def literal_text(xml):
     """Text a reader sees typed in, with field results dropped.
 
@@ -351,6 +368,19 @@ def build(orig, ref, outdir, name=None):
                 f"value, copied as it is rather than corrected. Change it only "
                 f"to depart from the source deliberately.")
             break
+
+    # A heading smaller than the body is the more glaring inversion and the
+    # ladder above cannot see it, because the body size usually lives in
+    # docDefaults rather than on Body Text.
+    body_pt = (st.get("body text") or {}).get("size") or docdefault_size(ref)
+    if body_pt:
+        small = [(n, v) for n, v in sizes if n != "Title" and v <= body_pt]
+        if small:
+            limits.append(
+                ", ".join(f"`{n}` at {v}pt" for n, v in small)
+                + f" {'is' if len(small) == 1 else 'are'} no larger than body text "
+                  f"at {body_pt}pt — the source's own values, copied as they are. "
+                  f"Change them only to depart from the source deliberately.")
     limits = "\n".join("\n".join(textwrap.wrap(l, 76, initial_indent="- ",
                                               subsequent_indent="  "))
                        for l in limits)

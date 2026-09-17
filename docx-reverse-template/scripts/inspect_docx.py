@@ -117,7 +117,8 @@ def main(path):
         print("  REVIEW: the literal text above is copied verbatim into every document")
         print("          generated from this template. Document numbers, versions, owners")
         print("          and dates belonging to the source must be replaced:")
-        print("          set_header_footer.py <ref> --replace 'OKOU-2026-001=PLACEHOLDER'")
+        print("          set_header_footer.py <ref> --replace 'OLD=PLACEHOLDER'")
+        print("          using values from the literal text above, not this example.")
         print("          Swap the values in place. Rebuilding with --footer would flatten")
         print("          tab columns, border rules, a first-page variant and any table.")
 
@@ -134,6 +135,20 @@ def main(path):
             print(f"  paper: {TWIP(pg.group(1)):.1f} x {TWIP(pg.group(2)):.1f} cm")
         if mar:
             print("  margins: " + "  ".join(f"{k} {TWIP(v):.2f}cm" for k, v in mar.items()))
+        # A tab stop past the text width puts that part of the header outside
+        # the text area on every page. One subtraction catches it, and nothing
+        # else in the toolchain looks at w:tab.
+        if pg and mar.get("left") and mar.get("right"):
+            tw = int(pg.group(1)) - int(mar["left"]) - int(mar["right"])
+            for part in [n for n in names if re.match(r"word/(header|footer)\d+\.xml", n)]:
+                x = z.read(part).decode("utf-8", "replace")
+                for val, pos in re.findall(r'<w:tab w:val="(\w+)" w:pos="(\d+)"', x):
+                    if int(pos) > tw:
+                        over = int(pos) - tw
+                        print(f"  REVIEW: {os.path.basename(part)} has a {val} tab at "
+                              f"{pos} twips, {over} past the {tw}-twip text width "
+                              f"({over / 1440 * 2.54:.2f}cm outside it). Move it to "
+                              f"{tw} or change the margins.")
         print(f"  references a header: {'yes' if 'headerReference' in s else 'no'}"
               f"   footer: {'yes' if 'footerReference' in s else 'no'}")
         # Columns ride along in sectPr like paper and margins do, so a
@@ -161,10 +176,28 @@ def main(path):
     # --- theme fonts ---
     if "word/theme/theme1.xml" in names:
         t = z.read("word/theme/theme1.xml").decode("utf-8", "replace")
-        major = re.search(r"<a:majorFont>.*?typeface=\"([^\"]*)\"", t, re.S)
-        minor = re.search(r"<a:minorFont>.*?typeface=\"([^\"]*)\"", t, re.S)
-        print(f"\n[theme fonts] headings {major.group(1) if major else '?'} / "
-              f"body {minor.group(1) if minor else '?'}")
+        # Each font group has its own latin, East Asian and complex-script
+        # slot. A single non-greedy search always returns the latin one, so an
+        # empty <a:ea> reads as if the fonts were fine while every CJK glyph
+        # falls back to whatever the reader picks.
+        def slots(group):
+            m = re.search(rf"<a:{group}>(.*?)</a:{group}>", t, re.S)
+            if not m:
+                return "?", "?"
+            g = lambda tag: (re.search(rf'<a:{tag} typeface="([^"]*)"', m.group(1))
+                             or re.search(r"(?!)", "")) 
+            lat = re.search(r'<a:latin typeface="([^"]*)"', m.group(1))
+            ea = re.search(r'<a:ea typeface="([^"]*)"', m.group(1))
+            return (lat.group(1) if lat else "?"), (ea.group(1) if ea else "")
+        maj_l, maj_e = slots("majorFont")
+        min_l, min_e = slots("minorFont")
+        print(f"\n[theme fonts] headings {maj_l or '(none)'} / body {min_l or '(none)'}")
+        print(f"              east asian: headings {maj_e or 'EMPTY'} / "
+              f"body {min_e or 'EMPTY'}")
+        if not (maj_e and min_e):
+            print("  REVIEW: the theme sets no East Asian font, so CJK text falls back to")
+            print("          whatever the reader substitutes. Set it per style with")
+            print("          set_style.py --font, which writes w:eastAsia.")
 
     # --- required style coverage ---
     crit = [n for n in PS.MUST_EXIST if n.lower() not in have]

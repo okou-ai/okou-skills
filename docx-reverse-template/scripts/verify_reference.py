@@ -76,7 +76,9 @@ def defined_styles(z):
 
 def used_styles(z):
     used = set()
-    for part in ("word/document.xml", "word/footnotes.xml"):
+    parts = ["word/document.xml", "word/footnotes.xml", "word/endnotes.xml"]
+    parts += [n for n in z.namelist() if re.match(r"word/(header|footer)\d+\.xml", n)]
+    for part in parts:
         try:
             x = z.read(part).decode("utf-8", "replace")
         except KeyError:
@@ -104,7 +106,13 @@ def main(ref, keep=None):
     dangling = sorted(used - defined)
 
     print(f"===== verifying {os.path.basename(ref)} =====\n")
-    print(f"[style references] probe uses {len(used)} styles; template defines {len(defined)}")
+    # Count what the template defines, not what the converted probe ended up
+    # with: pandoc adds its code-highlight styles whenever the probe contains a
+    # fenced block, so the output number moves with the probe, not the template.
+    with zipfile.ZipFile(ref) as zt:
+        tmpl_defined = defined_styles(zt)
+    print(f"[style references] probe uses {len(used)} styles; "
+          f"template defines {len(tmpl_defined)}")
     if dangling:
         print(f"  FAIL  {len(dangling)} dangling references (Word renders these as Normal):")
         for d in dangling:
