@@ -34,6 +34,10 @@ Three or more references separate a locked axis from a dial. With one, ask for
 more; if none arrive, record in `design-system.md` which axes stay unsettled
 and give them no range.
 
+Ask for files at least 400px on the short side. Below that the palette fills
+with anti-alias blends and the stroke is one pixel wide, so colour and line
+describe the downscaling.
+
 ### 2. Measure
 
 ```bash
@@ -157,5 +161,6 @@ pass an image to it.
 | Generated pieces flood the whole canvas | The locked frame is missing the ink coverage and the unpainted ground; "vignette" alone does not hold |
 | The medium drifts to pencil or crayon | Name the wet behaviour — washes pooling at the stroke edges — and name the media to avoid |
 | The check passes but the piece looks wrong | Medium, shape language or subject convention is missing from the locked frame |
+| `LOW RES` in the measurement | Ask for a larger file. Keep aspect, ground colour, ink coverage and centring; leave colour and stroke out of the locked frame |
 | Background reads as `textured` on a flat style | The reference is a JPEG; re-export as PNG or accept the grain figure it reports |
 | One reference only | Record the unsettled axes; do not write ranges you cannot support |

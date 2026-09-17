@@ -223,6 +223,12 @@ def surface(rows, w, h, bg):
             "edge_samples": len(ramps)}
 
 
+# Below this, a reference describes its own downscaling: the palette fills up
+# with anti-alias blends, the modal dark colour is one of those blends rather
+# than the ink, and one pixel of stroke is a large share of the canvas.
+MIN_SIDE = 400
+
+
 def measure(path):
     rows, quarter, w, h = load(path)
     bg = background(rows, w, h)
@@ -236,7 +242,8 @@ def measure(path):
     if probe and not bg["from_strips"] and probe["ink_pct"] >= 45:
         bg = {"color": bg["color"], "kind": "none (art covers the canvas)",
               "edge_spread": bg["edge_spread"], "corner_spread": bg["corner_spread"]}
-    return {"file": os.path.basename(path), "canvas": {"w": w, "h": h,
+    return {"file": os.path.basename(path), "low_res": min(w, h) < MIN_SIDE,
+            "canvas": {"w": w, "h": h,
             "aspect": round(w / h, 3), "shape": "square" if abs(w - h) <= 2 else
             ("portrait" if h > w else "landscape")},
             "background": bg, "palette": palette(quarter),
@@ -263,6 +270,11 @@ def report(ms):
         print(f"  lines       " + (f"#{l['color']}  width {l.get('width_px')}px "
               f"({l.get('width_pct_of_canvas')}% of canvas, range {l.get('width_range_px')}, {l.get('samples')} runs)" if l["present"] else "no dark line structure"))
         print(f"  surface     flat {f['flat_pct']}%  grain {f['grain']}  edge ramp {f['edge_px']}px")
+        if m["low_res"]:
+            print(f"  LOW RES     {c['w']}x{c['h']} is under {MIN_SIDE}px. Palette, line colour and"
+                  f" line width\n              describe the downscaling, not the style. Ask for a"
+                  f" larger file.\n              Still usable: aspect, ground colour, ink coverage,"
+                  f" centring.")
 
     if len(ms) < 2:
         print("\nOne reference cannot separate a locked axis from a dial. Every value above"

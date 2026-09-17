@@ -27,11 +27,18 @@ def rgb(h):
 
 def check(refs, piece):
     out, bad = [], 0
+    # A reference smaller than MIN_SIDE cannot speak for colour or stroke: its
+    # own downscaling produced those values. Those axes are reported and not
+    # counted.
+    coarse = all(m.get("low_res") for m in refs)
+    soft = {"line colour", "line width", "fill flatness", "grain"} if coarse else set()
 
     def row(name, want, got, ok):
         nonlocal bad
-        bad += 0 if ok else 1
-        out.append(f"  {name:20} {str(want):>26} {str(got):>26}  {'ok' if ok else 'DIFF'}")
+        excused = name in soft or (coarse and name.startswith("locked colour"))
+        bad += 0 if (ok or excused) else 1
+        mark = "ok" if ok else ("not counted" if excused else "DIFF")
+        out.append(f"  {name:20} {str(want):>26} {str(got):>26}  {mark}")
 
     rc = {(m["canvas"]["w"], m["canvas"]["h"]) for m in refs}
     pc = (piece["canvas"]["w"], piece["canvas"]["h"])
@@ -89,6 +96,9 @@ def check(refs, piece):
         row(f"locked colour #{c}", "present", "#" + got[1], got[0] <= 34)
     if not shared:
         out.append(f"  {'locked colours':20} {'none shared by all refs':>26} {'-':>26}  n/a")
+    if coarse:
+        out.append("  every reference is under 400px: colour and stroke axes are reported"
+                   " but not counted")
     return out, bad
 
 
