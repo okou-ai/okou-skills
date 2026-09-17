@@ -22,6 +22,36 @@ MD_MAP = [
 ]
 
 
+def outline(path):
+    """The source document's headings, in reading order.
+
+    Matched on the style's w:name, not its styleId: a Word export localises the
+    id but keeps the name, so "heading 1" is reliable where "1" is not.
+    """
+    with zipfile.ZipFile(path) as z:
+        doc = z.read("word/document.xml").decode("utf-8", "replace")
+        sty = z.read("word/styles.xml").decode("utf-8", "replace")
+    name = {}
+    for m in re.finditer(r'<w:style\b[^>]*w:styleId="([^"]+)".*?</w:style>', sty, re.S):
+        n = re.search(r'<w:name w:val="([^"]+)"', m.group(0))
+        if n:
+            name[m.group(1)] = n.group(1)
+    out = []
+    for m in re.finditer(r"<w:p\b[^>]*>.*?</w:p>|<w:p\b[^>]*/>", doc, re.S):
+        para = m.group(0)
+        ps = re.search(r'<w:pStyle w:val="([^"]+)"', para)
+        if not ps:
+            continue
+        n = name.get(ps.group(1), ps.group(1))
+        lv = re.fullmatch(r"heading (\d)", n, re.I)
+        if not (lv or n in ("Title", "Subtitle")):
+            continue
+        t = literal_text(para)
+        if t:
+            out.append((n, int(lv.group(1)) if lv else 0, t))
+    return out
+
+
 def literal_text(xml):
     """Text a reader sees typed in, with field results dropped.
 
@@ -191,7 +221,34 @@ Body text.
 
 {page}
 
-## 4. FAQ
+## 4. Writing a new document from this template
+
+The template guarantees the **styles**, and nothing else — `--reference-doc`
+discards every piece of body content, so the template knows nothing about what
+the source document said.
+
+When the task is "another one of these", or a revised version, the source
+document in this package is the content reference. Read it for:
+
+- **The section skeleton** — `outline.md` has it in reading order. Match it
+  unless there is a reason not to.
+- **Fixed text that must be reproduced verbatim** — legal and confidentiality
+  notices, defined terms, standard table headers, metric definitions. These
+  belong to the document type, not to that one instance.
+- **Terminology and level of detail** — what things are called, how precise
+  the numbers are, how long a section runs.
+
+What is fixed and what changes cannot be settled from a single sample: text
+that looks like boilerplate may be specific to this instance, and a value that
+looks specific may be required in every version. With one document, read it
+and decide. With several, compare them first — what differs is variable, but
+what matches is only *probably* fixed, since two samples can coincide.
+
+The header and footer **are** in the template, and they carry the source's
+own document number, version and owner. Replace those before handing the
+template on, or every document made from it inherits them.
+
+## 5. FAQ
 
 **The fonts look wrong.**
 A font named in the template only renders if it is installed locally; otherwise
@@ -225,12 +282,13 @@ find out which one.
 Edit them directly in `reference.docx` with Word and save; all of it carries
 into every output document. Or use `set_header_footer.py` from the skill.
 
-## 5. Package contents
+## 6. Package contents
 
 | File | Purpose |
 |---|---|
 | `reference.docx` | **The template.** Point `--reference-doc` at this |
-| `{orig}` | The source document. Keep it for comparison |
+| `{orig}` | The source document. Keep it — see section 4 |
+| `outline.md` | The source's section skeleton, in reading order |
 | `report.txt` | Inspection and verification output from when this was built |
 | `README.md` | This file |
 
@@ -269,6 +327,19 @@ def build(orig, ref, outdir):
         rep.append(f"$ python3 {script} {os.path.basename(arg)}\n"
                    f"(exit={r.returncode})\n{r.stdout}")
     open(os.path.join(outdir, "report.txt"), "w").write("\n\n".join(rep))
+
+    # The outline is the one piece of the source's *content* that travels with
+    # the package. reference.docx carries no body text, so without this there
+    # is nothing to work from when the task is "another document like this one".
+    ol = outline(orig)
+    if ol:
+        lines = [f"# Outline of {os.path.basename(orig)}", "",
+                 "The template carries styles only. This is how the source document",
+                 "was organised; use it when you are writing a new document to match.",
+                 ""]
+        for n, lv, t in ol:
+            lines.append(f"{'  ' * max(0, lv - 1)}- {t}  `{n}`")
+        open(os.path.join(outdir, "outline.md"), "w").write("\n".join(lines) + "\n")
 
     open(os.path.join(outdir, "README.md"), "w").write(README.format(
         name=os.path.splitext(os.path.basename(orig))[0],

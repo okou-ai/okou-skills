@@ -166,7 +166,33 @@ Confidence by field:
 | Top / left / right margins | Measured, then rounded | Medium |
 | Bottom margin | Only bounded, never measured | Low |
 
-## 5. FAQ
+## 5. Writing a new document from this template
+
+The template guarantees the **styles**, and nothing else — `--reference-doc`
+discards every piece of body content, so the template knows nothing about what
+the source document said.
+
+When the task is "another one of these", or a revised version, the source
+PDF in this package is the content reference. Read it for:
+
+- **The section skeleton** — `outline.md` has it in reading order. Match it
+  unless there is a reason not to.
+- **Fixed text that must be reproduced verbatim** — legal and confidentiality
+  notices, defined terms, standard table headers, metric definitions. These
+  belong to the document type, not to that one instance.
+- **Terminology and level of detail** — what things are called, how precise
+  the numbers are, how long a section runs.
+
+What is fixed and what changes cannot be settled from a single sample: text
+that looks like boilerplate may be specific to this instance, and a value that
+looks specific may be required in every version. With one document, read it
+and decide. With several, compare them first — what differs is variable, but
+what matches is only *probably* fixed, since two samples can coincide.
+
+The source's running head and footer are not in the template either;
+`report.txt` lists what they said.
+
+## 6. FAQ
 
 **The fonts look wrong.**
 The PDF stores embedded subset names; the script restores the system name, but
@@ -203,12 +229,13 @@ added deliberately when the template was built. Add or change one in Word, or
 with `set_header_footer.py` from the skill; either way it flows into every
 output document.
 
-## 6. Package contents
+## 7. Package contents
 
 | File | Purpose |
 |---|---|
 | `reference.docx` | **The template.** Point `--reference-doc` at this |
-| `{orig}` | The source PDF. Keep it for comparison |
+| `{orig}` | The source PDF. Keep it — see section 5 |
+| `outline.md` | The source's section skeleton, in reading order |
 | `styles.json` | The raw inferred values, useful when editing the template |
 | `report.txt` | Analysis and verification output from when this was built |
 | `README.md` | This file |
@@ -342,6 +369,22 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
                            capture_output=True, text=True)
         rep.append(f"$ python3 {script} ...\n(exit={r.returncode})\n{r.stdout}")
     open(os.path.join(outdir, "report.txt"), "w").write("\n\n".join(rep))
+
+    # The outline is the one piece of the source's *content* that travels with
+    # the package. reference.docx carries no body text, so without this there
+    # is nothing to work from when the task is "another document like this one".
+    ol = d.get("outline") or []
+    if ol:
+        lines = [f"# Outline of {os.path.basename(pdf)}", "",
+                 "The template carries styles only. This is how the source document",
+                 "was organised; use it when you are writing a new document to match.",
+                 ""]
+        for o in ol:
+            n = mapping.get(str(o["level"]), f"Heading{o['level']}")
+            lv = re.fullmatch(r"Heading(\d)", n)
+            depth = max(0, int(lv.group(1)) - 1) if lv else 0
+            lines.append(f"{'  ' * depth}- {o['text']}  `{n}`  (p{o['page']})")
+        open(os.path.join(outdir, "outline.md"), "w").write("\n".join(lines) + "\n")
 
     open(os.path.join(outdir, "README.md"), "w").write(README.format(
         name=os.path.splitext(os.path.basename(pdf))[0],

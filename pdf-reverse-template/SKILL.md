@@ -154,6 +154,12 @@ default cluster and contradict the template shipped beside it.
 
 Hand over the whole directory.
 
+The package carries the source alongside the template on purpose. The template
+is styles only, so "write another document like this one" has to come from the
+source: `outline.md` for the section skeleton, and the source itself for the
+text that belongs to the document type rather than to that one instance. Say so
+when handing it over.
+
 ### Optional: adjust styles, add a header or footer
 
 ```bash

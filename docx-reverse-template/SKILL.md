@@ -128,6 +128,12 @@ python3 scripts/make_package.py <source.docx> reference.docx <output dir>
 
 Hand over the whole directory, not just `reference.docx`.
 
+The package carries the source alongside the template on purpose. The template
+is styles only, so "write another document like this one" has to come from the
+source: `outline.md` for the section skeleton, and the source itself for the
+text that belongs to the document type rather than to that one instance. Say so
+when handing it over.
+
 ## Rules
 
 - Do not edit `w:styleId`. Pandoc matches on `w:name`, so the numeric styleIds

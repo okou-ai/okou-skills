@@ -209,6 +209,7 @@ def to_lines(spans, columns=1, left=None, right=None):
             line = dict(page=pg, y=y, x0=round(x0, 1),
                         x1=round(max(s["bbox"][2] for s in run), 1),
                         key=skey(run[0]),
+                        text="".join(s["text"] for s in run).strip(),
                         filler=all(s["filler"] for s in run))
             if bounds:
                 line["col"] = sum(1 for b in bounds if x0 >= b)
@@ -507,6 +508,14 @@ def analyze(path, body_pick=None, columns=1):
                                  ("top", top_pt), ("bottom", bottom_bound_pt))},
         "margins_suggested_cm": {"left": snap(CM(left_pt))[0], "right": snap(CM(right_pt))[0],
                                  "top": top_cm, "bottom": bottom_suggested},
+        # Every heading line in reading order, not just one sample per cluster.
+        # The template carries no body content at all, so this outline is the
+        # only record of how the source document was actually organised — and
+        # that is what a request to "write another one of these" needs.
+        "outline": [{"level": lv, "text": l["text"], "page": l["page"] + 1}
+                    for l in lines if l["text"] and not l["filler"]
+                    for lv in [next((i for i, h in enumerate(heads, 1)
+                                     if h == l["key"]), None)] if lv],
         "geometry_notes": geom_notes,
         "running_heads": sorted({s["text"].strip() for i, s in enumerate(spans) if i in hf})[:6],
         "running_heads_method": hf_method,
