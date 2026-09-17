@@ -11,11 +11,11 @@ Render the pages, decide what the file is, follow that guide to the end.
 okou presentation screenshot --input <source.pptx|source.pdf> --out shots
 ```
 
-| The file is | Go to | Which produces |
-|---|---|---|
-| a deck — `.pptx`, `.ppt`, an image deck, or a `.pdf` whose pages are slides | `presentation/SKILL.md` | an HTML presentation template |
-| a Word document — `.docx` | `docx/SKILL.md` | a `reference.docx` template package |
-| a PDF document — pages of prose, not slides | `pdf/SKILL.md` | a `reference.docx` template package |
+| The file is | Go to |
+|---|---|
+| a deck — `.pptx`, `.ppt`, an image deck, or a `.pdf` whose pages are slides | `presentation/SKILL.md` |
+| a Word document — `.docx` | `docx/SKILL.md` |
+| a PDF document — pages of prose, not slides | `pdf/SKILL.md` |
 
 A page carrying one idea in display type is a slide. A page carrying running
 prose under a repeated header, footer, or page number is a document.
