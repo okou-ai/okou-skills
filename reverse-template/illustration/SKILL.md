@@ -18,6 +18,14 @@ picture is one arrangement the user wants back.
 For one picture, write the prompt that recreates it and stop. Continue here
 only for a style.
 
+## Or the interactive route
+
+The `style-forge` workflow covers the same ground with a confirm gate: it
+generates variations, waits for the user to pick one, then registers the result
+as a slash command in the Open Design registry. Use it when the user wants to
+choose a direction. Use this guide when the package is the deliverable, and run
+`scripts/measure_style.py` and `scripts/check_piece.py` from either route.
+
 ## Prerequisites
 
 ```bash
