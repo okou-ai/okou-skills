@@ -3,7 +3,8 @@
 
 Usage:
   python3 make_package.py <source.pdf> <reference.docx> <styles.json> <output dir> \
-          [--map 1=Heading1,2=Title] [--bottom 3.0] [--body 2] [--name slug]
+          [--map 1=Heading1,2=Title] [--body 2] [--name slug]
+          [--top 2.4] [--right 1.8] [--bottom 2.2] [--left 1.8]
 
 Three files, no more. SKILL.md carries the usage, the measured style values,
 the choices made and the source's outline; reference.docx is the artifact
@@ -11,9 +12,10 @@ pandoc consumes; source.pdf is the content reference. styles.json is not
 shipped because SKILL.md records the exact command that re-derives it, and the
 analysis is reproducible byte for byte.
 
-Pass --map, --bottom and --body through verbatim: they are every choice made
-along the way, and SKILL.md is the only place they are written down. --name
-sets the skill name and defaults to the output directory's name.
+Pass --map, --body and every margin you overrode through verbatim: they are
+every choice made along the way, and SKILL.md is the only place they are
+written down. --name sets the skill name and defaults to the output
+directory's name.
 """
 import sys, os, re, json, shutil, zipfile, subprocess, datetime
 
@@ -221,7 +223,9 @@ Built from `{src}` by the pdf-reverse-template skill on {date}.
 """
 
 
-def build(pdf, ref, jpath, outdir, mapping, bottom, body=None, name=None):
+def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
+    bottom = margins.get("bottom") if isinstance(margins, dict) else margins
+    margins = margins if isinstance(margins, dict) else {}
     os.makedirs(outdir, exist_ok=True)
     name = name or os.path.basename(os.path.abspath(outdir))
     src = "source" + os.path.splitext(pdf)[1].lower()
@@ -336,6 +340,14 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None, name=None):
     # rather than from a flag, where it cannot drift from the template.
     ncols = d.get("columns") or 1
     repro = (f" --body {body}" if body else "") + (f" --columns {ncols}" if ncols > 1 else "")
+    # Every margin overridden on the command line. These are measurements the
+    # analyzer got wrong and somebody corrected; if SKILL.md does not carry
+    # them, the correction is lost the moment the template is rebuilt.
+    if margins:
+        rev.append("")
+        rev.append("**Margins set by hand**: "
+                   + ", ".join(f"`--{k} {v}`" for k, v in sorted(margins.items()))
+                   + ". The rest came from the analysis.")
 
     # The outline is the only record of the source's *content* that survives.
     # reference.docx carries no body text, so without it there is nothing to
@@ -379,8 +391,9 @@ if __name__ == "__main__":
         for kv in a[a.index("--map") + 1].split(","):
             k, v = kv.split("=")
             mapping[k.strip()] = v.strip()
-    if "--bottom" in a:
-        bottom = float(a[a.index("--bottom") + 1])
+    margins = {k: float(a[a.index(f"--{k}") + 1])
+               for k in ("top", "right", "bottom", "left") if f"--{k}" in a}
+    bottom = margins.get("bottom")
     body = int(a[a.index("--body") + 1]) if "--body" in a else None
     nm = a[a.index("--name") + 1] if "--name" in a else None
-    build(a[1], a[2], a[3], a[4], mapping, bottom, body, nm)
+    build(a[1], a[2], a[3], a[4], mapping, margins, body, nm)

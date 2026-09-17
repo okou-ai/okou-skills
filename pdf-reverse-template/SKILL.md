@@ -142,9 +142,11 @@ python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output 
         --map 1=Heading1,2=Title,3=Heading2 --body 2
 ```
 
-Pass `--map`, `--bottom` and `--body` through verbatim. They are every choice
-made along the way, and `SKILL.md` is the only place they get written down —
-including in the command it records for re-deriving the analysis.
+Pass `--map`, `--body` and every margin you overrode (`--top`, `--right`,
+`--bottom`, `--left`) through verbatim. They are every choice made along the
+way, and `SKILL.md` is the only place they get written down — including in the
+command it records for re-deriving the analysis. A correction left out here is
+lost the moment anyone rebuilds the template.
 
 The package is three files: `SKILL.md`, `reference.docx` and `source.pdf`.
 `SKILL.md` has a `name` and `description` in its frontmatter, so the directory
