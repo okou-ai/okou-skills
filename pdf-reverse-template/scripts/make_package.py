@@ -25,6 +25,27 @@ MD_MAP = [
 ]
 
 
+def literal_text(xml):
+    """Text a reader sees typed in, with field results dropped.
+
+    A PAGE field caches its last result in an ordinary <w:t>, so a plain sweep
+    of <w:t> reports a footer that only holds a page number as literally
+    reading "1". Runs between fldChar begin and end carry the instruction and
+    that cached result; both are skipped.
+    """
+    xml = re.sub(r"<w:fldSimple\b.*?</w:fldSimple>", "", xml, flags=re.S)
+    out, depth = [], 0
+    for m in re.finditer(r"<w:r\b[^>]*>.*?</w:r>", xml, re.S):
+        r = m.group(0)
+        if 'fldCharType="begin"' in r:
+            depth += 1
+        elif 'fldCharType="end"' in r:
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            out += re.findall(r"<w:t[^>]*>([^<]*)</w:t>", r)
+    return " ".join(out).strip()
+
+
 def styles_of(path):
     with zipfile.ZipFile(path) as z:
         x = z.read("word/styles.xml").decode("utf-8", "replace")
@@ -225,8 +246,7 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
         rhf = []
         for part in sorted(x for x in rparts if re.match(r"word/(header|footer)\d+\.xml", x)):
             raw = z.read(part)
-            t = " ".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>",
-                                    raw.decode("utf-8", "replace"))).strip()
+            t = literal_text(raw.decode("utf-8", "replace"))
             kind = "Header" if "header" in part else "Footer"
             extra = []
             if b"PAGE" in raw:

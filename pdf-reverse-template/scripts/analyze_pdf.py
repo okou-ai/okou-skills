@@ -168,7 +168,7 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
     return hf, "single-page heuristic (unreliable)" if hf else None
 
 
-def to_lines(spans):
+def to_lines(spans, columns=1, left=None, right=None):
     """Group spans into lines. PyMuPDF blocks are not paragraphs — in practice
     each block often holds a single line — so paragraphs are segmented here.
 
@@ -177,18 +177,42 @@ def to_lines(spans):
     box tops, because the two faces have different ascents; keying on the top
     splits one heading into two lines, halves the sample for its spacing, and
     turns the gaps that straddle the split into negative numbers.
+
+    Multi-column layouts share one baseline grid, so side-by-side lines from
+    different columns land in the same group and merge into one full-width
+    line: a real line is lost, and the merged line's right edge is the *other*
+    column's, which makes the measured gutter negative. A group is therefore
+    split wherever the whitespace between two spans straddles a column
+    boundary. Text that genuinely crosses a boundary — a title spanning the
+    page — has no gap there and stays one line.
     """
+    bounds = []
+    if columns > 1 and left is not None and right is not None:
+        w = (right - left) / columns
+        bounds = [left + w * k for k in range(1, columns)]
+
     byline = collections.defaultdict(list)
     for s in spans:
         byline[(s["page"], s["base"])].append(s)
     out = []
     for (pg, y), ss in byline.items():
-        first = min(ss, key=lambda s: s["bbox"][0])
-        out.append(dict(page=pg, y=y,
-                        x0=round(min(s["bbox"][0] for s in ss), 1),
-                        x1=round(max(s["bbox"][2] for s in ss), 1),
-                        key=skey(first),
-                        filler=all(s["filler"] for s in ss)))
+        ss.sort(key=lambda s: s["bbox"][0])
+        runs, cur = [], [ss[0]]
+        for prev, s in zip(ss, ss[1:]):
+            if any(prev["bbox"][2] <= b <= s["bbox"][0] for b in bounds):
+                runs.append(cur)
+                cur = []
+            cur.append(s)
+        runs.append(cur)
+        for run in runs:
+            x0 = min(s["bbox"][0] for s in run)
+            line = dict(page=pg, y=y, x0=round(x0, 1),
+                        x1=round(max(s["bbox"][2] for s in run), 1),
+                        key=skey(run[0]),
+                        filler=all(s["filler"] for s in run))
+            if bounds:
+                line["col"] = sum(1 for b in bounds if x0 >= b)
+            out.append(line)
     out.sort(key=lambda l: (l["page"], l["y"]))
     return out
 
@@ -336,11 +360,30 @@ def analyze(path, body_pick=None, columns=1):
     def sample(key):
         return next((s["text"].strip() for s in content if skey(s) == key), "")
 
-    # Left: the mode of line start x, steadier than taking the minimum.
-    lefts = collections.Counter(round(s["bbox"][0]) for s in body_spans)
-    left_pt = lefts.most_common(1)[0][0]
-    # Right: where the longest line ends, assuming some line fills the column.
-    right_pt = W - max(s["bbox"][2] for s in body_spans)
+    # Left and right edges are both modes, per column. Taking the extreme
+    # instead loses to a single outlier: a justified line reports a right edge
+    # a few points past the column, because the span box carries the tracking
+    # added to the last glyph. That one span moved the measured right margin
+    # by 4.7pt on the fixture and, in a two-column layout, shrank the gutter
+    # by the same amount.
+    def edges(ss):
+        return (collections.Counter(round(s["bbox"][0], 1) for s in ss).most_common(1)[0][0],
+                collections.Counter(round(s["bbox"][2], 1) for s in ss).most_common(1)[0][0])
+
+    # Bootstrap the column bands from the extremes; a few points of overshoot
+    # cannot move a band boundary, which sits half a column away.
+    raw_l = min(s["bbox"][0] for s in body_spans)
+    raw_r = max(s["bbox"][2] for s in body_spans)
+    if columns > 1:
+        w = (raw_r - raw_l) / columns
+        per_band = collections.defaultdict(list)
+        for s in body_spans:
+            per_band[min(columns - 1, int((s["bbox"][0] - raw_l) / w))].append(s)
+        band_edges = [edges(per_band[k]) for k in sorted(per_band)]
+        left_pt, right_edge = band_edges[0][0], band_edges[-1][1]
+    else:
+        left_pt, right_edge = edges(body_spans)
+    right_pt = W - right_edge
     # Top: prefer page 2 onward; a title block inflates the first page.
     not_first = [s for s in body_spans if s["page"] > 0]
     top_src = not_first or body_spans
@@ -382,8 +425,8 @@ def analyze(path, body_pick=None, columns=1):
                 f"vertically symmetric, so do not mirror the top margin. The suggestion "
                 f"is the rounded bound; pass --bottom to override it")
 
-    lines = to_lines(body_spans)
     col_right = W - right_pt
+    lines = to_lines(body_spans, columns, left_pt, col_right)
 
     # Evidence for the column decision, not a verdict. Bands of line-start x
     # separate for a multi-column layout and for a table alike, so the count
@@ -400,18 +443,23 @@ def analyze(path, body_pick=None, columns=1):
     # column 2 is the last line of column 1, which sits lower on the page and
     # turns every heading gap into noise.
     if columns > 1:
-        span_w = (col_right - left_pt) / columns
-        for l in lines:
-            l["col"] = max(0, min(columns - 1, int((l["x0"] - left_pt) / span_w)))
         lines.sort(key=lambda l: (l["page"], l["col"], l["y"]))
+        # Column edges come only from lines that stay inside one column. A
+        # title or abstract set across the full width belongs to no column;
+        # letting it set column 1's right edge puts that edge past where
+        # column 2 starts, and the gutter comes out negative.
+        span_w = (col_right - left_pt) / columns
+        bounds = [left_pt + span_w * k for k in range(1, columns)]
         per_col = collections.defaultdict(list)
         for l in lines:
-            per_col[l["col"]].append(l)
-        edges = [(min(v, key=lambda l: l["x0"])["x0"], max(v, key=lambda l: l["x1"])["x1"])
-                 for _, v in sorted(per_col.items())]
+            if not any(l["x0"] < b < l["x1"] for b in bounds):
+                per_col[l["col"]].append(l)
+        box = [(collections.Counter(l["x0"] for l in v).most_common(1)[0][0],
+                collections.Counter(l["x1"] for l in v).most_common(1)[0][0])
+               for _, v in sorted(per_col.items())]
         col_gap = round(statistics.median(
-            [b[0] - a[1] for a, b in zip(edges, edges[1:])]), 1) if len(edges) > 1 else None
-        col_width = round(statistics.median([e[1] - e[0] for e in edges]), 1)
+            [b[0] - a[1] for a, b in zip(box, box[1:])]), 1) if len(box) > 1 else None
+        col_width = round(statistics.median([e[1] - e[0] for e in box]), 1) if box else None
     else:
         col_gap = col_width = None
     body_sp, head_sp = measure_spacing(lines, body, left_pt, col_right)

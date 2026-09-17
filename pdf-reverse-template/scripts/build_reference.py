@@ -219,10 +219,15 @@ def build(json_path, out_path, mapping, bottom_override):
         (mg.get("bottom") if mg.get("bottom") is not None else mg.get("top"))
     # w:cols comes after w:pgMar in CT_SectPr
     cols = d.get("columns") or 1
-    cols_xml = ""
+    cols_xml, gap_note = "", ""
     if cols > 1:
-        gap = PT2TWIP(d.get("column_gap_pt") or 24)
-        cols_xml = f'<w:cols w:num="{cols}" w:space="{gap}" w:equalWidth="1"/>'
+        gap_pt = d.get("column_gap_pt")
+        if gap_pt is None:
+            gap_pt, gap_note = 24, "  gutter 24pt (DEFAULT — none could be measured)"
+        else:
+            gap_note = (f"  gutter {gap_pt}pt, column width "
+                        f"{d.get('column_width_pt')}pt (both measured)")
+        cols_xml = f'<w:cols w:num="{cols}" w:space="{PT2TWIP(gap_pt)}" w:equalWidth="1"/>'
     sect = (f'<w:sectPr><w:pgSz w:w="{CM2TWIP(p["w_cm"])}" w:h="{CM2TWIP(p["h_cm"])}"/>'
             f'<w:pgMar w:top="{CM2TWIP(mg["top"])}" w:right="{CM2TWIP(mg["right"])}" '
             f'w:bottom="{CM2TWIP(bottom)}" w:left="{CM2TWIP(mg["left"])}" '

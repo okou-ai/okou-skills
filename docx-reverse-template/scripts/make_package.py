@@ -22,6 +22,27 @@ MD_MAP = [
 ]
 
 
+def literal_text(xml):
+    """Text a reader sees typed in, with field results dropped.
+
+    A PAGE field caches its last result in an ordinary <w:t>, so a plain sweep
+    of <w:t> reports a footer that only holds a page number as literally
+    reading "1". Runs between fldChar begin and end carry the instruction and
+    that cached result; both are skipped.
+    """
+    xml = re.sub(r"<w:fldSimple\b.*?</w:fldSimple>", "", xml, flags=re.S)
+    out, depth = [], 0
+    for m in re.finditer(r"<w:r\b[^>]*>.*?</w:r>", xml, re.S):
+        r = m.group(0)
+        if 'fldCharType="begin"' in r:
+            depth += 1
+        elif 'fldCharType="end"' in r:
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            out += re.findall(r"<w:t[^>]*>([^<]*)</w:t>", r)
+    return " ".join(out).strip()
+
+
 def styles_of(path):
     with zipfile.ZipFile(path) as z:
         x = z.read("word/styles.xml").decode("utf-8", "replace")
@@ -59,19 +80,42 @@ def page_of(path):
         names = z.namelist()
         hf = []
         for part in [n for n in names if re.match(r"word/(header|footer)\d+\.xml", n)]:
-            t = " ".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>",
-                                    z.read(part).decode("utf-8", "replace"))).strip()
+            raw = z.read(part)
+            t = literal_text(raw.decode("utf-8", "replace"))
             kind = "Header" if "header" in part else "Footer"
-            img = " (contains an image)" if b"<w:drawing" in z.read(part) else ""
-            hf.append(f"{kind}: {t or '(no text)'}{img}")
+            extra = []
+            if b"PAGE" in raw:
+                extra.append("automatic page number")
+            if b"<w:drawing" in raw or b"<v:imagedata" in raw:
+                extra.append("image")
+            hf.append(f"{kind}: {t or '(no literal text)'}"
+                      + (f" + {', '.join(extra)}" if extra else ""))
     s = re.search(r"<w:sectPr\b.*?</w:sectPr>", d, re.S)
     s = s.group(0) if s else ""
     pg = re.search(r'<w:pgSz[^>]*w:w="(\d+)"[^>]*w:h="(\d+)"', s) or \
          re.search(r'<w:pgSz[^>]*w:h="(\d+)"[^>]*w:w="(\d+)"', s)
     mar = dict(re.findall(r'w:(top|right|bottom|left)="(-?\d+)"', s))
+    # Columns are inherited from the source sectPr without anyone asking for
+    # them, so a template can be two-column while its README says nothing.
+    cols = re.search(r"<w:cols\b[^>]*/>|<w:cols\b[^>]*>.*?</w:cols>", s, re.S)
+    col = None
+    if cols:
+        c = cols.group(0)
+        n = re.search(r'w:num="(\d+)"', c)
+        n = int(n.group(1)) if n else (len(re.findall(r"<w:col\b", c)) or 1)
+        if n > 1:
+            gap = re.search(r'w:space="(\d+)"', c)
+            widths = re.findall(r'<w:col\b[^>]*w:w="(\d+)"', c)
+            col = f"- Columns: {n}"
+            if gap:
+                col += f", gutter {TWIP2CM(gap.group(1))} cm"
+            if widths:
+                col += (" (per-column widths "
+                        + ", ".join(f"{TWIP2CM(w)} cm" for w in widths)
+                        + ", inherited as they are)")
     return {"size": (TWIP2CM(pg.group(1)), TWIP2CM(pg.group(2))) if pg else None,
             "margin": {k: TWIP2CM(v) for k, v in mar.items()} or None,
-            "hf": hf}
+            "cols": col, "hf": hf}
 
 
 def row(st, name):
@@ -213,6 +257,8 @@ def build(orig, ref, outdir):
         m = pg["margin"]
         page_lines.append("- Margins: top {top} / bottom {bottom} / left {left} / "
                           "right {right} cm".format(**m))
+    if pg["cols"]:
+        page_lines.append(pg["cols"])
     page_lines += [f"- {h}" for h in pg["hf"]] or ["- No header or footer"]
 
     here = os.path.dirname(os.path.abspath(__file__))

@@ -153,6 +153,7 @@ python3 scripts/set_style.py reference.docx --list
 python3 scripts/set_style.py reference.docx "Block Text" --size 10.5 --color 6C757D
 python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
 python3 scripts/set_header_footer.py reference.docx --header "Company" --footer "Page " --page-number
+python3 scripts/set_header_footer.py reference.docx --header 'Title\tv2.3'   # left / right columns
 ```
 
 Re-run step 7 with `--structure-only`, then step 8.
@@ -167,6 +168,7 @@ reference check and drops that comparison.
 - Take margins from the `suggested` row, never the `measured` row.
 - The source PDF's header and footer are not carried over. Add them with
   `set_header_footer.py` if the recurring content reported in step 1 matters.
+  A running head split left and right is one `--header` with a tab in it.
 - Font names are restored from embedded subset names, but the font still has to
   be installed on the target machine to render.
 

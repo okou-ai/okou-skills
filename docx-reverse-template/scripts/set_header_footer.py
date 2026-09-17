@@ -13,8 +13,11 @@ Options:
                      to swap a document number or owner out of a branded footer:
                      rebuilding it with --footer would flatten the tab columns,
                      border rules, first-page variant and any table it contains.
-  --header TEXT      header text (omit to leave the header untouched)
-  --footer TEXT      footer text
+  --header TEXT      header text (omit to leave the header untouched). A tab
+                     splits the line into columns against the right margin:
+                     "Title\tv2.3" puts the title left and the version right,
+                     "left\tcentre\tright" gives three. Write it as \t.
+  --footer TEXT      footer text, same tab handling
   --page-number      append an automatic PAGE field after the footer text
   --align L          left | center | right (default: header right, footer center)
   --size PT          font size (default 9)
@@ -52,6 +55,27 @@ SECTPR_ORDER = ["headerReference", "footerReference", "footnotePr", "endnotePr",
                 "sectPrChange"]
 
 
+def literal_text(xml):
+    """Text a reader sees typed in, with field results dropped.
+
+    A PAGE field caches its last result in an ordinary <w:t>, so a plain sweep
+    of <w:t> reports a footer that only holds a page number as literally
+    reading "1". Runs between fldChar begin and end carry the instruction and
+    that cached result; both are skipped.
+    """
+    xml = re.sub(r"<w:fldSimple\b.*?</w:fldSimple>", "", xml, flags=re.S)
+    out, depth = [], 0
+    for m in re.finditer(r"<w:r\b[^>]*>.*?</w:r>", xml, re.S):
+        r = m.group(0)
+        if 'fldCharType="begin"' in r:
+            depth += 1
+        elif 'fldCharType="end"' in r:
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            out += re.findall(r"<w:t[^>]*>([^<]*)</w:t>", r)
+    return " ".join(out).strip()
+
+
 def merge_sectpr(inner, new_elems):
     """Replace same-named children and re-sort into CT_SectPr order."""
     rank = {n: i for i, n in enumerate(SECTPR_ORDER)}
@@ -87,11 +111,43 @@ def esc(s):
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def part_xml(tag, text, align, size, color, page_number):
+def part_xml(tag, text, align, size, color, page_number, width=None):
+    """One header or footer paragraph.
+
+    A tab in the text splits the line into columns: "left\tright" for a
+    two-part running head, "left\tcentre\tright" for three. The tab stops are
+    positioned from the document's own text width, so the last column ends
+    exactly on the right margin. Without a tab the whole line takes --align.
+    """
+    # CT_RPr is an ordered sequence and w:color precedes w:sz. Emitting them the
+    # other way round makes the part invalid, and Word may refuse the file.
+    rpr = (f'<w:rPr><w:color w:val="{color}"/>'
+           f'<w:sz w:val="{int(round(size*2))}"/>'
+           f'<w:szCs w:val="{int(round(size*2))}"/></w:rPr>')
+
+    def t(s):
+        return f'<w:r>{rpr}<w:t xml:space="preserve">{esc(s)}</w:t></w:r>'
+
+    cols = (text or "").split("\t")
+    tabs = ""
+    if len(cols) > 1:
+        if width is None:
+            print(f"  NOTE  {tag}: the document declares no page size, so the tab "
+                  f"stops fall back to Word's defaults and the columns will not "
+                  f"reach the margins. Run --paper first.")
+        else:
+            stops = ([("center", width // 2)] if len(cols) > 2 else []) \
+                    + [("right", width)]
+            tabs = "<w:tabs>" + "".join(
+                f'<w:tab w:val="{v}" w:pos="{p}"/>' for v, p in stops) + "</w:tabs>"
+        align = "left"
+
     runs = ""
-    rpr = f'<w:rPr><w:sz w:val="{int(round(size*2))}"/><w:color w:val="{color}"/></w:rPr>'
-    if text:
-        runs += f'<w:r>{rpr}<w:t xml:space="preserve">{esc(text)}</w:t></w:r>'
+    for i, c in enumerate(cols):
+        if i:
+            runs += f'<w:r>{rpr}<w:tab/></w:r>'
+        if c:
+            runs += t(c)
     if page_number:
         # PAGE field: Word computes the current page number when the file opens
         runs += (f'<w:r>{rpr}<w:fldChar w:fldCharType="begin"/></w:r>'
@@ -99,8 +155,20 @@ def part_xml(tag, text, align, size, color, page_number):
                  f'<w:r>{rpr}<w:fldChar w:fldCharType="separate"/></w:r>'
                  f'<w:r>{rpr}<w:t>1</w:t></w:r>'
                  f'<w:r>{rpr}<w:fldChar w:fldCharType="end"/></w:r>')
+    # CT_PPrBase order: tabs precedes jc.
     return (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            f'<w:{tag} {NS}><w:p><w:pPr><w:jc w:val="{align}"/></w:pPr>{runs}</w:p></w:{tag}>')
+            f'<w:{tag} {NS}><w:p><w:pPr>{tabs}<w:jc w:val="{align}"/></w:pPr>'
+            f'{runs}</w:p></w:{tag}>')
+
+
+def text_width(doc):
+    """Text width in twips from the document's own sectPr, or None."""
+    w = re.search(r'<w:pgSz\b[^>]*w:w="(\d+)"', doc)
+    m = re.search(r'<w:pgMar\b[^>]*?w:left="(\d+)"[^>]*?w:right="(\d+)"', doc) \
+        or re.search(r'<w:pgMar\b[^>]*?w:right="(\d+)"[^>]*?w:left="(\d+)"', doc)
+    if not (w and m):
+        return None
+    return int(w.group(1)) - int(m.group(1)) - int(m.group(2))
 
 
 def show(members):
@@ -112,7 +180,7 @@ def show(members):
             continue
         found = True
         x = blob[fn].decode("utf-8", "replace")
-        txt = "".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", x)).strip()
+        txt = literal_text(x)
         extra = []
         if "PAGE" in x:
             extra.append("+page field")
@@ -177,7 +245,10 @@ def main():
                 missed.append(old)
 
     clear = "--clear" in a
-    header, footer = opt("--header"), opt("--footer")
+    # A literal tab is awkward to type in a shell argument, so \t is accepted
+    # as the column separator for a split running head.
+    unesc = lambda s: None if s is None else s.replace("\\t", "\t")
+    header, footer = unesc(opt("--header")), unesc(opt("--footer"))
     paper = (opt("--paper") or "").upper() or None
     ncols = int(opt("--columns")) if opt("--columns") else None
     cgap = float(opt("--column-gap")) if opt("--column-gap") else None
@@ -215,6 +286,11 @@ def main():
         rels = re.sub(rf'<Relationship[^>]*Target="{kind}\d+\.xml"[^>]*/>', "", rels)
         doc = re.sub(rf"<w:{kind}Reference\b[^>]*/>", "", doc)
 
+    tw = text_width(doc)
+    if paper and tw is not None:
+        cur = int(re.search(r'<w:pgSz\b[^>]*w:w="(\d+)"', doc).group(1))
+        tw += PAPER[paper][0] - cur
+
     new_parts, added = {}, []
     if not clear:
         for kind, text, default_align, ctype in (
@@ -225,7 +301,7 @@ def main():
             rid = "rIdHdrX" if kind == "hdr" else "rIdFtrX"
             new_parts[f"word/{part}"] = part_xml(
                 kind, text, align or default_align, size, color,
-                pagenum and kind == "ftr").encode()
+                pagenum and kind == "ftr", width=tw).encode()
             ct = ct.replace("</Types>",
                             f'<Override PartName="/word/{part}" ContentType="{ctype}"/></Types>')
             reltype = REL + ("header" if kind == "hdr" else "footer")
