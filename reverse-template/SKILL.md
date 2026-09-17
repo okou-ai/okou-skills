@@ -36,6 +36,3 @@ Three rules override the table:
 `cd` into the branch directory; every path inside a branch guide is relative to
 it. The two document guides open by checking whether a style sheet can hold this
 particular file, and publish the source itself when it cannot.
-
-`python3 scripts/classify_source.py <source.pdf>` reads slides-or-document off
-page geometry and text density, for a second opinion on row 1.
