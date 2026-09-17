@@ -144,10 +144,15 @@ def main(path):
             num = re.search(r'w:num="(\d+)"', c.group(0))
             sp = re.search(r'w:space="(\d+)"', c.group(0))
             n = int(num.group(1)) if num else 1
+            widths = re.findall(r'<w:col\b[^>]*w:w="(\d+)"', c.group(0))
             print(f"  columns: {n}"
                   + (f"   gutter {TWIP(sp.group(1)):.2f}cm" if sp and n > 1 else "")
-                  + ("   (inherited as is; use set_header_footer.py --columns to change it)"
-                     if n > 1 else ""))
+                  + (f"   unequal widths: {', '.join(f'{TWIP(w):.2f}cm' for w in widths)}"
+                     if widths else ""))
+            if n > 1:
+                print("           inherited as is. set_header_footer.py --columns changes"
+                      " the count,")
+                print("           and changing it drops per-column widths.")
         else:
             print("  columns: 1 (none set)")
     else:

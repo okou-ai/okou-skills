@@ -20,8 +20,11 @@ Options:
   --size PT          font size (default 9)
   --color RRGGBB     colour (default 808080)
   --paper NAME       paper size: A4 | A5 | A3 | Letter | Legal
-  --columns N        number of text columns (1 restores a single column)
-  --column-gap PT    gutter between columns, default 24pt
+  --columns N        number of text columns (1 restores a single column). The
+                     gutter and any per-column widths come from the document;
+                     they are only replaced when the count actually changes.
+  --column-gap PT    override the gutter. Without it the document's own gutter
+                     is kept, and 24pt is used only when the document sets none.
   --out PATH         write elsewhere; default is in place
 
 Pandoc carries the header and footer into every document produced with
@@ -177,7 +180,7 @@ def main():
     header, footer = opt("--header"), opt("--footer")
     paper = (opt("--paper") or "").upper() or None
     ncols = int(opt("--columns")) if opt("--columns") else None
-    cgap = float(opt("--column-gap") or 24)
+    cgap = float(opt("--column-gap")) if opt("--column-gap") else None
     if paper and paper not in PAPER:
         print(f"Unknown paper size {paper!r}. Choose from: {', '.join(PAPER)}")
         return 2
@@ -239,10 +242,34 @@ def main():
         if ncols < 1:
             print("--columns must be 1 or more")
             return 2
-        doc = put_in_sectpr(doc, {"cols": f'<w:cols w:num="{ncols}" '
-                                          f'w:space="{int(round(cgap * 20))}" '
-                                          f'w:equalWidth="1"/>'})
-        added.append(f"{ncols} column(s)" + (f", gap {cgap}pt" if ncols > 1 else ""))
+        # Read what the document already declares. Replacing the whole element
+        # with defaults would discard a gutter and per-column widths that the
+        # source chose deliberately.
+        cur = re.search(r"<w:cols\b[^>]*/>|<w:cols\b[^>]*>.*?</w:cols>", doc, re.S)
+        cur_xml = cur.group(0) if cur else ""
+        cur_num = int((re.search(r'w:num="(\d+)"', cur_xml) or [0, "1"])[1]) if cur_xml else 1
+        cur_space = re.search(r'w:space="(\d+)"', cur_xml)
+        has_children = "<w:col " in cur_xml
+        unequal = 'w:equalWidth="0"' in cur_xml or has_children
+
+        if ncols == cur_num and cgap is None:
+            print(f"  columns already {ncols}; left untouched"
+                  + (" (per-column widths preserved)" if has_children else ""))
+        else:
+            if cgap is not None:
+                space, origin = int(round(cgap * 20)), "from --column-gap"
+            elif cur_space:
+                space, origin = int(cur_space.group(1)), "kept from the document"
+            else:
+                space, origin = 480, "default, the document sets none"
+            if unequal and ncols != cur_num:
+                print(f"  NOTE  the document defines {cur_num} columns of unequal width; "
+                      f"changing the count to {ncols} cannot keep those widths and they "
+                      f"are dropped")
+            doc = put_in_sectpr(doc, {"cols": f'<w:cols w:num="{ncols}" '
+                                              f'w:space="{space}" w:equalWidth="1"/>'})
+            added.append(f"{ncols} column(s)"
+                         + (f", gap {space / 20:g}pt ({origin})" if ncols > 1 else ""))
 
     if paper:
         w, h = PAPER[paper]

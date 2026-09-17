@@ -244,7 +244,7 @@ def build(json_path, out_path, mapping, bottom_override):
     print(f"\npage {p['w_cm']}x{p['h_cm']}cm  margins left {mg['left']} right {mg['right']} "
           f"top {mg['top']} bottom {bottom}cm"
           + ("  (bottom from the analyzer's suggestion)" if bottom_override is None else "")
-          + (f"  columns {cols} gap {d.get('column_gap_pt')}pt" if cols > 1 else ""))
+          + (f"  columns {cols}{gap_note}" if cols > 1 else ""))
     if derived:
         print(f"\nNOTE  the source used {max(written)} heading level(s). Levels "
               f"{derived[0][0][-1]}-9 were extended from it as a descending ladder "

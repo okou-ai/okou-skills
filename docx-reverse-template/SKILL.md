@@ -74,7 +74,14 @@ value is not found, and composes with the other flags in one invocation.
 `--columns` **changes** the layout; it is not needed to preserve one. A
 multi-column source is already multi-column in the template, because `w:cols`
 rides along in `sectPr` with the paper size and margins. Step 1 reports the
-count so the inheritance is visible.
+count, the gutter and any unequal widths so the inheritance is visible.
+
+Everything about the columns is read from the document, not assumed: the gutter
+is kept unless `--column-gap` overrides it, a count that is already correct is
+left untouched so per-column widths survive, and 24pt is used only when the
+document sets no gutter at all — which the output says. Changing the count on an
+unequal-width layout cannot keep those widths, and that is reported rather than
+done quietly.
 
 `--header` / `--footer` rebuild the part from scratch and flatten all of that.
 Use them only for a template whose header and footer are plain text, or when
