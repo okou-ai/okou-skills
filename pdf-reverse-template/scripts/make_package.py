@@ -331,7 +331,12 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
     rep = []
     map_args = ["--map", ",".join(f"{k}={v}" for k, v in mapping.items())] if mapping else []
     body_args = ["--body", str(body)] if body else []
-    for script, args in (("analyze_pdf.py", [pdf] + body_args),
+    # The column count is read back out of styles.json rather than taken as a
+    # flag. Re-running the analysis without it regenerates report.txt as a
+    # single-column document, which then contradicts the template beside it.
+    ncols = d.get("columns") or 1
+    col_args = ["--columns", str(ncols)] if ncols > 1 else []
+    for script, args in (("analyze_pdf.py", [pdf] + body_args + col_args),
                          ("verify_roundtrip.py", [ref, jpath] + map_args)):
         r = subprocess.run([sys.executable, os.path.join(here, script)] + args,
                            capture_output=True, text=True)

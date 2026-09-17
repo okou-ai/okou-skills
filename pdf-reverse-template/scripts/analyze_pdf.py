@@ -366,9 +366,22 @@ def analyze(path, body_pick=None, columns=1):
     # added to the last glyph. That one span moved the measured right margin
     # by 4.7pt on the fixture and, in a two-column layout, shrank the gutter
     # by the same amount.
+    def far_edge(xs):
+        """The right-hand text edge from the x where lines end.
+
+        Justified text piles up on one x, and anything past it is overshoot.
+        Ragged-right text has no pile-up at all, and then the longest line is
+        the only estimate there is. Which case this is comes from the counts:
+        a justified edge outnumbers everything to the right of it put together.
+        """
+        c = collections.Counter(xs)
+        mode, n = c.most_common(1)[0]
+        beyond = sum(v for k, v in c.items() if k > mode)
+        return mode if n > beyond else max(c)
+
     def edges(ss):
         return (collections.Counter(round(s["bbox"][0], 1) for s in ss).most_common(1)[0][0],
-                collections.Counter(round(s["bbox"][2], 1) for s in ss).most_common(1)[0][0])
+                far_edge([round(s["bbox"][2], 1) for s in ss]))
 
     # Bootstrap the column bands from the extremes; a few points of overshoot
     # cannot move a band boundary, which sits half a column away.

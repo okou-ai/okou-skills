@@ -107,6 +107,14 @@ Override either with `--bottom <cm>`. `build_reference.py` uses this suggestion
 by default, so a non-symmetric layout no longer needs the flag — pass it only to
 disagree with the report.
 
+The suggested row snaps to a table of common layout values. A margin that is
+not in that table, or a `measured` value that sits between two of them, lands
+on the wrong one. Check the suggestion against the `measured` row; where they
+disagree by more than rounding, measure it yourself and pass `--top`, `--left`
+or `--right`. A two-column document gives you a free check: the two columns
+must come out the same width, since one edge is set by the gutter and the
+other by the right margin.
+
 ### 6. Build the template
 
 ```bash

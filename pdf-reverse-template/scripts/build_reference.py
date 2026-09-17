@@ -5,6 +5,7 @@ Usage:
   python3 build_reference.py styles.json out.docx
   python3 build_reference.py styles.json out.docx --map 1=Title,2=Heading1,3=Heading2
   python3 build_reference.py styles.json out.docx --bottom 3.0
+  python3 build_reference.py styles.json out.docx --top 2.4 --left 1.8 --right 1.8
 
 --map corrects the level assignment. analyze_pdf orders heading clusters by
 size, but a document title and an H1 are both just large text in a PDF, so the
@@ -14,6 +15,11 @@ the analysis report; the right side is a Word style name.
 --bottom overrides the bottom margin. By default the analyzer's own suggestion
 is used, which mirrors the top margin only when the layout measures as
 vertically symmetric.
+
+--top, --left and --right override the other three the same way. A measured
+margin is the distance to the first glyph box, which sits a little inside the
+text block, so a layout whose real margin is not in the analyzer's table of
+common values can land on the wrong side of it. Pass the value you measured.
 
 Requires pandoc on PATH.
 """
@@ -119,7 +125,7 @@ def patch_style(xml, style_id, body_rpr, ppr_extra=""):
     return xml[:m.start()] + head + inner + tail + xml[m.end():], True
 
 
-def build(json_path, out_path, mapping, bottom_override):
+def build(json_path, out_path, mapping, overrides):
     d = json.load(open(json_path))
     ref, tmp = default_reference()
     with zipfile.ZipFile(ref) as z:
@@ -215,8 +221,12 @@ def build(json_path, out_path, mapping, bottom_override):
     # Take the analyzer's own bottom suggestion. Mirroring the top margin is
     # wrong whenever the layout is not vertically symmetric, and the report
     # prints a warning in exactly that case.
-    bottom = bottom_override if bottom_override is not None else \
-        (mg.get("bottom") if mg.get("bottom") is not None else mg.get("top"))
+    mg = dict(mg)
+    if mg.get("bottom") is None:
+        mg["bottom"] = mg.get("top")
+    mg.update({k: v for k, v in overrides.items() if v is not None})
+    bottom = mg["bottom"]
+    overridden = sorted(k for k, v in overrides.items() if v is not None)
     # w:cols comes after w:pgMar in CT_SectPr
     cols = d.get("columns") or 1
     cols_xml, gap_note = "", ""
@@ -248,7 +258,10 @@ def build(json_path, out_path, mapping, bottom_override):
         print(f"{sid:<20}{f:<22}{s:>6}{'#'+c:>9}  {spm}")
     print(f"\npage {p['w_cm']}x{p['h_cm']}cm  margins left {mg['left']} right {mg['right']} "
           f"top {mg['top']} bottom {bottom}cm"
-          + ("  (bottom from the analyzer's suggestion)" if bottom_override is None else "")
+          + ("  (bottom from the analyzer's suggestion)" if "bottom" not in overridden
+             else "")
+          + (f"  ({', '.join(overridden)} overridden on the command line)"
+             if overridden else "")
           + (f"  columns {cols}{gap_note}" if cols > 1 else ""))
     if derived:
         print(f"\nNOTE  the source used {max(written)} heading level(s). Levels "
@@ -268,11 +281,13 @@ if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(__doc__); sys.exit(2)
     a = sys.argv
-    mapping, bottom = {}, None
+    mapping = {}
+    overrides = {k: None for k in ("top", "right", "bottom", "left")}
     if "--map" in a:
         for kv in a[a.index("--map") + 1].split(","):
             k, v = kv.split("=")
             mapping[k.strip()] = v.strip()
-    if "--bottom" in a:
-        bottom = float(a[a.index("--bottom") + 1])
-    build(a[1], a[2], mapping, bottom)
+    for k in overrides:
+        if f"--{k}" in a:
+            overrides[k] = float(a[a.index(f"--{k}") + 1])
+    build(a[1], a[2], mapping, overrides)
