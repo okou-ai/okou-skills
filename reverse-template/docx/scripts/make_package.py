@@ -1,27 +1,21 @@
 #!/usr/bin/env python3
-"""Assemble the deliverable: SKILL.md, reference.docx and source.pdf.
+"""Assemble the deliverable: SKILL.md, reference.docx and source.docx.
 
-Usage:
-  python3 make_package.py <source.pdf> <reference.docx> <styles.json> <output dir> \
-          [--map 1=Heading1,2=Title] [--body 2] [--name slug]
-          [--top 2.4] [--right 1.8] [--bottom 2.2] [--left 1.8]
+Usage:  python3 make_package.py <source.docx> <reference.docx> <output dir> [--name slug]
 
-Three files, no more. SKILL.md carries the usage, the measured style values,
-the choices made and the source's outline; reference.docx is the artifact
-pandoc consumes; source.pdf is the content reference. styles.json is not
-shipped because SKILL.md records the exact command that re-derives it, and the
-analysis is reproducible byte for byte.
-
-Pass --map, --body and every margin you overrode through verbatim: they are
-every choice made along the way, and SKILL.md is the only place they are
-written down. --name sets the skill name and defaults to the output
-directory's name.
+Three files, no more. SKILL.md carries the usage, the measured style values and
+the source's outline; reference.docx is the artifact pandoc consumes;
+source.docx is the content reference. The style values are read back out of
+reference.docx, not hardcoded. --name sets the skill name and defaults to the
+output directory's name.
 """
-import sys, os, re, json, shutil, zipfile, subprocess, datetime, textwrap
+import sys, os, re, shutil, zipfile, subprocess, datetime, textwrap
 
 HALF2PT = lambda h: round(int(h) / 2, 1)
 TWIP2PT = lambda t: round(int(t) / 20, 1)
+TWIP2CM = lambda t: round(int(t) / 1440 * 2.54, 2)
 
+# Markdown construct -> Word style name, for the reader of the package
 MD_MAP = [
     ("`# Heading 1`", "heading 1"), ("`## Heading 2`", "heading 2"),
     ("`### Heading 3`", "heading 3"),
@@ -30,6 +24,53 @@ MD_MAP = [
     ("Pipe table", "Table"),
     ("`title:` in the YAML header", "Title"),
 ]
+
+
+def outline(path):
+    """The source document's headings, in reading order.
+
+    Matched on the style's w:name, not its styleId: a Word export localises the
+    id but keeps the name, so "heading 1" is reliable where "1" is not.
+    """
+    with zipfile.ZipFile(path) as z:
+        doc = z.read("word/document.xml").decode("utf-8", "replace")
+        sty = z.read("word/styles.xml").decode("utf-8", "replace")
+    name = {}
+    for m in re.finditer(r'<w:style\b[^>]*w:styleId="([^"]+)".*?</w:style>', sty, re.S):
+        n = re.search(r'<w:name w:val="([^"]+)"', m.group(0))
+        if n:
+            name[m.group(1)] = n.group(1)
+    out = []
+    for m in re.finditer(r"<w:p\b[^>]*>.*?</w:p>|<w:p\b[^>]*/>", doc, re.S):
+        para = m.group(0)
+        ps = re.search(r'<w:pStyle w:val="([^"]+)"', para)
+        if not ps:
+            continue
+        n = name.get(ps.group(1), ps.group(1))
+        lv = re.fullmatch(r"heading (\d)", n, re.I)
+        if not (lv or n in ("Title", "Subtitle")):
+            continue
+        t = literal_text(para)
+        if t:
+            out.append((n, int(lv.group(1)) if lv else 0, t))
+    return out
+
+
+def norm(x):
+    return re.sub(r"\s+/>", "/>", re.sub(r"\s+", " ", x))
+
+
+def docdefault_size(path):
+    """Body size in points from docDefaults, where a style that inherits
+    everything gets it from. No other script in the toolchain reads it, so a
+    heading smaller than the body went unnoticed."""
+    with zipfile.ZipFile(path) as z:
+        x = norm(z.read("word/styles.xml").decode("utf-8", "replace"))
+    m = re.search(r"<w:docDefaults>.*?</w:docDefaults>", x, re.S)
+    if not m:
+        return None
+    sz = re.search(r'<w:sz w:val="(\d+)"', m.group(0))
+    return HALF2PT(sz.group(1)) if sz else None
 
 
 def literal_text(xml):
@@ -68,7 +109,7 @@ def styles_of(path):
         p = ppr.group(0) if ppr else ""
         g = lambda pat, conv, src: (lambda mm: conv(mm.group(1)) if mm else None)(
             re.search(pat, src))
-        ind = re.search(r'<w:ind[^>]*w:firstLine="(\d+)"', p)
+        ind = re.search(r'<w:ind[^>]*w:(?:firstLine)="(\d+)"', p)
         jc = re.search(r'<w:jc w:val="([a-z]+)"', p)
         out[n.group(1).lower()] = dict(
             id=sid,
@@ -82,6 +123,57 @@ def styles_of(path):
             align=jc.group(1) if jc else None,
         )
     return out
+
+
+def page_of(path):
+    with zipfile.ZipFile(path) as z:
+        d = z.read("word/document.xml").decode("utf-8", "replace")
+        names = z.namelist()
+        hf = []
+        for part in [n for n in names if re.match(r"word/(header|footer)\d+\.xml", n)]:
+            raw = z.read(part)
+            t = literal_text(raw.decode("utf-8", "replace"))
+            kind = "Header" if "header" in part else "Footer"
+            extra = []
+            if b"PAGE" in raw:
+                extra.append("automatic page number")
+            if b"<w:drawing" in raw or b"<v:imagedata" in raw:
+                extra.append("image")
+            hf.append(f"{kind}: {t or '(no literal text)'}"
+                      + (f" + {', '.join(extra)}" if extra else ""))
+    s = re.search(r"<w:sectPr\b.*?</w:sectPr>", d, re.S)
+    s = s.group(0) if s else ""
+    pg = re.search(r'<w:pgSz[^>]*w:w="(\d+)"[^>]*w:h="(\d+)"', s) or \
+         re.search(r'<w:pgSz[^>]*w:h="(\d+)"[^>]*w:w="(\d+)"', s)
+    mar = dict(re.findall(r'w:(top|right|bottom|left)="(-?\d+)"', s))
+    # Columns are inherited from the source sectPr without anyone asking for
+    # them, so a template can be two-column while its README says nothing.
+    cols = re.search(r"<w:cols\b[^>]*/>|<w:cols\b[^>]*>.*?</w:cols>", s, re.S)
+    col, narrow = None, None
+    if cols:
+        c = cols.group(0)
+        n = re.search(r'w:num="(\d+)"', c)
+        n = int(n.group(1)) if n else (len(re.findall(r"<w:col\b", c)) or 1)
+        if n > 1:
+            gap = re.search(r'w:space="(\d+)"', c)
+            widths = re.findall(r'<w:col\b[^>]*w:w="(\d+)"', c)
+            # Unequal columns are common; a table has to fit the narrowest.
+            if widths:
+                narrow = min(TWIP2CM(w) for w in widths)
+            elif pg and mar:
+                text = int(pg.group(1)) - int(mar.get("left", 0)) - int(mar.get("right", 0))
+                spc = int(gap.group(1)) if gap else 0
+                narrow = TWIP2CM((text - spc * (n - 1)) // n)
+            col = f"- Columns: {n}"
+            if gap:
+                col += f", gutter {TWIP2CM(gap.group(1))} cm"
+            if widths:
+                col += (" (per-column widths "
+                        + ", ".join(f"{TWIP2CM(w)} cm" for w in widths)
+                        + ", inherited as they are)")
+    return {"size": (TWIP2CM(pg.group(1)), TWIP2CM(pg.group(2))) if pg else None,
+            "margin": {k: TWIP2CM(v) for k, v in mar.items()} or None,
+            "cols": col, "narrowest_cm": narrow, "hf": hf}
 
 
 def row(st, name):
@@ -107,7 +199,7 @@ description: {desc}
 # {name}
 
 Produce Word documents in this house style. `reference.docx` carries the
-styles; `{src}` is the document they were reverse-engineered from.
+styles; `{src}` is the document they were taken from.
 
 Two different jobs, and only the first one stops at the next section:
 
@@ -131,14 +223,25 @@ download the build matching your OS and CPU from
 <https://github.com/jgm/pandoc/releases> and put its `bin` on PATH; it is a
 single static binary.
 
-For a PDF, convert to docx first and export from Word. Going straight to PDF
-with pandoc bypasses `--reference-doc` entirely and loses every style here.
-
 ## Markdown that picks up these styles
 
 | Markdown construct | Style it maps to |
 |---|---|
 {md_map}
+
+Put the document title in the YAML header, not in a `#` heading:
+
+```markdown
+---
+title: Document title
+author: Author
+date: 2026-01-01
+---
+
+# Chapter one
+
+Body text.
+```
 
 ## What the template sets
 
@@ -169,6 +272,10 @@ looks specific may be required in every version. With one document, read it
 and decide. With several, compare them first — what differs is variable, but
 what matches is only *probably* fixed, since two samples can coincide.
 
+The header and footer **are** in the template and carry the source's own
+document number, version and owner. Replace them before reusing this template
+more widely, or every document made from it inherits them.
+
 ## Adjusting it
 
 Edit the style *definition*, not the text: formatting applied to a selection
@@ -179,128 +286,70 @@ python3 set_style.py reference.docx --list
 python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12
 python3 set_style.py reference.docx "Source Code" --create --font Consolas --size 9
 python3 set_header_footer.py reference.docx --replace 'OLD=NEW'
-python3 verify_roundtrip.py reference.docx styles.json --structure-only
+python3 verify_reference.py reference.docx
 ```
 
-The scripts are in the `pdf-reverse-template` skill.
+The scripts are in `reverse-template/docx`.
 
 ## Known limits
 
-- The PDF stores embedded subset names. The system name is restored, but the
-  font still has to be installed locally or Word substitutes one.
+- A font renders only if it is installed locally; otherwise Word substitutes
+  one. Install the font rather than changing the template.
 - Pandoc only writes the style names in the table above. A new name such as
   "Company Heading" is never referenced.
 - Code blocks use `Source Code`, which pandoc generates on output. Customising
   it means creating a paragraph style with that exact name.
-- A layout that does not match the original is almost always the heading level
-  mapping. Levels are the one thing a PDF does not record.
-- A PDF stores its running head as ordinary text, so nothing was carried over
-  automatically. Whatever the page section lists was added deliberately.{limits}
+- Headings that come out looking like body text mean the template is missing
+  that style. `verify_reference.py` says which one.{limits}
 
 ---
 
-Built from `{src}` on {date}. A PDF records no roles and no text block, so
-the heading levels and the bottom margin were judged rather than measured; if
-anything here looks wrong, start with those. To rebuild:
+Built from `{src}` on {date}. Every value above was read out of that file,
+not inferred. To rebuild:
 
 ```bash
-python3 analyze_pdf.py {src}{repro} --json styles.json      # reproducible byte for byte
-python3 build_reference.py styles.json reference.docx{rebuild}
+python3 build_reference.py {src} reference.docx
 ```
 """
 
 
-def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
-    bottom = margins.get("bottom") if isinstance(margins, dict) else margins
-    margins = margins if isinstance(margins, dict) else {}
+def build(orig, ref, outdir, name=None):
     os.makedirs(outdir, exist_ok=True)
     name = name or os.path.basename(os.path.abspath(outdir))
-    src = "source" + os.path.splitext(pdf)[1].lower()
+    src = "source" + os.path.splitext(orig)[1].lower()
     shutil.copy(ref, os.path.join(outdir, "reference.docx"))
-    shutil.copy(pdf, os.path.join(outdir, src))
+    shutil.copy(orig, os.path.join(outdir, src))
 
-    d = json.load(open(jpath))
-    st = styles_of(ref)
-    # Every style the reader is told about, plus anything else the template
-    # actually defines. A fixed list would omit a style created during the
-    # optional step — Source Code is the usual one — while the FAQ still
-    # explains how to create it.
-    names = ["Title", "Subtitle", "heading 1", "heading 2", "heading 3",
-             "Body Text", "First Paragraph", "Compact", "Block Text", "Source Code"]
-    names += [n for _, n in MD_MAP if n not in names]
-    rows = "\n".join(row(st, n) for n in names if n.lower() in st)
+    st, pg = styles_of(ref), page_of(ref)
+    names = ["Title", "heading 1", "heading 2", "heading 3",
+             "Body Text", "First Paragraph", "Compact", "Block Text"]
+    rows = "\n".join(row(st, n) for n in names)
     md = "\n".join(f"| {a} | `{b}` |" for a, b in MD_MAP)
 
-    p, mg = d["page"], d["margins_suggested_cm"]
-    # Read the margins back out of the template rather than recomputing them.
-    # Recomputing is how section 3 and section 4 came to disagree, and how a
-    # value that is in neither the template nor the decision log got printed.
-    with zipfile.ZipFile(ref) as z:
-        rdoc = z.read("word/document.xml").decode("utf-8", "replace")
-        rparts = z.namelist()
-        rhf = []
-        for part in sorted(x for x in rparts if re.match(r"word/(header|footer)\d+\.xml", x)):
-            raw = z.read(part)
-            t = literal_text(raw.decode("utf-8", "replace"))
-            kind = "Header" if "header" in part else "Footer"
-            extra = []
-            if b"PAGE" in raw:
-                extra.append("automatic page number")
-            if b"<w:drawing" in raw or b"<v:imagedata" in raw:
-                extra.append("image")
-            rhf.append(f"{kind}: {t or '(no literal text)'}"
-                       + (f" + {', '.join(extra)}" if extra else ""))
-    cm = lambda t: round(int(t) / 1440 * 2.54, 2)
-    mar = dict(re.findall(r'w:(top|right|bottom|left)="(-?\d+)"', rdoc))
-    page = [f"- Paper: {p['w_cm']} x {p['h_cm']} cm"
-            + (f" ({p['paper']})" if p.get("paper") else "")]
-    if mar:
-        page.append("- Margins: top {top} / bottom {bottom} / left {left} / "
-                    "right {right} cm".format(**{k: cm(v) for k, v in mar.items()}))
-    if (d.get("columns") or 1) > 1:
-        page.append(f"- Columns: {d['columns']}, gap {d.get('column_gap_pt')}pt "
-                    f"(column width {d.get('column_width_pt')}pt)")
-    if rhf:
-        page += [f"- {h}" for h in rhf]
-    elif d.get("running_heads"):
-        page.append(f"- Recurring content in the source PDF (header/footer/page number): "
-                    f"{' / '.join(d['running_heads'])}\n"
-                    f"  This was **not** carried into the template — in a PDF it is "
-                    f"ordinary text. Add one with `set_header_footer.py`.")
-
-    # The flags that were chosen rather than measured, so the analysis can be
-    # reproduced from source.pdf alone. The column count comes out of styles.json
-    # rather than from a flag, where it cannot drift from the template.
-    ncols = d.get("columns") or 1
-    repro = (f" --body {body}" if body else "") + (f" --columns {ncols}" if ncols > 1 else "")
-    # The build flags, so the rebuild line actually reproduces this template.
-    # A margin corrected by hand is a measurement the analyzer got wrong; left
-    # out here it is lost the moment anyone rebuilds.
-    rebuild = ("" if not mapping else
-               " \\\n        --map " + ",".join(f"{k}={v}" for k, v in mapping.items()))
-    rebuild += "".join(f" --{k} {v}" for k, v in sorted(margins.items()))
+    page_lines = []
+    if pg["size"]:
+        page_lines.append(f"- Paper: {pg['size'][0]} x {pg['size'][1]} cm")
+    if pg["margin"]:
+        m = pg["margin"]
+        page_lines.append("- Margins: top {top} / bottom {bottom} / left {left} / "
+                          "right {right} cm".format(**m))
+    if pg["cols"]:
+        page_lines.append(pg["cols"])
+    page_lines += [f"- {h}" for h in pg["hf"]] or ["- No header or footer"]
 
     # The outline is the only record of the source's *content* that survives.
     # reference.docx carries no body text, so without it there is nothing to
     # work from when the task is "another document like this one".
-    ol_lines = []
-    for o in d.get("outline") or []:
-        n = mapping.get(str(o["level"]), f"Heading{o['level']}")
-        lv = re.fullmatch(r"Heading(\d)", n)
-        depth = max(0, int(lv.group(1)) - 1) if lv else 0
-        ol_lines.append(f"{'  ' * depth}- {o['text']}  `{n}`  (p{o['page']})")
-    ol_md = "\n".join(ol_lines) or "_No headings were detected in the source._"
-
     # Limits that follow from this template rather than from the skill. A
     # multi-column layout has two that bite immediately and neither is
     # obvious from the style table.
     limits = []
-    if ncols > 1:
-        cw = d.get("column_width_pt")
-        w = f"{cw * 20:.0f} twips ({cw}pt)" if cw else "narrower than the page"
+    if pg["cols"]:
+        narrow = pg["narrowest_cm"]
+        w = f"the narrowest column, {narrow} cm," if narrow else "a text column"
         limits += [
-            f"A table wider than the text column, {w}, overflows it. Set the "
-            f"column widths explicitly rather than letting pandoc size them.",
+            f"A table wider than {w} overflows it. Set the column widths "
+            f"explicitly rather than letting pandoc size them.",
             "Headings do not span the columns. Everything sits in one `sectPr`, "
             "and a full-width title needs a second section, which "
             "`--reference-doc` cannot add.",
@@ -308,15 +357,10 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
 
     # An inverted hierarchy is the source's own value, reproduced rather than
     # corrected. Say so, or the next person silently "fixes" it.
-    # Only levels that --map actually assigned. An unmapped level keeps
-    # pandoc's default, which is larger than a small mapped heading and would
-    # read as an inversion the source never had.
     LADDER = ["Title", "heading 1", "heading 2", "heading 3",
               "heading 4", "heading 5", "heading 6"]
-    got = {v.lower().replace("heading", "heading ").replace("  ", " ")
-           for v in mapping.values()}
     sizes = [(n, st[n.lower()]["size"]) for n in LADDER
-             if n.lower() in got and st.get(n.lower()) and st[n.lower()].get("size")]
+             if st.get(n.lower()) and st[n.lower()].get("size")]
     for (an, a), (bn, b) in zip(sizes, sizes[1:]):
         if b >= a:
             limits.append(
@@ -324,10 +368,27 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
                 f"value, copied as it is rather than corrected. Change it only "
                 f"to depart from the source deliberately.")
             break
+
+    # A heading smaller than the body is the more glaring inversion and the
+    # ladder above cannot see it, because the body size usually lives in
+    # docDefaults rather than on Body Text.
+    body_pt = (st.get("body text") or {}).get("size") or docdefault_size(ref)
+    if body_pt:
+        small = [(n, v) for n, v in sizes if n != "Title" and v <= body_pt]
+        if small:
+            limits.append(
+                ", ".join(f"`{n}` at {v}pt" for n, v in small)
+                + f" {'is' if len(small) == 1 else 'are'} no larger than body text "
+                  f"at {body_pt}pt — the source's own values, copied as they are. "
+                  f"Change them only to depart from the source deliberately.")
     limits = "\n".join("\n".join(textwrap.wrap(l, 76, initial_indent="- ",
                                               subsequent_indent="  "))
                        for l in limits)
     limits = "\n" + limits if limits else ""
+
+    ol = outline(orig)
+    ol_md = "\n".join(f"{'  ' * max(0, lv - 1)}- {t}  `{n}`" for n, lv, t in ol) \
+        or "_The source has no headings to record._"
 
     # The description is what makes an agent reach for this package at all, so
     # it names the look rather than describing the file.
@@ -346,9 +407,8 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
 
     open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
         name=name, desc=desc, src=src, md_map=md, styles=rows,
-        page="\n".join(page), repro=repro, rebuild=rebuild,
-        limits=limits,
-        outline=ol_md, date=datetime.date.today().isoformat()))
+        page="\n".join(page_lines), outline=ol_md, limits=limits,
+        date=datetime.date.today().isoformat()))
 
     print(f"Package written to {outdir}/")
     for f in sorted(os.listdir(outdir)):
@@ -359,16 +419,8 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
 
 if __name__ == "__main__":
     a = sys.argv
-    if len(a) < 5:
-        print(__doc__); sys.exit(2)
-    mapping, bottom = {}, None
-    if "--map" in a:
-        for kv in a[a.index("--map") + 1].split(","):
-            k, v = kv.split("=")
-            mapping[k.strip()] = v.strip()
-    margins = {k: float(a[a.index(f"--{k}") + 1])
-               for k in ("top", "right", "bottom", "left") if f"--{k}" in a}
-    bottom = margins.get("bottom")
-    body = int(a[a.index("--body") + 1]) if "--body" in a else None
+    if len(a) < 4:
+        print(__doc__)
+        sys.exit(2)
     nm = a[a.index("--name") + 1] if "--name" in a else None
-    build(a[1], a[2], a[3], a[4], mapping, margins, body, nm)
+    build(a[1], a[2], a[3], nm)
