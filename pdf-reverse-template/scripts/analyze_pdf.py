@@ -245,12 +245,28 @@ def measure_spacing(lines, body_key, col_left, col_right):
     adv = collections.Counter(dl).most_common(1)[0][0]
 
     # A y delta clearly larger than the line advance starts a new paragraph.
+    # So does a column break: y jumps back to the top of the page there, which
+    # is not a larger delta but a negative one.
     starts = {0}
     for i, (a, b) in enumerate(zip(B, B[1:]), start=1):
-        if a["page"] != b["page"] or (b["y"] - a["y"]) > adv * 1.25:
+        if a["page"] != b["page"] or a.get("col") != b.get("col") \
+                or (b["y"] - a["y"]) > adv * 1.25:
             starts.add(i)
-    sx = collections.Counter(B[i]["x0"] for i in starts)
-    cx = collections.Counter(B[i]["x0"] for i in range(len(B)) if i not in starts)
+
+    # Indent is measured from each line's own column edge. An absolute x mixes
+    # the columns: the mode over paragraph starts can land in one column while
+    # the mode over continuations lands in another, and subtracting them gives
+    # a column offset rather than an indent. On the two-column fixture that
+    # cancelled to exactly 0.0 and the real 2em indent was lost in silence.
+    per_col = collections.defaultdict(collections.Counter)
+    for l in B:
+        per_col[l.get("col", 0)][l["x0"]] += 1
+    # Most lines in a column are continuations, so the mode is its left edge.
+    edge = {c: cc.most_common(1)[0][0] for c, cc in per_col.items()}
+    relx = lambda l: round(l["x0"] - edge.get(l.get("col", 0), 0), 1)
+
+    sx = collections.Counter(relx(B[i]) for i in starts)
+    cx = collections.Counter(relx(B[i]) for i in range(len(B)) if i not in starts)
     indent = None
     if sx and cx:
         v = sx.most_common(1)[0][0] - cx.most_common(1)[0][0]
