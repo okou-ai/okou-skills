@@ -98,9 +98,11 @@ Convert first and install only on failure. Three things make that ordering neces
 
 - **`libreoffice-writer` is absent from the image.** Only `-impress` and `-draw` ship, so the Writer filters do not exist and a bare `soffice` fails with `Error: source file could not be loaded`. Installing it pulls 9 packages and 66 MB.
 - **`apt-get update` has to come first.** `/var/lib/apt/lists/` ships empty, so installing without it reports `Package 'libreoffice-writer' has no installation candidate`, which reads like the package is missing from the archive rather than uncached.
-- **The root filesystem is rolled back from time to time.** An install that worked earlier in the run can be gone later, and so can `pip --user` packages; only `/home/user/workspace` is unaffected. Re-running the line above recovers.
+- **The root filesystem can be rolled back mid-run.** Observed in this sandbox: an install that worked earlier in a run was gone later, and `pip --user` packages with it. Only `/home/user/workspace` was unaffected. Re-running the line above recovers.
 
-Fonts, line spacing and justification all survive the conversion, so the result is good enough to deliver. The `w:header` and `w:footer` offsets in `pgMar` do not — LibreOffice puts the running head a few points off where Word does.
+The install needs passwordless `sudo` and the Ubuntu archive. Where either is missing the convert keeps failing with `Error: source file could not be loaded`; deliver the docx together with the unbranded typst PDF and say the branded export was unavailable, rather than quietly handing over the unbranded one.
+
+Fonts, line spacing and justification all survive the conversion, so the result is good enough to deliver. The `w:header` and `w:footer` offsets in `pgMar` do not: converting a template whose source puts the running head at 47.62pt, LibreOffice placed it at 49.85pt. That is measured against the source document, not against Word — nothing in this section has been checked in Word itself.
 
 ## xlsx
 
