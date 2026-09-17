@@ -149,7 +149,7 @@ def classify_pdf(path):
 
     # A deck runs to many pages. One or two pages at a paper size is a document
     # however little text it carries — a resume, a certificate, an invoice —
-    # and sparse text there is a form, which check 2 answers by looking.
+    # and sparse text there is a form, which the router's question 2 answers.
     if paper and pages <= 2:
         return PDF, report, f"{pages} page(s) at {paper}: a document, not a deck"
 

@@ -12,7 +12,7 @@ pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `reverse-template/pdf/`.
 
-Check 2 of the router must have answered "an article, and one stream". A form
+The router's question 2 must have answered "an article, and one stream". A form
 — a resume, a receipt, a certificate — or a body with a sidebar beside it takes
 `../source-style/SKILL.md` instead.
 
