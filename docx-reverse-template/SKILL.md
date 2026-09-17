@@ -1,6 +1,6 @@
 ---
 name: docx-reverse-template
-description: Reverse-engineer an existing Word document into a loadable template skill: SKILL.md, reference.docx and the source document. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc.
+description: "Reverse-engineer an existing Word document into a loadable template skill: SKILL.md, reference.docx and the source document. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc."
 ---
 
 # Reverse a docx into a template package

@@ -1,6 +1,6 @@
 ---
 name: pdf-reverse-template
-description: Infer the typographic styles of a PDF and reverse-engineer it into a loadable template skill: SKILL.md, reference.docx and the source PDF. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout.
+description: "Infer the typographic styles of a PDF and reverse-engineer it into a loadable template skill: SKILL.md, reference.docx and the source PDF. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout."
 ---
 
 # Reverse a PDF into a template package
