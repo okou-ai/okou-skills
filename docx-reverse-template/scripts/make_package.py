@@ -369,6 +369,11 @@ def build(orig, ref, outdir, name=None):
             + (f" ({marks})" if marks else "")
             + f". Use when asked to write, format, re-issue or restyle a document "
               f"in this style, or to produce another document like {src}.")
+    # Quote it. The description carries hex colours, and " #" opens a comment
+    # in an unquoted YAML scalar, so everything from the first colour onward -
+    # including every trigger phrase - is dropped when the frontmatter is
+    # parsed, and the published skill never matches anything.
+    desc = '"' + desc.replace('\\', '\\\\').replace('"', '\\"') + '"' 
 
     open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
         name=name, desc=desc, src=src, md_map=md, styles=rows,

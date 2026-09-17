@@ -318,7 +318,20 @@ def measure_spacing(lines, body_key, col_left, col_right):
     # claims. Every paragraph here may be followed by a table, a list or a
     # heading, in which case nothing was measured and the builder must not
     # write a value it never obtained.
+    # Justified or ragged right. A line that ends a paragraph stops wherever
+    # the sentence does in either case, so only the lines that continue into
+    # another line carry the evidence: under justification they all reach the
+    # column edge, and under ragged right almost none do.
+    inner = [B[i] for i in range(len(B) - 1) if (i + 1) not in starts
+             and B[i]["page"] == B[i + 1]["page"]
+             and B[i].get("col") == B[i + 1].get("col")]
+    align = None
+    if len(inner) >= 4:
+        right = collections.Counter(l["x1"] for l in inner).most_common(1)[0]
+        align = "both" if right[1] * 2 > len(inner) else "left"
+
     body = {"line_advance_pt": adv, "line_ratio": round(adv / body_key[0], 2),
+            "align": align, "align_samples": len(inner),
             "space_after_pt": round(statistics.median(gaps), 1) if gaps else None,
             "space_after_samples": len(gaps),
             "first_line_indent_pt": indent,
@@ -589,6 +602,14 @@ def analyze(path, body_pick=None, columns=1):
                                      if h == l["key"]), None)] if lv],
         "geometry_notes": geom_notes,
         "running_heads": sorted({s["text"].strip() for i, s in enumerate(spans) if i in hf})[:6],
+        # Where the running head and foot actually sit, so a header added later
+        # lands where the source put it rather than at Word's default 708 twips.
+        "header_pt": (round(min(spans[i]["bbox"][1] for i in hf
+                                if spans[i]["bbox"][1] < H / 2), 1)
+                      if any(spans[i]["bbox"][1] < H / 2 for i in hf) else None),
+        "footer_pt": (round(H - max(spans[i]["bbox"][3] for i in hf
+                                    if spans[i]["bbox"][3] >= H / 2), 1)
+                      if any(spans[i]["bbox"][3] >= H / 2 for i in hf) else None),
         "running_heads_method": hf_method,
     }
     doc.close()

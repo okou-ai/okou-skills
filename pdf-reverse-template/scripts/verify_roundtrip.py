@@ -91,7 +91,10 @@ def style_props(xml, sid):
         mm = re.search(r'<w:ind[^>]*w:firstLine="(\d+)"', p)
         out["first_line_indent_pt"] = TWIP2PT(mm.group(1)) if mm else None
         mm = re.search(r'<w:jc w:val="([a-z]+)"', p)
-        out["align"] = "center" if (mm and mm.group(1) == "center") else "left"
+        # Report what the style says, not one of two values: the body can be
+        # justified, and collapsing "both" to "left" hid that the template
+        # never carried the measured alignment at all.
+        out["align"] = mm.group(1) if mm else "left"
     return out
 
 

@@ -66,8 +66,11 @@ def default_reference():
 
 def rpr(font, size, color, bold):
     f = clean_font(font)
+    # Not-bold is written explicitly, not by omission: Subtitle is basedOn
+    # Title and several heading styles are bold by default, so leaving the
+    # element out inherits the weight instead of clearing it.
     return (f'<w:rFonts w:ascii="{f}" w:hAnsi="{f}" w:eastAsia="{f}" w:cs="{f}"/>'
-            + ("<w:b/>" if bold else "")
+            + ("<w:b/>" if bold else '<w:b w:val="0"/>')
             + f'<w:color w:val="{color}"/>'
             + f'<w:sz w:val="{PT2HALF(size)}"/><w:szCs w:val="{PT2HALF(size)}"/>')
 
@@ -153,10 +156,17 @@ def build(json_path, out_path, mapping, overrides):
     fi = b.get("first_line_indent_pt") or 0
     indent_xml = f'<w:ind w:firstLine="{PT2TWIP(fi)}"/>' if fi else ""
     ppr += indent_xml
+    # Justified body text is the common case in a typeset PDF and pandoc's
+    # default is left, so the measured value has to be written either way.
+    if b.get("align"):
+        ppr += f'<w:jc w:val="{b["align"]}"/>'
     for sid in ("BodyText", "FirstParagraph", "Compact", "Normal"):
         # Indent only Body Text: First Paragraph follows a heading and is not
         # indented by convention, and Compact is used for tight list items.
-        p = ppr if sid == "BodyText" else ppr.replace(indent_xml, "")
+        # Both are basedOn BodyText, so dropping the element inherits the
+        # indent instead of clearing it - the zero has to be explicit.
+        p = ppr if sid == "BodyText" else \
+            ppr.replace(indent_xml, '<w:ind w:firstLine="0"/>' if fi else "")
         styles, ok = patch_style(styles, sid,
                                  rpr(b["font"], b["size"], b["color"], False), p)
         if ok:
@@ -227,6 +237,11 @@ def build(json_path, out_path, mapping, overrides):
     mg.update({k: v for k, v in overrides.items() if v is not None})
     bottom = mg["bottom"]
     overridden = sorted(k for k, v in overrides.items() if v is not None)
+    # Where the source put its running head, not Word's default 0.49in. A
+    # header added later otherwise sits at a different height than the source.
+    hdr = PT2TWIP(d["header_pt"]) if d.get("header_pt") else 708
+    ftr = PT2TWIP(d["footer_pt"]) if d.get("footer_pt") else 708
+
     # w:cols comes after w:pgMar in CT_SectPr
     cols = d.get("columns") or 1
     cols_xml, gap_note = "", ""
@@ -241,7 +256,7 @@ def build(json_path, out_path, mapping, overrides):
     sect = (f'<w:sectPr><w:pgSz w:w="{CM2TWIP(p["w_cm"])}" w:h="{CM2TWIP(p["h_cm"])}"/>'
             f'<w:pgMar w:top="{CM2TWIP(mg["top"])}" w:right="{CM2TWIP(mg["right"])}" '
             f'w:bottom="{CM2TWIP(bottom)}" w:left="{CM2TWIP(mg["left"])}" '
-            f'w:header="708" w:footer="708" w:gutter="0"/>{cols_xml}</w:sectPr>')
+            f'w:header="{hdr}" w:footer="{ftr}" w:gutter="0"/>{cols_xml}</w:sectPr>')
     doc = re.sub(r"<w:sectPr\b.*?</w:sectPr>|<w:sectPr\b[^>]*/>", sect, doc, flags=re.S)
 
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as out:
