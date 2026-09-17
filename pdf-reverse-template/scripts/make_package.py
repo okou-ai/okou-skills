@@ -148,28 +148,6 @@ with pandoc bypasses `--reference-doc` entirely and loses every style here.
 
 {page}
 
-## What was inferred rather than read
-
-A PDF has no style layer, so these values were measured from glyph
-coordinates. Start here if something looks off.
-
-{review}
-
-| Field | Source | Confidence |
-|---|---|---|
-| Font / size / colour | Recorded exactly in the PDF | High |
-| Spacing / line height / indent / alignment | Computed from coordinates | High |
-| Heading levels | Assigned from the sample text (above) | Depends on the review |
-| Top / left / right margins | Measured, then rounded | Medium |
-| Bottom margin | Only bounded, never measured | Low |
-
-To re-derive every measured value, run this against `{src}` with the
-`pdf-reverse-template` skill; the output is reproducible byte for byte:
-
-```bash
-python3 analyze_pdf.py {src}{repro} --json styles.json
-```
-
 ## Writing a new document in this style
 
 `--reference-doc` discards every piece of body content, so the template knows
@@ -219,7 +197,16 @@ python3 verify_roundtrip.py reference.docx styles.json --structure-only
 - A PDF stores its running head as ordinary text, so nothing was carried over
   automatically. Whatever the page section lists was added deliberately.
 
-Built from `{src}` by the pdf-reverse-template skill on {date}.
+---
+
+Built from `{src}` on {date}. A PDF records no roles and no text block, so
+the heading levels and the bottom margin were judged rather than measured; if
+anything here looks wrong, start with those. To rebuild:
+
+```bash
+python3 analyze_pdf.py {src}{repro} --json styles.json      # reproducible byte for byte
+python3 build_reference.py styles.json reference.docx{rebuild}
+```
 """
 
 
@@ -281,73 +268,17 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
                     f"  This was **not** carried into the template — in a PDF it is "
                     f"ordinary text. Add one with `set_header_footer.py` or in Word.")
 
-    rev = []
-    if mapping:
-        rev.append("**Heading level mapping** (`--map " +
-                   ",".join(f"{k}={v}" for k, v in mapping.items()) + "`):\n")
-        rev.append("| Cluster in the analysis | Sample text | Assigned to |")
-        rev.append("|---|---|---|")
-        for h in d["headings"]:
-            tgt = mapping.get(str(h["level"]), f"Heading{h['level']}")
-            rev.append(f"| #{h['level']} - {h['size']}pt - #{h['color']} "
-                       f"| {h.get('sample', '')[:20]} | `{tgt}` |")
-    else:
-        rev.append("**Heading levels**: no `--map` was given, so groups were assigned "
-                   "Heading1/2/3... by size.\n")
-        rev.append("> If the source PDF has a separate document title it took Heading1 "
-                   "and shifted every level by one. Check the sample text for each "
-                   "group in `report.txt`.")
-    rev.append("")
-    rev.append(f"**Columns**: {d.get('columns', 1)}"
-               + (f", gap {d.get('column_gap_pt')}pt" if (d.get("columns") or 1) > 1 else "")
-               + ". A PDF does not record whether a layout is multi-column; this was "
-                 "declared by looking at a rendered page.")
-
-    cands = d.get("body_candidates") or []
-    chosen = next((c for c in cands if c.get("chosen")), None)
-    if chosen and len(cands) > 1:
-        rev.append("")
-        rev.append(f"**Body group**: rank {chosen['rank']} "
-                   f"({chosen['font']} {chosen['size']}pt #{chosen['color']}, "
-                   f"{chosen['chars']} characters)"
-                   + (f", chosen explicitly with --body {d['body_pick']}"
-                      if d.get("body_pick")
-                      else ". It was the largest group, accepted as the default."))
-        rev.append("")
-        rev.append("| Rank | Font | Size | Chars | Lines | Sample |")
-        rev.append("|---|---|---|---|---|---|")
-        for c in cands:
-            mark = " **<- chosen**" if c["chosen"] else ""
-            rev.append(f"| {c['rank']} | {c['font']} | {c['size']}pt | {c['chars']} "
-                       f"| {c.get('lines', '-')} | {c['sample'][:28]}{mark} |")
-    rev.append("")
-    if bottom is not None:
-        rev.append(f"**Bottom margin**: overridden to {bottom} cm.")
-    else:
-        mb = d["margins_measured_cm"].get("bottom")
-        sug = mg.get("bottom")
-        rev.append(f"**Bottom margin**: {sug} cm, taken from the analyzer's suggestion"
-                   + (f" (it mirrors the top margin of {mg['top']} cm, which fits under "
-                      f"the measured upper bound of <={mb} cm)"
-                      if sug == mg.get("top") and mb else
-                      f" (the top margin of {mg['top']} cm exceeds the measured upper "
-                      f"bound of <={mb} cm, so this layout is not vertically symmetric "
-                      f"and the bound was rounded instead)" if mb else "")
-                   + ".")
-
     # The flags that were chosen rather than measured, so the analysis can be
     # reproduced from source.pdf alone. The column count comes out of styles.json
     # rather than from a flag, where it cannot drift from the template.
     ncols = d.get("columns") or 1
     repro = (f" --body {body}" if body else "") + (f" --columns {ncols}" if ncols > 1 else "")
-    # Every margin overridden on the command line. These are measurements the
-    # analyzer got wrong and somebody corrected; if SKILL.md does not carry
-    # them, the correction is lost the moment the template is rebuilt.
-    if margins:
-        rev.append("")
-        rev.append("**Margins set by hand**: "
-                   + ", ".join(f"`--{k} {v}`" for k, v in sorted(margins.items()))
-                   + ". The rest came from the analysis.")
+    # The build flags, so the rebuild line actually reproduces this template.
+    # A margin corrected by hand is a measurement the analyzer got wrong; left
+    # out here it is lost the moment anyone rebuilds.
+    rebuild = ("" if not mapping else
+               " \\\n        --map " + ",".join(f"{k}={v}" for k, v in mapping.items()))
+    rebuild += "".join(f" --{k} {v}" for k, v in sorted(margins.items()))
 
     # The outline is the only record of the source's *content* that survives.
     # reference.docx carries no body text, so without it there is nothing to
@@ -372,7 +303,7 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
 
     open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
         name=name, desc=desc, src=src, md_map=md, styles=rows,
-        page="\n".join(page), review="\n".join(rev), repro=repro,
+        page="\n".join(page), repro=repro, rebuild=rebuild,
         outline=ol_md, date=datetime.date.today().isoformat()))
 
     print(f"Package written to {outdir}/")

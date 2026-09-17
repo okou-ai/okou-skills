@@ -278,7 +278,14 @@ python3 verify_reference.py reference.docx
 - Headings that come out looking like body text mean the template is missing
   that style. `verify_reference.py` says which one.
 
-Built from `{src}` by the docx-reverse-template skill on {date}.
+---
+
+Built from `{src}` on {date}. Every value above was read out of that file,
+not inferred. To rebuild:
+
+```bash
+python3 build_reference.py {src} reference.docx
+```
 """
 
 
