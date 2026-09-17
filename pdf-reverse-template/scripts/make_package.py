@@ -280,11 +280,11 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None, name=None):
             rev.append(f"| #{h['level']} - {h['size']}pt - #{h['color']} "
                        f"| {h.get('sample', '')[:20]} | `{tgt}` |")
     else:
-        rev.append("**Heading levels**: no `--map` was given, so clusters were assigned "
+        rev.append("**Heading levels**: no `--map` was given, so groups were assigned "
                    "Heading1/2/3... by size.\n")
         rev.append("> If the source PDF has a separate document title it took Heading1 "
                    "and shifted every level by one. Check the sample text for each "
-                   "cluster in `report.txt`.")
+                   "group in `report.txt`.")
     rev.append("")
     rev.append(f"**Columns**: {d.get('columns', 1)}"
                + (f", gap {d.get('column_gap_pt')}pt" if (d.get("columns") or 1) > 1 else "")
@@ -295,12 +295,12 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None, name=None):
     chosen = next((c for c in cands if c.get("chosen")), None)
     if chosen and len(cands) > 1:
         rev.append("")
-        rev.append(f"**Body cluster**: rank {chosen['rank']} "
+        rev.append(f"**Body group**: rank {chosen['rank']} "
                    f"({chosen['font']} {chosen['size']}pt #{chosen['color']}, "
                    f"{chosen['chars']} characters)"
                    + (f", chosen explicitly with --body {d['body_pick']}"
                       if d.get("body_pick")
-                      else ". It was the largest cluster, accepted as the default."))
+                      else ". It was the largest group, accepted as the default."))
         rev.append("")
         rev.append("| Rank | Font | Size | Chars | Lines | Sample |")
         rev.append("|---|---|---|---|---|---|")

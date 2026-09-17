@@ -7,9 +7,9 @@ Usage:
   python3 build_reference.py styles.json out.docx --bottom 3.0
   python3 build_reference.py styles.json out.docx --top 2.4 --left 1.8 --right 1.8
 
---map corrects the level assignment. analyze_pdf orders heading clusters by
+--map corrects the level assignment. analyze_pdf orders heading groups by
 size, but a document title and an H1 are both just large text in a PDF, so the
-mapping has to be stated explicitly. The left side is the cluster number from
+mapping has to be stated explicitly. The left side is the group number from
 the analysis report; the right side is a Word style name.
 
 --bottom overrides the bottom margin. By default the analyzer's own suggestion

@@ -4,15 +4,19 @@
 Usage:
   python3 analyze_pdf.py source.pdf                   # human-readable report
   python3 analyze_pdf.py source.pdf --json out.json   # input for build_reference.py
-  python3 analyze_pdf.py source.pdf --body 2           # pick a different body cluster
+  python3 analyze_pdf.py source.pdf --body 2           # pick a different body group
   python3 analyze_pdf.py source.pdf --columns 2        # declare a multi-column layout
 
 Requires: pip install pymupdf
 
 A PDF has no style layer, only "draw this glyph at this coordinate in this font
-and colour". So this clusters every text span by (size, colour, weight): the
-cluster with the most characters is body text, and anything larger becomes a
-heading candidate, ordered by size.
+and colour". Spans are therefore grouped on (size, colour, weight) by exact
+equality — a group-by on values the file records, not a similarity grouping:
+the group with the most characters is taken as body text, and anything larger
+becomes a heading candidate, ordered by size.
+
+Which group is prose, and what each larger group means, is not in the file.
+That is what the samples in the report are for.
 
 Fonts, sizes, colours and paragraph metrics come out of the coordinates and are
 reliable. Heading levels and the bottom margin are not — neither is recorded,
@@ -37,11 +41,11 @@ def is_filler(text):
     """True for a leader or rule run: the dot leaders in a table of contents,
     a row of dashes, and similar.
 
-    These are the single biggest source of a wrong body cluster. A dotted ToC
+    These are the single biggest source of a wrong body group. A dotted ToC
     packs hundreds of characters into a handful of spans, so counting raw
     characters hands "body text" to the leader dots and every downstream
     metric — line advance, space after, the heading size threshold — is then
-    computed against the wrong cluster.
+    computed against the wrong group.
     """
     t = re.sub(r"\s+", "", text)
     if len(t) < 6:
@@ -74,9 +78,13 @@ def collect(doc):
 def skey(s):
     """Merge key: size, colour and weight — deliberately not the font name.
 
+    Exact tuple equality, not a distance: two spans group together only when all
+    three values match. Size and colour come straight out of the PDF; weight is
+    the span's own bold flag, falling back to the font name when it is unset.
+
     One heading is routinely split across two runs when it mixes scripts, e.g.
     "1.1" in a Latin face and the title text in a CJK face at the same size and
-    colour. Keying on the font name would leave them as separate clusters that
+    colour. Keying on the font name would leave them as separate groups that
     both map to the same Word style, which no --map can reconcile.
     """
     return (s["size"], s["color"], s["bold"])
@@ -123,10 +131,10 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
             #   - a short token that counts up (a page number)
             # Position alone is not enough: a section heading printed at the top
             # of every page sits at the same y with different words each time,
-            # and dropping it removes real headings from the style clusters.
+            # and dropping it removes real headings from the style groups.
             # Chrome is never set larger than the body text. A section heading
             # printed at the top of every page repeats a position but not a
-            # size: dropping it would delete real headings from the clusters.
+            # size: dropping it would delete real headings from the groups.
             if body_size is not None and \
                     max(spans[i]["size"] for i in idx) > body_size + 0.4:
                 continue
@@ -271,7 +279,7 @@ def measure_spacing(lines, body_key, col_left, col_right):
     # advance). So state one model and use it in both directions.
     #
     # Natural gap between two lines = the mean of their line advances. A
-    # cluster's own advance is measured when it wraps, and scaled from the body
+    # group's own advance is measured when it wraps, and scaled from the body
     # otherwise, since a heading is rarely more than one line.
     def adv_of(key):
         L = [l for l in lines if l["key"] == key and not l["filler"]]
@@ -348,7 +356,7 @@ def analyze(path, body_pick=None, columns=1):
     if not chars:
         sys.exit("Every span looks like a leader or rule. Nothing to infer.")
 
-    # Ranked by character count, nothing more. Which cluster is body text is a
+    # Ranked by character count, nothing more. Which group is body text is a
     # reading decision, not an arithmetic one: a dense table or an index can
     # hold more characters than the prose around it. The report prints every
     # candidate with its sample text so the caller can judge and pass --body.
@@ -420,7 +428,7 @@ def analyze(path, body_pick=None, columns=1):
     bottom_suggested, geom_notes = None, []
     if filler_count:
         geom_notes.append(f"{filler_count} leader or rule spans were excluded from "
-                          f"clustering; counting them would hand the body cluster to a "
+                          f"grouping; counting them would hand the body group to a "
                           f"dotted table of contents")
     if not not_first:
         geom_notes.append("single page: the top margin may include a title block "
@@ -512,7 +520,7 @@ def analyze(path, body_pick=None, columns=1):
                                  ("top", top_pt), ("bottom", bottom_bound_pt))},
         "margins_suggested_cm": {"left": snap(CM(left_pt))[0], "right": snap(CM(right_pt))[0],
                                  "top": top_cm, "bottom": bottom_suggested},
-        # Every heading line in reading order, not just one sample per cluster.
+        # Every heading line in reading order, not just one sample per group.
         # The template carries no body content at all, so this outline is the
         # only record of how the source document was actually organised — and
         # that is what a request to "write another one of these" needs.
@@ -535,8 +543,8 @@ def report(r, chars, body):
           + (f"  = {p['paper']}" if p["paper"] else "  (non-standard size)"))
     print(f"[structure tree] " + ("present — read heading levels from /StructTreeRoot "
                                   "instead of guessing from font size"
-                                  if r["tagged"] else "absent — levels are inferred by "
-                                  "clustering and must be checked against the sample text"))
+                                  if r["tagged"] else "absent — the PDF records no roles "
+                                  "at all, so levels come from the sample text"))
     if r["running_heads"]:
         print(f"[running head/foot] {r['running_heads_method']}: "
               f"{' | '.join(r['running_heads'])}  -> excluded from margin measurement")
@@ -549,7 +557,7 @@ def report(r, chars, body):
           + (f"   width {r['column_width_pt']}pt   gap {r['column_gap_pt']}pt"
              if r.get("column_width_pt") else ""))
     if bands:
-        print("  line starts cluster at: "
+        print("  lines start at: "
               + "   ".join(f"{b['x']}pt x{b['lines']}" for b in bands))
     print("  Bands appear for a table just as they do for columns, so this count")
     print("  settles nothing. Render a page and look at it, then pass --columns N.")
@@ -557,7 +565,7 @@ def report(r, chars, body):
     cands = r.get("body_candidates") or []
     if len(cands) > 1:
         print(f"\n[body candidates]  ranked by character count only — READ THE SAMPLES.")
-        print(f"  The default is simply the largest cluster, which is wrong whenever a")
+        print(f"  The default is simply the largest group, which is wrong whenever a")
         print(f"  table, an index or a caption block outweighs the prose. The choice")
         print(f"  drives every paragraph metric. Override with --body <rank>.")
         print(f"  {'rank':<5}{'size':>6}{'colour':>9}{'chars':>7}{'lines':>7}{'pages':>7}  sample")
@@ -566,9 +574,12 @@ def report(r, chars, body):
             print(f"  {c['rank']:<5}{c['size']:>6}{'#'+c['color']:>9}{c['chars']:>7}"
                   f"{c['lines']:>7}{c['pages']:>7}  {c['sample'][:40]}{mark}")
 
-    print(f"\n[inferred styles]  clustered by size + colour + weight, so one heading "
-          f"split\n across scripts stays a single cluster. Exact: size/colour/weight. "
-          f"Inferred: level.")
+    print(f"\n[inferred styles]  Spans are grouped on (size, colour, weight) by exact "
+          f"equality —\n there is no similarity threshold, so a heading split across two "
+          f"scripts stays\n one group. Size and colour are read from the PDF; weight is "
+          f"read from the span\n flag, or from the font name when the flag is unset. "
+          f"The role column is not\n recorded anywhere and is the one thing being "
+          f"guessed — check it.")
     print(f"{'role':<7}{'font':<26}{'size':>6}{'colour':>9}{'wt':>4}{'chars':>7}  sample")
     b = r["body"]
     print(f"{'body':<7}{b['font']:<26}{b['size']:>6}{'#'+b['color']:>9}"
@@ -614,7 +625,7 @@ def report(r, chars, body):
 
     print("\n[not recorded in the PDF — settle these before building]")
     print("  1. Levels: a document title and an H1 are both just large text in a PDF;")
-    print("     clustering cannot separate them. Read the sample column.")
+    print("     grouping cannot separate them. Read the sample column.")
     print("  2. Margins: right/top/bottom measure where content reaches, not where the")
     print("     text block is defined. Feeding measurements back in accumulates drift.")
 

@@ -33,7 +33,7 @@ Read the report before going on.
 present, take the heading levels in step 3 from the structure tree rather than
 from font size. "No text layer" means a scan; OCR it first and come back.
 
-`[body candidates]` marks the cluster it took as body text — the largest by
+`[body candidates]` marks the group it took as body text — the largest by
 character count. Check that sample is running prose; if it is not, re-run with
 `--body <rank>` on the one that is. Rank 1 below is a table column header:
 
@@ -44,12 +44,13 @@ rank   size   colour  chars  lines  pages  sample
 ```
 
 Every paragraph metric and the threshold separating headings from body come
-from this cluster, and a wrong pick corrupts all of them silently.
+from this group, and a wrong pick corrupts all of them silently.
 
 ### 2. Declare the column count
 
-Read `[columns]`. The report lists where line starts cluster, but bands appear
-for a table exactly as they do for columns, so that count settles nothing.
+Read `[columns]`. The report lists the x positions lines start at, but those
+bands appear for a table exactly as they do for columns, so the count settles
+nothing on its own.
 
 Render a page and look at it:
 
@@ -66,7 +67,7 @@ the measured column width and gutter.
 
 ### 3. Assign heading levels
 
-Read the `sample` column under `[inferred styles]` and decide what each cluster
+Read the `sample` column under `[inferred styles]` and decide what each group
 actually is:
 
 ```
@@ -123,8 +124,8 @@ python3 scripts/verify_roundtrip.py reference.docx styles.json \
         --map 1=Heading1,2=Title,3=Heading2
 ```
 
-Pass the same `--map`. Without it the cluster-to-style match is guessed from
-size and colour, which reports a false failure when two clusters resolve to one
+Pass the same `--map`. Without it the group-to-style match is guessed from
+size and colour, which reports a false failure when two groups resolve to one
 style.
 
 The exit code must be 0. It catches dangling style references and reconciles
@@ -191,7 +192,7 @@ reference check and drops that comparison.
 | The right margin reads far too large | No line fills the column; round to a common value yourself |
 | A single-page PDF gives bad margins | Running heads cannot be detected; measure all four off a rendered page |
 | Paragraph metrics look implausible, or the default body candidate is a table or an index | Re-run step 1 with `--body <rank>` |
-| Body text splits into several clusters | Clusters merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |
+| Body text splits into several groups | Clusters merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |
 | Space after reads NOT MEASURED | Every paragraph is followed by a table, list or heading, so no gap exists to measure; the template keeps pandoc's default |
 | Heading before/after look off | They are derived, not recorded. The report prints the raw baseline gaps beside them; override with `set_style.py --before/--after` and re-verify using `--structure-only` |
 | Verify fails after a deliberate style change | Expected; re-run it with `--structure-only` |

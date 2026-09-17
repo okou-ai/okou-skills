@@ -9,9 +9,9 @@ check. Use it after deliberately editing a style with set_style.py: the
 reconciliation asks "did the builder write what was measured", which stops being
 a meaningful question once a value has been overridden on purpose.
 
-Pass the same --map that build_reference.py was given. Without it the cluster to
+Pass the same --map that build_reference.py was given. Without it the group to
 style match is guessed from size and colour, which reports a false failure when
-two clusters resolve to one style.
+two groups resolve to one style.
 
 Two checks:
   1. Convert a probe document and look for dangling style references. A missing
