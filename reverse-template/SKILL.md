@@ -13,10 +13,10 @@ so do not carry steps between them.
 
 | Source | It is |
 |---|---|
-| `.pptx`, `.ppt`, `.key`, `.odp` | a deck |
+| `.pptx`, `.ppt` | a deck |
 | an image deck, or a directory of page screenshots | a deck |
 | `.docx` | a document |
-| `.doc`, `.rtf`, `.odt`, or a `.docx` saved by WPS | re-save it as `.docx` from Word, then start again |
+| `.doc`, or a `.docx` saved by WPS | re-save it as `.docx` from Word, then start again |
 | `.pdf` | look at the pages |
 
 ```bash

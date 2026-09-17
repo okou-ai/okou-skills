@@ -19,10 +19,10 @@ GUIDE = {
     PDF: "reverse-template/pdf/SKILL.md",
 }
 
-DECK_EXT = {".pptx", ".ppt", ".key", ".odp"}
+DECK_EXT = {".pptx", ".ppt"}
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".webp", ".heic", ".tif", ".tiff", ".bmp"}
 DOC_EXT = {".docx"}
-LEGACY_DOC_EXT = {".doc", ".rtf", ".odt"}
+LEGACY_DOC_EXT = {".doc"}
 
 # Paper sizes in points, portrait. A page that matches one of these in either
 # orientation was laid out for paper, which decks are not.
