@@ -212,7 +212,7 @@ def main():
     if route in (DOCX, PDF):
         print(
             "  That branch builds a style sheet. Look at the pages first: a form,\n"
-            "  or an article whose body is not one stream, takes source-style."
+            "  or an article whose body is not one stream, publishes the source itself."
         )
     return 0
 

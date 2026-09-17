@@ -24,12 +24,55 @@ offer letter, a spec sheet.
 Stay here only for an article whose body runs as one stream. One column is one
 stream, and so are columns of equal width.
 
-Take `../source-style/SKILL.md` instead when the file is a form, when a sidebar
-or a margin note sits beside the body, or when the call is close. A style sheet
-holds none of those, and it drops them silently; that branch keeps everything.
-
 Judge on what the document is, not on how it looks. A plain single-column
 resume with no colour is still a form.
+
+### A form, a sidebar, or a close call: publish the source instead
+
+A style sheet holds none of those and drops them silently. Publish the file
+itself, and stop — nothing below this section applies.
+
+```bash
+sudo apt-get update -qq && sudo apt-get install -y -qq libreoffice-writer
+soffice --headless -env:UserInstallation=file:///tmp/lo \
+        --convert-to pdf --outdir . <source.docx>
+okou presentation screenshot --input <source.pdf> --out package/pages
+```
+
+Write `package/SKILL.md`, and put nothing else in `package/` — assets cut out of
+a composed page are one-off content, not reusable material:
+
+````markdown
+---
+name: <template-slug>
+description: <what this document is, in one line>
+---
+
+Follow the source file's own styling. It is the authority for page size,
+margins, typography, colour, and the position of every block.
+
+Replace the content, keep the composition:
+
+- <one line per entry a new document has to fill>
+
+`pages/` holds the source's rendered pages in order.
+````
+
+Name the entries off the rendered pages — a resume's contact block, skills, and
+experience list; an invoice's parties, line items, and totals. Write nothing the
+pages do not show, and do not restate measurements: the source file carries
+them.
+
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
+  --title "<user-visible template name>" \
+  --kind document \
+  --source <the original file> \
+  --package package
+```
+
+`--kind document` takes no `--pages`; the rendered pages ride inside
+`--package`. Say the template exists only after the command succeeds.
 
 ## Prerequisites
 

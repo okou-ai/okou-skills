@@ -34,8 +34,8 @@ Three rules override the table:
   an invoice carry as little text as a slide and are still documents.
 
 `cd` into the branch directory; every path inside a branch guide is relative to
-it. Each guide opens by checking whether it is the right one for this particular
-file, and hands over to `source-style/SKILL.md` when it is not.
+it. The two document guides open by checking whether a style sheet can hold this
+particular file, and publish the source itself when it cannot.
 
 `python3 scripts/classify_source.py <source.pdf>` reads slides-or-document off
 page geometry and text density, for a second opinion on row 1.
