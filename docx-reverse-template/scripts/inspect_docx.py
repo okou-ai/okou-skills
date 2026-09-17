@@ -136,6 +136,20 @@ def main(path):
             print("  margins: " + "  ".join(f"{k} {TWIP(v):.2f}cm" for k, v in mar.items()))
         print(f"  references a header: {'yes' if 'headerReference' in s else 'no'}"
               f"   footer: {'yes' if 'footerReference' in s else 'no'}")
+        # Columns ride along in sectPr like paper and margins do, so a
+        # multi-column source produces a multi-column template with nothing
+        # asked of the caller. Say so rather than letting it pass unseen.
+        c = re.search(r"<w:cols\b[^>]*/>|<w:cols\b[^>]*>.*?</w:cols>", s, re.S)
+        if c:
+            num = re.search(r'w:num="(\d+)"', c.group(0))
+            sp = re.search(r'w:space="(\d+)"', c.group(0))
+            n = int(num.group(1)) if num else 1
+            print(f"  columns: {n}"
+                  + (f"   gutter {TWIP(sp.group(1)):.2f}cm" if sp and n > 1 else "")
+                  + ("   (inherited as is; use set_header_footer.py --columns to change it)"
+                     if n > 1 else ""))
+        else:
+            print("  columns: 1 (none set)")
     else:
         print("  no sectPr — output falls back to Word defaults")
 

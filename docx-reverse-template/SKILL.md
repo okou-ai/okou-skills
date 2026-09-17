@@ -24,8 +24,9 @@ Requires pandoc 3.x. The script checks for it or installs it; run the
 python3 scripts/inspect_docx.py <source.docx>
 ```
 
-Note from the report: which required styles are missing, the paper size and
-margins, and — if a `REVIEW` block appears — the literal header and footer text.
+Note from the report: which required styles are missing, the paper size, margins
+and column count, and — if a `REVIEW` block appears — the literal header and
+footer text.
 
 That literal text is copied verbatim into every document made from the template.
 Document numbers, versions, owners and dates belonging to the source have to be
@@ -54,6 +55,7 @@ python3 scripts/set_header_footer.py reference.docx --paper A4 \
         --replace "DOC-2026-001=[DOC ID]" --replace "Jane Doe=[OWNER]"
 
 python3 scripts/set_header_footer.py reference.docx --columns 2 --column-gap 20
+python3 scripts/set_header_footer.py reference.docx --columns 1
 
 python3 scripts/set_style.py reference.docx --list
 
@@ -68,6 +70,11 @@ When step 1 flagged literal header or footer text, swap the values with
 `--replace`. It edits the text in place, so tab columns, border rules, a
 first-page variant and any table in the footer survive. It exits non-zero when a
 value is not found, and composes with the other flags in one invocation.
+
+`--columns` **changes** the layout; it is not needed to preserve one. A
+multi-column source is already multi-column in the template, because `w:cols`
+rides along in `sectPr` with the paper size and margins. Step 1 reports the
+count so the inheritance is visible.
 
 `--header` / `--footer` rebuild the part from scratch and flatten all of that.
 Use them only for a template whose header and footer are plain text, or when
