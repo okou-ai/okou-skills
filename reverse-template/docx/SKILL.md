@@ -22,9 +22,9 @@ Stay here only for an article whose body runs as one stream; one column, or
 columns of equal width, is one stream. Judge on what the document is, not on
 how it looks — a plain single-column resume is still a form.
 
-### A form, a sidebar, or a close call: publish the source instead
+### Otherwise: publish the source itself
 
-A style sheet drops those silently. Publish the file itself and stop here.
+A style sheet drops those silently. Publish the file and stop here.
 
 ```bash
 sudo apt-get update -qq && sudo apt-get install -y -qq libreoffice-writer
@@ -33,7 +33,11 @@ soffice --headless -env:UserInstallation=file:///tmp/lo \
 okou presentation screenshot --input <source.pdf> --out package/pages
 ```
 
-Write `package/SKILL.md` and put nothing else in `package/`:
+`package/` holds three things and nothing else. `SKILL.md` and
+`design-system.md` are both required and neither may be empty — publish rejects
+the archive otherwise.
+
+`package/SKILL.md`, how a later run uses the template:
 
 ````markdown
 ---
@@ -51,7 +55,10 @@ Replace the content, keep the composition:
 `pages/` holds the source's rendered pages in order.
 ````
 
-Name the entries off the rendered pages, and write nothing they do not show.
+`package/design-system.md`, what the pages show: the regions and where they sit,
+the type hierarchy, the colour roles, the repeated blocks.
+
+Read both off the rendered pages, and write nothing they do not show.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
