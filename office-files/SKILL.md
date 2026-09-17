@@ -88,7 +88,7 @@ Three things that fail quietly here:
 - **Pin `papersize`.** Without `-s` you get typst's own default of A4; with `-s` and no `papersize` you get pandoc's template default of `us-letter`. Same document, different paper.
 - **CJK without `mainfont` renders in the wrong script.** Chinese text falls back to `NotoSansCJKjp`, so you get Japanese glyph forms with no error and no missing characters. Verify with `pdffonts doc.pdf` — the embedded name must end in `sc` for Simplified Chinese.
 
-One message from this flow is loud but harmless, and it is the opposite of the three above: `pdfinfo` on a typst-built PDF prints `Syntax Error: Suspects object is wrong type (boolean)` to stderr. It is poppler complaining about typst's metadata, not a broken file — PDFs built by LibreOffice do not trigger it, and the same PDF still reports its page count, page size and fonts correctly and rasterises fine. Do not debug it and do not re-render because of it.
+One message from this flow is loud but harmless, and it is the opposite of the three above: `pdfinfo` on a typst-built PDF prints `Syntax Error: Suspects object is wrong type (boolean)` to stderr. It is a poppler bug and not a broken file: poppler mis-reports the valid `/Suspects false` that typst writes for tagged output (fixed upstream after poppler 25.11.0), while PDFs built by LibreOffice omit that key and so stay quiet. The same PDF still reports its page count, page size and fonts correctly and rasterises fine. Do not debug it and do not re-render because of it.
 
 Variable names come from `pandoc --print-default-template=typst`: `mainfont`, `mathfont`, `codefont`, `fontsize`, `papersize`.
 
