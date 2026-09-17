@@ -27,21 +27,15 @@ Requires pandoc 3.x. The script checks for it or installs it; run the
 python3 scripts/analyze_pdf.py <source.pdf> --json styles.json
 ```
 
-The `[structure tree]` line says whether this is a tagged PDF. If
-`/StructTreeRoot` is present, take the step 2 mapping from the structure tree
-rather than guessing from font size.
+Read the report before going on.
 
-"No text layer" means a scan; OCR it first and come back.
+`[structure tree]` says whether this is a tagged PDF. If `/StructTreeRoot` is
+present, take the heading levels in step 3 from the structure tree rather than
+from font size. "No text layer" means a scan; OCR it first and come back.
 
-### 2. Pick the body cluster — human decision
-
-Read `[body candidates]` and decide which cluster is the running prose. The
-default is just the largest one by character count, which loses whenever a table,
-an index or a caption block holds more characters than the text around it.
-
-This choice drives every paragraph metric — line advance, space after, first-line
-indent, and the size threshold that decides what counts as a heading. A wrong
-pick corrupts all of them and nothing downstream complains.
+`[body candidates]` marks the cluster it took as body text — the largest by
+character count. Check that sample is running prose; if it is not, re-run with
+`--body <rank>` on the one that is. Rank 1 below is a table column header:
 
 ```
 rank   size   colour  chars  lines  pages  sample
@@ -49,10 +43,10 @@ rank   size   colour  chars  lines  pages  sample
 2      10.5  #242121    737     33      5  本报告覆盖试点项目第一阶段的交付范围…   <- the real body
 ```
 
-Rank 1 there is a table column header; rank 2 is prose. Judge it from the sample
-text, not the character count, and re-run with `--body 2`.
+Every paragraph metric and the threshold separating headings from body come
+from this cluster, and a wrong pick corrupts all of them silently.
 
-### 3. Declare the column count — human decision
+### 2. Declare the column count — human decision
 
 Read `[columns]`. The report lists where line starts cluster, but bands appear
 for a table exactly as they do for columns, so that count settles nothing.
@@ -70,7 +64,7 @@ column 2 is the last line of column 1 and every heading gap becomes noise.
 The declared count is written into the template as `w:cols` and reported with
 the measured column width and gutter.
 
-### 4. Assign heading levels — human decision
+### 3. Assign heading levels — human decision
 
 Read the `sample` column under `[inferred styles]` and decide what each cluster
 actually is:
@@ -91,7 +85,7 @@ Write it as an argument; the right side takes `Title`, `Subtitle`,
 
 Skipping this shifts every level by one.
 
-### 5. Set the bottom margin — human decision
+### 4. Set the bottom margin — human decision
 
 Read `[margins]` and take the whole `suggested` row, not the `measured` row.
 
@@ -115,14 +109,14 @@ or `--right`. A two-column document gives you a free check: the two columns
 must come out the same width, since one edge is set by the gutter and the
 other by the right margin.
 
-### 6. Build the template
+### 5. Build the template
 
 ```bash
 python3 scripts/build_reference.py styles.json reference.docx \
         --map 1=Heading1,2=Title,3=Heading2
 ```
 
-### 7. Verify
+### 6. Verify
 
 ```bash
 python3 scripts/verify_roundtrip.py reference.docx styles.json \
@@ -140,16 +134,16 @@ values.
 Fields the analysis could not measure are skipped rather than compared, so a
 `NOT MEASURED` space-after is not a failure.
 
-### 8. Package and deliver
+### 7. Package and deliver
 
 ```bash
 python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output dir> \
         --map 1=Heading1,2=Title,3=Heading2 --body 2
 ```
 
-Pass `--map`, `--bottom` and `--body` through verbatim. They are the human
-decisions from steps 2 to 5, and `SKILL.md` is the only place they get written
-down — including in the command it records for re-deriving the analysis.
+Pass `--map`, `--bottom` and `--body` through verbatim. They are every choice
+made along the way, and `SKILL.md` is the only place they get written down —
+including in the command it records for re-deriving the analysis.
 
 The package is three files: `SKILL.md`, `reference.docx` and `source.pdf`.
 `SKILL.md` has a `name` and `description` in its frontmatter, so the directory
@@ -171,7 +165,7 @@ python3 scripts/set_header_footer.py reference.docx --header "Company" --footer 
 python3 scripts/set_header_footer.py reference.docx --header 'Title\tv2.3'   # left / right columns
 ```
 
-Re-run step 7 with `--structure-only`, then step 8.
+Re-run step 6 with `--structure-only`, then step 7.
 
 The full reconciliation compares the template against `styles.json`, so it fails
 on any value you deliberately changed. `--structure-only` keeps the dangling
@@ -179,7 +173,7 @@ reference check and drops that comparison.
 
 ## Rules
 
-- Steps 2 to 5 are human decisions; do not let a script stand in for them.
+- Steps 2 to 4 are human decisions; do not let a script stand in for them.
 - Take margins from the `suggested` row, never the `measured` row.
 - The source PDF's header and footer are not carried over. Add them with
   `set_header_footer.py` if the recurring content reported in step 1 matters.
@@ -191,11 +185,10 @@ reference check and drops that comparison.
 
 | Symptom | Action |
 |---|---|
-| Every heading level is off by one | Redo step 2 using the `sample` column |
+| Every heading level is off by one | Redo step 3 using the `sample` column |
 | The right margin reads far too large | No line fills the column; round to a common value by hand |
 | A single-page PDF gives bad margins | Running heads cannot be detected; measure all four by hand |
-| Paragraph metrics look implausible | The wrong body cluster was picked; re-run step 2 with `--body <rank>` |
-| The default body candidate is a table or an index | Expected; that is what step 2 exists to catch |
+| Paragraph metrics look implausible, or the default body candidate is a table or an index | Re-run step 1 with `--body <rank>` |
 | Body text splits into several clusters | Clusters merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |
 | Space after reads NOT MEASURED | Every paragraph is followed by a table, list or heading, so no gap exists to measure; the template keeps pandoc's default |
 | Heading before/after look off | They are derived, not recorded. The report prints the raw baseline gaps beside them; override with `set_style.py --before/--after` and re-verify using `--structure-only` |

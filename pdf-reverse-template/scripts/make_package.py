@@ -11,9 +11,9 @@ pandoc consumes; source.pdf is the content reference. styles.json is not
 shipped because SKILL.md records the exact command that re-derives it, and the
 analysis is reproducible byte for byte.
 
-Pass --map, --bottom and --body through verbatim: they are the human decisions,
-and SKILL.md is the only place they are written down. --name sets the skill
-name and defaults to the output directory's name.
+Pass --map, --bottom and --body through verbatim: they are every choice made
+along the way, and SKILL.md is the only place they are written down. --name
+sets the skill name and defaults to the output directory's name.
 """
 import sys, os, re, json, shutil, zipfile, subprocess, datetime
 
@@ -323,8 +323,8 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None, name=None):
                       f"and the bound was rounded instead)" if mb else "")
                    + ".")
 
-    # The flags that were human decisions, so the analysis can be reproduced
-    # from source.pdf alone. The column count comes back out of styles.json
+    # The flags that were chosen rather than measured, so the analysis can be
+    # reproduced from source.pdf alone. The column count comes out of styles.json
     # rather than from a flag, where it cannot drift from the template.
     ncols = d.get("columns") or 1
     repro = (f" --body {body}" if body else "") + (f" --columns {ncols}" if ncols > 1 else "")
