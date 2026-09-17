@@ -11,6 +11,7 @@ that is what Pandoc matches on. Names are case-insensitive.
 Edits happen in place unless --out is given.
 
 Options:
+  --east-asia-font NAME   East Asian font only; Latin slots are left alone
   --font NAME      font family (written to ascii/hAnsi/eastAsia/cs so CJK text
                    does not fall back to a default serif)
   --size PT        font size
@@ -113,9 +114,20 @@ def describe(style_xml):
     return " ".join(bits) or "(everything inherited)"
 
 
+def _log_recipe(target, argv):
+    """Append this invocation beside the template so make_package can replay
+    it. Inferring the recipe from the result was never complete."""
+    import json, os
+    try:
+        with open(os.path.abspath(target) + ".recipe", "a") as f:
+            f.write(json.dumps({"cmd": [os.path.basename(argv[0])] + argv[1:]}, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+
+
 def main():
     a = sys.argv[1:]
-    if not a:
+    if not a or a[0] in ('-h', '--help'):
         print(__doc__)
         return 2
     path = a[0]
@@ -159,6 +171,14 @@ def main():
         f = opt("--font")
         rpr_new["rFonts"] = (f'<w:rFonts w:ascii="{f}" w:hAnsi="{f}" '
                              f'w:eastAsia="{f}" w:cs="{f}"/>')
+    if opt("--east-asia-font"):
+        f = opt("--east-asia-font")
+        cur = re.search(r"<w:rFonts\b[^>]*/>", smap[target][1])
+        keep = dict(re.findall(r'w:(\w+)="([^"]*)"', cur.group(0))) if cur else {}
+        if opt("--font"):
+            keep = dict(re.findall(r'w:(\w+)="([^"]*)"', rpr_new["rFonts"]))
+        keep["eastAsia"] = f
+        rpr_new["rFonts"] = "<w:rFonts " + " ".join(f'w:{k}="{v}"' for k, v in keep.items()) + "/>"
     if opt("--size"):
         s = PT2HALF(opt("--size"))
         rpr_new["sz"] = f'<w:sz w:val="{s}"/>'
@@ -242,4 +262,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    _rc = main()
+    if not _rc and len(sys.argv) > 1 and sys.argv[1] not in ("-h", "--help") and "--show" not in sys.argv and "--list" not in sys.argv:
+        _out = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else sys.argv[1]
+        _log_recipe(_out, sys.argv)
+    sys.exit(_rc or 0)

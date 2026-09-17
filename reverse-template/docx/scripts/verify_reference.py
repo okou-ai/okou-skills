@@ -10,6 +10,7 @@ the heading quietly renders as Normal, which is easy to miss by eye.
 Exit code 0 means it passed; 1 means dangling style references, a lost
 header/footer, or a missing paper size.
 """
+import shutil
 import sys, os, re, zipfile, subprocess, tempfile
 
 PROBE = """---
@@ -95,6 +96,10 @@ def main(ref, keep=None):
     out = keep or os.path.join(tmp, "probe.docx")
     open(md, "w").write(PROBE)
 
+    if not shutil.which("pandoc"):
+
+        sys.exit("pandoc is not on PATH. Run: python3 ensure_pandoc.py")
+
     r = subprocess.run(["pandoc", md, f"--reference-doc={ref}", "-o", out],
                        capture_output=True, text=True)
     if r.returncode != 0:
@@ -158,7 +163,7 @@ def main(ref, keep=None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) not in (2, 3):
+    if len(sys.argv) not in (2, 3) or sys.argv[1] in ("-h", "--help"):
         print(__doc__)
         sys.exit(2)
     sys.exit(main(sys.argv[1], sys.argv[2] if len(sys.argv) == 3 else None))

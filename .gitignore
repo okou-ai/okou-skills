@@ -2,3 +2,6 @@ artifact/
 .env
 .env.local
 tmp/
+
+__pycache__/
+*.py[cod]

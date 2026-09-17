@@ -1,28 +1,29 @@
 ---
 name: docx-reverse-template
-description: "Reverse-engineer an existing Word document into a loadable template skill: SKILL.md, reference.docx and the source document. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc."
+description: "Reverse-engineer a Word document into a loadable template skill: SKILL.md, reference.docx and the source document. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc."
 ---
 
 # Reverse a docx into a template package
 
-Takes one `.docx` and produces a template package directory ready to hand over.
+Input: one `.docx`. Output for an article: a directory holding `SKILL.md`,
+`reference.docx` and `source.docx`. Output for a fixed structure: `SKILL.md`
+and the source alone.
 
 Run every command below from `reverse-template/docx/`.
 
-## Before anything — an article, or a form?
+## Before anything — an article, or a fixed structure?
 
 Look at the rendered pages.
 
 An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a manual, a policy. A **form** is one
-object with a fixed set of entries, and a new one fills the same entries — a
-resume, an invoice, a certificate.
+length on another subject — a report, a manual, a policy. A **fixed structure**
+is the whole document as one arrangement of blocks, and a new one keeps that
+arrangement and changes the content — a resume, an invoice, a certificate.
 
-Stay here only for an article whose body runs as one stream; one column, or
-columns of equal width, is one stream. Judge on what the document is, not on
-how it looks — a plain single-column resume is still a form.
+Judge on what the document is, not on how it looks — a plain single-column
+resume is still a fixed structure. An article continues at Prerequisites below.
 
-### Otherwise: publish the source itself
+### A fixed structure: publish the source itself
 
 A style sheet drops those silently. Publish the file and stop here.
 
@@ -57,90 +58,61 @@ Say the template exists only after the command succeeds.
 ## Prerequisites
 
 ```bash
-python3 scripts/ensure_pandoc.py --dir ./vendor
+python3 scripts/ensure_pandoc.py --dir ./vendor   # then run the export PATH line it prints
 ```
-
-Requires pandoc 3.x. The script checks for it or installs it; run the
-`export PATH` line it prints.
 
 ## Steps
 
-### 1. Inspect the source
+### 1. Inspect
 
 ```bash
 python3 scripts/inspect_docx.py <source.docx>
 ```
 
-Note from the report: which required styles are missing, the paper size, margins
-and column count, and — if a `REVIEW` block appears — the literal header and
-footer text.
+Note the missing required styles, the paper size, and every `REVIEW` line.
+`[styles in use]` decides the route:
 
-Literal header and footer text is copied verbatim into every document made
-from the template, so replace the source's own numbers, versions, owners and
-dates in step 3. `[fields: ...]` are computed by Word and need no action.
+- the document uses its own style names: run step 2 with the `--map` it
+  prints, after checking which pandoc style each name plays the part of;
+- the document is formatted by hand (`Normal` with direct formatting): its
+  styles carry nothing. Render it as the inspector says and follow
+  `../pdf/SKILL.md` on the render instead of continuing here.
+Ignore the exit code.
 
-Ignore the exit code and continue.
-
-### 2. Build the template
+### 2. Build
 
 ```bash
-python3 scripts/build_reference.py <source.docx> reference.docx
+python3 scripts/build_reference.py <source.docx> reference.docx \
+        [--map 'Memo Title=Title,Section Head=Heading1,Body Copy=BodyText']
 ```
 
-Missing styles are filled in automatically. Only the ones listed as "using
-pandoc's default spacing" may need step 3; otherwise go to step 4.
+Missing styles are filled in. If it prints `ACTION REQUIRED`, set the paper
+size in step 3.
 
-### 3. Set the paper size, and adjust styles
+### 3. Adjust
 
-Set the paper size whenever step 2 printed `ACTION REQUIRED`. Everything else in
-this step is optional.
+Required when step 1 or 2 asked for it; otherwise optional.
 
 ```bash
-# Paper size, and the header/footer values step 1 flagged. The left side of
-# each --replace is text the source's own header literally says; the right
-# side is what every document built from the template should say instead.
+# paper size, and the header values step 1 flagged (left = literal text in the source)
 python3 scripts/set_header_footer.py reference.docx --paper A4 \
         --replace "DOC-2026-001=[DOC ID]" --replace "Jane Doe=[OWNER]"
 
-# Change the column layout. Not needed to keep the one the source already has.
-python3 scripts/set_header_footer.py reference.docx --columns 2 --column-gap 20
-python3 scripts/set_header_footer.py reference.docx --columns 1
-
-# Read the current style values back out
+# style values
 python3 scripts/set_style.py reference.docx --list
+python3 scripts/set_style.py reference.docx "Block Text" --font Georgia --size 10.5 --color 6C757D
+python3 scripts/set_style.py reference.docx "Source Code" --create --font Consolas --size 9
 
-python3 scripts/set_style.py reference.docx "Block Text" \
-        --font "Georgia" --size 10.5 --color 6C757D --before 6 --after 6
+# only to change the layout; a multi-column source is already multi-column
+python3 scripts/set_header_footer.py reference.docx --columns 2 --column-gap 20
 
-python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
+# only for a plain-text header/footer, or to add one; rebuilds the part
+python3 scripts/set_header_footer.py reference.docx --footer "Confidential - page " --page-number
 ```
 
-`--replace` edits the text in place, so tab columns, border rules, a
-first-page variant and any table in the footer survive. It exits non-zero when
-a value is not found, and composes with the other flags in one invocation.
-
-`--columns` **changes** the layout and is not needed to preserve one: a
-multi-column source is already multi-column in the template. Changing the count
-on an unequal-width layout drops the per-column widths, which the output says.
-
-`--header` / `--footer` rebuild the part and flatten all of that. Use them only
-on a plain-text header or footer, or to add one that does not exist:
-
-```bash
-python3 scripts/set_header_footer.py reference.docx \
-        --footer "Confidential - page " --page-number
-```
-
-Only the kind being set is touched, so a logo in the header survives a footer
-change.
-
-Pass the `w:name` of the style (`heading 2`, `Body Text`), case-insensitive.
-Add `--create` for a style the template does not define.
-
-Options: `--font --size --color --bold/--no-bold --italic/--no-italic --before
---after --line --indent --left-indent --align --keep-next`
-
-Return to step 4 afterwards.
+Style names are the `w:name`, case-insensitive. `set_style.py` options:
+`--font --east-asia-font --size --color --bold/--no-bold --italic/--no-italic
+--before --after --line --indent --left-indent --align --keep-next`.
 
 ### 4. Verify
 
@@ -148,45 +120,36 @@ Return to step 4 afterwards.
 python3 scripts/verify_reference.py reference.docx
 ```
 
-The exit code must be 0. Two things fail it:
+Exit code must be 0. Dangling style → step 2. No paper size → step 3 with
+`--paper`.
 
-- **dangling style names** — go back to step 2
-- **no paper size** — the source document never set one, so output would follow
-  the reader's locale default (A4 in most of the world, Letter in the US) and
-  the page count would differ per machine. Fix it in step 3 with
-  `set_header_footer.py reference.docx --paper A4`
-
-**Do not skip this step**: a missing style raises no error, Word simply renders
-the text as Normal.
-
-### 5. Package and deliver
+### 5. Package
 
 ```bash
-python3 scripts/make_package.py <source.docx> reference.docx <output dir>
+python3 scripts/make_package.py <source.docx> reference.docx <out dir>
 ```
 
-Append anything you hit that the scripts could not read to "Known limits" in
-the package's `SKILL.md`.
-
-Hand over the whole directory.
+The output directory name is the skill name; `--name` overrides it. Add
+anything the scripts could not read to the package's `Limits`. Hand over the
+whole directory.
 
 ## Rules
 
-- Reproduce the source, do not correct it. An inverted heading hierarchy or
-  a style left at Word's default is the source's own value; the package
-  records it as deliberate.
-- Do not edit `w:styleId`. Pandoc matches on `w:name`, so the numeric styleIds
-  produced by localised Word builds work as they are.
-- Do not invent style names outside Pandoc's set; they are never referenced.
-  Modify the existing ones.
+- Reproduce the source. Do not correct an inverted hierarchy or a style left
+  at a default; the package records it.
+- Replace the source's own title, document number, version, owner and date in
+  the header and footer with `--replace`; they are copied into every output.
+- Change the column layout only when asked.
+- Do not edit `w:styleId`. Do not add style names outside pandoc's set.
 - Step 4 is mandatory.
 
 ## Troubleshooting
 
 | Symptom | Action |
 |---|---|
-| Headings render like body text | Run step 4; it names the dangling styles |
-| CJK text falls back to a serif font | Use `set_style.py --font`, which also writes `w:eastAsia` |
-| Code block appearance will not change | `set_style.py reference.docx "Source Code" --create` |
-| Output carries the source document's number or owner | Literal header/footer text; replace it with `set_header_footer.py` |
-| A docx saved by WPS fails to parse | Ask a person to re-save it from Word, then restart at step 1 |
+| Headings render like body text | Step 4 names the missing style |
+| CJK text falls back to a serif font | The source names no East Asian font. `set_style.py Normal --east-asia-font NAME` fills that slot and leaves the Latin font alone |
+| Code blocks will not restyle | `set_style.py reference.docx "Source Code" --create` |
+| Output carries the source's number or owner | `set_header_footer.py --replace` |
+| Header text sits outside the text area | Step 1 reports the tab stop; rebuild the header with `--header 'left\tright'`, which places it from the margins |
+| A docx saved by WPS fails to parse | Re-save it from Word, restart at step 1 |

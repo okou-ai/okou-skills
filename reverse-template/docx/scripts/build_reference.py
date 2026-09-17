@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Turn any .docx into a usable Pandoc --reference-doc template.
 
-Usage:  python3 build_reference.py source.docx reference.docx
+Usage:  python3 build_reference.py source.docx reference.docx [--map 'Memo Title=Title,Section Head=Heading1,Body Copy=BodyText']
 
 Three things happen:
   1. The source stylesheet, theme, header/footer, numbering and page setup are
@@ -144,23 +144,41 @@ def _spacing_of(styles_xml, sid):
     return (g("before"), g("after"), str(round(int(ind.group(1)) / 20, 1)) if ind else "-")
 
 
-def build(src_path, out_path):
+def _log_recipe(target, argv):
+    """Append this invocation beside the template so make_package can replay
+    it. Inferring the recipe from the result was never complete."""
+    import json, os
+    try:
+        with open(os.path.abspath(target) + ".recipe", "a") as f:
+            f.write(json.dumps({"cmd": [os.path.basename(argv[0])] + argv[1:]}, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+
+
+def build(src_path, out_path, mapping=None):
     with zipfile.ZipFile(src_path) as src:
         members = [(i.filename, src.read(i.filename)) for i in src.infolist()]
         names = [f for f, _ in members]
     blob = dict(members)
     styles = blob["word/styles.xml"].decode("utf-8", "replace")
     doc = blob["word/document.xml"].decode("utf-8", "replace")
+    src_doc = doc          # the document as written, before the body becomes a sampler
 
     have = style_map(styles)
-    missing = [n for n in PS.MUST_EXIST + PS.AUTO_INJECTED if n.lower() not in have]
+    # Every style pandoc's own reference.docx defines is one pandoc may emit;
+    # the source must end up with all of them. Read the list from pandoc
+    # itself rather than from a table here, which is how Abstract Title went
+    # missing for a whole pandoc release.
+    dref, tmp = default_reference()
+    with zipfile.ZipFile(dref) as dz:
+        dmap = style_map(dz.read("word/styles.xml").decode("utf-8", "replace"))
+    shutil.rmtree(tmp, ignore_errors=True)
+    dnames = {k: (re.search(r'<w:name w:val="([^"]+)"', v[1]) or [None, k])[1] for k, v in dmap.items()}
+    known = [n for n in PS.MUST_EXIST + PS.AUTO_INJECTED if n.lower() not in have]
+    missing = known + [dnames[k] for k in dmap if k not in have and dnames[k] not in known]
 
     injected, unavailable, derived = [], [], []
     if missing:
-        dref, tmp = default_reference()
-        with zipfile.ZipFile(dref) as dz:
-            dmap = style_map(dz.read("word/styles.xml").decode("utf-8", "replace"))
-        shutil.rmtree(tmp, ignore_errors=True)
         rf = normal_rfonts(styles, have)
         used_ids = {v[0] for v in have.values()}
         blocks = []
@@ -184,6 +202,11 @@ def build(src_path, out_path):
                 derived.append((n, dsize, basis))
             elif rf:
                 xml = re.sub(r"<w:rFonts\b[^>]*/>", rf, xml)
+            if n.lower() in ("body text", "first paragraph", "compact"):
+                # Body paragraphs must look like the source's Normal: pandoc's
+                # own spacing and indent on these would replace it.
+                xml = re.sub(r"<w:spacing\b[^>]*/>|<w:ind\b[^>]*/>", "", xml)
+                xml = re.sub(r"<w:pPr>\s*</w:pPr>", "", xml)
             blocks.append(xml)
             used_ids.add(sid)
             have[n.lower()] = (sid, xml)
@@ -193,9 +216,127 @@ def build(src_path, out_path):
     # body -> style sampler; sectPr kept as is (header/footer refs, paper, margins)
     sect = re.search(r"<w:sectPr\b.*?</w:sectPr>|<w:sectPr\b[^>]*/>", doc, re.S)
     sect_xml = sect.group(0) if sect else "<w:sectPr/>"
+    # Make the closing section continuous. A single-section source never says,
+    # and the default (nextPage) makes any section break inserted later start
+    # a new page. CT_SectPr order: header/footer refs, footnotePr, endnotePr,
+    # then type, then pgSz.
+    if "<w:type " not in sect_xml and not sect_xml.endswith("/>"):
+        m_ = re.search(r"<w:(?:pgSz|pgMar|paperSrc|pgBorders|lnNumType|pgNumType|cols)\b", sect_xml)
+        at = m_.start() if m_ else sect_xml.index("</w:sectPr>")
+        sect_xml = sect_xml[:at] + '<w:type w:val="continuous"/>' + sect_xml[at:]
+    elif sect_xml.endswith("/>"):
+        sect_xml = '<w:sectPr><w:type w:val="continuous"/></w:sectPr>'
     doc = re.sub(r"(<w:body>).*?(</w:body>)",
                  lambda m: m.group(1) + sample_body(have, sect_xml, PS.PARAGRAPH) + m.group(2),
                  doc, flags=re.S)
+
+
+
+    # --- body paragraphs look like the paragraphs the document is set in ---
+    # pandoc writes ordinary paragraphs as Body Text / First Paragraph /
+    # Compact. In most documents those styles exist but are never used: the
+    # text is Normal, and Word's built-in Body Text carries a 6pt space-after
+    # of its own. Rebase them on the style the document actually uses and
+    # clear their own paragraph and run overrides.
+    import collections as _c
+    _use = _c.Counter()
+    for _para in re.findall(r"<w:p\b.*?</w:p>", src_doc, re.S):
+        if re.search(r"<w:t\b[^>]*>[^<]*\S", _para):
+            _ps = re.search(r'<w:pStyle w:val="([^"]+)"', _para)
+            _use[_ps.group(1) if _ps else "Normal"] += 1
+    _body_sid = _use.most_common(1)[0][0] if _use else "Normal"
+    _body_targets = ("body text", "first paragraph", "compact")
+    _body_ids = {have[n][0] for n in _body_targets if n in have}
+    if (mapping or {}).get("__body__"):
+        _body_sid = have[mapping["__body__"].lower()][0]
+    if _body_sid not in _body_ids:
+        for n in _body_targets:
+            if n not in have:
+                continue
+            sid, xml = have[n]
+            new = re.sub(r"<w:rPr>.*?</w:rPr>|<w:rPr/>", "", xml, flags=re.S)
+            new = re.sub(r"<w:spacing\b[^>]*/>|<w:ind\b[^>]*/>|<w:jc\b[^>]*/>|<w:contextualSpacing\b[^>]*/>", "", new)
+            new = re.sub(r"<w:pPr>\s*</w:pPr>", "", new)
+            new = (re.sub(r'<w:basedOn w:val="[^"]+"/>', f'<w:basedOn w:val="{_body_sid}"/>', new, count=1)
+                   if "<w:basedOn" in new else
+                   re.sub(r'(<w:name w:val="[^"]+"/>)', lambda m: m.group(1) + f'<w:basedOn w:val="{_body_sid}"/>', new, count=1))
+            if xml in styles:
+                styles = styles.replace(xml, new, 1)
+            else:
+                styles = re.sub(rf'<w:style\b[^>]*w:styleId="{re.escape(sid)}".*?</w:style>', lambda m: new, styles, count=1, flags=re.S)
+            have[n] = (sid, new)
+        print(f"  body paragraphs: Body Text, First Paragraph and Compact now follow {_body_sid!r},"
+              f" the style {_use[_body_sid]} of {sum(_use.values())} paragraphs use")
+
+
+    # --- tables look like the document's tables ---
+    # pandoc writes every table with style "Table" (its own: one rule under
+    # the header row). The document's tables use a table style of their own
+    # or direct borders; either becomes "Table".
+    import collections as _c2
+    _tstyles = _c2.Counter(re.findall(r'<w:tblStyle w:val="([^"]+)"', src_doc))
+    _tbl_hit = have.get("table")
+    if _tbl_hit:
+        _tsid, _txml = _tbl_hit
+        _src_tbl = None
+        if _tstyles:
+            _tid = _tstyles.most_common(1)[0][0]
+            _m = re.search(rf'<w:style\b[^>]*w:type="table"[^>]*w:styleId="{re.escape(_tid)}".*?</w:style>', styles, re.S)
+            _src_tbl = _m.group(0) if _m else None
+        if _src_tbl:
+            # everything after the naming elements: pPr, rPr, tblPr, trPr, tcPr, tblStylePr*
+            _props = "".join(m.group(0) for m in re.finditer(
+                r"<w:pPr>.*?</w:pPr>|<w:rPr>.*?</w:rPr>|<w:tblPr>.*?</w:tblPr>|<w:trPr>.*?</w:trPr>|<w:tcPr>.*?</w:tcPr>|<w:tblStylePr\b.*?</w:tblStylePr>",
+                _src_tbl, re.S))
+            _new = re.sub(r"<w:pPr>.*?</w:pPr>|<w:rPr>.*?</w:rPr>|<w:tblPr>.*?</w:tblPr>|<w:trPr>.*?</w:trPr>|<w:tcPr>.*?</w:tcPr>|<w:tblStylePr\b.*?</w:tblStylePr>",
+                          "", _txml, flags=re.S)
+            _new = _new.replace("</w:style>", _props + "</w:style>")
+            _how = f"table style {_tid!r} ({_tstyles[_tid]} tables)"
+        else:
+            _tp = re.search(r"<w:tblPr>.*?</w:tblPr>", src_doc, re.S)
+            _borders = re.search(r"<w:tblBorders>.*?</w:tblBorders>", _tp.group(0), re.S) if _tp else None
+            _new = None
+            if _borders:
+                _new = re.sub(r"<w:tblPr>.*?</w:tblPr>", lambda m: re.sub(r"(<w:tblPr>)", r"\1" + _borders.group(0), m.group(0), count=1)
+                              if "<w:tblBorders>" not in m.group(0) else m.group(0), _txml, flags=re.S)
+                _how = "the first table's own borders"
+        if _src_tbl or (_borders if not _src_tbl else False):
+            styles = styles.replace(_txml, _new, 1) if _txml in styles else re.sub(
+                rf'<w:style\b[^>]*w:styleId="{re.escape(_tsid)}".*?</w:style>', lambda m: _new, styles, count=1, flags=re.S)
+            have["table"] = (_tsid, _new)
+            print(f"  tables: 'Table' takes {_how}")
+
+    # --- custom style names onto the ones pandoc writes to ---
+    # A document set in "Memo Title" and "Section Head" never touches Title
+    # and heading 1; the mapped style's own look is copied into the target.
+    TARGET = {"title": "title", "subtitle": "subtitle", "bodytext": "body text",
+              "heading1": "heading 1", "heading2": "heading 2", "heading3": "heading 3",
+              "heading4": "heading 4", "heading5": "heading 5", "heading6": "heading 6"}
+    NAMING = r"(?:name|aliases|basedOn|next|link|autoRedefine|hidden|uiPriority|semiHidden|unhideWhenUsed|qFormat|locked|personal\w*|rsid)"
+    for src_name, target in (mapping or {}).items():
+        tkey = TARGET.get(target.lower().replace(" ", ""), target.lower())
+        src_hit, tgt_hit = have.get(src_name.lower()), have.get(tkey)
+        if not src_hit or not tgt_hit:
+            print(f"  --map: {src_name!r} -> {target}: "
+                  f"{'source style not found' if not src_hit else 'target not found'}")
+            continue
+        sxml, (tsid, txml) = src_hit[1], tgt_hit
+        new = re.sub(r"<w:pPr>.*?</w:pPr>|<w:pPr/>|<w:rPr>.*?</w:rPr>|<w:rPr/>", "", txml, flags=re.S)
+        props = "".join(m.group(0) for m in re.finditer(r"<w:pPr>.*?</w:pPr>|<w:rPr>.*?</w:rPr>", sxml, re.S))
+        last = None
+        for m in re.finditer(rf"<w:{NAMING}\b[^>]*/>", new):
+            last = m
+        new = (new[:last.end()] + props + new[last.end():]) if last else new.replace("</w:style>", props + "</w:style>")
+        sb = re.search(r'<w:basedOn w:val="[^"]+"/>', sxml)
+        if sb:
+            new = (re.sub(r'<w:basedOn w:val="[^"]+"/>', sb.group(0), new, count=1) if "<w:basedOn" in new
+                   else re.sub(r'(<w:name w:val="[^"]+"/>)', lambda m: m.group(1) + sb.group(0), new, count=1))
+        if txml in styles:
+            styles = styles.replace(txml, new, 1)
+        else:
+            styles = re.sub(rf'<w:style\b[^>]*w:styleId="{re.escape(tsid)}".*?</w:style>', lambda m: new, styles, count=1, flags=re.S)
+        have[tkey] = (tsid, new)
+        print(f"  mapped {src_name!r} -> {target}")
 
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as out:
         for fn, data in members:
@@ -250,7 +391,14 @@ def build(src_path, out_path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    a = sys.argv[1:]
+    mp = None
+    if "--map" in a:
+        i = a.index("--map")
+        mp = dict(kv.split("=", 1) for kv in a[i + 1].split(",") if "=" in kv)
+        a = a[:i] + a[i + 2:]
+    if len(a) != 2 or a[0] in ("-h", "--help"):
         print(__doc__)
         sys.exit(2)
-    build(sys.argv[1], sys.argv[2])
+    build(a[0], a[1], mp)
+    _log_recipe(a[1], sys.argv)

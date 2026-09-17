@@ -23,6 +23,7 @@ common values can land on the wrong side of it. Pass the value you measured.
 
 Requires pandoc on PATH.
 """
+import os
 import sys, os, re, json, zipfile, shutil, subprocess, tempfile
 
 CM2TWIP = lambda cm: int(round(cm / 2.54 * 1440))   # cm -> twips
@@ -124,8 +125,63 @@ def patch_style(xml, style_id, body_rpr, ppr_extra=""):
         if old:
             inner = inner[:old.start()] + f"<w:pPr>{merged}</w:pPr>" + inner[old.end():]
         else:
-            inner = f"<w:pPr>{merged}</w:pPr>" + inner
+            # CT_Style is an ordered sequence and w:pPr comes after the
+            # naming and linking elements. Prepending put it before w:name on
+            # every style that had no pPr yet - Normal and FirstParagraph
+            # always - which is invalid even though pandoc still wrote it.
+            head_tags = ("name", "aliases", "basedOn", "next", "link",
+                         "autoRedefine", "hidden", "uiPriority", "semiHidden",
+                         "unhideWhenUsed", "qFormat", "locked", "personal",
+                         "personalCompose", "personalReply", "rsid")
+            cut = 0
+            for m2 in re.finditer(r"<w:([a-zA-Z]+)\b[^>]*?/>|<w:([a-zA-Z]+)\b[^>]*?>.*?</w:\2>",
+                                  inner, re.S):
+                if (m2.group(1) or m2.group(2)) in head_tags:
+                    cut = m2.end()
+                else:
+                    break
+            inner = inner[:cut] + f"<w:pPr>{merged}</w:pPr>" + inner[cut:]
     return xml[:m.start()] + head + inner + tail + xml[m.end():], True
+
+
+def _log_recipe(target, argv):
+    """Append this invocation beside the template so make_package can replay
+    it. Inferring the recipe from the result was never complete."""
+    import json, os
+    try:
+        with open(os.path.abspath(target) + ".recipe", "a") as f:
+            f.write(json.dumps({"cmd": [os.path.basename(argv[0])] + argv[1:]}, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+
+
+def table_style_xml(t):
+    """pandoc's 'Table' style rebuilt from the measured table."""
+    def border(tag, rule):
+        if not rule:
+            return f'<w:{tag} w:val="nil"/>'
+        color, w = rule
+        return f'<w:{tag} w:val="single" w:sz="{max(2, int(round(w * 8)))}" w:space="0" w:color="{color}"/>'
+    borders = "<w:tblBorders>" + "".join(border(k, t.get(k)) for k in ("top", "left", "bottom", "right", "insideH", "insideV")) + "</w:tblBorders>"
+    tblpr = ('<w:tblPr><w:tblInd w:w="0" w:type="dxa"/>' + borders +
+             '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/>'
+             '<w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr>')
+    first = ""
+    if t.get("header_bold") or t.get("header_fill") or t.get("header_bottom"):
+        rpr = "<w:rPr><w:b/><w:bCs/></w:rPr>" if t.get("header_bold") else ""
+        tcpr = ""
+        if t.get("header_bottom"):
+            tcpr += "<w:tcBorders>" + border("bottom", t["header_bottom"]) + "</w:tcBorders>"
+        if t.get("header_fill"):
+            tcpr += f'<w:shd w:val="clear" w:color="auto" w:fill="{t["header_fill"]}"/>'
+        first = f'<w:tblStylePr w:type="firstRow">{rpr}' + (f"<w:tcPr>{tcpr}</w:tcPr>" if tcpr else "") + "</w:tblStylePr>"
+    band = ""
+    if t.get("band_fill"):
+        band = (f'<w:tblStylePr w:type="band1Horz"><w:tcPr><w:shd w:val="clear" w:color="auto" '
+                f'w:fill="{t["band_fill"]}"/></w:tcPr></w:tblStylePr>')
+    body_fill = (f'<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="{t["body_fill"]}"/></w:tcPr>'
+                 if t.get("body_fill") else "")
+    return tblpr + body_fill + first + band
 
 
 def build(json_path, out_path, mapping, overrides):
@@ -212,6 +268,14 @@ def build(json_path, out_path, mapping, overrides):
         if m:
             written[int(m.group(1))] = h
     derived = []
+    if not written:
+        # No heading level mapped at all (a one-level source): ladder down
+        # from the title, or from the body in bold when there is no title.
+        title = next((h for h in d["headings"] if mapping.get(str(h["level"])) == "Title"), None)
+        seed = dict(title) if title else dict(d["body"], color=d["body"]["color"])
+        seed["size"] = max(round(seed["size"] * 0.7 * 2) / 2, d["body"]["size"] + 2) if title else d["body"]["size"] + 4
+        seed["font"] = re.sub(r"-(Regular|Book)$", "-Bold", seed["font"]) if not title else seed["font"]
+        written = {0: seed}
     if written:
         deepest = max(written)
         ref_h = written[deepest]
@@ -219,12 +283,28 @@ def build(json_path, out_path, mapping, overrides):
         for lvl in range(deepest + 1, 10):
             size = max(round(ref_h["size"] * (0.92 ** (lvl - deepest)) * 2) / 2,
                        d["body"]["size"])
+            if deepest == 0:
+                bold = True
             styles, ok = patch_style(styles, f"Heading{lvl}",
                                      rpr(ref_h["font"], size, ref_h["color"], bold), "")
             if ok:
                 derived.append((f"Heading{lvl}", size))
                 applied.append((f"Heading{lvl}", clean_font(ref_h["font"]), size,
                                 ref_h["color"], "derived"))
+
+    # --- tables: pandoc's 'Table' takes the measured rules and shading ---
+    if d.get("table"):
+        m = re.search(r'(<w:style\b[^>]*w:styleId="Table"[^>]*>)(.*?)(</w:style>)', styles, re.S)
+        if m:
+            inner = re.sub(r"<w:tblPr>.*?</w:tblPr>|<w:tcPr>.*?</w:tcPr>|<w:tblStylePr\b.*?</w:tblStylePr>", "", m.group(2), flags=re.S)
+            styles = styles[:m.start()] + m.group(1) + inner + table_style_xml(d["table"]) + m.group(3) + styles[m.end():]
+            t = d["table"]
+            applied.append(("Table", "-", "-", "-", f"rules {t.get('top') and t['top'][0]} / header fill {t.get('header_fill') or '-'}"))
+
+    # --- no theme fonts anywhere: the PDF names concrete faces ---
+    bf = clean_font(d["body"]["font"])
+    styles = re.sub(r"<w:rFonts\b[^>]*Theme[^>]*/>",
+                    f'<w:rFonts w:ascii="{bf}" w:hAnsi="{bf}" w:eastAsia="{bf}" w:cs="{bf}"/>', styles)
 
     # --- page ---
     p, mg = d["page"], d["margins_suggested_cm"]
@@ -253,7 +333,18 @@ def build(json_path, out_path, mapping, overrides):
             gap_note = (f"  gutter {gap_pt}pt, column width "
                         f"{d.get('column_width_pt')}pt (both measured)")
         cols_xml = f'<w:cols w:num="{cols}" w:space="{PT2TWIP(gap_pt)}" w:equalWidth="1"/>'
-    sect = (f'<w:sectPr><w:pgSz w:w="{CM2TWIP(p["w_cm"])}" w:h="{CM2TWIP(p["h_cm"])}"/>'
+        if d.get("columns_unequal") and d.get("column_edges_pt"):
+            # Reproduce the measured widths; Word wants each column's width
+            # and the gap that follows it.
+            ed = d["column_edges_pt"]
+            cols_xml = f'<w:cols w:num="{cols}" w:space="{PT2TWIP(gap_pt)}" w:equalWidth="0">' + "".join(
+                f'<w:col w:w="{PT2TWIP(r - l)}"' + (f' w:space="{PT2TWIP(ed[i + 1][0] - r)}"' if i + 1 < len(ed) else "") + "/>"
+                for i, (l, r) in enumerate(ed)) + "</w:cols>"
+            gap_note += f"; unequal columns {', '.join(f'{r - l:.0f}pt' for l, r in ed)}"
+    # continuous, so a section break inserted before a full-width heading does
+    # not push the closing section onto a new page (the default is nextPage)
+    sect = (f'<w:sectPr><w:type w:val="continuous"/>'
+            f'<w:pgSz w:w="{CM2TWIP(p["w_cm"])}" w:h="{CM2TWIP(p["h_cm"])}"/>'
             f'<w:pgMar w:top="{CM2TWIP(mg["top"])}" w:right="{CM2TWIP(mg["right"])}" '
             f'w:bottom="{CM2TWIP(bottom)}" w:left="{CM2TWIP(mg["left"])}" '
             f'w:header="{hdr}" w:footer="{ftr}" w:gutter="0"/>{cols_xml}</w:sectPr>')
@@ -289,7 +380,8 @@ def build(json_path, out_path, mapping, overrides):
         print("  If the PDF has a separate document title it takes Heading1 and shifts")
         print("  every level by one. Check the sample text in the analysis report, then")
         print("  re-run with --map 1=Title,2=Heading1,...")
-    print("\nNext: python3 verify_roundtrip.py " + out_path + " " + json_path)
+    mp = (" --map " + ",".join(f"{k}={v}" for k, v in mapping.items())) if mapping else ""
+    print("\nNext: python3 verify_roundtrip.py " + out_path + " " + json_path + mp)
 
 
 if __name__ == "__main__":
@@ -306,3 +398,23 @@ if __name__ == "__main__":
         if f"--{k}" in a:
             overrides[k] = float(a[a.index(f"--{k}") + 1])
     build(a[1], a[2], mapping, overrides)
+    # The running head and foot are part of the look; put them back where the
+    # source had them. Rebuilding replays this, so the recipe needs no line.
+    d = json.load(open(a[1]))
+    if d.get("header") or d.get("footer"):
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import set_header_footer as shf
+        hd = d.get("header")
+        if hd and hd.get("image"):
+            # the picture lives beside styles.json; resolve it from there
+            f = hd["image"]["file"]
+            if not os.path.isabs(f) or not os.path.exists(f):
+                cand = os.path.join(os.path.dirname(os.path.abspath(a[1])), os.path.basename(f))
+                if os.path.exists(cand):
+                    hd["image"]["file"] = cand
+        shf.apply_running_heads(a[2], hd, d.get("footer"),
+                                d.get("header_pt"), d.get("footer_pt"))
+        for k in ("header", "footer"):
+            if d.get(k):
+                print(f"  {k}: {d[k]['text']!r}  {d[k]['size']}pt #{d[k]['color']} {d[k]['align']}")
+    _log_recipe(a[2], a)

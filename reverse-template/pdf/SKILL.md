@@ -1,31 +1,32 @@
 ---
-name: pdf-reverse-template
-description: "Infer the typographic styles of a PDF and reverse-engineer it into a loadable template skill: SKILL.md, reference.docx and the source PDF. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout."
+name: reverse-template/pdf
+description: "Reverse-engineer a PDF into a loadable template skill: SKILL.md, reference.docx and the source PDF. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout."
 ---
 
 # Reverse a PDF into a template package
 
-Takes one `.pdf` and produces a template package directory ready to hand over.
+Input: one `.pdf`. Output for an article: a directory holding `SKILL.md`,
+`reference.docx` and `source.pdf`. Output for a fixed structure: `SKILL.md`
+and the source alone.
 
 **If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
 pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `reverse-template/pdf/`.
 
-## Before anything — an article, or a form?
+## Before anything — an article, or a fixed structure?
 
 Look at the rendered pages.
 
 An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a manual, a policy. A **form** is one
-object with a fixed set of entries, and a new one fills the same entries — a
-resume, an invoice, a certificate.
+length on another subject — a report, a manual, a policy. A **fixed structure**
+is the whole document as one arrangement of blocks, and a new one keeps that
+arrangement and changes the content — a resume, an invoice, a certificate.
 
-Stay here only for an article whose body runs as one stream; one column, or
-columns of equal width, is one stream. Judge on what the document is, not on
-how it looks — a plain single-column resume is still a form.
+Judge on what the document is, not on how it looks — a plain single-column
+resume is still a fixed structure. An article continues at Prerequisites below.
 
-### Otherwise: publish the source itself
+### A fixed structure: publish the source itself
 
 A style sheet drops those silently. Publish the file and stop here.
 
@@ -61,11 +62,8 @@ Say the template exists only after the command succeeds.
 
 ```bash
 pip install pymupdf
-python3 scripts/ensure_pandoc.py --dir ./vendor
+python3 scripts/ensure_pandoc.py --dir ./vendor   # then run the export PATH line it prints
 ```
-
-Requires pandoc 3.x. The script checks for it or installs it; run the
-`export PATH` line it prints.
 
 ## Steps
 
@@ -75,83 +73,55 @@ Requires pandoc 3.x. The script checks for it or installs it; run the
 python3 scripts/analyze_pdf.py <source.pdf> --json styles.json
 ```
 
-Read the report before going on.
+Read the report:
 
-`[structure tree]` says whether this is a tagged PDF. If `/StructTreeRoot` is
-present, take the heading levels in step 3 from the structure tree rather than
-from font size. "No text layer" means a scan; OCR it first and come back.
-
-`[body candidates]` marks the group it took as body text — the largest by
-character count. Check that sample is running prose; if it is not, re-run with
-`--body <rank>` on the one that is. Rank 1 below is a table column header:
-
-```
-rank   size   colour  chars  lines  pages  sample
-1       9.4  #242121    789     65      6  Metric                       <- default
-2      10.5  #242121    737     33      5  This report covers the first  <- the real body
-```
+- `[structure tree]` present → take the heading levels in step 3 from it.
+- "No text layer" → OCR the PDF first, then restart.
+- `[body candidates]` → the chosen group must be running prose. If its sample
+  is a table header, an index or a caption, re-run with `--body <rank>`.
 
 ### 2. Declare the column count
-
-Read `[columns]`. The report lists the x positions lines start at, but those
-bands appear for a table exactly as they do for columns, so the count settles
-nothing on its own.
-
-Render a page and look at it:
 
 ```bash
 okou presentation screenshot --input <source.pdf> --out shots
 ```
 
-Then pass `--columns N`.
+Look at a page. Re-run step 1 with `--columns N`.
 
-### 3. Assign heading levels
+### 3. Map the heading levels
 
-Read the `sample` column under `[inferred styles]` and decide what each group
-actually is:
-
-```
-role  size    colour    sample
-H1   20.0  #1B4F72  Chapter 1        ->  Heading1
-H2   16.5  #000000  Technical Guide  ->  Title      <- the document title, not an H2
-H3   15.0  #2E86C1  1.1 Overview     ->  Heading2
-```
-
-Write it as an argument; the right side takes `Title`, `Subtitle`,
-`Heading1`..`Heading9`, or `skip`:
+Under `[inferred styles]`, decide each group's role from its sample text and
+write the map:
 
 ```
 --map 1=Heading1,2=Title,3=Heading2
 ```
 
-Skipping this shifts every level by one.
+Right side: `Title`, `Subtitle`, `Heading1`..`Heading9` or `skip`. The
+largest group is usually the document title, not `Heading1`.
 
-### 4. Set the bottom margin
+### 4. Settle the margins
 
-Read `[margins]` and take the whole `suggested` row, not the `measured` row.
+Use the `suggested` row. Where `measured` disagrees with it by more than
+rounding, measure the page yourself and pass `--top`, `--right` or `--left`
+in cm. The bottom margin is never measured. Pass `--bottom` as:
 
-The bottom margin is only bounded, never measured. The report resolves it one of
-two ways and says which:
+- the `measured` bound, when some page is full to the bottom;
+- for a Typst source with a footer, `(page height − footer baseline − 0.73 ×
+  footer size) / 0.7`, in cm;
+- otherwise the mirror of the top, which `suggested` already holds.
 
-- the top margin fits under the bound, so the layout is consistent with being
-  symmetric and the top value is suggested
-- the top margin **exceeds** the bound, so the layout is not symmetric and the
-  rounded bound is suggested instead
+On a two-column document the two columns must come out the same width.
 
-`--bottom <cm>` overrides it; the suggestion is used by default.
-
-The suggested row rounds to a table of common values, so check it against
-`measured`. Where they disagree by more than rounding, measure it yourself and
-pass `--top`, `--left` or `--right`. On a two-column document the two columns
-must come out the same width — one edge comes from the gutter and the other
-from the right margin, so that is a free check.
-
-### 5. Build the template
+### 5. Build
 
 ```bash
 python3 scripts/build_reference.py styles.json reference.docx \
-        --map 1=Heading1,2=Title,3=Heading2
+        --map 1=Heading1,2=Title,3=Heading2 [--bottom 2.2 ...]
 ```
+
+`--map` keys are the `#` column of `[inferred styles]`. Map every group that
+is a heading; leave captions and footnotes unmapped.
 
 ### 6. Verify
 
@@ -160,62 +130,56 @@ python3 scripts/verify_roundtrip.py reference.docx styles.json \
         --map 1=Heading1,2=Title,3=Heading2
 ```
 
-Pass the same `--map`, or two groups resolving to one style read as a failure.
-The exit code must be 0. A `NOT MEASURED` space-after is not a failure.
+Same `--map` as step 5. Exit code must be 0. `NOT MEASURED` is not a failure.
 
-### 7. Package and deliver
+### 7. Package
 
 ```bash
-python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output dir> \
-        --map 1=Heading1,2=Title,3=Heading2 --body 2
+python3 scripts/make_package.py <source.pdf> reference.docx styles.json <out dir> \
+        --map 1=Heading1,2=Title,3=Heading2 --body 2 [--bottom 2.2 ...]
 ```
 
-Pass `--map`, `--body` and every margin you overrode through verbatim;
-`SKILL.md` is the only place they are recorded.
-
-Append anything you hit that the scripts could not measure to "Known limits"
-in the package's `SKILL.md`.
-
-Hand over the whole directory.
+Pass every flag used in steps 1–5. The output directory name is the skill
+name; `--name` overrides it. Add anything the scripts could not measure to the
+package's `Limits`. Hand over the whole directory.
 
 ### Optional: adjust styles, add a header or footer
 
 ```bash
 python3 scripts/set_style.py reference.docx --list
 python3 scripts/set_style.py reference.docx "Block Text" --size 10.5 --color 6C757D
-python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
+python3 scripts/set_style.py reference.docx "Source Code" --create --font Consolas --size 9
 python3 scripts/set_header_footer.py reference.docx --header "Company" --footer "Page " --page-number
-python3 scripts/set_header_footer.py reference.docx --header 'Title\tv2.3'   # left / right columns
+python3 scripts/set_header_footer.py reference.docx --header 'Title\tv2.3'   # left / right
 ```
 
-Re-run step 6 with `--structure-only` — the full check fails on any value you
-changed on purpose — then step 7.
+Then step 6 with `--structure-only`, then step 7.
 
 ## Rules
 
-- Steps 2 to 4 are values the PDF does not record. The script prints a guess
-  for each; settle it against the evidence the step names — a rendered page,
-  the sample text, the measured bound — instead of passing the guess through.
-- Take margins from the `suggested` row, never the `measured` row.
-- Reproduce the source, do not correct it. An inverted heading hierarchy or
-  a style left at Word's default is the source's own value; the package
-  records it as deliberate.
-- The source PDF's header and footer are not carried over. Add them with
-  `set_header_footer.py` if the recurring content reported in step 1 matters.
-  A running head split left and right is one `--header` with a tab in it.
-- Font names are restored from embedded subset names, but the font still has to
-  be installed on the target machine to render.
+- Reproduce the source. Do not correct an inverted hierarchy or a style left
+  at a default; the package records it.
+- Steps 2–4 are not recorded in the PDF. Settle each against the evidence the
+  step names, never the script's default.
+- The running head and foot are rebuilt from `[running head/foot]`. If that
+  line lists body text, the source has no header; run
+  `set_header_footer.py reference.docx --clear`.
+- Change the column layout only when asked.
 
 ## Troubleshooting
 
 | Symptom | Action |
 |---|---|
-| Every heading level is off by one | Redo step 3 using the `sample` column |
-| The right margin reads far too large | No line fills the column; round to a common value yourself |
-| A single-page PDF gives bad margins | Running heads cannot be detected; measure all four off a rendered page |
-| Paragraph metrics look implausible, or the default body candidate is a table or an index | Re-run step 1 with `--body <rank>` |
-| Body text splits into several groups | Groups merge by size, colour and weight, so this means a real difference; keep the largest and drop the rest with `--map <n>=skip` |
-| Space after reads NOT MEASURED | Every paragraph is followed by a table, list or heading, so no gap exists to measure; the template keeps pandoc's default |
-| Heading before/after look off | They are derived, not recorded. The report prints the raw baseline gaps beside them; override with `set_style.py --before/--after` and re-verify using `--structure-only` |
-| Verify fails after a deliberate style change | Expected; re-run it with `--structure-only` |
-| Heading gaps are near zero on a multi-column source | `--columns` was not declared; redo step 2 |
+| Every heading level is off by one | Redo step 3 from the `sample` column |
+| Right margin far too large | No line fills the column; measure it off a page and pass `--right` |
+| Single-page PDF gives bad margins | Running heads cannot be detected; measure all four and pass them |
+| Paragraph metrics implausible, or the body candidate is a table | Re-run step 1 with `--body <rank>` |
+| Body text splits into several groups | Real difference in size, colour or weight; keep the largest, `--map <n>=skip` the rest |
+| Space after reads NOT MEASURED | No paragraph is followed by a paragraph; pandoc's default stays |
+| Heading before/after look off | `set_style.py --before/--after`, then step 6 with `--structure-only` |
+| Verify fails after a deliberate change | Re-run step 6 with `--structure-only` |
+| Heading gaps near zero on a multi-column source | `--columns` was not passed; redo step 2 |
+| A header or footer added later sits a few points off | Step 1 sets the distance from the font's hhea metrics; when it printed no `hhea` line, install the source's font and rerun, or pass `set_header_footer.py --header-distance PT --footer-distance PT` (page edge to the line box, baseline − 1.16 × size for Noto Sans CJK) |
+| LibreOffice preview shows a smaller gap above a heading than the source | Expected. LibreOffice takes the larger of space-after and space-before; Word adds them, and the template is written for Word |
+| Title→Subtitle or Subtitle→Heading gap doubles in Word | Both sides carry the same gap (Word adds them, LibreOffice takes the larger). Zero one side: `set_style.py reference.docx "Subtitle" --before 0` |
+| A paragraph repeated on every page is listed as a running head | Body text in the header band. Pass the margins you measured; the styles are unaffected |

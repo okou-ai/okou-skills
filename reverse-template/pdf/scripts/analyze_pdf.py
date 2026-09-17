@@ -23,6 +23,7 @@ reliable. Heading levels and the bottom margin are not — neither is recorded,
 so both have to be settled by reading the report rather than trusting it.
 """
 import sys, json, math, re, collections, statistics
+import os
 
 try:
     import pymupdf
@@ -162,7 +163,11 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
                     elif sy >= page_h / 2 and above:
                         gaps.append(sy - max(above))
                 isolated = bool(gaps) and statistics.median(gaps) > advance * 1.8
-            if repeats or numeric or isolated:
+            # Repetition alone is not enough at body size: two pages that
+            # carry the same paragraph at the same height repeat a body line
+            # too. Body-sized chrome must also stand clear of the text block.
+            smaller = body_size is not None and max(spans[i]["size"] for i in idx) < body_size - 0.4
+            if numeric or isolated or (repeats and smaller):
                 hits |= set(idx)
         return hits, "recurring across pages"
 
@@ -173,8 +178,15 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
         return set(), None
     typical = statistics.median([g for g in gaps if g > 0.5] or [0])
     hf = set()
+    # Chrome is never larger than the body text; a title at the top of a
+    # one-page document is isolated too, and must stay a heading.
+    small = lambda i: body_size is None or spans[i]["size"] <= body_size + 0.4
     if typical and gaps and gaps[0] > typical * 2.5:
-        hf |= {i for i in order if spans[i]["bbox"][1] <= ys[0] + 1}
+        hf |= {i for i in order if spans[i]["bbox"][1] <= ys[0] + 1 and small(i)}
+    if body_size is not None:
+        tiny = lambda i: spans[i]["size"] < body_size - 0.4
+        hf |= {i for i in order if spans[i]["bbox"][1] < page_h * 0.08 and tiny(i)}
+        hf |= {i for i in order if spans[i]["bbox"][3] > page_h * 0.92 and tiny(i)}
     if typical and gaps and gaps[-1] > typical * 2.5:
         hf |= {i for i in order if spans[i]["bbox"][1] >= ys[-1] - 1}
     return hf, "single-page heuristic (unreliable)" if hf else None
@@ -228,6 +240,68 @@ def to_lines(spans, columns=1, left=None, right=None):
             out.append(line)
     out.sort(key=lambda l: (l["page"], l["y"]))
     return out
+
+
+def _sfnt_metrics(buf):
+    import struct
+    off = 0
+    if buf[:4] == b"ttcf":
+        off = struct.unpack(">I", buf[12:16])[0]
+    if buf[off:off + 4] not in (b"\0\1\0\0", b"OTTO", b"true"):
+        return None
+    n = struct.unpack(">H", buf[off + 4:off + 6])[0]
+    tables = {}
+    for i in range(n):
+        tag, _, toff, ln = struct.unpack(">4sIII", buf[off + 12 + 16 * i: off + 28 + 16 * i])
+        tables[tag] = toff
+    upm = struct.unpack(">H", buf[tables[b"head"] + 18: tables[b"head"] + 20])[0]
+    asc, desc = struct.unpack(">hh", buf[tables[b"hhea"] + 4: tables[b"hhea"] + 8])
+    return asc / upm, abs(desc) / upm
+
+
+_METRICS_CACHE = {}
+
+
+def font_metrics(doc, fontname):
+    """(ascender, descender) in em from the font's hhea table, which is the
+    box Word and LibreOffice lay a line out in. PyMuPDF's span bbox uses the
+    OS/2 typo values instead, and for Noto Sans CJK the two differ by 0.28em.
+
+    Read from the embedded font when it is an sfnt. Typst embeds CJK faces as
+    bare CFF and LibreOffice as Type1, neither of which carries hhea, so fall
+    back to the same face installed on this machine: that is the file Word
+    will use to lay the output out anyway. None when neither is readable."""
+    import subprocess
+    want = fontname.split("+")[-1].split("-Identity")[0]
+    if want in _METRICS_CACHE:
+        return _METRICS_CACHE[want]
+    res = None
+    for pno in range(min(doc.page_count, 4)):
+        for entry in doc[pno].get_fonts():
+            if entry[3].split("+")[-1].split("-Identity")[0] != want:
+                continue
+            try:
+                res = _sfnt_metrics(doc.extract_font(entry[0])[3])
+            except Exception:
+                res = None
+            break
+        if res:
+            break
+    if res is None:
+        family = want.split("-")[0]
+        style = want.split("-")[1] if "-" in want else "Regular"
+        try:
+            hit = subprocess.run(["fc-match", "-f", "%{file}|%{family}", f"{family}:style={style}"],
+                                 capture_output=True, text=True, timeout=10).stdout
+            path, fam = hit.split("|", 1)
+            norm = lambda x: re.sub(r"[^a-z0-9]", "", x.lower())
+            if any(norm(family).startswith(norm(f)[:8]) or norm(f).startswith(norm(family)[:8])
+                   for f in fam.split(",")):
+                res = _sfnt_metrics(open(path, "rb").read())
+        except Exception:
+            res = None
+    _METRICS_CACHE[want] = res
+    return res
 
 
 def fit_top(spans, npages):
@@ -312,8 +386,13 @@ def measure_spacing(lines, body_key, col_left, col_right):
         v = sx.most_common(1)[0][0] - cx.most_common(1)[0][0]
         indent = round(v, 1) if v > 2 else 0.0
 
+    # A body line that follows a heading has its previous *body* line two or
+    # three lines up; that distance is not a paragraph gap. Only pairs that
+    # are adjacent in the page's line order count.
+    pos = {id(l): j for j, l in enumerate(lines)}
     gaps = [round(B[i]["y"] - B[i - 1]["y"] - adv, 1) for i in sorted(starts)
-            if i > 0 and B[i]["page"] == B[i - 1]["page"] and B[i]["y"] - B[i - 1]["y"] < adv * 4]
+            if i > 0 and B[i]["page"] == B[i - 1]["page"] and B[i]["y"] - B[i - 1]["y"] < adv * 4
+            and pos[id(B[i])] - pos[id(B[i - 1])] == 1]
     # None, not 0.0: "no usable sample" and "measured as zero" are different
     # claims. Every paragraph here may be followed by a table, a list or a
     # heading, in which case nothing was measured and the builder must not
@@ -363,32 +442,237 @@ def measure_spacing(lines, body_key, col_left, col_right):
     # A gap this large is not paragraph spacing, it is white space on a cover or
     # section-break page. Left in, the median lands in the hundreds of points.
     cap = adv * 6
-    for key in {l["key"] for l in lines if l["key"][0] > body_key[0] + 0.4}:
+    # A heading is larger than the body, or the body's size set apart by
+    # weight or colour on lines that stop well short of the column edge:
+    # a bold run-in inside a paragraph fills its line, a heading does not.
+    colw = col_right - col_left
+    def stands_apart(key):
+        L = [l for l in lines if l["key"] == key and not l["filler"]]
+        if not L or key == body_key:
+            return False
+        if key[0] > body_key[0] + 0.4:
+            return True
+        if key[0] < body_key[0] - 0.4 or (key[1] == body_key[1] and key[2] == body_key[2]):
+            return False
+        return statistics.median(l["x1"] - l["x0"] for l in L) < 0.7 * colw and len(L) * 4 < len(B)
+    keys = {l["key"] for l in lines if stands_apart(l["key"])}
+    natural = lambda a, b: (adv_of(a["key"]) + adv_of(b["key"])) / 2
+    # Word adds space-after and space-before across a paragraph boundary
+    # (LibreOffice takes the larger; Typst the larger). One gap must
+    # therefore be written on one side only:
+    #   heading -> body     : the heading's after
+    #   anything -> heading : the heading's before, less whatever the
+    #                         preceding paragraph already carries as after
+    after_of = {body_key: body["space_after_pt"] or 0.0}
+    for key in keys:
+        idx = [i for i, l in enumerate(lines) if l["key"] == key]
+        after, raw_a, to_head = [], [], False
+        for i in idx:
+            if i + 1 < len(lines) and lines[i + 1]["page"] == lines[i]["page"] \
+                    and lines[i + 1]["key"] != key:
+                g = lines[i + 1]["y"] - lines[i]["y"]
+                if g > cap:
+                    continue
+                if lines[i + 1]["key"] == body_key:
+                    raw_a.append(g)
+                    after.append(g - natural(lines[i], lines[i + 1]))
+                elif lines[i + 1]["key"] in keys:
+                    to_head = True
+        heads[key] = {
+            "space_after_pt": (round(max(0, statistics.median(after)), 1) if after
+                               else 0.0 if to_head else None),
+            "baseline_gap_after_pt": round(statistics.median(raw_a), 1) if raw_a else None,
+        }
+        after_of[key] = heads[key]["space_after_pt"] or 0.0
+    for key in keys:
         idx = [i for i, l in enumerate(lines) if l["key"] == key]
         mine = adv_of(key)
-        before, after, raw_b, raw_a = [], [], [], []
+        before, raw_b = [], []
         for i in idx:
-            if i > 0 and lines[i]["page"] == lines[i - 1]["page"]:
+            if i > 0 and lines[i]["page"] == lines[i - 1]["page"] and lines[i - 1]["key"] != key:
                 g = lines[i]["y"] - lines[i - 1]["y"]
                 if g <= cap:
                     raw_b.append(g)
-                    before.append(g - (adv_of(lines[i - 1]["key"]) + mine) / 2)
-            if i + 1 < len(lines) and lines[i + 1]["page"] == lines[i]["page"]:
-                g = lines[i + 1]["y"] - lines[i]["y"]
-                if g <= cap:
-                    raw_a.append(g)
-                    after.append(g - (mine + adv_of(lines[i + 1]["key"])) / 2)
+                    before.append(g - natural(lines[i - 1], lines[i])
+                                  - after_of.get(lines[i - 1]["key"], 0.0))
         off = statistics.median([abs((lines[i]["x0"] + lines[i]["x1"]) / 2 - col_mid) for i in idx])
         left_off = statistics.median([abs(lines[i]["x0"] - col_left) for i in idx])
-        heads[key] = {
-            "space_before_pt": round(max(0, statistics.median(before)), 1) if before else None,
-            "space_after_pt": round(max(0, statistics.median(after)), 1) if after else None,
+        # Never preceded by anything on its page: it sits at the top margin,
+        # so the space before it is zero. Left unwritten, pandoc's own value
+        # (24pt on Title) pushes the whole first page down.
+        page_first = {}
+        for i in idx:
+            page_first.setdefault(lines[i]["page"], i)
+        first_on_page = all(i == 0 or lines[i]["page"] != lines[i - 1]["page"]
+                            for i in page_first.values())
+        heads[key].update({
+            "first_on_page_ys": ([[lines[i]["y"], key[0]] for i in page_first.values()]
+                                 if first_on_page else None),
+            "space_before_pt": (round(max(0, statistics.median(before)), 1) if before
+                                else 0.0 if first_on_page else None),
             "baseline_gap_before_pt": round(statistics.median(raw_b), 1) if raw_b else None,
-            "baseline_gap_after_pt": round(statistics.median(raw_a), 1) if raw_a else None,
             "own_line_advance_pt": round(mine, 1),
             "align": "center" if off < 6 and left_off > 12 else "left",
-        }
+        })
     return body, heads
+
+
+def hf_distance(doc, spans, hf, H, which):
+    """Distance from the page edge to the running head's line-box edge, which
+    is what w:pgMar w:header / w:footer mean. Line box = baseline -/+ the
+    font's hhea ascender/descender; the glyph box when the font is unreadable."""
+    top = [spans[i] for i in hf if spans[i]["bbox"][1] < H / 2]
+    bot = [spans[i] for i in hf if spans[i]["bbox"][3] >= H / 2]
+    if which == "header":
+        if not top:
+            return None
+        s = min(top, key=lambda x: x["base"])
+        fm = font_metrics(doc, s["font"])
+        return round(s["base"] - fm[0] * s["size"] if fm else s["bbox"][1], 1)
+    if not bot:
+        return None
+    s = max(bot, key=lambda x: x["base"])
+    fm = font_metrics(doc, s["font"])
+    return round(H - (s["base"] + fm[1] * s["size"]) if fm else H - s["bbox"][3], 1)
+
+
+def hf_spec(doc, spans, hf, H, col_left, col_right, which):
+    """What set_header_footer.py needs to put the running head back: its text
+    with tab stops between left / centre / right groups, {PAGE} where the page
+    number goes, and its size and colour. Built from the first page that
+    carries it; the page number is the token that differs on the next page."""
+    band = [spans[i] for i in hf if (spans[i]["bbox"][1] < H / 2) == (which == "header")]
+    if not band:
+        return None
+    pages = sorted({s["page"] for s in band})
+    def compose(pg):
+        row = sorted([s for s in band if s["page"] == pg], key=lambda s: s["bbox"][0])
+        # Spans that nearly touch are one piece of text ("第 ", "1", " 页");
+        # a piece is classified as a whole, by where it sits.
+        pieces = []
+        for s in row:
+            if pieces and s["bbox"][0] - pieces[-1]["x1"] < s["size"] * 1.0:
+                gap = s["bbox"][0] - pieces[-1]["x1"]
+                pieces[-1]["text"] += (" " if gap > s["size"] * 0.2 and not pieces[-1]["text"].endswith(" ")
+                                       and not s["text"].startswith(" ") else "") + s["text"]
+                pieces[-1]["x1"] = s["bbox"][2]
+            else:
+                pieces.append({"text": s["text"], "x0": s["bbox"][0], "x1": s["bbox"][2]})
+        mid = (col_left + col_right) / 2
+        groups = {"l": [], "c": [], "r": []}
+        for pc in pieces:
+            if abs((pc["x0"] + pc["x1"]) / 2 - mid) < 0.08 * (col_right - col_left):
+                groups["c"].append(pc)
+            elif pc["x0"] - col_left < col_right - pc["x1"]:
+                groups["l"].append(pc)
+            else:
+                groups["r"].append(pc)
+        parts = [" ".join(x["text"].strip() for x in groups[k]).strip() for k in ("l", "c", "r")]
+        return parts, row
+    parts0, row0 = compose(pages[0])
+    if len(pages) > 1:
+        parts1, _ = compose(pages[1])
+        parts0 = [re.sub(r"\d+", "{PAGE}", a, count=1) if a != b and re.search(r"\d", a) else a
+                  for a, b in zip(parts0, parts1)]
+    if parts0[1] and (parts0[0] or parts0[2]):
+        text, align = "\t".join(parts0), "left"          # left / centre / right stops
+    elif parts0[0] and parts0[2]:
+        text, align = parts0[0] + "\t" + parts0[2], "left"   # left / right stops
+    else:
+        text, align = parts0[0], "left"
+    if not parts0[0] and parts0[1] and not parts0[2]:
+        text, align = parts0[1], "center"
+    if not parts0[0] and not parts0[1] and parts0[2]:
+        text, align = parts0[2], "right"
+    lead = row0[0]
+    return {"text": text, "align": align, "size": lead["size"], "color": lead["color"],
+            "font": lead["font"].split("+")[-1], "page_number": "{PAGE}" in text}
+
+
+def _hex(rgb):
+    return "%02X%02X%02X" % tuple(int(round(c * 255)) for c in rgb[:3])
+
+
+def measure_tables(doc):
+    """Borders and shading of the first table found: outer and inside rules
+    as (colour, width pt), the header row's fill and weight, and the fill
+    of banded rows. LibreOffice and Word export rules as stroked lines and
+    shading as filled rectangles; both are read from the page's drawings."""
+    for page in doc:
+        try:
+            import io, contextlib
+            with contextlib.redirect_stdout(io.StringIO()):   # PyMuPDF's upsell line
+                found = page.find_tables()
+        except Exception:
+            return None
+        tabs = [t for t in found.tables if t.row_count >= 2 and t.col_count >= 2]
+        if not tabs:
+            continue
+        tb = tabs[0]
+        bb = pymupdf.Rect(tb.bbox)
+        outer = bb + (-3, -3, 3, 3)
+        row0 = pymupdf.Rect(tb.rows[0].bbox)
+        edges = {"top": [], "bottom": [], "left": [], "right": [], "insideH": [], "insideV": [], "header_bottom": []}
+        fills_head, fills_body = collections.Counter(), collections.Counter()
+        for dr in page.get_drawings():
+            col = dr.get("color"); w = round(dr.get("width") or 0, 2)
+            for it in dr["items"]:
+                if it[0] == "l" and (outer.contains(it[1]) or outer.contains(it[2])) and col and w:
+                    a, b = it[1], it[2]
+                    if abs(a.y - b.y) < 0.5:
+                        y = a.y
+                        k = ("top" if abs(y - bb.y0) < 2 else "bottom" if abs(y - bb.y1) < 2
+                             else "header_bottom" if abs(y - row0.y1) < 2 else "insideH")
+                    else:
+                        x = a.x
+                        k = "left" if abs(x - bb.x0) < 2 else "right" if abs(x - bb.x1) < 2 else "insideV"
+                    edges[k].append((_hex(col), w))
+                elif it[0] == "re" and outer.intersects(it[1]) and min(it[1].width, it[1].height) >= 1.6:
+                    f = dr.get("fill")
+                    if f and _hex(f) != "FFFFFF":
+                        (fills_head if it[1].intersects(row0) and it[1].y0 >= row0.y0 - 1 and it[1].y1 <= row0.y1 + 1
+                         else fills_body)[_hex(f)] += 1
+        rule = lambda k: (collections.Counter(edges[k]).most_common(1)[0][0] if edges[k] else None)
+        head_bold = None
+        spans = [sp for b in page.get_text("dict", clip=row0)["blocks"] for l in b.get("lines", []) for sp in l["spans"] if sp["text"].strip()]
+        if spans:
+            head_bold = all(is_bold(sp) for sp in spans)
+        nrows = tb.row_count
+        band = fills_body.most_common(1)[0] if fills_body else None
+        return {
+            "page": page.number + 1, "rows": nrows, "cols": tb.col_count,
+            "top": rule("top"), "bottom": rule("bottom"), "left": rule("left"), "right": rule("right"),
+            "insideH": rule("insideH"), "insideV": rule("insideV"),
+            "header_bottom": rule("header_bottom"),
+            "header_fill": fills_head.most_common(1)[0][0] if fills_head else None,
+            "header_bold": head_bold,
+            # shading on some but not all body rows is banding
+            "band_fill": band[0] if band and band[1] < (nrows - 1) * tb.col_count else None,
+            "body_fill": band[0] if band and band[1] >= (nrows - 1) * tb.col_count else None,
+        }
+    return None
+
+
+def header_image(doc, H):
+    """An image that sits in the header band on most pages: its xref, box and
+    where it hangs (left / centre / right of the page)."""
+    seen = collections.Counter(); boxes = {}
+    for page in doc:
+        for info in page.get_image_info(xrefs=True):
+            r = pymupdf.Rect(info["bbox"])
+            if r.y1 < H * 0.15 and info.get("xref"):
+                key = (info["xref"], round(r.x0), round(r.y0))
+                seen[key] += 1; boxes[key] = r
+    if not seen:
+        return None
+    key, n = seen.most_common(1)[0]
+    if n < max(1, math.ceil(doc.page_count * 0.6)):
+        return None
+    r = boxes[key]; W = doc[0].rect.width
+    mid = (r.x0 + r.x1) / 2
+    align = "center" if abs(mid - W / 2) < W * 0.08 else ("left" if r.x0 < W / 2 else "right")
+    return {"xref": key[0], "x_pt": round(r.x0, 1), "y_pt": round(r.y0, 1),
+            "w_pt": round(r.width, 1), "h_pt": round(r.height, 1), "align": align}
 
 
 def analyze(path, body_pick=None, columns=1):
@@ -462,18 +746,35 @@ def analyze(path, body_pick=None, columns=1):
         return mode if n > beyond else max(c)
 
     def edges(ss):
-        return (collections.Counter(round(s["bbox"][0], 1) for s in ss).most_common(1)[0][0],
-                far_edge([round(s["bbox"][2], 1) for s in ss]))
+        # A first-line indent on two-line paragraphs puts half the lines at the
+        # indented x; the text edge is the leftmost x a substantial share of
+        # lines start at, not the single most common one.
+        c = collections.Counter(round(s["bbox"][0], 1) for s in ss)
+        top = max(c.values())
+        left = min(k for k, v in c.items() if v >= 0.3 * top)
+        return (left, far_edge([round(s["bbox"][2], 1) for s in ss]))
 
     # Bootstrap the column bands from the extremes; a few points of overshoot
     # cannot move a band boundary, which sits half a column away.
     raw_l = min(s["bbox"][0] for s in body_spans)
     raw_r = max(s["bbox"][2] for s in body_spans)
+    band_edges = None
     if columns > 1:
-        w = (raw_r - raw_l) / columns
+        # Column starts are the most common line-start x values that sit at
+        # least 60pt apart; equal division would misfile the wide column's
+        # lines when the columns are unequal.
+        c = collections.Counter(round(s["bbox"][0]) for s in body_spans)
+        starts = []
+        for x, _ in c.most_common():
+            if all(abs(x - y) >= 60 for y in starts):
+                starts.append(x)
+            if len(starts) == columns:
+                break
+        starts.sort()
         per_band = collections.defaultdict(list)
         for s in body_spans:
-            per_band[min(columns - 1, int((s["bbox"][0] - raw_l) / w))].append(s)
+            k = max((i for i, x in enumerate(starts) if s["bbox"][0] >= x - 3), default=0)
+            per_band[k].append(s)
         band_edges = [edges(per_band[k]) for k in sorted(per_band)]
         left_pt, right_edge = band_edges[0][0], band_edges[-1][1]
     else:
@@ -486,6 +787,30 @@ def analyze(path, body_pick=None, columns=1):
     top_src = not_first or body_spans
     top_fit = fit_top(body_spans, doc.page_count)
     top_pt = top_fit if top_fit is not None else min(s["bbox"][1] for s in top_src)
+    # Word puts the first baseline at top margin + the font's hhea ascender.
+    # Solving the margin from the baselines with that ascender lands the
+    # first line where the PDF has it; the glyph-box fit above reads it
+    # 0.2-0.4em higher for every CJK face.
+    fm = font_metrics(doc, body_spans[0]["font"]) if body_spans else None
+    top_metric = None
+    if fm:
+        # First content line of each page, whatever its size: a page that
+        # opens with a heading starts at the margin too. No page can start
+        # above the margin, so the smallest value across pages is the margin;
+        # a cover title pushed down the page is simply not the smallest.
+        firsts = {}
+        for i, sp in enumerate(spans):
+            if i in hf or sp["filler"]:
+                continue
+            if sp["page"] not in firsts or sp["base"] < firsts[sp["page"]]["base"]:
+                firsts[sp["page"]] = sp
+        cand = []
+        for f in firsts.values():
+            m = font_metrics(doc, f["font"]) or fm
+            cand.append(f["base"] - m[0] * f["size"])
+        if cand:
+            top_metric = min(cand)
+            top_pt, top_fit = top_metric, top_metric
     # Bottom: page breaks rarely land exactly at the bottom of the text block,
     # so the measurement is always >= the real value. Take the minimum across
     # non-final pages as the tightest upper bound.
@@ -525,6 +850,17 @@ def analyze(path, body_pick=None, columns=1):
 
     col_right = W - right_pt
     lines = to_lines(body_spans, columns, left_pt, col_right)
+    # Same size as the body but set apart by weight or colour, on lines that
+    # stop well short of the column: a heading, not a bold run-in.
+    colw = col_right - left_pt
+    nbody = sum(1 for l in lines if l["key"] == body)
+    for k in chars:
+        if k in heads or k == body or abs(k[0] - body[0]) > 0.4 or (k[1] == body[1] and k[2] == body[2]):
+            continue
+        L = [l for l in lines if l["key"] == k and not l["filler"]]
+        if L and statistics.median(l["x1"] - l["x0"] for l in L) < 0.7 * colw and len(L) * 4 < nbody:
+            heads.append(k)
+    heads.sort(key=lambda k: (-k[0], not k[2]))
 
     # Evidence for the column decision, not a verdict. Bands of line-start x
     # separate for a multi-column layout and for a table alike, so the count
@@ -560,7 +896,19 @@ def analyze(path, body_pick=None, columns=1):
         col_width = round(statistics.median([e[1] - e[0] for e in box]), 1) if box else None
     else:
         col_gap = col_width = None
+    if band_edges and len(band_edges) > 1:
+        col_gap = round(statistics.median([b[0] - a[1] for a, b in zip(band_edges, band_edges[1:])]), 1)
+        col_width = round(statistics.median([r - l for l, r in band_edges]), 1)
     body_sp, head_sp = measure_spacing(lines, body, left_pt, col_right)
+    # A heading that opens its page sits where the top margin plus its own
+    # ascender puts it; anything beyond that is space-before (a cover title
+    # 200pt down the page), measured against the margin rather than a
+    # preceding line.
+    for _k, _h in head_sp.items():
+        if _h.get("first_on_page_ys"):
+            _asc = (fm[0] if fm else 0.88)
+            _off = [y - top_pt - _asc * sz for y, sz in _h["first_on_page_ys"]]
+            _h["space_before_pt"] = round(max(0.0, statistics.median(_off)), 1)
     leading = body_sp.get("line_advance_pt")
 
     result = {
@@ -590,7 +938,7 @@ def analyze(path, body_pick=None, columns=1):
         "margins_measured_cm": {k: (round(CM(v), 2) if v is not None else None) for k, v in
                                 (("left", left_pt), ("right", right_pt),
                                  ("top", top_pt), ("bottom", bottom_bound_pt))},
-        "margins_suggested_cm": {"left": snap(CM(left_pt))[0], "right": snap(CM(right_pt))[0],
+        "margins_suggested_cm": {"left": round(CM(left_pt), 2), "right": round(CM(right_pt), 2),
                                  "top": top_cm, "bottom": bottom_suggested},
         # Every heading line in reading order, not just one sample per group.
         # The template carries no body content at all, so this outline is the
@@ -601,15 +949,22 @@ def analyze(path, body_pick=None, columns=1):
                     for lv in [next((i for i, h in enumerate(heads, 1)
                                      if h == l["key"]), None)] if lv],
         "geometry_notes": geom_notes,
+        "table": measure_tables(doc),
+        "header_image": header_image(doc, H),
+        "column_edges_pt": ([[round(l, 1), round(r, 1)] for l, r in band_edges]
+                            if band_edges else None),
+        "columns_unequal": (bool(band_edges) and
+                            max(r - l for l, r in band_edges) > 1.05 * min(r - l for l, r in band_edges)),
         "running_heads": sorted({s["text"].strip() for i, s in enumerate(spans) if i in hf})[:6],
         # Where the running head and foot actually sit, so a header added later
         # lands where the source put it rather than at Word's default 708 twips.
-        "header_pt": (round(min(spans[i]["bbox"][1] for i in hf
-                                if spans[i]["bbox"][1] < H / 2), 1)
-                      if any(spans[i]["bbox"][1] < H / 2 for i in hf) else None),
-        "footer_pt": (round(H - max(spans[i]["bbox"][3] for i in hf
-                                    if spans[i]["bbox"][3] >= H / 2), 1)
-                      if any(spans[i]["bbox"][3] >= H / 2 for i in hf) else None),
+        "header": hf_spec(doc, spans, hf, H, left_pt, W - right_pt, "header"),
+        "footer": hf_spec(doc, spans, hf, H, left_pt, W - right_pt, "footer"),
+        "header_pt": (lambda t, im: (min(v for v in (t, im and im["y_pt"]) if v is not None)
+                                      if (t is not None or im) else None))(
+            hf_distance(doc, spans, hf, H, "header"), header_image(doc, H)),
+        "footer_pt": hf_distance(doc, spans, hf, H, "footer"),
+        "font_metrics_hhea": ([round(v, 3) for v in fm] if fm else None),
         "running_heads_method": hf_method,
     }
     doc.close()
@@ -628,6 +983,21 @@ def report(r, chars, body):
     if r["running_heads"]:
         print(f"[running head/foot] {r['running_heads_method']}: "
               f"{' | '.join(r['running_heads'])}  -> excluded from margin measurement")
+        for k in ("header", "footer"):
+            if r.get(k):
+                print(f"  {k}: {r[k]['text']!r}  {r[k]['size']}pt #{r[k]['color']} {r[k]['align']}"
+                      f"  -> build_reference.py writes it into reference.docx")
+    if r.get("header_image"):
+        im = r["header_image"]
+        print(f"  header image: {im['w_pt']}x{im['h_pt']}pt at x={im['x_pt']} y={im['y_pt']} ({im['align']})"
+              f"  -> saved beside styles.json, written into the header")
+    if r.get("table"):
+        t = r["table"]
+        fmt = lambda v: "none" if not v else f"#{v[0]} {v[1]}pt"
+        print(f"\n[table] p{t['page']} {t['rows']}x{t['cols']}: outer {fmt(t['top'])}, inside H {fmt(t['insideH'])},"
+              f" inside V {fmt(t['insideV'])}, header rule {fmt(t['header_bottom'])},"
+              f" header fill {t['header_fill'] or 'none'}, header bold {t['header_bold']},"
+              f" band fill {t['band_fill'] or 'none'}  -> pandoc's 'Table' style")
     elif r["pages"] < 2:
         print("[running head/foot] single page, cannot be determined by recurrence; "
               "any header or footer will distort the top and bottom margins")
@@ -660,14 +1030,15 @@ def report(r, chars, body):
           f"read from the span\n flag, or from the font name when the flag is unset. "
           f"The role column is not\n recorded anywhere and is the one thing being "
           f"guessed — check it.")
-    print(f"{'role':<7}{'font':<26}{'size':>6}{'colour':>9}{'wt':>4}{'chars':>7}  sample")
+    print(f"{'#':<4}{'role':<7}{'font':<26}{'size':>6}{'colour':>9}{'wt':>4}{'chars':>7}  sample")
     b = r["body"]
-    print(f"{'body':<7}{b['font']:<26}{b['size']:>6}{'#'+b['color']:>9}"
+    print(f"{'':<4}{'body':<7}{b['font']:<26}{b['size']:>6}{'#'+b['color']:>9}"
           f"{('B' if b['bold'] else '-'):>4}{chars[(b['size'],b['color'],b['bold'])]:>7}")
     for h in r["headings"]:
         key = (h["size"], h["color"], h["bold"])
-        print(f"{'H'+str(h['level']):<7}{h['font']:<26}{h['size']:>6}{'#'+h['color']:>9}"
+        print(f"{h['level']:<4}{'H'+str(h['level']):<7}{h['font']:<26}{h['size']:>6}{'#'+h['color']:>9}"
               f"{('B' if h['bold'] else '-'):>4}{chars[key]:>7}  {h['sample'][:18]}")
+    print(" --map takes the # column: --map 1=Heading1,2=Title")
 
     if b.get("line_advance_pt"):
         print(f"\n[paragraph metrics]  computed from coordinates, same confidence as fonts")
@@ -718,6 +1089,20 @@ if __name__ == "__main__":
     r, chars, body = analyze(sys.argv[1], pick, cols)
     if "--json" in sys.argv:
         out = sys.argv[sys.argv.index("--json") + 1]
+        if r.get("header_image"):
+            # the picture itself, beside styles.json, for build_reference to place
+            im = r["header_image"]
+            try:
+                d = pymupdf.open(sys.argv[1]); ex = d.extract_image(im["xref"]); d.close()
+                fn = os.path.join(os.path.dirname(os.path.abspath(out)), "header-image." + ex["ext"])
+                open(fn, "wb").write(ex["image"])
+                r["header"] = r.get("header") or {"text": "", "align": im["align"], "size": 9.0,
+                                                  "color": "808080", "font": "", "page_number": False}
+                left_edge = r["margins_suggested_cm"]["left"] / 2.54 * 72
+                r["header"]["image"] = {"file": fn, "h_pt": im["h_pt"], "w_pt": im["w_pt"], "align": im["align"],
+                                        "indent_pt": round(im["x_pt"] - left_edge, 1) if im["align"] == "left" else 0.0}
+            except Exception as e:
+                print(f"header image not extracted: {e}")
         json.dump(r, open(out, "w"), ensure_ascii=False, indent=2)
         print(f"Wrote {out}\n")
     report(r, chars, body)
