@@ -1,6 +1,6 @@
 ---
 name: source-style-template
-description: "Publish a document whose look lives in its page composition as a template that points back at the source file. Use when a resume, certificate, invoice, brochure, or any composed page has failed the docx or pdf branch's layout check, so a style-only reference.docx would drop its sidebars, panels, and floating blocks."
+description: "Publish a document as a template that points back at the source file itself. Use for a resume, receipt, invoice, certificate, offer letter, or any page whose body does not run as one stream, where a style-only reference.docx would drop the entries and the composition that make it what it is."
 ---
 
 # Keep the source as the template
@@ -75,9 +75,10 @@ report the specific blocker if it fails.
 
 ## Rules
 
-- Do not fall back here to avoid work on a flowing document. A style sheet is
-  editable and recomposable; this branch is neither, and it is the right answer
-  only when the composition is the identity.
+- An article that runs as one stream belongs on the docx or pdf branch, whose
+  style sheet stays editable and recomposable. Do not come here to skip that
+  work — but do come here whenever check 2 is a close call, because this branch
+  keeps everything.
 - Do not crop the source's pages into assets. They carry the original's own
   text and data.
 - One line of instruction is the deliverable. Everything a new document needs
