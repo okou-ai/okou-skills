@@ -22,9 +22,8 @@ length on another subject — a report, a manual, a policy. A **form** is one
 object with a fixed set of entries, and a new one fills the same entries — a
 resume, an invoice, a certificate.
 
-Stay here only for an article whose body runs as one stream; one column, or
-columns of equal width, is one stream. Judge on what the document is, not on
-how it looks — a plain single-column resume is still a form.
+Judge on what the document is, not on how it looks — a plain single-column
+resume is still a form.
 
 ### Otherwise: publish the source itself
 
