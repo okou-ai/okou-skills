@@ -6,7 +6,7 @@ Usage:
           [--map 1=Heading1,2=Title] [--bottom 3.0] [--body 2] [--name slug]
 
 Three files, no more. SKILL.md carries the usage, the measured style values,
-the human decisions and the source's outline; reference.docx is the artifact
+the choices made and the source's outline; reference.docx is the artifact
 pandoc consumes; source.pdf is the content reference. styles.json is not
 shipped because SKILL.md records the exact command that re-derives it, and the
 analysis is reproducible byte for byte.
@@ -149,7 +149,7 @@ coordinates. Start here if something looks off.
 |---|---|---|
 | Font / size / colour | Recorded exactly in the PDF | High |
 | Spacing / line height / indent / alignment | Computed from coordinates | High |
-| Heading levels | Assigned by hand (above) | Depends on the review |
+| Heading levels | Assigned from the sample text (above) | Depends on the review |
 | Top / left / right margins | Measured, then rounded | Medium |
 | Bottom margin | Only bounded, never measured | Low |
 
@@ -310,7 +310,7 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None, name=None):
                        f"| {c.get('lines', '-')} | {c['sample'][:28]}{mark} |")
     rev.append("")
     if bottom is not None:
-        rev.append(f"**Bottom margin**: set by hand to {bottom} cm.")
+        rev.append(f"**Bottom margin**: overridden to {bottom} cm.")
     else:
         mb = d["margins_measured_cm"].get("bottom")
         sug = mg.get("bottom")

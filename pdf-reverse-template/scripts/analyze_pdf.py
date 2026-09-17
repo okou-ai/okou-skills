@@ -15,7 +15,8 @@ cluster with the most characters is body text, and anything larger becomes a
 heading candidate, ordered by size.
 
 Fonts, sizes, colours and paragraph metrics come out of the coordinates and are
-reliable. Heading levels and the bottom margin are not — both need a human.
+reliable. Heading levels and the bottom margin are not — neither is recorded,
+so both have to be settled by reading the report rather than trusting it.
 """
 import sys, json, math, re, collections, statistics
 
@@ -131,8 +132,11 @@ def running_heads(spans, npages, page_h, body_size=None, advance=None):
                 continue
             common = collections.Counter(texts).most_common(1)[0][1]
             repeats = common / len(texts) >= 0.6
-            numeric = all(len(t) <= 6 and re.fullmatch(r"[\divxlcIVXLC/第页共\-–—.]+", t)
-                          for t in texts)
+            # Page numbers in any of the forms a footer uses: arabic, roman,
+            # "3 / 12", and the CJK "page N of M" frame, whose three characters
+            # are matched as data rather than written as prose.
+            PAGE_TOKEN = r"[\divxlcIVXLC/第页共\-–—.]+"
+            numeric = all(len(t) <= 6 and re.fullmatch(PAGE_TOKEN, t) for t in texts)
             # A header showing the current chapter changes its words every page,
             # so neither test above catches it. What it does have is a clear gap
             # to the text block; the first line of a paragraph does not.
@@ -532,7 +536,7 @@ def report(r, chars, body):
     print(f"[structure tree] " + ("present — read heading levels from /StructTreeRoot "
                                   "instead of guessing from font size"
                                   if r["tagged"] else "absent — levels are inferred by "
-                                  "clustering and must be reviewed by a human"))
+                                  "clustering and must be checked against the sample text"))
     if r["running_heads"]:
         print(f"[running head/foot] {r['running_heads_method']}: "
               f"{' | '.join(r['running_heads'])}  -> excluded from margin measurement")
@@ -608,7 +612,7 @@ def report(r, chars, body):
     for n in r.get("geometry_notes", []):
         print(f"  .  {n}")
 
-    print("\n[needs a human]")
+    print("\n[not recorded in the PDF — settle these before building]")
     print("  1. Levels: a document title and an H1 are both just large text in a PDF;")
     print("     clustering cannot separate them. Read the sample column.")
     print("  2. Margins: right/top/bottom measure where content reaches, not where the")

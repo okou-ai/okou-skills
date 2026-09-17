@@ -7,7 +7,7 @@ Usage:  python3 verify_roundtrip.py reference.docx styles.json [--map 1=Heading1
 --structure-only drops the value reconciliation and keeps the dangling-reference
 check. Use it after deliberately editing a style with set_style.py: the
 reconciliation asks "did the builder write what was measured", which stops being
-a meaningful question once a human has overridden a value on purpose.
+a meaningful question once a value has been overridden on purpose.
 
 Pass the same --map that build_reference.py was given. Without it the cluster to
 style match is guessed from size and colour, which reports a false failure when
