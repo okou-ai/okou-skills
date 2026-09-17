@@ -102,7 +102,7 @@ Convert first and install only on failure. Three things make that ordering neces
 
 The install needs passwordless `sudo` and the Ubuntu archive. Where either is missing the convert keeps failing with `Error: source file could not be loaded`; deliver the docx together with the unbranded typst PDF and say the branded export was unavailable, rather than quietly handing over the unbranded one.
 
-Fonts, line spacing and justification all survive the conversion, so the result is good enough to deliver. The `w:header` and `w:footer` offsets in `pgMar` do not — LibreOffice puts the running head a few points off where Word does.
+Fonts, line spacing and justification all survive the conversion, so the result is good enough to deliver. The `w:header` and `w:footer` offsets in `pgMar` do not: converting a template whose source puts the running head at 47.62pt, LibreOffice placed it at 49.85pt. That is measured against the source document, not against Word — nothing in this section has been checked in Word itself.
 
 ## xlsx
 
