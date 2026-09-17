@@ -64,15 +64,23 @@ python3 scripts/assess_layout.py <source.pdf|source.docx>
 |---|---|
 | `flow` | the branch check 1 named |
 | `composed` | `source-style/SKILL.md` |
-| `check` | render a page and decide; panels, sidebars, or cards behind the text mean `source-style` |
+| `check` | render a page and decide; blocks placed side by side at different widths, or text over a fill, mean `source-style` |
 
-It measures fill and image coverage on a PDF, after subtracting whatever repeats
-in the same place on most pages, because a header band and a logo are chrome the
-branch already reproduces. On a `.docx` it looks for floating shapes, text
-boxes, positioned frames, and short wide tables whose cells hold prose.
+On a PDF it splits each page at its vertical corridors and keeps the regions
+that run down the page. One region is a flow. Two of equal width are columns,
+which `w:cols` reproduces. Two of unequal width are a sidebar, which nothing in
+a style sheet holds. A narrow strip of right-aligned dates is a tab stop rather
+than a region — a region has to carry its share of the page's text.
 
-A single-page PDF has no repetition to measure, so it can only come back
-`composed` or `check`.
+It then measures fill and image coverage, after subtracting whatever repeats in
+the same place on most pages, because a header band and a logo are chrome the
+branch already reproduces.
+
+Colour is the weaker of the two signals and only the second is about it: a
+sidebar drawn in plain text with a hairline rule covers no area at all.
+
+On a `.docx` it reads the markup instead: floating shapes, text boxes,
+positioned frames, and short wide tables whose cells hold prose.
 
 ## Deliverables
 
