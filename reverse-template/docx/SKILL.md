@@ -20,9 +20,9 @@ object with a fixed set of entries, and a new one fills the same entries — a
 resume, an invoice, a certificate.
 
 Judge on what the document is, not on how it looks — a plain single-column
-resume is still a form.
+resume is still a form. An article continues at Prerequisites below.
 
-### Otherwise: publish the source itself
+### A form: publish the source itself
 
 A style sheet drops those silently. Publish the file and stop here.
 
