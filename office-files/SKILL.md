@@ -12,6 +12,10 @@ export PATH="$(python3 -c 'import pypandoc,os;print(os.path.dirname(pypandoc.get
 
 Takes about 6 seconds; nothing is preinstalled. Both lines are required — the system Python is PEP 668 externally managed, and the wheel ships the pandoc binary inside the package directory rather than on `PATH`.
 
+**Install only what the flow needs, and know which package is which.** `pypandoc_binary` and `typst` cover the PDF flow and the prose-to-docx render; `openpyxl` is only for **xlsx**; `python-docx` is only for the **docx** steps that build or edit a reference doc. Installing just the first two is fine — until a later docx or xlsx step in the same session dies with `ModuleNotFoundError: No module named 'docx'` (or `openpyxl`). Install all four unless the task certainly never touches docx or xlsx.
+
+**`export PATH` lasts for one shell only, so re-run it in every new shell.** Each Bash call starts a fresh shell, so a single setup at the top of a run does not carry forward and later calls fail with `pandoc: command not found`. Prefix the `export` line to each command that uses pandoc, or re-export it at the start of every shell.
+
 If the install fails, deliver Markdown or a hosted HTML view instead and say the toolchain was unavailable. Never ship a worse format without saying so.
 
 ## Pick your flow
@@ -83,6 +87,8 @@ Three things that fail quietly here:
 - **`-s` is mandatory for any `-V` to apply.** Without it pandoc emits a fragment whose `.typ` contains no `set page` or `set text` at all, so every variable you pass is silently dropped.
 - **Pin `papersize`.** Without `-s` you get typst's own default of A4; with `-s` and no `papersize` you get pandoc's template default of `us-letter`. Same document, different paper.
 - **CJK without `mainfont` renders in the wrong script.** Chinese text falls back to `NotoSansCJKjp`, so you get Japanese glyph forms with no error and no missing characters. Verify with `pdffonts doc.pdf` — the embedded name must end in `sc` for Simplified Chinese.
+
+One message from this flow is loud but harmless, and it is the opposite of the three above: `pdfinfo` on a typst-built PDF prints `Syntax Error: Suspects object is wrong type (boolean)` to stderr. It is poppler complaining about typst's metadata, not a broken file — PDFs built by LibreOffice do not trigger it, and the same PDF still reports its page count, page size and fonts correctly and rasterises fine. Do not debug it and do not re-render because of it.
 
 Variable names come from `pandoc --print-default-template=typst`: `mainfont`, `mathfont`, `codefont`, `fontsize`, `papersize`.
 
