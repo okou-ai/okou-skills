@@ -17,7 +17,7 @@ every choice made along the way, and SKILL.md is the only place they are
 written down. --name sets the skill name and defaults to the output
 directory's name.
 """
-import sys, os, re, json, shutil, zipfile, subprocess, datetime
+import sys, os, re, json, shutil, zipfile, subprocess, datetime, textwrap
 
 HALF2PT = lambda h: round(int(h) / 2, 1)
 TWIP2PT = lambda t: round(int(t) / 20, 1)
@@ -195,7 +195,7 @@ python3 verify_roundtrip.py reference.docx styles.json --structure-only
 - A layout that does not match the original is almost always the heading level
   mapping. Levels are the one thing a PDF does not record.
 - A PDF stores its running head as ordinary text, so nothing was carried over
-  automatically. Whatever the page section lists was added deliberately.
+  automatically. Whatever the page section lists was added deliberately.{limits}
 
 ---
 
@@ -291,6 +291,25 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
         ol_lines.append(f"{'  ' * depth}- {o['text']}  `{n}`  (p{o['page']})")
     ol_md = "\n".join(ol_lines) or "_No headings were detected in the source._"
 
+    # Limits that follow from this template rather than from the skill. A
+    # multi-column layout has two that bite immediately and neither is
+    # obvious from the style table.
+    limits = []
+    if ncols > 1:
+        cw = d.get("column_width_pt")
+        w = f"{cw * 20:.0f} twips ({cw}pt)" if cw else "narrower than the page"
+        limits += [
+            f"A table wider than the text column, {w}, overflows it. Set the "
+            f"column widths explicitly rather than letting pandoc size them.",
+            "Headings do not span the columns. Everything sits in one `sectPr`, "
+            "and a full-width title needs a second section, which "
+            "`--reference-doc` cannot add.",
+        ]
+    limits = "\n".join("\n".join(textwrap.wrap(l, 76, initial_indent="- ",
+                                              subsequent_indent="  "))
+                       for l in limits)
+    limits = "\n" + limits if limits else ""
+
     # The description is what makes an agent reach for this package at all, so
     # it names the look rather than describing the file.
     look = st.get("heading 1") or st.get("title") or st.get("body text") or {}
@@ -304,6 +323,7 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
     open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
         name=name, desc=desc, src=src, md_map=md, styles=rows,
         page="\n".join(page), repro=repro, rebuild=rebuild,
+        limits=limits,
         outline=ol_md, date=datetime.date.today().isoformat()))
 
     print(f"Package written to {outdir}/")

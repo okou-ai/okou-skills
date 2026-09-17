@@ -9,7 +9,7 @@ source.docx is the content reference. The style values are read back out of
 reference.docx, not hardcoded. --name sets the skill name and defaults to the
 output directory's name.
 """
-import sys, os, re, shutil, zipfile, subprocess, datetime
+import sys, os, re, shutil, zipfile, subprocess, datetime, textwrap
 
 HALF2PT = lambda h: round(int(h) / 2, 1)
 TWIP2PT = lambda t: round(int(t) / 20, 1)
@@ -132,7 +132,7 @@ def page_of(path):
     # Columns are inherited from the source sectPr without anyone asking for
     # them, so a template can be two-column while its README says nothing.
     cols = re.search(r"<w:cols\b[^>]*/>|<w:cols\b[^>]*>.*?</w:cols>", s, re.S)
-    col = None
+    col, narrow = None, None
     if cols:
         c = cols.group(0)
         n = re.search(r'w:num="(\d+)"', c)
@@ -140,6 +140,13 @@ def page_of(path):
         if n > 1:
             gap = re.search(r'w:space="(\d+)"', c)
             widths = re.findall(r'<w:col\b[^>]*w:w="(\d+)"', c)
+            # Unequal columns are common; a table has to fit the narrowest.
+            if widths:
+                narrow = min(TWIP2CM(w) for w in widths)
+            elif pg and mar:
+                text = int(pg.group(1)) - int(mar.get("left", 0)) - int(mar.get("right", 0))
+                spc = int(gap.group(1)) if gap else 0
+                narrow = TWIP2CM((text - spc * (n - 1)) // n)
             col = f"- Columns: {n}"
             if gap:
                 col += f", gutter {TWIP2CM(gap.group(1))} cm"
@@ -149,7 +156,7 @@ def page_of(path):
                         + ", inherited as they are)")
     return {"size": (TWIP2CM(pg.group(1)), TWIP2CM(pg.group(2))) if pg else None,
             "margin": {k: TWIP2CM(v) for k, v in mar.items()} or None,
-            "cols": col, "hf": hf}
+            "cols": col, "narrowest_cm": narrow, "hf": hf}
 
 
 def row(st, name):
@@ -276,7 +283,7 @@ python3 verify_reference.py reference.docx
 - Code blocks use `Source Code`, which pandoc generates on output. Customising
   it means creating a paragraph style with that exact name.
 - Headings that come out looking like body text mean the template is missing
-  that style. `verify_reference.py` says which one.
+  that style. `verify_reference.py` says which one.{limits}
 
 ---
 
@@ -316,6 +323,25 @@ def build(orig, ref, outdir, name=None):
     # The outline is the only record of the source's *content* that survives.
     # reference.docx carries no body text, so without it there is nothing to
     # work from when the task is "another document like this one".
+    # Limits that follow from this template rather than from the skill. A
+    # multi-column layout has two that bite immediately and neither is
+    # obvious from the style table.
+    limits = []
+    if pg["cols"]:
+        narrow = pg["narrowest_cm"]
+        w = f"the narrowest column, {narrow} cm," if narrow else "a text column"
+        limits += [
+            f"A table wider than {w} overflows it. Set the column widths "
+            f"explicitly rather than letting pandoc size them.",
+            "Headings do not span the columns. Everything sits in one `sectPr`, "
+            "and a full-width title needs a second section, which "
+            "`--reference-doc` cannot add.",
+        ]
+    limits = "\n".join("\n".join(textwrap.wrap(l, 76, initial_indent="- ",
+                                              subsequent_indent="  "))
+                       for l in limits)
+    limits = "\n" + limits if limits else ""
+
     ol = outline(orig)
     ol_md = "\n".join(f"{'  ' * max(0, lv - 1)}- {t}  `{n}`" for n, lv, t in ol) \
         or "_The source has no headings to record._"
@@ -332,7 +358,7 @@ def build(orig, ref, outdir, name=None):
 
     open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
         name=name, desc=desc, src=src, md_map=md, styles=rows,
-        page="\n".join(page_lines), outline=ol_md,
+        page="\n".join(page_lines), outline=ol_md, limits=limits,
         date=datetime.date.today().isoformat()))
 
     print(f"Package written to {outdir}/")

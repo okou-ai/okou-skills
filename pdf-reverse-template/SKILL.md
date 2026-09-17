@@ -158,6 +158,13 @@ document of this kind.
 Hand over the whole directory. `reference.docx` on its own says nothing about
 how it was built or what it is for.
 
+`make_package.py` writes what the scripts measured, and the multi-column limits
+that follow from the layout. It cannot know what you hit working on this
+document. Append those to "Known limits" in the package's `SKILL.md` before
+handing it over — a style the source left at Word's default, a heading
+hierarchy that reads inverted, a header that needed hand-written XML. The next
+person meets the same thing and has nothing else to go on.
+
 ### Optional: adjust styles, add a header or footer
 
 ```bash
