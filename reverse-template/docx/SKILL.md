@@ -9,10 +9,9 @@ Takes one `.docx` and produces a template package directory ready to hand over.
 
 Run every command below from `reverse-template/docx/`.
 
-`python3 ../scripts/assess_layout.py <source.docx>` must return `flow` first. A
-`composed` verdict means the look lives in a sidebar, a text box, or a floating
-block that a `reference.docx` cannot hold; take `../source-style/SKILL.md`
-instead.
+Check 2 of the router must have answered "an article, and one stream". A form
+— a resume, a receipt, a certificate — or a body with a sidebar beside it takes
+`../source-style/SKILL.md` instead.
 
 ## Prerequisites
 

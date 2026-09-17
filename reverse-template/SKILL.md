@@ -44,41 +44,37 @@ okou presentation screenshot --input <source.pdf> --out shots
 A page carrying one idea in display type is a slide. A page carrying running
 prose under a repeated header, footer, or page number is a document.
 
-## Check 2 — whether a style sheet can hold it
+## Check 2 — an article, or a form
 
 Only for the pdf and docx branches. The presentation branch rebuilds pages in
-HTML, so composition is not a problem it has.
+HTML, so this is not a question it has.
 
-Those two branches produce a `reference.docx`, and pandoc pours one stream of
-paragraphs into it. The gates below are the list of what that reproduces. A
-source passes to the branch only when every gate passes; anything else goes to
-`source-style/SKILL.md`, which keeps the source file itself.
+Look at the pages. Render them first if the source is a PDF:
 
 ```bash
-pip install pymupdf        # PDF only
-python3 scripts/assess_layout.py <source.pdf|source.docx>
+okou presentation screenshot --input <source.pdf> --out shots
 ```
 
-| Gate | Passes when |
-|---|---|
-| columns | one column, or columns of equal width |
-| blocks side by side | no fill or image has text beside it at the same height |
-| page art | fills and images cover under a quarter of the page, page chrome excluded |
-| dividing rules | no vertical rule runs 40% of the page height or more |
-| paragraph rules | no horizontal rule sits against a line of text |
+Two questions, both answered by looking:
 
-A `.docx` is gated on its markup instead: floating shapes, text boxes,
-positioned frames, short wide tables whose cells hold prose, and unequal
-`w:cols` widths. It has no paragraph-rule gate — `build_reference.py` copies
-`styles.xml` across whole, so a rule carried on a style survives.
+1. **Is it an article, or a form?** An article is written top to bottom and
+   could be written again at another length on another subject — a report, a
+   paper, a white paper, a manual, a policy, a memo. A form is one object with
+   a fixed set of entries, and a new one fills the same entries — a resume, a
+   receipt, an invoice, a certificate, an offer letter, a spec sheet.
+2. **If it is an article, does the body run as one stream?** One column is one
+   stream, and so are columns of equal width. A sidebar, a margin note beside
+   the text, or blocks tiled across the page is not.
 
-The exit code is 0 for `flow` and 1 for `composed`; the report names the gates
-that failed and, where the gap is the branch's own tooling rather than the
-format, says so.
+An article that runs as one stream stays on the branch check 1 named: a
+`reference.docx` reproduces it. Everything else goes to
+`source-style/SKILL.md`, which uploads the source file itself.
 
-Widen the list by widening the branch, not by overriding a gate here. A wrong
-`flow` is silent — the template comes out looking plausible with the sidebar
-gone — and a wrong `composed` only costs editability.
+Answer question 1 on what the document is, not on how it looks. A plain
+single-column resume with no colour is still a form.
+
+When it is not obvious either way, take `source-style`. That branch keeps
+everything; the other one silently drops whatever a style sheet cannot hold.
 
 ## Deliverables
 

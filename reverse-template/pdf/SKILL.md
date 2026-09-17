@@ -12,9 +12,9 @@ pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `reverse-template/pdf/`.
 
-`python3 ../scripts/assess_layout.py <source.pdf>` must return `flow` first. A
-`composed` verdict means the look lives in panels, a sidebar, or cards that a
-`reference.docx` cannot hold; take `../source-style/SKILL.md` instead.
+Check 2 of the router must have answered "an article, and one stream". A form
+— a resume, a receipt, a certificate — or a body with a sidebar beside it takes
+`../source-style/SKILL.md` instead.
 
 ## Prerequisites
 

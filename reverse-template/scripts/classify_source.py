@@ -149,7 +149,7 @@ def classify_pdf(path):
 
     # A deck runs to many pages. One or two pages at a paper size is a document
     # however little text it carries — a resume, a certificate, an invoice —
-    # and sparse text there is composition, which assess_layout.py answers.
+    # and sparse text there is a form, which check 2 answers by looking.
     if paper and pages <= 2:
         return PDF, report, f"{pages} page(s) at {paper}: a document, not a deck"
 
@@ -211,8 +211,8 @@ def main():
     print(f"  {why}")
     if route in (DOCX, PDF):
         print(
-            "  That branch builds a style sheet. Check the look survives one first:\n"
-            f"    python3 scripts/assess_layout.py {args.source}"
+            "  That branch builds a style sheet. Look at the pages first: a form,\n"
+            "  or an article whose body is not one stream, takes source-style."
         )
     return 0
 

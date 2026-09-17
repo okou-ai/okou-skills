@@ -5,8 +5,8 @@ description: "Publish a document whose look lives in its page composition as a t
 
 # Keep the source as the template
 
-Reach this branch from `scripts/assess_layout.py` returning `composed`, or from
-a rendered page that shows panels, sidebars, or cards behind the text.
+Reach this branch from check 2 of the router: the source is a form, or an
+article whose body does not run as one stream.
 
 The docx and pdf branches ship a style sheet. This branch ships the source file:
 later runs open it and follow what they see.
