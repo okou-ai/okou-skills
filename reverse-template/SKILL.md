@@ -31,7 +31,7 @@ the branch. Requires `pdfinfo` and `pdftotext`.
 
 One or two pages at a paper size is a document whatever the density says. A
 resume or an invoice carries as little text as a slide and is still not a deck;
-what makes it sparse is composition, which check 2 answers.
+check 2 is what decides where it goes from there.
 
 When the two signals disagree it prints `ambiguous` and exits 1 — an A4
 landscape deck reads as paper by geometry and as slides by density. Render the
