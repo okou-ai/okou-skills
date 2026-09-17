@@ -5,81 +5,41 @@ description: "Route a deck or document to the reverse-engineering branch that ma
 
 # Reverse a file into a reusable template
 
-Two questions name the branch. Only the first one can end it. Then follow that
-branch's `SKILL.md` to the end — the branches produce different deliverables,
-so do not carry steps between them.
-
-## 1. A deck, or a document?
-
-| Source | It is |
-|---|---|
-| `.pptx`, `.ppt` | a deck |
-| an image deck, or a directory of page screenshots | a deck |
-| `.docx` | a document |
-| `.doc`, or a `.docx` saved by WPS | re-save it as `.docx` from Word, then start again |
-| `.pdf` | look at the pages |
+Render the pages, read one row off the table, follow that guide to the end.
 
 ```bash
-okou presentation screenshot --input <source.pdf> --out shots
+okou presentation screenshot --input <source.pptx|source.pdf> --out shots
 ```
 
-A page carrying one idea in display type is a slide. A page carrying running
-prose under a repeated header, footer, or page number is a document. One or two
-pages at a paper size is a document whatever else it looks like — a resume and
-an invoice carry as little text as a slide and are still not decks.
+Re-save a `.doc`, or a `.docx` written by WPS, as `.docx` from Word first. For a
+`.docx`, export a PDF to render from and keep the original as the source.
 
-**A deck goes to `presentation/SKILL.md`. That is the whole answer; stop here.**
-
-A document goes to question 2.
-
-## 2. An article, or a form?
-
-Look at the same pages and answer two things:
-
-1. **Is it an article, or a form?** An article is written top to bottom and
-   could be written again at another length on another subject — a report, a
-   paper, a white paper, a manual, a policy, a memo. A form is one object with
-   a fixed set of entries, and a new one fills the same entries — a resume, a
-   receipt, an invoice, a certificate, an offer letter, a spec sheet.
-2. **If it is an article, does the body run as one stream?** One column is one
-   stream, and so are columns of equal width. A sidebar, a margin note beside
-   the text, or blocks tiled across the page is not.
-
-| Answer | Branch |
+| The pages show | Go to |
 |---|---|
-| an article, and one stream | `docx/SKILL.md` for a `.docx`, `pdf/SKILL.md` for a `.pdf` |
-| a form, or a body that is not one stream | `source-style/SKILL.md` |
+| slides — one idea a page, display type | `presentation/SKILL.md` |
+| an article, body running as one stream — report, paper, manual, policy | `docx/SKILL.md` for a `.docx`, `pdf/SKILL.md` for a `.pdf` |
+| an article whose body does not run as one stream — a sidebar or margin note beside it | `source-style/SKILL.md` |
+| a form — resume, receipt, invoice, certificate, offer letter, spec sheet | `source-style/SKILL.md` |
+| a scan, or anything you are unsure of | `source-style/SKILL.md` |
 
-Answer the first one on what the document is, not on how it looks. A plain
-single-column resume with no colour is still a form.
+One column is one stream, and so are columns of equal width. Read row 4 off what
+the document is, not off how it looks: a plain single-column resume is a form.
 
-When it is not obvious either way, take `source-style`. That branch keeps
-everything; the other one silently drops whatever a style sheet cannot hold.
+Three rules override the table:
 
-## The four branches
+- A deliverable the user names beats the table. "Turn these slides into a Word
+  template" is `docx/`; "save this report's look as a presentation template" is
+  `presentation/`.
+- Reverse the authoring file when it sits beside an export of itself: `.docx`
+  over its PDF, `.pptx` over its PDF.
+- One or two pages at a paper size is never slides, however sparse.
 
 | Branch | Deliverable | Ends with |
 |---|---|---|
 | `presentation` | HTML presentation template package | `okou presentation-template publish` |
-| `docx`, `pdf` | package directory holding `SKILL.md`, `reference.docx`, and the source | handing the directory over |
+| `docx`, `pdf` | directory holding `SKILL.md`, `reference.docx`, and the source | handing the directory over |
 | `source-style` | the source file plus one line of instruction | `okou user-template publish --kind document` |
 
-Three rules override both questions:
-
-- A deliverable the user names wins over the source's extension. "Turn these
-  slides into a Word template" is question 2's answer for a deck; "save this
-  report's look as a presentation template" is the presentation branch.
-- When an authoring file sits beside an export of itself, reverse the authoring
-  file: `.docx` over its PDF, `.pptx` over its PDF.
-- A PDF with no text layer is a scan or an image export. Settle both questions
-  on a rendered page.
-
-## Then
-
-`cd` into the branch directory. Every path inside a branch guide is relative to
-that directory.
-
-`python3 scripts/classify_source.py <source.pdf>` answers question 1 from page
-geometry and text density if a second opinion is useful. It needs `pdfinfo` and
-`pdftotext`, and it prints `ambiguous` rather than guessing when its two signals
-disagree.
+`cd` into the branch directory; every path inside a branch guide is relative to
+it. `python3 scripts/classify_source.py <source.pdf>` reads slides-or-document
+off page geometry and text density, for a second opinion on row 1.

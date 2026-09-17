@@ -5,8 +5,8 @@ description: "Publish a document as a template that points back at the source fi
 
 # Keep the source as the template
 
-Reach this branch from the router's question 2: the source is a form, or an
-article whose body does not run as one stream.
+Reach this branch from the router: the source is a form, or an article whose
+body does not run as one stream.
 
 The docx and pdf branches ship a style sheet. This branch ships the source file:
 later runs open it and follow what they see.
@@ -77,8 +77,8 @@ report the specific blocker if it fails.
 
 - An article that runs as one stream belongs on the docx or pdf branch, whose
   style sheet stays editable and recomposable. Do not come here to skip that
-  work — but do come here whenever question 2 is a close call, because this branch
-  keeps everything.
+  work — but do come here whenever the call is close, because this branch keeps
+  everything.
 - Do not crop the source's pages into assets. They carry the original's own
   text and data.
 - One line of instruction is the deliverable. Everything a new document needs

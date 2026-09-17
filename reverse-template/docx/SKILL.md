@@ -9,9 +9,9 @@ Takes one `.docx` and produces a template package directory ready to hand over.
 
 Run every command below from `reverse-template/docx/`.
 
-The router's question 2 must have answered "an article, and one stream". A form
-— a resume, a receipt, a certificate — or a body with a sidebar beside it takes
-`../source-style/SKILL.md` instead.
+The router must have read the pages as an article whose body runs as one
+stream. A form — a resume, a receipt, a certificate — or a body with a sidebar
+beside it takes `../source-style/SKILL.md` instead.
 
 ## Prerequisites
 
