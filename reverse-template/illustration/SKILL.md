@@ -93,7 +93,11 @@ should trigger it) and these sections:
 
 - **Brief → piece** — how to turn a one-line brief into a full spec by choosing
   a value for every dial.
-- **Locked frame** — one line per axis, measured values included.
+- **Locked frame** — one line per axis, measured values included. State the
+  contour width in pixels at the canvas the package delivers, not only as a
+  percentage: the references are rarely that size. State how much of the sheet
+  the art covers and whether the ground stays unpainted — without it the model
+  floods the sheet and the paper stops being a colour.
 - **Dials** — one line per axis, with the values the references used.
 - **Not in the frame** — techniques absent from every reference.
 - **Prompt template** — one prompt with a placeholder per dial, opening on the
@@ -150,6 +154,8 @@ pass an image to it.
 | `check_piece.py` fails on line width | Step 2's measurement, not your estimate, goes in the package |
 | Every generated piece looks the same | Too few dials, or the prompt template has no placeholders |
 | A colour appears that no reference uses | The palette dial has no list of allowed values |
+| Generated pieces flood the whole canvas | The locked frame is missing the ink coverage and the unpainted ground; "vignette" alone does not hold |
+| The medium drifts to pencil or crayon | Name the wet behaviour — washes pooling at the stroke edges — and name the media to avoid |
 | The check passes but the piece looks wrong | Medium, shape language or subject convention is missing from the locked frame |
 | Background reads as `textured` on a flat style | The reference is a JPEG; re-export as PNG or accept the grain figure it reports |
 | One reference only | Record the unsettled axes; do not write ranges you cannot support |
