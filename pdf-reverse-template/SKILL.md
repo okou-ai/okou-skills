@@ -1,6 +1,6 @@
 ---
 name: pdf-reverse-template
-description: Infer the typographic styles of a PDF and reverse-engineer it into a Pandoc template package, delivering reference.docx plus the source PDF and usage notes. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout.
+description: Infer the typographic styles of a PDF and reverse-engineer it into a loadable template skill: SKILL.md, reference.docx and the source PDF. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout.
 ---
 
 # Reverse a PDF into a template package
@@ -147,18 +147,19 @@ python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output 
         --map 1=Heading1,2=Title,3=Heading2 --body 2
 ```
 
-Pass `--map`, `--bottom` and `--body` through verbatim. They are recorded in the
-"Human decisions" section of the README, and `--body` is replayed when the
-report is regenerated — omitting it makes `report.txt` re-analyse with the
-default cluster and contradict the template shipped beside it.
+Pass `--map`, `--bottom` and `--body` through verbatim. They are the human
+decisions from steps 2 to 5, and `SKILL.md` is the only place they get written
+down — including in the command it records for re-deriving the analysis.
 
-Hand over the whole directory.
+The package is three files: `SKILL.md`, `reference.docx` and `source.pdf`.
+`SKILL.md` has a `name` and `description` in its frontmatter, so the directory
+loads as a skill and triggers on its own — drop it into a skills path rather
+than explaining it. It carries the style values, the human decisions, the source's
+outline, and what else to take from `source.pdf` when writing a new
+document of this kind.
 
-The package carries the source alongside the template on purpose. The template
-is styles only, so "write another document like this one" has to come from the
-source: `outline.md` for the section skeleton, and the source itself for the
-text that belongs to the document type rather than to that one instance. Say so
-when handing it over.
+Hand over the whole directory. `reference.docx` on its own says nothing about
+how it was built or what it is for.
 
 ### Optional: adjust styles, add a header or footer
 

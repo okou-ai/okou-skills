@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Assemble the deliverable: template, source, report and usage notes in one directory.
+"""Assemble the deliverable: SKILL.md, reference.docx and source.docx.
 
-Usage:  python3 make_package.py <source.docx> <reference.docx> <output dir>
+Usage:  python3 make_package.py <source.docx> <reference.docx> <output dir> [--name slug]
 
-The style values in README.md are read out of reference.docx, not hardcoded.
+Three files, no more. SKILL.md carries the usage, the measured style values and
+the source's outline; reference.docx is the artifact pandoc consumes;
+source.docx is the content reference. The style values are read back out of
+reference.docx, not hardcoded. --name sets the skill name and defaults to the
+output directory's name.
 """
 import sys, os, re, shutil, zipfile, subprocess, datetime
 
@@ -163,39 +167,37 @@ def row(st, name):
             f"{indent} | {s['align'] or '-'} |")
 
 
-README = """# {name} document template
+SKILL = """---
+name: {name}
+description: {desc}
+---
 
-Convert Markdown into Word documents that match this template's layout.
+# {name}
 
-## 1. Quick start
+Produce Word documents in this house style. `reference.docx` carries the
+styles; `{src}` is the document they were taken from.
+
+## Convert
 
 ```bash
-# Install pandoc
-brew install pandoc                                  # macOS
-sudo apt install pandoc                              # Debian / Ubuntu
-winget install --id JohnMacFarlane.Pandoc            # Windows
-
-# Convert
 pandoc your-document.md --reference-doc=reference.docx -o output.docx
 ```
 
-That single command applies the whole template to the output.
+That single command applies the whole template. Nothing else is required.
 
-No administrator rights? Pandoc ships a portable build. Download the archive
-matching **your OS and CPU architecture** from
-<https://github.com/jgm/pandoc/releases> (Apple Silicon: `arm64-macOS.zip`,
-Intel Mac: `x86_64-macOS.zip`, Windows: `windows-x86_64.zip`, Linux:
-`linux-amd64` or `linux-arm64.tar.gz`), unpack it, and add its `bin` directory
-to PATH. It is a single static binary with no runtime dependencies.
+No pandoc? `brew install pandoc`, `sudo apt install pandoc`, or
+`winget install --id JohnMacFarlane.Pandoc`. Without administrator rights,
+download the build matching your OS and CPU from
+<https://github.com/jgm/pandoc/releases> and put its `bin` on PATH; it is a
+single static binary.
 
-## 2. Writing Markdown that picks up these styles
+## Markdown that picks up these styles
 
 | Markdown construct | Style it maps to |
 |---|---|
 {md_map}
 
-Standard Markdown syntax is all that is needed. Put the document title in the
-YAML header:
+Put the document title in the YAML header, not in a `#` heading:
 
 ```markdown
 ---
@@ -209,98 +211,75 @@ date: 2026-01-01
 Body text.
 ```
 
-## 3. What this template contains
-
-### Fonts and spacing (pt)
+## What the template sets
 
 | Style | Font / size / colour | Spacing | First-line indent | Alignment |
 |---|---|---|---|---|
 {styles}
 
-### Page
-
 {page}
 
-## 4. Writing a new document from this template
+## Writing a new document in this style
 
-The template guarantees the **styles**, and nothing else — `--reference-doc`
-discards every piece of body content, so the template knows nothing about what
-the source document said.
+`--reference-doc` discards every piece of body content, so the template knows
+the styles and nothing about what the source document said. When the task is
+another document of this kind, or a revised version, read `{src}`.
 
-When the task is "another one of these", or a revised version, the source
-document in this package is the content reference. Read it for:
+Its section skeleton:
 
-- **The section skeleton** — `outline.md` has it in reading order. Match it
-  unless there is a reason not to.
-- **Fixed text that must be reproduced verbatim** — legal and confidentiality
-  notices, defined terms, standard table headers, metric definitions. These
-  belong to the document type, not to that one instance.
-- **Terminology and level of detail** — what things are called, how precise
-  the numbers are, how long a section runs.
+{outline}
 
-What is fixed and what changes cannot be settled from a single sample: text
+Also take from it the text that belongs to the **document type** rather than
+to that one instance — legal and confidentiality notices, defined terms,
+standard table headers, metric definitions — along with its terminology and
+level of detail.
+
+What is fixed and what varies cannot be settled from a single sample: text
 that looks like boilerplate may be specific to this instance, and a value that
 looks specific may be required in every version. With one document, read it
 and decide. With several, compare them first — what differs is variable, but
 what matches is only *probably* fixed, since two samples can coincide.
 
-The header and footer **are** in the template, and they carry the source's
-own document number, version and owner. Replace those before handing the
-template on, or every document made from it inherits them.
+The header and footer **are** in the template and carry the source's own
+document number, version and owner. Replace them before reusing this template
+more widely, or every document made from it inherits them.
 
-## 5. FAQ
+## Adjusting it
 
-**The fonts look wrong.**
-A font named in the template only renders if it is installed locally; otherwise
-Word substitutes one. Install the font — the template does not need changing.
+Open `reference.docx` in Word and **right-click the style in the Styles pane ->
+Modify**. Editing the style *definition* is what matters; selecting text and
+changing its font is direct formatting and does nothing to the template.
 
-**How do I adjust a style?**
-Open `reference.docx` in Word and use **right-click the style in the Styles
-pane -> Modify**. Editing the **style definition** is what matters; selecting
-text and changing its font is direct formatting and does not affect the
-template. Save when done.
+Without Word, use the scripts from the `docx-reverse-template` skill:
 
-Without Word, or for bulk edits, use `set_style.py` from the skill that
-generated this package:
-`python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12`
+```bash
+python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12
+python3 set_style.py reference.docx "Source Code" --create --font Consolas --size 9
+python3 set_header_footer.py reference.docx --replace 'OLD=NEW'
+python3 verify_reference.py reference.docx
+```
 
-**I created my own style and nothing happens.**
-Pandoc only uses a fixed set of style names — the ones in the table above.
-A new name like "Company Heading" is never referenced. Modify the existing ones.
+## Known limits
 
-**I cannot change how code blocks look.**
-Code blocks use `Source Code`, which Pandoc generates on output. To customise
-it, create a paragraph style with that exact name — in Word via
-**Styles -> New Style**, or with the script:
-`python3 set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9`
+- A font renders only if it is installed locally; otherwise Word substitutes
+  one. Install the font rather than changing the template.
+- Pandoc only writes the style names in the table above. A new name such as
+  "Company Heading" is never referenced.
+- Code blocks use `Source Code`, which pandoc generates on output. Customising
+  it means creating a paragraph style with that exact name.
+- Headings that come out looking like body text mean the template is missing
+  that style. `verify_reference.py` says which one.
 
-**Headings come out looking like body text.**
-The template is missing that style. Run `verify_reference.py` from the skill to
-find out which one.
-
-**I need a header, footer, or different margins.**
-Edit them directly in `reference.docx` with Word and save; all of it carries
-into every output document. Or use `set_header_footer.py` from the skill.
-
-## 6. Package contents
-
-| File | Purpose |
-|---|---|
-| `reference.docx` | **The template.** Point `--reference-doc` at this |
-| `{orig}` | The source document. Keep it — see section 4 |
-| `outline.md` | The source's section skeleton, in reading order |
-| `report.txt` | Inspection and verification output from when this was built |
-| `README.md` | This file |
-
----
-Generated by the docx-reverse-template skill on {date}
+Built from `{src}` by the docx-reverse-template skill on {date}.
 """
 
 
-def build(orig, ref, outdir):
+def build(orig, ref, outdir, name=None):
     os.makedirs(outdir, exist_ok=True)
+    name = name or os.path.basename(os.path.abspath(outdir))
+    src = "source" + os.path.splitext(orig)[1].lower()
     shutil.copy(ref, os.path.join(outdir, "reference.docx"))
-    shutil.copy(orig, os.path.join(outdir, os.path.basename(orig)))
+    shutil.copy(orig, os.path.join(outdir, src))
 
     st, pg = styles_of(ref), page_of(ref)
     names = ["Title", "heading 1", "heading 2", "heading 3",
@@ -319,42 +298,39 @@ def build(orig, ref, outdir):
         page_lines.append(pg["cols"])
     page_lines += [f"- {h}" for h in pg["hf"]] or ["- No header or footer"]
 
-    here = os.path.dirname(os.path.abspath(__file__))
-    rep = []
-    for script, arg in (("inspect_docx.py", orig), ("verify_reference.py", ref)):
-        r = subprocess.run([sys.executable, os.path.join(here, script), arg],
-                           capture_output=True, text=True)
-        rep.append(f"$ python3 {script} {os.path.basename(arg)}\n"
-                   f"(exit={r.returncode})\n{r.stdout}")
-    open(os.path.join(outdir, "report.txt"), "w").write("\n\n".join(rep))
-
-    # The outline is the one piece of the source's *content* that travels with
-    # the package. reference.docx carries no body text, so without this there
-    # is nothing to work from when the task is "another document like this one".
+    # The outline is the only record of the source's *content* that survives.
+    # reference.docx carries no body text, so without it there is nothing to
+    # work from when the task is "another document like this one".
     ol = outline(orig)
-    if ol:
-        lines = [f"# Outline of {os.path.basename(orig)}", "",
-                 "The template carries styles only. This is how the source document",
-                 "was organised; use it when you are writing a new document to match.",
-                 ""]
-        for n, lv, t in ol:
-            lines.append(f"{'  ' * max(0, lv - 1)}- {t}  `{n}`")
-        open(os.path.join(outdir, "outline.md"), "w").write("\n".join(lines) + "\n")
+    ol_md = "\n".join(f"{'  ' * max(0, lv - 1)}- {t}  `{n}`" for n, lv, t in ol) \
+        or "_The source has no headings to record._"
 
-    open(os.path.join(outdir, "README.md"), "w").write(README.format(
-        name=os.path.splitext(os.path.basename(orig))[0],
-        md_map=md, styles=rows, page="\n".join(page_lines),
-        orig=os.path.basename(orig),
+    # The description is what makes an agent reach for this package at all, so
+    # it names the look rather than describing the file.
+    look = st.get("heading 1") or st.get("title") or st.get("body text") or {}
+    marks = ", ".join(v for v in (look.get("font"),
+                                  f"#{look['color']}" if look.get("color") else "") if v)
+    desc = (f"Produce Word documents in the {name} house style"
+            + (f" ({marks})" if marks else "")
+            + f". Use when asked to write, format, re-issue or restyle a document "
+              f"in this style, or to produce another document like {src}.")
+
+    open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
+        name=name, desc=desc, src=src, md_map=md, styles=rows,
+        page="\n".join(page_lines), outline=ol_md,
         date=datetime.date.today().isoformat()))
 
     print(f"Package written to {outdir}/")
     for f in sorted(os.listdir(outdir)):
         print(f"  {f}")
-    print("\nHand over the whole directory; README.md explains how to use it.")
+    print("\nHand over the whole directory. SKILL.md is loadable as a skill: drop")
+    print("the directory into a skills path and it triggers on its own description.")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
+    a = sys.argv
+    if len(a) < 4:
         print(__doc__)
         sys.exit(2)
-    build(sys.argv[1], sys.argv[2], sys.argv[3])
+    nm = a[a.index("--name") + 1] if "--name" in a else None
+    build(a[1], a[2], a[3], nm)

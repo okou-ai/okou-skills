@@ -1,6 +1,6 @@
 ---
 name: docx-reverse-template
-description: Reverse-engineer an existing Word document into a reusable Pandoc template package, delivering reference.docx plus the source document and usage notes. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc.
+description: Reverse-engineer an existing Word document into a loadable template skill: SKILL.md, reference.docx and the source document. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc.
 ---
 
 # Reverse a docx into a template package
@@ -126,13 +126,15 @@ the text as Normal.
 python3 scripts/make_package.py <source.docx> reference.docx <output dir>
 ```
 
-Hand over the whole directory, not just `reference.docx`.
+The package is three files: `SKILL.md`, `reference.docx` and `source.docx`.
+`SKILL.md` has a `name` and `description` in its frontmatter, so the directory
+loads as a skill and triggers on its own — drop it into a skills path rather
+than explaining it. It carries the style values, the source's
+outline, and what else to take from `source.docx` when writing a new
+document of this kind.
 
-The package carries the source alongside the template on purpose. The template
-is styles only, so "write another document like this one" has to come from the
-source: `outline.md` for the section skeleton, and the source itself for the
-text that belongs to the document type rather than to that one instance. Say so
-when handing it over.
+Hand over the whole directory. `reference.docx` on its own says nothing about
+how it was built or what it is for.
 
 ## Rules
 

@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
-"""Assemble the deliverable: template, source PDF, report and usage notes.
+"""Assemble the deliverable: SKILL.md, reference.docx and source.pdf.
 
 Usage:
   python3 make_package.py <source.pdf> <reference.docx> <styles.json> <output dir> \
-          [--map 1=Heading1,2=Title] [--bottom 3.0] [--body 2]
+          [--map 1=Heading1,2=Title] [--bottom 3.0] [--body 2] [--name slug]
 
-Pass --map, --bottom and --body through verbatim. They are recorded in the
-"Human decisions" section of the README, and --body is also replayed when the
-report is regenerated — otherwise report.txt would re-analyse with the default
-cluster and contradict the template it ships beside.
+Three files, no more. SKILL.md carries the usage, the measured style values,
+the human decisions and the source's outline; reference.docx is the artifact
+pandoc consumes; source.pdf is the content reference. styles.json is not
+shipped because SKILL.md records the exact command that re-derives it, and the
+analysis is reproducible byte for byte.
+
+Pass --map, --bottom and --body through verbatim: they are the human decisions,
+and SKILL.md is the only place they are written down. --name sets the skill
+name and defaults to the output directory's name.
 """
 import sys, os, re, json, shutil, zipfile, subprocess, datetime
 
@@ -92,71 +97,53 @@ def row(st, name):
             f"{indent} | {s['align'] or '-'} |")
 
 
-README = """# {name} document template
+SKILL = """---
+name: {name}
+description: {desc}
+---
 
-A Word template reverse-engineered from a PDF. Use it to convert Markdown into
-documents that match the original layout.
+# {name}
 
-## 1. Quick start
+Produce Word documents in this house style. `reference.docx` carries the
+styles; `{src}` is the document they were reverse-engineered from.
+
+## Convert
 
 ```bash
-# Install pandoc
-brew install pandoc                                  # macOS
-sudo apt install pandoc                              # Debian / Ubuntu
-winget install --id JohnMacFarlane.Pandoc            # Windows
-
-# Convert
 pandoc your-document.md --reference-doc=reference.docx -o output.docx
 ```
 
-For a PDF, open the resulting .docx in Word and export from there.
+That single command applies the whole template. Nothing else is required.
 
-No administrator rights? Pandoc ships a portable build. Download the archive
-matching **your OS and CPU architecture** from
-<https://github.com/jgm/pandoc/releases> (Apple Silicon: `arm64-macOS.zip`,
-Intel Mac: `x86_64-macOS.zip`, Windows: `windows-x86_64.zip`, Linux:
-`linux-amd64` or `linux-arm64.tar.gz`), unpack it, and add its `bin` directory
-to PATH.
+No pandoc? `brew install pandoc`, `sudo apt install pandoc`, or
+`winget install --id JohnMacFarlane.Pandoc`. Without administrator rights,
+download the build matching your OS and CPU from
+<https://github.com/jgm/pandoc/releases> and put its `bin` on PATH; it is a
+single static binary.
 
-## 2. Writing Markdown that picks up these styles
+For a PDF, convert to docx first and export from Word. Going straight to PDF
+with pandoc bypasses `--reference-doc` entirely and loses every style here.
+
+## Markdown that picks up these styles
 
 | Markdown construct | Style it maps to |
 |---|---|
 {md_map}
 
-Put the document title in the YAML header:
-
-```markdown
----
-title: Document title
-author: Author
----
-
-# Chapter one
-
-Body text.
-```
-
-## 3. What this template contains
-
-### Fonts and spacing (pt)
+## What the template sets
 
 | Style | Font / size / colour | Spacing | First-line indent | Alignment |
 |---|---|---|---|---|
 {styles}
 
-### Page
-
 {page}
 
-## 4. Human decisions
+## What was inferred rather than read
 
-A PDF has no style layer, so this template was **measured and inferred**. Two
-choices were made by hand when it was built; start here if any value looks off:
+A PDF has no style layer, so these values were measured from glyph
+coordinates. Start here if something looks off.
 
 {review}
-
-Confidence by field:
 
 | Field | Source | Confidence |
 |---|---|---|
@@ -166,90 +153,72 @@ Confidence by field:
 | Top / left / right margins | Measured, then rounded | Medium |
 | Bottom margin | Only bounded, never measured | Low |
 
-## 5. Writing a new document from this template
+To re-derive every measured value, run this against `{src}` with the
+`pdf-reverse-template` skill; the output is reproducible byte for byte:
 
-The template guarantees the **styles**, and nothing else — `--reference-doc`
-discards every piece of body content, so the template knows nothing about what
-the source document said.
+```bash
+python3 analyze_pdf.py {src}{repro} --json styles.json
+```
 
-When the task is "another one of these", or a revised version, the source
-PDF in this package is the content reference. Read it for:
+## Writing a new document in this style
 
-- **The section skeleton** — `outline.md` has it in reading order. Match it
-  unless there is a reason not to.
-- **Fixed text that must be reproduced verbatim** — legal and confidentiality
-  notices, defined terms, standard table headers, metric definitions. These
-  belong to the document type, not to that one instance.
-- **Terminology and level of detail** — what things are called, how precise
-  the numbers are, how long a section runs.
+`--reference-doc` discards every piece of body content, so the template knows
+the styles and nothing about what the source document said. When the task is
+another document of this kind, or a revised version, read `{src}`.
 
-What is fixed and what changes cannot be settled from a single sample: text
+Its section skeleton:
+
+{outline}
+
+Also take from it the text that belongs to the **document type** rather than
+to that one instance — legal and confidentiality notices, defined terms,
+standard table headers, metric definitions — along with its terminology and
+level of detail.
+
+What is fixed and what varies cannot be settled from a single sample: text
 that looks like boilerplate may be specific to this instance, and a value that
 looks specific may be required in every version. With one document, read it
 and decide. With several, compare them first — what differs is variable, but
 what matches is only *probably* fixed, since two samples can coincide.
 
-The source's running head and footer are not in the template either;
-`report.txt` lists what they said.
+## Adjusting it
 
-## 6. FAQ
+Open `reference.docx` in Word and **right-click the style in the Styles pane ->
+Modify**. Editing the style *definition* is what matters; selecting text and
+changing its font is direct formatting and does nothing to the template.
 
-**The fonts look wrong.**
-The PDF stores embedded subset names; the script restores the system name, but
-the font still has to be installed locally. Install it — the template does not
-need changing.
+Without Word, use the scripts from the `pdf-reverse-template` skill:
 
-**How do I adjust a style?**
-Open `reference.docx` in Word and use **right-click the style in the Styles
-pane -> Modify**. Editing the **style definition** is what matters; selecting
-text and changing its font is direct formatting and does not affect the
-template.
+```bash
+python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12
+python3 set_style.py reference.docx "Source Code" --create --font Consolas --size 9
+python3 set_header_footer.py reference.docx --header 'Title\tv2.3'
+python3 verify_roundtrip.py reference.docx styles.json --structure-only
+```
 
-Without Word, or for bulk edits, use `set_style.py` from the skill that
-generated this package:
-`python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12`
+## Known limits
 
-**I created my own style and nothing happens.**
-Pandoc only uses a fixed set of style names — the ones in the table above.
-Modify the existing ones.
+- The PDF stores embedded subset names. The system name is restored, but the
+  font still has to be installed locally or Word substitutes one.
+- Pandoc only writes the style names in the table above. A new name such as
+  "Company Heading" is never referenced.
+- Code blocks use `Source Code`, which pandoc generates on output. Customising
+  it means creating a paragraph style with that exact name.
+- A layout that does not match the original is almost always the heading level
+  mapping. Levels are the one thing a PDF does not record.
+- A PDF stores its running head as ordinary text, so nothing was carried over
+  automatically. Whatever the page section lists was added deliberately.
 
-**I cannot change how code blocks look.**
-`Source Code` is generated by Pandoc on output. Create a paragraph style with
-that exact name — in Word via **Styles -> New Style**, or with the script:
-`python3 set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9`
-
-**The layout does not match the original PDF.**
-Check the heading level mapping in section 4 first. Levels are the one thing a
-PDF does not record.
-
-**I need a header or footer.**
-Section 3 lists what this template carries. A PDF stores its running content as
-ordinary text, so nothing is carried over automatically — whatever is listed was
-added deliberately when the template was built. Add or change one in Word, or
-with `set_header_footer.py` from the skill; either way it flows into every
-output document.
-
-## 7. Package contents
-
-| File | Purpose |
-|---|---|
-| `reference.docx` | **The template.** Point `--reference-doc` at this |
-| `{orig}` | The source PDF. Keep it — see section 5 |
-| `outline.md` | The source's section skeleton, in reading order |
-| `styles.json` | The raw inferred values, useful when editing the template |
-| `report.txt` | Analysis and verification output from when this was built |
-| `README.md` | This file |
-
----
-Generated by the pdf-reverse-template skill on {date}
+Built from `{src}` by the pdf-reverse-template skill on {date}.
 """
 
 
-def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
+def build(pdf, ref, jpath, outdir, mapping, bottom, body=None, name=None):
     os.makedirs(outdir, exist_ok=True)
+    name = name or os.path.basename(os.path.abspath(outdir))
+    src = "source" + os.path.splitext(pdf)[1].lower()
     shutil.copy(ref, os.path.join(outdir, "reference.docx"))
-    shutil.copy(pdf, os.path.join(outdir, os.path.basename(pdf)))
-    shutil.copy(jpath, os.path.join(outdir, "styles.json"))
+    shutil.copy(pdf, os.path.join(outdir, src))
 
     d = json.load(open(jpath))
     st = styles_of(ref)
@@ -354,48 +323,43 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
                       f"and the bound was rounded instead)" if mb else "")
                    + ".")
 
-    here = os.path.dirname(os.path.abspath(__file__))
-    rep = []
-    map_args = ["--map", ",".join(f"{k}={v}" for k, v in mapping.items())] if mapping else []
-    body_args = ["--body", str(body)] if body else []
-    # The column count is read back out of styles.json rather than taken as a
-    # flag. Re-running the analysis without it regenerates report.txt as a
-    # single-column document, which then contradicts the template beside it.
+    # The flags that were human decisions, so the analysis can be reproduced
+    # from source.pdf alone. The column count comes back out of styles.json
+    # rather than from a flag, where it cannot drift from the template.
     ncols = d.get("columns") or 1
-    col_args = ["--columns", str(ncols)] if ncols > 1 else []
-    for script, args in (("analyze_pdf.py", [pdf] + body_args + col_args),
-                         ("verify_roundtrip.py", [ref, jpath] + map_args)):
-        r = subprocess.run([sys.executable, os.path.join(here, script)] + args,
-                           capture_output=True, text=True)
-        rep.append(f"$ python3 {script} ...\n(exit={r.returncode})\n{r.stdout}")
-    open(os.path.join(outdir, "report.txt"), "w").write("\n\n".join(rep))
+    repro = (f" --body {body}" if body else "") + (f" --columns {ncols}" if ncols > 1 else "")
 
-    # The outline is the one piece of the source's *content* that travels with
-    # the package. reference.docx carries no body text, so without this there
-    # is nothing to work from when the task is "another document like this one".
-    ol = d.get("outline") or []
-    if ol:
-        lines = [f"# Outline of {os.path.basename(pdf)}", "",
-                 "The template carries styles only. This is how the source document",
-                 "was organised; use it when you are writing a new document to match.",
-                 ""]
-        for o in ol:
-            n = mapping.get(str(o["level"]), f"Heading{o['level']}")
-            lv = re.fullmatch(r"Heading(\d)", n)
-            depth = max(0, int(lv.group(1)) - 1) if lv else 0
-            lines.append(f"{'  ' * depth}- {o['text']}  `{n}`  (p{o['page']})")
-        open(os.path.join(outdir, "outline.md"), "w").write("\n".join(lines) + "\n")
+    # The outline is the only record of the source's *content* that survives.
+    # reference.docx carries no body text, so without it there is nothing to
+    # work from when the task is "another document like this one".
+    ol_lines = []
+    for o in d.get("outline") or []:
+        n = mapping.get(str(o["level"]), f"Heading{o['level']}")
+        lv = re.fullmatch(r"Heading(\d)", n)
+        depth = max(0, int(lv.group(1)) - 1) if lv else 0
+        ol_lines.append(f"{'  ' * depth}- {o['text']}  `{n}`  (p{o['page']})")
+    ol_md = "\n".join(ol_lines) or "_No headings were detected in the source._"
 
-    open(os.path.join(outdir, "README.md"), "w").write(README.format(
-        name=os.path.splitext(os.path.basename(pdf))[0],
-        md_map=md, styles=rows, page="\n".join(page),
-        review="\n".join(rev), orig=os.path.basename(pdf),
-        date=datetime.date.today().isoformat()))
+    # The description is what makes an agent reach for this package at all, so
+    # it names the look rather than describing the file.
+    look = st.get("heading 1") or st.get("title") or st.get("body text") or {}
+    marks = ", ".join(v for v in (look.get("font"),
+                                  f"#{look['color']}" if look.get("color") else "") if v)
+    desc = (f"Produce Word documents in the {name} house style"
+            + (f" ({marks})" if marks else "")
+            + f". Use when asked to write, format, re-issue or restyle a document "
+              f"in this style, or to produce another document like {src}.")
+
+    open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
+        name=name, desc=desc, src=src, md_map=md, styles=rows,
+        page="\n".join(page), review="\n".join(rev), repro=repro,
+        outline=ol_md, date=datetime.date.today().isoformat()))
 
     print(f"Package written to {outdir}/")
     for f in sorted(os.listdir(outdir)):
         print(f"  {f}")
-    print("\nHand over the whole directory; README.md explains how to use it.")
+    print("\nHand over the whole directory. SKILL.md is loadable as a skill: drop")
+    print("the directory into a skills path and it triggers on its own description.")
 
 
 if __name__ == "__main__":
@@ -410,4 +374,5 @@ if __name__ == "__main__":
     if "--bottom" in a:
         bottom = float(a[a.index("--bottom") + 1])
     body = int(a[a.index("--body") + 1]) if "--body" in a else None
-    build(a[1], a[2], a[3], a[4], mapping, bottom, body)
+    nm = a[a.index("--name") + 1] if "--name" in a else None
+    build(a[1], a[2], a[3], a[4], mapping, bottom, body, nm)
