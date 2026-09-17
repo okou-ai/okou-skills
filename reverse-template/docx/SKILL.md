@@ -5,24 +5,25 @@ description: "Reverse-engineer a Word document into a loadable template skill: S
 
 # Reverse a docx into a template package
 
-Input: one `.docx`. Output: a directory holding `SKILL.md`, `reference.docx`
-and `source.docx`.
+Input: one `.docx`. Output for an article: a directory holding `SKILL.md`,
+`reference.docx` and `source.docx`. Output for a fixed structure: `SKILL.md`
+and the source alone.
 
 Run every command below from `reverse-template/docx/`.
 
-## Before anything — an article, or a form?
+## Before anything — an article, or a fixed structure?
 
 Look at the rendered pages.
 
 An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a manual, a policy. A **form** is one
-object with a fixed set of entries, and a new one fills the same entries — a
-resume, an invoice, a certificate.
+length on another subject — a report, a manual, a policy. A **fixed structure**
+is the whole document as one arrangement of blocks, and a new one keeps that
+arrangement and changes the content — a resume, an invoice, a certificate.
 
 Judge on what the document is, not on how it looks — a plain single-column
-resume is still a form. An article continues at Prerequisites below.
+resume is still a fixed structure. An article continues at Prerequisites below.
 
-### A form: publish the source itself
+### A fixed structure: publish the source itself
 
 A style sheet drops those silently. Publish the file and stop here.
 
