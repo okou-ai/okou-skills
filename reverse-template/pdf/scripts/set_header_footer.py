@@ -18,11 +18,14 @@ Options:
                      "Title\tv2.3" puts the title left and the version right,
                      "left\tcentre\tright" gives three. Write it as \t.
   --footer TEXT      footer text, same tab handling
-  --page-number      append an automatic PAGE field after the footer text
+  --page-number      append an automatic PAGE field after the footer text;
+                     or write {PAGE} inside the text where the number goes
   --align L          left | center | right (default: header right, footer center)
   --size PT          font size (default 9)
   --color RRGGBB     colour (default 808080)
   --paper NAME       paper size: A4 | A5 | A3 | Letter | Legal
+  --header-distance PT  distance from the page top to the header (pgMar w:header)
+  --footer-distance PT  distance from the page bottom to the footer (pgMar w:footer)
   --columns N        number of text columns (1 restores a single column). The
                      gutter and any per-column widths come from the document;
                      they are only replaced when the count actually changes.
@@ -142,23 +145,45 @@ def part_xml(tag, text, align, size, color, page_number, width=None):
                 f'<w:tab w:val="{v}" w:pos="{p}"/>' for v, p in stops) + "</w:tabs>"
         align = "left"
 
+    # PAGE field: Word computes the current page number when the file opens
+    field = (f'<w:r>{rpr}<w:fldChar w:fldCharType="begin"/></w:r>'
+             f'<w:r>{rpr}<w:instrText xml:space="preserve"> PAGE </w:instrText></w:r>'
+             f'<w:r>{rpr}<w:fldChar w:fldCharType="separate"/></w:r>'
+             f'<w:r>{rpr}<w:t>1</w:t></w:r>'
+             f'<w:r>{rpr}<w:fldChar w:fldCharType="end"/></w:r>')
     runs = ""
     for i, c in enumerate(cols):
         if i:
             runs += f'<w:r>{rpr}<w:tab/></w:r>'
-        if c:
-            runs += t(c)
-    if page_number:
-        # PAGE field: Word computes the current page number when the file opens
-        runs += (f'<w:r>{rpr}<w:fldChar w:fldCharType="begin"/></w:r>'
-                 f'<w:r>{rpr}<w:instrText xml:space="preserve"> PAGE </w:instrText></w:r>'
-                 f'<w:r>{rpr}<w:fldChar w:fldCharType="separate"/></w:r>'
-                 f'<w:r>{rpr}<w:t>1</w:t></w:r>'
-                 f'<w:r>{rpr}<w:fldChar w:fldCharType="end"/></w:r>')
-    # CT_PPrBase order: tabs precedes jc.
+        # {PAGE} anywhere in the text puts the field there: "第 {PAGE} 页"
+        for j, piece in enumerate(c.split("{PAGE}")):
+            if j:
+                runs += field
+            if piece:
+                runs += t(piece)
+    if page_number and "{PAGE}" not in (text or ""):
+        runs += field
+    # Explicit spacing: the part paragraph otherwise inherits Normal, including
+    # a body atLeast line height and space-after sized for body text, which
+    # pushes a header down and a footer up. CT_PPrBase order: tabs, spacing, jc.
+    spacing = '<w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/>'
     return (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            f'<w:{tag} {NS}><w:p><w:pPr>{tabs}<w:jc w:val="{align}"/></w:pPr>'
+            f'<w:{tag} {NS}><w:p><w:pPr>{tabs}{spacing}<w:jc w:val="{align}"/></w:pPr>'
             f'{runs}</w:p></w:{tag}>')
+
+
+def set_pgmar(doc, **attrs):
+    """Set attributes on the existing pgMar without disturbing the others."""
+    m = re.search(r"<w:pgMar\b[^>]*/>", doc)
+    if not m:
+        return doc, False
+    tag = m.group(0)
+    for k, v in attrs.items():
+        if re.search(rf'w:{k}="[^"]*"', tag):
+            tag = re.sub(rf'w:{k}="[^"]*"', f'w:{k}="{v}"', tag)
+        else:
+            tag = tag[:-2] + f' w:{k}="{v}"/>'
+    return doc[:m.start()] + tag + doc[m.end():], True
 
 
 def text_width(doc):
@@ -194,9 +219,47 @@ def show(members):
         print("  no header or footer")
 
 
+def _log_recipe(target, argv):
+    """Append this invocation beside the template so make_package can replay
+    it. Inferring the recipe from the result was never complete."""
+    import json, os
+    try:
+        with open(os.path.abspath(target) + ".recipe", "a") as f:
+            f.write(json.dumps({"cmd": [os.path.basename(argv[0])] + argv[1:]}, ensure_ascii=False) + "\n")
+    except OSError:
+        pass
+
+
+def apply_running_heads(path, header=None, footer=None, header_distance=None,
+                        footer_distance=None):
+    """Write a header and/or footer from analyzer specs
+    {"text","align","size","color","page_number"} into an existing docx."""
+    argv = [path]
+    for kind, spec in (("--header", header), ("--footer", footer)):
+        if not spec:
+            continue
+        args = argv + [kind, spec["text"].replace("\t", "\\t"), "--align", spec["align"],
+                       "--size", str(spec["size"]), "--color", spec["color"]]
+        if spec.get("page_number") and "{PAGE}" not in spec["text"]:
+            args.append("--page-number")
+        if header_distance is not None:
+            args += ["--header-distance", str(header_distance)]
+        if footer_distance is not None:
+            args += ["--footer-distance", str(footer_distance)]
+        saved = sys.argv
+        sys.argv = ["set_header_footer.py"] + args
+        try:
+            rc = main()
+        finally:
+            sys.argv = saved
+        if rc:
+            return rc
+    return 0
+
+
 def main():
     a = sys.argv[1:]
-    if not a:
+    if not a or a[0] in ('-h', '--help'):
         print(__doc__)
         return 2
     path = a[0]
@@ -250,13 +313,15 @@ def main():
     unesc = lambda s: None if s is None else s.replace("\\t", "\t")
     header, footer = unesc(opt("--header")), unesc(opt("--footer"))
     paper = (opt("--paper") or "").upper() or None
+    hdist = float(opt("--header-distance")) if opt("--header-distance") else None
+    fdist = float(opt("--footer-distance")) if opt("--footer-distance") else None
     ncols = int(opt("--columns")) if opt("--columns") else None
     cgap = float(opt("--column-gap")) if opt("--column-gap") else None
     if paper and paper not in PAPER:
         print(f"Unknown paper size {paper!r}. Choose from: {', '.join(PAPER)}")
         return 2
     if not clear and header is None and footer is None and not paper \
-            and not subs and ncols is None:
+            and not subs and ncols is None and hdist is None and fdist is None:
         print("Nothing to do: pass --replace / --header / --footer / --paper / "
               "--columns / --clear / --show.")
         return 2
@@ -347,6 +412,13 @@ def main():
             added.append(f"{ncols} column(s)"
                          + (f", gap {space / 20:g}pt ({origin})" if ncols > 1 else ""))
 
+    if hdist is not None or fdist is not None:
+        kw = {}
+        if hdist is not None: kw["header"] = int(round(hdist * 20))
+        if fdist is not None: kw["footer"] = int(round(fdist * 20))
+        doc, ok = set_pgmar(doc, **kw)
+        added.append("header/footer distance " + ", ".join(f"{k} {v / 20:g}pt" for k, v in kw.items())
+                     + ("" if ok else "  (no pgMar in the document; run --paper first)"))
     if paper:
         w, h = PAPER[paper]
         doc = put_in_sectpr(doc, {"pgSz": f'<w:pgSz w:w="{w}" w:h="{h}"/>'})
@@ -380,4 +452,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    _rc = main()
+    if not _rc and len(sys.argv) > 1 and sys.argv[1] not in ("-h", "--help") and "--show" not in sys.argv and "--list" not in sys.argv:
+        _out = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else sys.argv[1]
+        _log_recipe(_out, sys.argv)
+    sys.exit(_rc or 0)

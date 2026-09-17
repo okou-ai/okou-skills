@@ -6,10 +6,12 @@ Usage:  python3 inspect_docx.py source.docx
 Read-only. Exit code 0 means it is usable as is; 1 means build_reference.py
 needs to fill gaps first.
 """
+import collections
 import sys, zipfile, re, os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pandoc_styles as PS
+PS_LOWER = {n.lower() for n in PS.ALL}
 
 TWIP = lambda t: int(t) / 1440 * 2.54          # twips -> cm
 TWIP2PT = lambda t: round(int(t) / 20, 1)      # twips -> pt
@@ -147,8 +149,9 @@ def main(path):
                         over = int(pos) - tw
                         print(f"  REVIEW: {os.path.basename(part)} has a {val} tab at "
                               f"{pos} twips, {over} past the {tw}-twip text width "
-                              f"({over / 1440 * 2.54:.2f}cm outside it). Move it to "
-                              f"{tw} or change the margins.")
+                              f"({over / 1440 * 2.54:.2f}cm outside it). Rebuild the part with "
+                              f"set_header_footer.py --{part.split('/')[-1][:6]} 'left\\tright', "
+                              f"which places the stop at {tw}.")
         print(f"  references a header: {'yes' if 'headerReference' in s else 'no'}"
               f"   footer: {'yes' if 'footerReference' in s else 'no'}")
         # Columns ride along in sectPr like paper and margins do, so a
@@ -168,6 +171,16 @@ def main(path):
                 print("           inherited as is. set_header_footer.py --columns changes"
                       " the count,")
                 print("           and changing it drops per-column widths.")
+            if widths and n > 1:
+                spaces = re.findall(r'<w:col\b[^>]*w:space="(\d+)"', c.group(0))
+                span = sum(int(w) for w in widths) + sum(int(x) for x in spaces[:-1])
+                pw = re.search(r'<w:pgSz\b[^>]*w:w="(\d+)"', s)
+                mg = dict(re.findall(r'w:(left|right)="(-?\d+)"', re.search(r"<w:pgMar\b[^>]*/>", s).group(0))) if re.search(r"<w:pgMar\b[^>]*/>", s) else {}
+                if pw and mg:
+                    tw = int(pw.group(1)) - int(mg.get("left", 0)) - int(mg.get("right", 0))
+                    if abs(tw - span) > 40:
+                        print(f"  REVIEW: the columns span {TWIP(span):.2f}cm of a {TWIP(tw):.2f}cm text width."
+                              " Word leaves the rest empty; LibreOffice stretches the columns.")
         else:
             print("  columns: 1 (none set)")
     else:
@@ -202,6 +215,65 @@ def main(path):
     # --- required style coverage ---
     crit = [n for n in PS.MUST_EXIST if n.lower() not in have]
     soft = [n for n in PS.AUTO_INJECTED if n.lower() not in have]
+    # What the document actually uses. The styles pandoc writes to may be the
+    # ones the author never touched: a document set in "Memo Title" and
+    # "Section Head" leaves Title and heading 1 at their defaults, and a
+    # document formatted by hand leaves every style empty.
+    docxml = z.read("word/document.xml").decode("utf-8", "replace")
+    id_to_name = {(v[0] if isinstance(v, tuple) else v): k for k, v in have.items()}
+    paras = re.findall(r"<w:p\b.*?</w:p>", docxml, re.S)
+    use, direct = collections.Counter(), collections.Counter()
+    for para in paras:
+        if not re.search(r"<w:t\b[^>]*>[^<]*\S", para):
+            continue
+        ps = re.search(r'<w:pStyle w:val="([^"]+)"', para)
+        sid = ps.group(1) if ps else "Normal"
+        use[sid] += 1
+        runs = re.findall(r"<w:r\b.*?</w:r>", para, re.S)
+        if any(re.search(r"<w:rPr>.*?<w:(sz|b|color|rFonts)\b", r, re.S) for r in runs):
+            direct[sid] += 1
+    print(f"\n[styles in use] {sum(use.values())} paragraphs with text")
+    print(f"  {'style':24}{'paragraphs':>11}{'direct formatting':>19}")
+    for sid, n in use.most_common():
+        nm = id_to_name.get(sid, sid)
+        print(f"  {nm:24}{n:>11}{direct[sid]:>19}")
+    total = sum(use.values()) or 1
+    if direct["Normal"] * 100 >= 60 * total:
+        print("  REVIEW: the document is formatted by hand; its styles carry nothing.")
+        print("          Render it and reverse the render instead:")
+        print(f"            soffice --headless --convert-to pdf {os.path.basename(path)}")
+        print("          then follow reverse-template/pdf/SKILL.md on that PDF.")
+    else:
+        targets = {"title": "Title", "heading 1": "Heading1", "heading 2": "Heading2",
+                   "heading 3": "Heading3", "body text": "BodyText"}
+        sid_of = lambda n: have[n][0] if isinstance(have[n], tuple) else have[n]
+        unused = [n for n in targets if n in have and sid_of(n) not in use]
+        custom = [(id_to_name.get(sid, sid), n) for sid, n in use.most_common()
+                  if id_to_name.get(sid, sid).lower() not in PS_LOWER]
+        top_unused = any(n in unused for n in ("title", "heading 1"))
+        if top_unused and custom:
+            styles_xml = z.read("word/styles.xml").decode("utf-8", "replace")
+            def look(name):
+                sid = sid_of(name.lower()) if name.lower() in have else name
+                m = re.search(rf'<w:style\b[^>]*w:styleId="{re.escape(sid)}".*?</w:style>', styles_xml, re.S)
+                x = m.group(0) if m else ""
+                sz = re.search(r'<w:sz w:val="(\d+)"', x)
+                return (int(sz.group(1)) / 2 if sz else None, bool(re.search(r"<w:b\s*/>|<w:b w:val=\"(1|true)\"", x)))
+            print(f"  REVIEW: pandoc writes to {', '.join(unused)}, which this document never uses.")
+            print("          It uses:")
+            for name, n in custom:
+                sz, b = look(name)
+                print(f"            {name:24}{n:>4} paragraphs  {sz if sz else '-':>5}pt  {'bold' if b else ''}")
+            ranked = sorted(custom, key=lambda c: -(look(c[0])[0] or 0))
+            pandoc_body = use.get("Normal", 0) + use.get(sid_of("body text"), 0) if "body text" in have else use.get("Normal", 0)
+            body_guess = max(custom, key=lambda c: c[1])
+            body_guess = body_guess[0] if body_guess[1] > pandoc_body else None
+            heads = [c[0] for c in ranked if c[0] != body_guess]
+            guess = ([f"{body_guess}=BodyText"] if body_guess else []) + \
+                    [f"{h}={t}" for h, t in zip(heads, ("Title", "Heading1", "Heading2", "Heading3"))]
+            print("          Map each onto the pandoc style whose part it plays (the size order")
+            print("          below is a guess; check it against the document):")
+            print("            python3 build_reference.py <source.docx> reference.docx --map '" + ",".join(guess) + "'")
     print(f"\n[style coverage] {len(have)} styles defined; Pandoc references {len(PS.ALL)}")
     if crit:
         print(f"  MISSING {len(crit)} required — a dangling reference renders as Normal:")

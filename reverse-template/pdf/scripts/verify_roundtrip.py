@@ -22,6 +22,7 @@ Two checks:
 
 Exit code 0 means it passed.
 """
+import shutil
 import sys, os, re, json, zipfile, subprocess, tempfile
 
 PROBE = """---
@@ -104,6 +105,8 @@ def main(ref, jpath, mapping=None, structure_only=False):
     tmp = tempfile.mkdtemp()
     md, out = os.path.join(tmp, "p.md"), os.path.join(tmp, "p.docx")
     open(md, "w").write(PROBE)
+    if not shutil.which("pandoc"):
+        sys.exit("pandoc is not on PATH. Run: python3 ensure_pandoc.py")
     r = subprocess.run(["pandoc", md, f"--reference-doc={ref}", "-o", out],
                        capture_output=True, text=True)
     if r.returncode != 0:
@@ -186,6 +189,8 @@ def main(ref, jpath, mapping=None, structure_only=False):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
+        sys.exit(__doc__ or "usage: verify_roundtrip.py <reference.docx> <styles.json> [--map ...] [--structure-only]")
     a = sys.argv
     if len(a) < 3:
         print(__doc__); sys.exit(2)
