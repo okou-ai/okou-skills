@@ -29,7 +29,8 @@ data   →  you build rows in Python  →  openpyxl  →  .xlsx
 | Word document, user supplied a template | `pandoc doc.md --reference-doc=theirs.docx -o out.docx` — see **docx** |
 | Word document, no template | `pandoc doc.md -o out.docx` — see **docx** |
 | Word document needing a header, footer or page number, no template | build a reference doc first — see **docx** |
-| PDF | `pandoc doc.md -t typst -s -V papersize=a4` then `typst.compile` — see **PDF** |
+| PDF, no template | `pandoc doc.md -t typst -s -V papersize=a4` then `typst.compile` — see **PDF** |
+| PDF carrying the user's branding | render the docx with `--reference-doc`, then convert that docx — see **PDF** |
 | Spreadsheet | openpyxl — see **xlsx** |
 | Edit a file the user sent | **Start from the user's file** first, then the matching row above |
 
@@ -85,7 +86,21 @@ Three things that fail quietly here:
 
 Variable names come from `pandoc --print-default-template=typst`: `mainfont`, `mathfont`, `codefont`, `fontsize`, `papersize`.
 
-**`--reference-doc` does not apply to PDF** — only docx, pptx and ODT support it, so this path produces a clean but unbranded PDF. When the user needs their branding on a PDF, produce the docx with their reference doc and tell them the PDF export has to happen on their side; the sandbox cannot convert docx to PDF.
+**`--reference-doc` does not apply to PDF** — only docx, pptx and ODT support it, so the typst flow above always produces an unbranded PDF. When the user needs their branding on a PDF, render the docx with their reference doc first, then convert that docx:
+
+```bash
+soffice --headless -env:UserInstallation=file:///tmp/lo --convert-to pdf --outdir . out.docx 2>&1 | grep -q writer_pdf_Export \
+  || { sudo apt-get update -qq && sudo apt-get install -y -qq libreoffice-writer
+       soffice --headless -env:UserInstallation=file:///tmp/lo --convert-to pdf --outdir . out.docx; }
+```
+
+Convert first and install only on failure. Three things make that ordering necessary:
+
+- **`libreoffice-writer` is absent from the image.** Only `-impress` and `-draw` ship, so the Writer filters do not exist and a bare `soffice` fails with `Error: source file could not be loaded`. Installing it pulls 9 packages and 66 MB.
+- **`apt-get update` has to come first.** `/var/lib/apt/lists/` ships empty, so installing without it reports `Package 'libreoffice-writer' has no installation candidate`, which reads like the package is missing from the archive rather than uncached.
+- **The root filesystem is rolled back from time to time.** An install that worked earlier in the run can be gone later, and so can `pip --user` packages; only `/home/user/workspace` is unaffected. Re-running the line above recovers.
+
+Fonts, line spacing and justification all survive the conversion, so the result is good enough to deliver. The `w:header` and `w:footer` offsets in `pgMar` do not — LibreOffice puts the running head a few points off where Word does.
 
 ## xlsx
 
@@ -110,7 +125,7 @@ Excel evaluates formulas when the file opens, so when the file itself must alrea
 
 ## Never use
 
-- `soffice` / LibreOffice conversion — the sandbox installs only `libreoffice-impress` and `libreoffice-draw`, so the Writer and Calc filters do not exist and every convert fails with `Error: source file could not be loaded`.
+- `soffice` on a docx before installing `libreoffice-writer`, or on an xlsx at all — the image ships only `libreoffice-impress` and `libreoffice-draw`, so the Writer and Calc filters do not exist and the convert fails with `Error: source file could not be loaded`. For docx to PDF, install Writer first — see **PDF**. For spreadsheets, use openpyxl.
 - `chromium --headless --print-to-pdf` — produces no file.
 - `weasyprint` as a pandoc `--pdf-engine` — exits non-zero.
 - `pandoc -o out.xlsx` — pandoc has no xlsx writer.
