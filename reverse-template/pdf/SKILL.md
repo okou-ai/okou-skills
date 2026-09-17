@@ -14,33 +14,26 @@ Run every command below from `reverse-template/pdf/`.
 
 ## Before anything — an article, or a form?
 
-This branch builds a style sheet: paper size, margins, columns, per-style type,
-a header and a footer. Pandoc pours one stream of paragraphs into it. Look at
-the rendered pages before going further.
+Look at the rendered pages.
 
 An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a paper, a white paper, a manual, a
-policy, a memo. A **form** is one object with a fixed set of entries, and a new
-one fills the same entries — a resume, a receipt, an invoice, a certificate, an
-offer letter, a spec sheet.
+length on another subject — a report, a manual, a policy. A **form** is one
+object with a fixed set of entries, and a new one fills the same entries — a
+resume, an invoice, a certificate.
 
-Stay here only for an article whose body runs as one stream. One column is one
-stream, and so are columns of equal width.
-
-Judge on what the document is, not on how it looks. A plain single-column
-resume with no colour is still a form.
+Stay here only for an article whose body runs as one stream; one column, or
+columns of equal width, is one stream. Judge on what the document is, not on
+how it looks — a plain single-column resume is still a form.
 
 ### A form, a sidebar, or a close call: publish the source instead
 
-A style sheet holds none of those and drops them silently. Publish the file
-itself, and stop — nothing below this section applies.
+A style sheet drops those silently. Publish the file itself and stop here.
 
 ```bash
 okou presentation screenshot --input <source.pdf> --out package/pages
 ```
 
-Write `package/SKILL.md`, and put nothing else in `package/` — assets cut out of
-a composed page are one-off content, not reusable material:
+Write `package/SKILL.md` and put nothing else in `package/`:
 
 ````markdown
 ---
@@ -58,21 +51,18 @@ Replace the content, keep the composition:
 `pages/` holds the source's rendered pages in order.
 ````
 
-Name the entries off the rendered pages — a resume's contact block, skills, and
-experience list; an invoice's parties, line items, and totals. Write nothing the
-pages do not show, and do not restate measurements: the source file carries
-them.
+Name the entries off the rendered pages, and write nothing they do not show.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
   --title "<user-visible template name>" \
   --kind document \
-  --source <the original file> \
+  --source <the original .pdf> \
   --package package
 ```
 
-`--kind document` takes no `--pages`; the rendered pages ride inside
-`--package`. Say the template exists only after the command succeeds.
+`--kind document` takes no `--pages`; they ride inside `--package`. Say the
+template exists only after the command succeeds.
 
 ## Prerequisites
 
