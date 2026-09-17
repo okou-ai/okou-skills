@@ -5,8 +5,8 @@ description: "Publish a document as a template that points back at the source fi
 
 # Keep the source as the template
 
-Reach this branch from the router: the source is a form, or an article whose
-body does not run as one stream.
+Reach this branch from step 0 of `../docx/SKILL.md` or `../pdf/SKILL.md`: the
+source is a form, or an article whose body does not run as one stream.
 
 The docx and pdf branches ship a style sheet. This branch ships the source file:
 later runs open it and follow what they see.

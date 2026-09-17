@@ -9,9 +9,27 @@ Takes one `.docx` and produces a template package directory ready to hand over.
 
 Run every command below from `reverse-template/docx/`.
 
-The router must have read the pages as an article whose body runs as one
-stream. A form — a resume, a receipt, a certificate — or a body with a sidebar
-beside it takes `../source-style/SKILL.md` instead.
+## Before anything — an article, or a form?
+
+This branch builds a style sheet: paper size, margins, columns, per-style type,
+a header and a footer. Pandoc pours one stream of paragraphs into it. Look at
+the rendered pages before going further.
+
+An **article** is written top to bottom and could be written again at another
+length on another subject — a report, a paper, a white paper, a manual, a
+policy, a memo. A **form** is one object with a fixed set of entries, and a new
+one fills the same entries — a resume, a receipt, an invoice, a certificate, an
+offer letter, a spec sheet.
+
+Stay here only for an article whose body runs as one stream. One column is one
+stream, and so are columns of equal width.
+
+Take `../source-style/SKILL.md` instead when the file is a form, when a sidebar
+or a margin note sits beside the body, or when the call is close. A style sheet
+holds none of those, and it drops them silently; that branch keeps everything.
+
+Judge on what the document is, not on how it looks. A plain single-column
+resume with no colour is still a form.
 
 ## Prerequisites
 

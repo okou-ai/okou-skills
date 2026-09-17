@@ -1,29 +1,27 @@
 ---
 name: reverse-template
-description: "Route a deck or document to the reverse-engineering branch that matches it and produce a reusable template. Covers .pptx, .ppt, .pdf, .docx, image decks, and page screenshots, including forms such as resumes and invoices that a style-only template cannot hold. Use when asked to reverse a deck or a document, extract a template from a file, turn a PDF into a Word template, apply a company template to Markdown, or save a file's visual language as a reusable template."
+description: "Decide what an uploaded file is — a deck, a Word document, or a PDF document — and hand it to the reverse-engineering guide that matches. Use when asked to reverse a deck or a document, extract a template from a file, turn a PDF into a Word template, apply a company template to Markdown, or save a file's visual language as a reusable template."
 ---
 
 # Reverse a file into a reusable template
 
-Render the pages, read one row off the table, follow that guide to the end.
+Render the pages, decide what the file is, follow that guide to the end.
 
 ```bash
 okou presentation screenshot --input <source.pptx|source.pdf> --out shots
 ```
 
-Re-save a `.doc`, or a `.docx` written by WPS, as `.docx` from Word first. For a
-`.docx`, export a PDF to render from and keep the original as the source.
+| The file is | Go to | Which produces |
+|---|---|---|
+| a deck — `.pptx`, `.ppt`, an image deck, or a `.pdf` whose pages are slides | `presentation/SKILL.md` | an HTML presentation template |
+| a Word document — `.docx` | `docx/SKILL.md` | a `reference.docx` template package |
+| a PDF document — pages of prose, not slides | `pdf/SKILL.md` | a `reference.docx` template package |
 
-| The pages show | Go to |
-|---|---|
-| slides — one idea a page, display type | `presentation/SKILL.md` |
-| an article, body running as one stream — report, paper, manual, policy | `docx/SKILL.md` for a `.docx`, `pdf/SKILL.md` for a `.pdf` |
-| an article whose body does not run as one stream — a sidebar or margin note beside it | `source-style/SKILL.md` |
-| a form — resume, receipt, invoice, certificate, offer letter, spec sheet | `source-style/SKILL.md` |
-| a scan, or anything you are unsure of | `source-style/SKILL.md` |
+A page carrying one idea in display type is a slide. A page carrying running
+prose under a repeated header, footer, or page number is a document.
 
-One column is one stream, and so are columns of equal width. Read row 4 off what
-the document is, not off how it looks: a plain single-column resume is a form.
+Re-save a `.doc`, or a `.docx` written by WPS, as `.docx` from Word first. To
+render a `.docx`, export a PDF from it and keep the original as the source.
 
 Three rules override the table:
 
@@ -32,14 +30,12 @@ Three rules override the table:
   `presentation/`.
 - Reverse the authoring file when it sits beside an export of itself: `.docx`
   over its PDF, `.pptx` over its PDF.
-- One or two pages at a paper size is never slides, however sparse.
-
-| Branch | Deliverable | Ends with |
-|---|---|---|
-| `presentation` | HTML presentation template package | `okou presentation-template publish` |
-| `docx`, `pdf` | directory holding `SKILL.md`, `reference.docx`, and the source | handing the directory over |
-| `source-style` | the source file plus one line of instruction | `okou user-template publish --kind document` |
+- One or two pages at a paper size is never slides, however sparse. A resume and
+  an invoice carry as little text as a slide and are still documents.
 
 `cd` into the branch directory; every path inside a branch guide is relative to
-it. `python3 scripts/classify_source.py <source.pdf>` reads slides-or-document
-off page geometry and text density, for a second opinion on row 1.
+it. Each guide opens by checking whether it is the right one for this particular
+file, and hands over to `source-style/SKILL.md` when it is not.
+
+`python3 scripts/classify_source.py <source.pdf>` reads slides-or-document off
+page geometry and text density, for a second opinion on row 1.
