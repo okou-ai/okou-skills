@@ -26,13 +26,6 @@ how it looks — a plain single-column resume is still a form.
 
 A style sheet drops those silently. Publish the file and stop here.
 
-```bash
-sudo apt-get update -qq && sudo apt-get install -y -qq libreoffice-writer
-soffice --headless -env:UserInstallation=file:///tmp/lo \
-        --convert-to pdf --outdir . <source.docx>
-okou presentation screenshot --input <source.pdf> --out package/pages
-```
-
 Write `package/SKILL.md` and put nothing else in `package/`:
 
 ````markdown
@@ -47,8 +40,6 @@ margins, typography, colour, and the position of every block.
 Replace the content, keep the composition:
 
 - <one line per entry a new document has to fill>
-
-`pages/` holds the source's rendered pages in order.
 ````
 
 Name the entries off the rendered pages, and write nothing they do not show.
@@ -61,8 +52,7 @@ npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
   --package package
 ```
 
-`--kind document` takes no `--pages`; they ride inside `--package`. Say the
-template exists only after the command succeeds.
+Say the template exists only after the command succeeds.
 
 ## Prerequisites
 
