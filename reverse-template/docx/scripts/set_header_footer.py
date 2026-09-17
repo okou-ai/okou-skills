@@ -24,6 +24,9 @@ Options:
   --size PT          font size (default 9)
   --color RRGGBB     colour (default 808080)
   --paper NAME       paper size: A4 | A5 | A3 | Letter | Legal
+  --header-image FILE   picture at the start of the header (png/jpeg); with
+                        --header-image-height PT, --header-image-align left|center|right
+                        and --header-image-indent PT (picture offset from the left margin)
   --header-distance PT  distance from the page top to the header (pgMar w:header)
   --footer-distance PT  distance from the page bottom to the footer (pgMar w:footer)
   --columns N        number of text columns (1 restores a single column). The
@@ -114,7 +117,24 @@ def esc(s):
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def part_xml(tag, text, align, size, color, page_number, width=None):
+def image_run(rid, w_emu, h_emu):
+    """An inline picture: the run any header paragraph can hold."""
+    return (f'<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" '
+            f'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">'
+            f'<wp:extent cx="{w_emu}" cy="{h_emu}"/><wp:docPr id="1001" name="header image"/>'
+            f'<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
+            f'<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+            f'<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+            f'<pic:nvPicPr><pic:cNvPr id="0" name="header image"/><pic:cNvPicPr/></pic:nvPicPr>'
+            f'<pic:blipFill><a:blip r:embed="{rid}" '
+            f'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>'
+            f'<a:stretch><a:fillRect/></a:stretch></pic:blipFill>'
+            f'<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{w_emu}" cy="{h_emu}"/></a:xfrm>'
+            f'<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>'
+            f'</a:graphicData></a:graphic></wp:inline></w:drawing></w:r>')
+
+
+def part_xml(tag, text, align, size, color, page_number, width=None, image=None):
     """One header or footer paragraph.
 
     A tab in the text splits the line into columns: "left\tright" for a
@@ -152,9 +172,16 @@ def part_xml(tag, text, align, size, color, page_number, width=None):
              f'<w:r>{rpr}<w:t>1</w:t></w:r>'
              f'<w:r>{rpr}<w:fldChar w:fldCharType="end"/></w:r>')
     runs = ""
+    # image = (rid, w_emu, h_emu, align): left goes before the text, centre
+    # after the first tab, right after the last tab
+    img_at = {"left": 0, "center": 1, "right": len(cols) - 1}.get(image[3], 0) if image else None
+    if image and not any(cols) and len(cols) == 1:
+        align = image[3]
     for i, c in enumerate(cols):
         if i:
             runs += f'<w:r>{rpr}<w:tab/></w:r>'
+        if image and i == img_at:
+            runs += image_run(*image[:3])
         # {PAGE} anywhere in the text puts the field there: "第 {PAGE} 页"
         for j, piece in enumerate(c.split("{PAGE}")):
             if j:
@@ -167,8 +194,10 @@ def part_xml(tag, text, align, size, color, page_number, width=None):
     # a body atLeast line height and space-after sized for body text, which
     # pushes a header down and a footer up. CT_PPrBase order: tabs, spacing, jc.
     spacing = '<w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/>'
+    ind = (f'<w:ind w:left="{int(round(image[4] * 20))}"/>'
+           if image and len(image) > 4 and image[4] and image[4] > 1 else "")
     return (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            f'<w:{tag} {NS}><w:p><w:pPr>{tabs}{spacing}<w:jc w:val="{align}"/></w:pPr>'
+            f'<w:{tag} {NS}><w:p><w:pPr>{tabs}{spacing}{ind}<w:jc w:val="{align}"/></w:pPr>'
             f'{runs}</w:p></w:{tag}>')
 
 
@@ -240,6 +269,12 @@ def apply_running_heads(path, header=None, footer=None, header_distance=None,
             continue
         args = argv + [kind, spec["text"].replace("\t", "\\t"), "--align", spec["align"],
                        "--size", str(spec["size"]), "--color", spec["color"]]
+        if kind == "--header" and spec.get("image"):
+            im = spec["image"]
+            args += ["--header-image", im["file"], "--header-image-height", str(im["h_pt"]),
+                     "--header-image-align", im["align"]]
+            if im.get("indent_pt"):
+                args += ["--header-image-indent", str(im["indent_pt"])]
         if spec.get("page_number") and "{PAGE}" not in spec["text"]:
             args.append("--page-number")
         if header_distance is not None:
@@ -313,6 +348,21 @@ def main():
     unesc = lambda s: None if s is None else s.replace("\\t", "\t")
     header, footer = unesc(opt("--header")), unesc(opt("--footer"))
     paper = (opt("--paper") or "").upper() or None
+    himg = opt("--header-image")
+    himg_h = float(opt("--header-image-height")) if opt("--header-image-height") else None
+    himg_align = opt("--header-image-align") or "left"
+    himg_indent = float(opt("--header-image-indent")) if opt("--header-image-indent") else 0.0
+    if himg and header is None:
+        header = ""
+    # picture on one side, text on the other: give the text its own tab column
+    if himg and header and "\t" not in header:
+        want = (opt("--align") or "right")
+        if himg_align == "left" and want == "right":
+            header = "\t" + header
+        elif himg_align == "left" and want == "center":
+            header = "\t" + header + "\t"
+        elif himg_align == "right" and want in ("left", "center"):
+            header = (header + "\t") if want == "left" else ("\t" + header + "\t")
     hdist = float(opt("--header-distance")) if opt("--header-distance") else None
     fdist = float(opt("--footer-distance")) if opt("--footer-distance") else None
     ncols = int(opt("--columns")) if opt("--columns") else None
@@ -364,9 +414,36 @@ def main():
                 continue
             part = "header1.xml" if kind == "hdr" else "footer1.xml"
             rid = "rIdHdrX" if kind == "hdr" else "rIdFtrX"
+            image = None
+            if kind == "hdr" and himg:
+                data = open(himg, "rb").read()
+                ext = os.path.splitext(himg)[1].lower().lstrip(".") or "png"
+                ext = {"jpg": "jpeg"}.get(ext, ext)
+                # pixel size -> aspect; height in points from the flag or 0.7cm
+                import struct as _st
+                if data[:8] == b"\x89PNG\r\n\x1a\n":
+                    pw, ph = _st.unpack(">II", data[16:24])
+                else:
+                    pw, ph = 3, 1
+                    i = 2
+                    while i < len(data) - 9:          # JPEG SOF marker
+                        if data[i] == 0xFF and data[i + 1] in (0xC0, 0xC1, 0xC2):
+                            ph, pw = _st.unpack(">HH", data[i + 5:i + 9]); break
+                        i += 2 + _st.unpack(">H", data[i + 2:i + 4])[0]
+                h_pt = himg_h or 20.0
+                w_pt = h_pt * pw / ph
+                new_parts[f"word/media/hdrimg1.{ext}"] = data
+                new_parts[f"word/_rels/{part}.rels"] = (
+                    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                    '<Relationship Id="rIdImg1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" '
+                    f'Target="media/hdrimg1.{ext}"/></Relationships>').encode()
+                if f'Extension="{ext}"' not in ct:
+                    ct = ct.replace("<Default ", f'<Default Extension="{ext}" ContentType="image/{ext}"/><Default ', 1)
+                image = ("rIdImg1", int(w_pt * 12700), int(h_pt * 12700), himg_align, himg_indent)
             new_parts[f"word/{part}"] = part_xml(
                 kind, text, align or default_align, size, color,
-                pagenum and kind == "ftr", width=tw).encode()
+                pagenum and kind == "ftr", width=tw, image=image).encode()
             ct = ct.replace("</Types>",
                             f'<Override PartName="/word/{part}" ContentType="{ctype}"/></Types>')
             reltype = REL + ("header" if kind == "hdr" else "footer")

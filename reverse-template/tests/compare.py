@@ -57,13 +57,39 @@ def profile(path):
     cjk = lambda t: re.search(r"[\u4e00-\u9fff]", t) is not None
     lat = [l for l in body if not cjk(l["text"]) and re.search(r"[A-Za-z]{3}", l["text"])]
     cj = [l for l in body if cjk(l["text"])]
-    return dict(W=W, H=H, pages=d.page_count, body_size=body_key[0], body_color=body_key[1],
+    imgs = [pymupdf.Rect(i["bbox"]) for i in d[0].get_image_info() if pymupdf.Rect(i["bbox"]).y1 < H * 0.15]
+    himg = tuple(round(v, 1) for v in (imgs[0].x0, imgs[0].y0, imgs[0].width, imgs[0].height)) if imgs else None
+    return dict(W=W, H=H, pages=d.page_count, header_image=himg, body_size=body_key[0], body_color=body_key[1],
                 body_font_latin=collections.Counter(l["font"] for l in lat).most_common(1)[0][0] if len(lat) >= 3 else None,
                 body_font_cjk=collections.Counter(l["font"] for l in cj).most_common(1)[0][0] if len(cj) >= 5 else None, adv=adv[0][0] if adv else None, pgap=pgap[0][0] if pgap and pgap[0][1] >= 2 else None,
                 left=round(left, 1), right=round(right, 1), first_baseline=round(top, 1) if top else None, first_baseline_p1=round(top1, 1) if top1 else None, title_p1=title1,
                 cols=cols, header_y=round(statistics.median(head_y), 1) if head_y else None,
                 footer_y=round(statistics.median(foot_y), 1) if foot_y else None,
                 heads=sorted(heads, key=lambda k: -k[0]))
+
+def table_look(path):
+    """Border lines and shading of the first table: {(kind, colour, width)} and {fill}."""
+    d = pymupdf.open(path)
+    for p in d:
+        import io, contextlib
+        with contextlib.redirect_stdout(io.StringIO()):
+            t = p.find_tables()
+        if not t.tables:
+            continue
+        tb = t.tables[0]
+        bb = pymupdf.Rect(tb.bbox) + (-3, -3, 3, 3)
+        lines, fills = set(), set()
+        for dr in p.get_drawings():
+            for it in dr["items"]:
+                if it[0] == "l" and (bb.contains(it[1]) or bb.contains(it[2])):
+                    lines.add(("h" if abs(it[1].y - it[2].y) < 0.5 else "v",
+                               tuple(round(c, 1) for c in (dr.get("color") or ())), round(dr.get("width") or 0, 1)))
+                elif it[0] == "re" and bb.intersects(it[1]) and min(it[1].width, it[1].height) >= 1.6:
+                    f = dr.get("fill")
+                    if f and tuple(round(c, 2) for c in f) != (1.0, 1.0, 1.0):
+                        fills.add(tuple(round(c, 1) for c in f))
+        return {"lines": lines, "fills": fills}
+    return None
 
 def main(src, out):
     a, b = profile(src), profile(out)
@@ -101,7 +127,21 @@ def main(src, out):
         cmp("paragraph gap", a["pgap"], b["pgap"], 1.5)
     cmp("header y", a["header_y"], b["header_y"], 3)
     cmp("footer y", a["footer_y"], b["footer_y"], 3)
+    if a["header_image"] is None and b["header_image"] is None:
+        rows.append(f"  {'header image':16} {'none':>28} {'none':>28}  n/a")
+    elif a["header_image"] and b["header_image"]:
+        ok = all(abs(x - y) <= 3 for x, y in zip(a["header_image"], b["header_image"]))
+        bad += 0 if ok else 1
+        rows.append(f"  {'header image':16} {str(a['header_image']):>28} {str(b['header_image']):>28}  {'ok' if ok else 'DIFF'}")
+    else:
+        cmp("header image", a["header_image"], b["header_image"])
     ha = [(k[0], k[1], k[2]) for k in a["heads"]][:5]; hb = [(k[0], k[1], k[2]) for k in b["heads"]][:5]
+    ta_, tb_ = table_look(src), table_look(out)
+    if ta_ is None or tb_ is None:
+        rows.append(f"  {'table look':16} {str(ta_ and 'table'):>28} {str(tb_ and 'table'):>28}  n/a")
+    else:
+        cmp("table borders", sorted(ta_["lines"]), sorted(tb_["lines"]))
+        cmp("table shading", sorted(ta_["fills"]), sorted(tb_["fills"]))
     missing = [h for h in ha if h not in hb]
     cmp("source headings", "all present", "all present" if not missing else f"MISSING {missing}")
     print(f"  {'':16} {'source':>28} {'output':>28}")

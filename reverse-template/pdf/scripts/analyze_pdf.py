@@ -23,6 +23,7 @@ reliable. Heading levels and the bottom margin are not — neither is recorded,
 so both have to be settled by reading the report rather than trusting it.
 """
 import sys, json, math, re, collections, statistics
+import os
 
 try:
     import pymupdf
@@ -588,6 +589,92 @@ def hf_spec(doc, spans, hf, H, col_left, col_right, which):
             "font": lead["font"].split("+")[-1], "page_number": "{PAGE}" in text}
 
 
+def _hex(rgb):
+    return "%02X%02X%02X" % tuple(int(round(c * 255)) for c in rgb[:3])
+
+
+def measure_tables(doc):
+    """Borders and shading of the first table found: outer and inside rules
+    as (colour, width pt), the header row's fill and weight, and the fill
+    of banded rows. LibreOffice and Word export rules as stroked lines and
+    shading as filled rectangles; both are read from the page's drawings."""
+    for page in doc:
+        try:
+            import io, contextlib
+            with contextlib.redirect_stdout(io.StringIO()):   # PyMuPDF's upsell line
+                found = page.find_tables()
+        except Exception:
+            return None
+        tabs = [t for t in found.tables if t.row_count >= 2 and t.col_count >= 2]
+        if not tabs:
+            continue
+        tb = tabs[0]
+        bb = pymupdf.Rect(tb.bbox)
+        outer = bb + (-3, -3, 3, 3)
+        row0 = pymupdf.Rect(tb.rows[0].bbox)
+        edges = {"top": [], "bottom": [], "left": [], "right": [], "insideH": [], "insideV": [], "header_bottom": []}
+        fills_head, fills_body = collections.Counter(), collections.Counter()
+        for dr in page.get_drawings():
+            col = dr.get("color"); w = round(dr.get("width") or 0, 2)
+            for it in dr["items"]:
+                if it[0] == "l" and (outer.contains(it[1]) or outer.contains(it[2])) and col and w:
+                    a, b = it[1], it[2]
+                    if abs(a.y - b.y) < 0.5:
+                        y = a.y
+                        k = ("top" if abs(y - bb.y0) < 2 else "bottom" if abs(y - bb.y1) < 2
+                             else "header_bottom" if abs(y - row0.y1) < 2 else "insideH")
+                    else:
+                        x = a.x
+                        k = "left" if abs(x - bb.x0) < 2 else "right" if abs(x - bb.x1) < 2 else "insideV"
+                    edges[k].append((_hex(col), w))
+                elif it[0] == "re" and outer.intersects(it[1]) and min(it[1].width, it[1].height) >= 1.6:
+                    f = dr.get("fill")
+                    if f and _hex(f) != "FFFFFF":
+                        (fills_head if it[1].intersects(row0) and it[1].y0 >= row0.y0 - 1 and it[1].y1 <= row0.y1 + 1
+                         else fills_body)[_hex(f)] += 1
+        rule = lambda k: (collections.Counter(edges[k]).most_common(1)[0][0] if edges[k] else None)
+        head_bold = None
+        spans = [sp for b in page.get_text("dict", clip=row0)["blocks"] for l in b.get("lines", []) for sp in l["spans"] if sp["text"].strip()]
+        if spans:
+            head_bold = all(is_bold(sp) for sp in spans)
+        nrows = tb.row_count
+        band = fills_body.most_common(1)[0] if fills_body else None
+        return {
+            "page": page.number + 1, "rows": nrows, "cols": tb.col_count,
+            "top": rule("top"), "bottom": rule("bottom"), "left": rule("left"), "right": rule("right"),
+            "insideH": rule("insideH"), "insideV": rule("insideV"),
+            "header_bottom": rule("header_bottom"),
+            "header_fill": fills_head.most_common(1)[0][0] if fills_head else None,
+            "header_bold": head_bold,
+            # shading on some but not all body rows is banding
+            "band_fill": band[0] if band and band[1] < (nrows - 1) * tb.col_count else None,
+            "body_fill": band[0] if band and band[1] >= (nrows - 1) * tb.col_count else None,
+        }
+    return None
+
+
+def header_image(doc, H):
+    """An image that sits in the header band on most pages: its xref, box and
+    where it hangs (left / centre / right of the page)."""
+    seen = collections.Counter(); boxes = {}
+    for page in doc:
+        for info in page.get_image_info(xrefs=True):
+            r = pymupdf.Rect(info["bbox"])
+            if r.y1 < H * 0.15 and info.get("xref"):
+                key = (info["xref"], round(r.x0), round(r.y0))
+                seen[key] += 1; boxes[key] = r
+    if not seen:
+        return None
+    key, n = seen.most_common(1)[0]
+    if n < max(1, math.ceil(doc.page_count * 0.6)):
+        return None
+    r = boxes[key]; W = doc[0].rect.width
+    mid = (r.x0 + r.x1) / 2
+    align = "center" if abs(mid - W / 2) < W * 0.08 else ("left" if r.x0 < W / 2 else "right")
+    return {"xref": key[0], "x_pt": round(r.x0, 1), "y_pt": round(r.y0, 1),
+            "w_pt": round(r.width, 1), "h_pt": round(r.height, 1), "align": align}
+
+
 def analyze(path, body_pick=None, columns=1):
     doc = pymupdf.open(path)
     page = doc[0]
@@ -862,6 +949,8 @@ def analyze(path, body_pick=None, columns=1):
                     for lv in [next((i for i, h in enumerate(heads, 1)
                                      if h == l["key"]), None)] if lv],
         "geometry_notes": geom_notes,
+        "table": measure_tables(doc),
+        "header_image": header_image(doc, H),
         "column_edges_pt": ([[round(l, 1), round(r, 1)] for l, r in band_edges]
                             if band_edges else None),
         "columns_unequal": (bool(band_edges) and
@@ -871,7 +960,9 @@ def analyze(path, body_pick=None, columns=1):
         # lands where the source put it rather than at Word's default 708 twips.
         "header": hf_spec(doc, spans, hf, H, left_pt, W - right_pt, "header"),
         "footer": hf_spec(doc, spans, hf, H, left_pt, W - right_pt, "footer"),
-        "header_pt": hf_distance(doc, spans, hf, H, "header"),
+        "header_pt": (lambda t, im: (min(v for v in (t, im and im["y_pt"]) if v is not None)
+                                      if (t is not None or im) else None))(
+            hf_distance(doc, spans, hf, H, "header"), header_image(doc, H)),
         "footer_pt": hf_distance(doc, spans, hf, H, "footer"),
         "font_metrics_hhea": ([round(v, 3) for v in fm] if fm else None),
         "running_heads_method": hf_method,
@@ -896,6 +987,17 @@ def report(r, chars, body):
             if r.get(k):
                 print(f"  {k}: {r[k]['text']!r}  {r[k]['size']}pt #{r[k]['color']} {r[k]['align']}"
                       f"  -> build_reference.py writes it into reference.docx")
+    if r.get("header_image"):
+        im = r["header_image"]
+        print(f"  header image: {im['w_pt']}x{im['h_pt']}pt at x={im['x_pt']} y={im['y_pt']} ({im['align']})"
+              f"  -> saved beside styles.json, written into the header")
+    if r.get("table"):
+        t = r["table"]
+        fmt = lambda v: "none" if not v else f"#{v[0]} {v[1]}pt"
+        print(f"\n[table] p{t['page']} {t['rows']}x{t['cols']}: outer {fmt(t['top'])}, inside H {fmt(t['insideH'])},"
+              f" inside V {fmt(t['insideV'])}, header rule {fmt(t['header_bottom'])},"
+              f" header fill {t['header_fill'] or 'none'}, header bold {t['header_bold']},"
+              f" band fill {t['band_fill'] or 'none'}  -> pandoc's 'Table' style")
     elif r["pages"] < 2:
         print("[running head/foot] single page, cannot be determined by recurrence; "
               "any header or footer will distort the top and bottom margins")
@@ -987,6 +1089,20 @@ if __name__ == "__main__":
     r, chars, body = analyze(sys.argv[1], pick, cols)
     if "--json" in sys.argv:
         out = sys.argv[sys.argv.index("--json") + 1]
+        if r.get("header_image"):
+            # the picture itself, beside styles.json, for build_reference to place
+            im = r["header_image"]
+            try:
+                d = pymupdf.open(sys.argv[1]); ex = d.extract_image(im["xref"]); d.close()
+                fn = os.path.join(os.path.dirname(os.path.abspath(out)), "header-image." + ex["ext"])
+                open(fn, "wb").write(ex["image"])
+                r["header"] = r.get("header") or {"text": "", "align": im["align"], "size": 9.0,
+                                                  "color": "808080", "font": "", "page_number": False}
+                left_edge = r["margins_suggested_cm"]["left"] / 2.54 * 72
+                r["header"]["image"] = {"file": fn, "h_pt": im["h_pt"], "w_pt": im["w_pt"], "align": im["align"],
+                                        "indent_pt": round(im["x_pt"] - left_edge, 1) if im["align"] == "left" else 0.0}
+            except Exception as e:
+                print(f"header image not extracted: {e}")
         json.dump(r, open(out, "w"), ensure_ascii=False, indent=2)
         print(f"Wrote {out}\n")
     report(r, chars, body)

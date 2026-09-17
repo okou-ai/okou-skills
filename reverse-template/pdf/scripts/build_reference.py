@@ -155,6 +155,35 @@ def _log_recipe(target, argv):
         pass
 
 
+def table_style_xml(t):
+    """pandoc's 'Table' style rebuilt from the measured table."""
+    def border(tag, rule):
+        if not rule:
+            return f'<w:{tag} w:val="nil"/>'
+        color, w = rule
+        return f'<w:{tag} w:val="single" w:sz="{max(2, int(round(w * 8)))}" w:space="0" w:color="{color}"/>'
+    borders = "<w:tblBorders>" + "".join(border(k, t.get(k)) for k in ("top", "left", "bottom", "right", "insideH", "insideV")) + "</w:tblBorders>"
+    tblpr = ('<w:tblPr><w:tblInd w:w="0" w:type="dxa"/>' + borders +
+             '<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/>'
+             '<w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr>')
+    first = ""
+    if t.get("header_bold") or t.get("header_fill") or t.get("header_bottom"):
+        rpr = "<w:rPr><w:b/><w:bCs/></w:rPr>" if t.get("header_bold") else ""
+        tcpr = ""
+        if t.get("header_bottom"):
+            tcpr += "<w:tcBorders>" + border("bottom", t["header_bottom"]) + "</w:tcBorders>"
+        if t.get("header_fill"):
+            tcpr += f'<w:shd w:val="clear" w:color="auto" w:fill="{t["header_fill"]}"/>'
+        first = f'<w:tblStylePr w:type="firstRow">{rpr}' + (f"<w:tcPr>{tcpr}</w:tcPr>" if tcpr else "") + "</w:tblStylePr>"
+    band = ""
+    if t.get("band_fill"):
+        band = (f'<w:tblStylePr w:type="band1Horz"><w:tcPr><w:shd w:val="clear" w:color="auto" '
+                f'w:fill="{t["band_fill"]}"/></w:tcPr></w:tblStylePr>')
+    body_fill = (f'<w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="{t["body_fill"]}"/></w:tcPr>'
+                 if t.get("body_fill") else "")
+    return tblpr + body_fill + first + band
+
+
 def build(json_path, out_path, mapping, overrides):
     d = json.load(open(json_path))
     ref, tmp = default_reference()
@@ -263,6 +292,15 @@ def build(json_path, out_path, mapping, overrides):
                 applied.append((f"Heading{lvl}", clean_font(ref_h["font"]), size,
                                 ref_h["color"], "derived"))
 
+    # --- tables: pandoc's 'Table' takes the measured rules and shading ---
+    if d.get("table"):
+        m = re.search(r'(<w:style\b[^>]*w:styleId="Table"[^>]*>)(.*?)(</w:style>)', styles, re.S)
+        if m:
+            inner = re.sub(r"<w:tblPr>.*?</w:tblPr>|<w:tcPr>.*?</w:tcPr>|<w:tblStylePr\b.*?</w:tblStylePr>", "", m.group(2), flags=re.S)
+            styles = styles[:m.start()] + m.group(1) + inner + table_style_xml(d["table"]) + m.group(3) + styles[m.end():]
+            t = d["table"]
+            applied.append(("Table", "-", "-", "-", f"rules {t.get('top') and t['top'][0]} / header fill {t.get('header_fill') or '-'}"))
+
     # --- no theme fonts anywhere: the PDF names concrete faces ---
     bf = clean_font(d["body"]["font"])
     styles = re.sub(r"<w:rFonts\b[^>]*Theme[^>]*/>",
@@ -366,7 +404,15 @@ if __name__ == "__main__":
     if d.get("header") or d.get("footer"):
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import set_header_footer as shf
-        shf.apply_running_heads(a[2], d.get("header"), d.get("footer"),
+        hd = d.get("header")
+        if hd and hd.get("image"):
+            # the picture lives beside styles.json; resolve it from there
+            f = hd["image"]["file"]
+            if not os.path.isabs(f) or not os.path.exists(f):
+                cand = os.path.join(os.path.dirname(os.path.abspath(a[1])), os.path.basename(f))
+                if os.path.exists(cand):
+                    hd["image"]["file"] = cand
+        shf.apply_running_heads(a[2], hd, d.get("footer"),
                                 d.get("header_pt"), d.get("footer_pt"))
         for k in ("header", "footer"):
             if d.get(k):

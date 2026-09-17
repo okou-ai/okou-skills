@@ -244,5 +244,31 @@ def c08():
     add_table(d, "Table Grid")
     d.save("c08_zh_contract_placeholders.docx")
 
-for f in (c01, c02, c03, c04, c05, c06, c07, c08):
+# 9. header with a logo picture (left) and text (right), Light Grid table
+def c09():
+    import pymupdf
+    d = pymupdf.open(); pg = d.new_page(width=120, height=40)
+    pg.draw_rect(pymupdf.Rect(0, 0, 40, 40), color=None, fill=(0.93, 0.31, 0))
+    pg.insert_text((48, 28), "OKOU", fontsize=20, fontname="helv", color=(0.07, 0.08, 0.09))
+    pg.get_pixmap(dpi=144).save("logo.png"); d.close()
+    d = Document(); s = d.sections[0]; a4(s, 3.0, 2.5, 2.5, 2.5)
+    st = d.styles
+    set_font(st["Normal"], "Calibri", 10.5, ea="微软雅黑"); st["Normal"].paragraph_format.space_after = Pt(6)
+    set_font(st["Title"], "Calibri", 24, ea="微软雅黑", bold=True, color="ED4E01")
+    set_font(st["Heading 1"], "Calibri", 15, ea="微软雅黑", bold=True, color="111418")
+    set_font(st["Heading 2"], "Calibri", 12, ea="微软雅黑", bold=True, color="444444")
+    hp = s.header.paragraphs[0]; hp.add_run().add_picture("logo.png", height=Cm(0.7)); hp.add_run("\t\t客户成功部 · 内部资料")
+    for r in hp.runs[1:]: r.font.size = Pt(8); r.font.color.rgb = RGBColor.from_string("888888")
+    fp = s.footer.paragraphs[0]; fp.alignment = WD_ALIGN_PARAGRAPH.RIGHT; page_field(fp)
+    d.add_paragraph("客户成功季度回顾", style="Title")
+    for h in ("一、客户健康度", "二、续约与扩展", "三、下季度重点"):
+        d.add_paragraph(h, style="Heading 1"); body(d, ZH, n=3)
+        d.add_paragraph("要点", style="Heading 2"); body(d, ZH[1:], n=1)
+        t = d.add_table(rows=4, cols=3); t.style = "Light Grid Accent 1"
+        for i, row in enumerate(t.rows):
+            for j, c in enumerate(row.cells): c.text = ("客户", "健康分", "状态")[j] if i == 0 else f"第{i}项-{j}"
+    d.save("c09_zh_header_logo_lightgrid.docx")
+
+
+for f in (c01, c02, c03, c04, c05, c06, c07, c08, c09):
     f(); print("ok", f.__name__)

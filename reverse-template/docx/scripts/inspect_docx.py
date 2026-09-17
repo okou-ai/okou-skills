@@ -232,6 +232,12 @@ def main(path):
         runs = re.findall(r"<w:r\b.*?</w:r>", para, re.S)
         if any(re.search(r"<w:rPr>.*?<w:(sz|b|color|rFonts)\b", r, re.S) for r in runs):
             direct[sid] += 1
+    ntbl = docxml.count("<w:tbl>")
+    tstyles = collections.Counter(re.findall(r'<w:tblStyle w:val="([^"]+)"', docxml))
+    if ntbl:
+        print(f"\n[tables] {ntbl}; table style: "
+              + (", ".join(f"{id_to_name.get(k, k)} x{v}" for k, v in tstyles.most_common(3)) if tstyles else "none (direct borders)")
+              + " -> build_reference.py copies it onto pandoc's 'Table'")
     print(f"\n[styles in use] {sum(use.values())} paragraphs with text")
     print(f"  {'style':24}{'paragraphs':>11}{'direct formatting':>19}")
     for sid, n in use.most_common():

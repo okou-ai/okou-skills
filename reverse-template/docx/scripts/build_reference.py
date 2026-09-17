@@ -268,6 +268,44 @@ def build(src_path, out_path, mapping=None):
         print(f"  body paragraphs: Body Text, First Paragraph and Compact now follow {_body_sid!r},"
               f" the style {_use[_body_sid]} of {sum(_use.values())} paragraphs use")
 
+
+    # --- tables look like the document's tables ---
+    # pandoc writes every table with style "Table" (its own: one rule under
+    # the header row). The document's tables use a table style of their own
+    # or direct borders; either becomes "Table".
+    import collections as _c2
+    _tstyles = _c2.Counter(re.findall(r'<w:tblStyle w:val="([^"]+)"', src_doc))
+    _tbl_hit = have.get("table")
+    if _tbl_hit:
+        _tsid, _txml = _tbl_hit
+        _src_tbl = None
+        if _tstyles:
+            _tid = _tstyles.most_common(1)[0][0]
+            _m = re.search(rf'<w:style\b[^>]*w:type="table"[^>]*w:styleId="{re.escape(_tid)}".*?</w:style>', styles, re.S)
+            _src_tbl = _m.group(0) if _m else None
+        if _src_tbl:
+            # everything after the naming elements: pPr, rPr, tblPr, trPr, tcPr, tblStylePr*
+            _props = "".join(m.group(0) for m in re.finditer(
+                r"<w:pPr>.*?</w:pPr>|<w:rPr>.*?</w:rPr>|<w:tblPr>.*?</w:tblPr>|<w:trPr>.*?</w:trPr>|<w:tcPr>.*?</w:tcPr>|<w:tblStylePr\b.*?</w:tblStylePr>",
+                _src_tbl, re.S))
+            _new = re.sub(r"<w:pPr>.*?</w:pPr>|<w:rPr>.*?</w:rPr>|<w:tblPr>.*?</w:tblPr>|<w:trPr>.*?</w:trPr>|<w:tcPr>.*?</w:tcPr>|<w:tblStylePr\b.*?</w:tblStylePr>",
+                          "", _txml, flags=re.S)
+            _new = _new.replace("</w:style>", _props + "</w:style>")
+            _how = f"table style {_tid!r} ({_tstyles[_tid]} tables)"
+        else:
+            _tp = re.search(r"<w:tblPr>.*?</w:tblPr>", src_doc, re.S)
+            _borders = re.search(r"<w:tblBorders>.*?</w:tblBorders>", _tp.group(0), re.S) if _tp else None
+            _new = None
+            if _borders:
+                _new = re.sub(r"<w:tblPr>.*?</w:tblPr>", lambda m: re.sub(r"(<w:tblPr>)", r"\1" + _borders.group(0), m.group(0), count=1)
+                              if "<w:tblBorders>" not in m.group(0) else m.group(0), _txml, flags=re.S)
+                _how = "the first table's own borders"
+        if _src_tbl or (_borders if not _src_tbl else False):
+            styles = styles.replace(_txml, _new, 1) if _txml in styles else re.sub(
+                rf'<w:style\b[^>]*w:styleId="{re.escape(_tsid)}".*?</w:style>', lambda m: _new, styles, count=1, flags=re.S)
+            have["table"] = (_tsid, _new)
+            print(f"  tables: 'Table' takes {_how}")
+
     # --- custom style names onto the ones pandoc writes to ---
     # A document set in "Memo Title" and "Section Head" never touches Title
     # and heading 1; the mapped style's own look is copied into the target.
