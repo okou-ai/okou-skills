@@ -261,18 +261,18 @@ more widely, or every document made from it inherits them.
 
 ## Adjusting it
 
-Open `reference.docx` in Word and **right-click the style in the Styles pane ->
-Modify**. Editing the style *definition* is what matters; selecting text and
-changing its font is direct formatting and does nothing to the template.
-
-Without Word, use the scripts from the `docx-reverse-template` skill:
+Edit the style *definition*, not the text: formatting applied to a selection
+does nothing to the template.
 
 ```bash
+python3 set_style.py reference.docx --list
 python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12
 python3 set_style.py reference.docx "Source Code" --create --font Consolas --size 9
 python3 set_header_footer.py reference.docx --replace 'OLD=NEW'
 python3 verify_reference.py reference.docx
 ```
+
+The scripts are in the `docx-reverse-template` skill.
 
 ## Known limits
 

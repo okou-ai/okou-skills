@@ -171,18 +171,18 @@ what matches is only *probably* fixed, since two samples can coincide.
 
 ## Adjusting it
 
-Open `reference.docx` in Word and **right-click the style in the Styles pane ->
-Modify**. Editing the style *definition* is what matters; selecting text and
-changing its font is direct formatting and does nothing to the template.
-
-Without Word, use the scripts from the `pdf-reverse-template` skill:
+Edit the style *definition*, not the text: formatting applied to a selection
+does nothing to the template.
 
 ```bash
+python3 set_style.py reference.docx --list
 python3 set_style.py reference.docx "heading 2" --size 14 --color 1B4F72 --before 12
 python3 set_style.py reference.docx "Source Code" --create --font Consolas --size 9
-python3 set_header_footer.py reference.docx --header 'Title\tv2.3'
+python3 set_header_footer.py reference.docx --replace 'OLD=NEW'
 python3 verify_roundtrip.py reference.docx styles.json --structure-only
 ```
+
+The scripts are in the `pdf-reverse-template` skill.
 
 ## Known limits
 
@@ -266,7 +266,7 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
         page.append(f"- Recurring content in the source PDF (header/footer/page number): "
                     f"{' / '.join(d['running_heads'])}\n"
                     f"  This was **not** carried into the template — in a PDF it is "
-                    f"ordinary text. Add one with `set_header_footer.py` or in Word.")
+                    f"ordinary text. Add one with `set_header_footer.py`.")
 
     # The flags that were chosen rather than measured, so the analysis can be
     # reproduced from source.pdf alone. The column count comes out of styles.json

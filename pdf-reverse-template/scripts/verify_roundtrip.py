@@ -178,7 +178,7 @@ def main(ref, jpath, mapping=None, structure_only=False):
                            f"FAIL — {len(dangling)} dangling, {bad} mismatches"))
     print("\nNote: whether a font name actually renders depends on it being installed "
           "on the\n      target machine. The script restores the system name from the "
-          "embedded subset\n      name, but confirm it once in Word.")
+          "embedded subset\n      name; the font must be installed wherever the file is rendered.")
     return 0 if ok else 1
 
 

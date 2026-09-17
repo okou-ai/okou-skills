@@ -31,8 +31,8 @@ Options:
   --out PATH         write elsewhere; default is in place
 
 Pandoc carries the header and footer into every document produced with
---reference-doc. Image logos are out of scope here: they need extra media parts
-and relationships, which is easier to do in Word.
+--reference-doc. Image logos are out of scope: they need extra media parts and
+relationships that this script does not write.
 """
 import sys, os, re, shutil, zipfile, collections
 
