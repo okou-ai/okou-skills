@@ -242,6 +242,9 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
     if mar:
         page.append("- Margins: top {top} / bottom {bottom} / left {left} / "
                     "right {right} cm".format(**{k: cm(v) for k, v in mar.items()}))
+    if (d.get("columns") or 1) > 1:
+        page.append(f"- Columns: {d['columns']}, gap {d.get('column_gap_pt')}pt "
+                    f"(column width {d.get('column_width_pt')}pt)")
     if rhf:
         page += [f"- {h}" for h in rhf]
     elif d.get("running_heads"):
@@ -266,6 +269,12 @@ def build(pdf, ref, jpath, outdir, mapping, bottom, body=None):
         rev.append("> If the source PDF has a separate document title it took Heading1 "
                    "and shifted every level by one. Check the sample text for each "
                    "cluster in `report.txt`.")
+    rev.append("")
+    rev.append(f"**Columns**: {d.get('columns', 1)}"
+               + (f", gap {d.get('column_gap_pt')}pt" if (d.get("columns") or 1) > 1 else "")
+               + ". A PDF does not record whether a layout is multi-column; this was "
+                 "declared by looking at a rendered page.")
+
     cands = d.get("body_candidates") or []
     chosen = next((c for c in cands if c.get("chosen")), None)
     if chosen and len(cands) > 1:

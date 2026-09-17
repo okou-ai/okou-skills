@@ -5,6 +5,7 @@ Usage:
   python3 analyze_pdf.py source.pdf                   # human-readable report
   python3 analyze_pdf.py source.pdf --json out.json   # input for build_reference.py
   python3 analyze_pdf.py source.pdf --body 2           # pick a different body cluster
+  python3 analyze_pdf.py source.pdf --columns 2        # declare a multi-column layout
 
 Requires: pip install pymupdf
 
@@ -284,7 +285,7 @@ def measure_spacing(lines, body_key, col_left, col_right):
     return body, heads
 
 
-def analyze(path, body_pick=None):
+def analyze(path, body_pick=None, columns=1):
     doc = pymupdf.open(path)
     page = doc[0]
     W, H = page.rect.width, page.rect.height
@@ -383,6 +384,36 @@ def analyze(path, body_pick=None):
 
     lines = to_lines(body_spans)
     col_right = W - right_pt
+
+    # Evidence for the column decision, not a verdict. Bands of line-start x
+    # separate for a multi-column layout and for a table alike, so the count
+    # alone decides nothing — the report says to look at a rendered page.
+    xs = sorted(l["x0"] for l in lines)
+    bands = [[xs[0]]] if xs else []
+    for a, b in zip(xs, xs[1:]):
+        (bands[-1] if b - a < 30 else bands.append([b]) or bands[-1]).append(b)
+    band_info = [{"x": round(sum(b) / len(b), 1), "lines": len(b)}
+                 for b in bands if len(b) >= 3]
+
+    # With the column count declared, order lines within a column instead of
+    # straight down the page. Otherwise the line before a heading at the top of
+    # column 2 is the last line of column 1, which sits lower on the page and
+    # turns every heading gap into noise.
+    if columns > 1:
+        span_w = (col_right - left_pt) / columns
+        for l in lines:
+            l["col"] = max(0, min(columns - 1, int((l["x0"] - left_pt) / span_w)))
+        lines.sort(key=lambda l: (l["page"], l["col"], l["y"]))
+        per_col = collections.defaultdict(list)
+        for l in lines:
+            per_col[l["col"]].append(l)
+        edges = [(min(v, key=lambda l: l["x0"])["x0"], max(v, key=lambda l: l["x1"])["x1"])
+                 for _, v in sorted(per_col.items())]
+        col_gap = round(statistics.median(
+            [b[0] - a[1] for a, b in zip(edges, edges[1:])]), 1) if len(edges) > 1 else None
+        col_width = round(statistics.median([e[1] - e[0] for e in edges]), 1)
+    else:
+        col_gap = col_width = None
     body_sp, head_sp = measure_spacing(lines, body, left_pt, col_right)
     leading = body_sp.get("line_advance_pt")
 
@@ -393,6 +424,10 @@ def analyze(path, body_pick=None):
                  "paper": paper_name(W, H)},
         "tagged": tagged,
         "filler_spans_excluded": filler_count,
+        "columns": columns,
+        "column_gap_pt": col_gap,
+        "column_width_pt": col_width,
+        "column_evidence": band_info,
         "body_candidates": [{"rank": i, "font": font_of(k), "size": k[0], "color": k[1],
                              "bold": k[2], "chars": chars[k],
                              "lines": len({(s["page"], s["base"])
@@ -434,6 +469,16 @@ def report(r, chars, body):
     elif r["pages"] < 2:
         print("[running head/foot] single page, cannot be determined by recurrence; "
               "any header or footer will distort the top and bottom margins")
+
+    bands = r.get("column_evidence") or []
+    print(f"\n[columns] declared: {r.get('columns', 1)}"
+          + (f"   width {r['column_width_pt']}pt   gap {r['column_gap_pt']}pt"
+             if r.get("column_width_pt") else ""))
+    if bands:
+        print("  line starts cluster at: "
+              + "   ".join(f"{b['x']}pt x{b['lines']}" for b in bands))
+    print("  Bands appear for a table just as they do for columns, so this count")
+    print("  settles nothing. Render a page and look at it, then pass --columns N.")
 
     cands = r.get("body_candidates") or []
     if len(cands) > 1:
@@ -504,7 +549,8 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(__doc__); sys.exit(2)
     pick = int(sys.argv[sys.argv.index("--body") + 1]) if "--body" in sys.argv else None
-    r, chars, body = analyze(sys.argv[1], pick)
+    cols = int(sys.argv[sys.argv.index("--columns") + 1]) if "--columns" in sys.argv else 1
+    r, chars, body = analyze(sys.argv[1], pick, cols)
     if "--json" in sys.argv:
         out = sys.argv[sys.argv.index("--json") + 1]
         json.dump(r, open(out, "w"), ensure_ascii=False, indent=2)

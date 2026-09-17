@@ -53,6 +53,8 @@ this step is optional.
 python3 scripts/set_header_footer.py reference.docx --paper A4 \
         --replace "DOC-2026-001=[DOC ID]" --replace "Jane Doe=[OWNER]"
 
+python3 scripts/set_header_footer.py reference.docx --columns 2 --column-gap 20
+
 python3 scripts/set_style.py reference.docx --list
 
 python3 scripts/set_style.py reference.docx "Block Text" \

@@ -217,10 +217,16 @@ def build(json_path, out_path, mapping, bottom_override):
     # prints a warning in exactly that case.
     bottom = bottom_override if bottom_override is not None else \
         (mg.get("bottom") if mg.get("bottom") is not None else mg.get("top"))
+    # w:cols comes after w:pgMar in CT_SectPr
+    cols = d.get("columns") or 1
+    cols_xml = ""
+    if cols > 1:
+        gap = PT2TWIP(d.get("column_gap_pt") or 24)
+        cols_xml = f'<w:cols w:num="{cols}" w:space="{gap}" w:equalWidth="1"/>'
     sect = (f'<w:sectPr><w:pgSz w:w="{CM2TWIP(p["w_cm"])}" w:h="{CM2TWIP(p["h_cm"])}"/>'
             f'<w:pgMar w:top="{CM2TWIP(mg["top"])}" w:right="{CM2TWIP(mg["right"])}" '
             f'w:bottom="{CM2TWIP(bottom)}" w:left="{CM2TWIP(mg["left"])}" '
-            f'w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>')
+            f'w:header="708" w:footer="708" w:gutter="0"/>{cols_xml}</w:sectPr>')
     doc = re.sub(r"<w:sectPr\b.*?</w:sectPr>|<w:sectPr\b[^>]*/>", sect, doc, flags=re.S)
 
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as out:
@@ -237,7 +243,8 @@ def build(json_path, out_path, mapping, bottom_override):
         print(f"{sid:<20}{f:<22}{s:>6}{'#'+c:>9}  {spm}")
     print(f"\npage {p['w_cm']}x{p['h_cm']}cm  margins left {mg['left']} right {mg['right']} "
           f"top {mg['top']} bottom {bottom}cm"
-          + ("  (bottom from the analyzer's suggestion)" if bottom_override is None else ""))
+          + ("  (bottom from the analyzer's suggestion)" if bottom_override is None else "")
+          + (f"  columns {cols} gap {d.get('column_gap_pt')}pt" if cols > 1 else ""))
     if derived:
         print(f"\nNOTE  the source used {max(written)} heading level(s). Levels "
               f"{derived[0][0][-1]}-9 were extended from it as a descending ladder "

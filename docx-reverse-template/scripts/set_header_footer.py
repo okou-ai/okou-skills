@@ -20,6 +20,8 @@ Options:
   --size PT          font size (default 9)
   --color RRGGBB     colour (default 808080)
   --paper NAME       paper size: A4 | A5 | A3 | Letter | Legal
+  --columns N        number of text columns (1 restores a single column)
+  --column-gap PT    gutter between columns, default 24pt
   --out PATH         write elsewhere; default is in place
 
 Pandoc carries the header and footer into every document produced with
@@ -174,12 +176,15 @@ def main():
     clear = "--clear" in a
     header, footer = opt("--header"), opt("--footer")
     paper = (opt("--paper") or "").upper() or None
+    ncols = int(opt("--columns")) if opt("--columns") else None
+    cgap = float(opt("--column-gap") or 24)
     if paper and paper not in PAPER:
         print(f"Unknown paper size {paper!r}. Choose from: {', '.join(PAPER)}")
         return 2
-    if not clear and header is None and footer is None and not paper and not subs:
+    if not clear and header is None and footer is None and not paper \
+            and not subs and ncols is None:
         print("Nothing to do: pass --replace / --header / --footer / --paper / "
-              "--clear / --show.")
+              "--columns / --clear / --show.")
         return 2
 
     size = float(opt("--size") or 9)
@@ -229,6 +234,15 @@ def main():
                                       f'<w:{tag}Reference w:type="default" r:id="{rid}"/>'})
             added.append(f"{tag} {text!r}"
                          f"{' +page number' if pagenum and kind == 'ftr' else ''}")
+
+    if ncols is not None:
+        if ncols < 1:
+            print("--columns must be 1 or more")
+            return 2
+        doc = put_in_sectpr(doc, {"cols": f'<w:cols w:num="{ncols}" '
+                                          f'w:space="{int(round(cgap * 20))}" '
+                                          f'w:equalWidth="1"/>'})
+        added.append(f"{ncols} column(s)" + (f", gap {cgap}pt" if ncols > 1 else ""))
 
     if paper:
         w, h = PAPER[paper]

@@ -52,7 +52,25 @@ rank   size   colour  chars  lines  pages  sample
 Rank 1 there is a table column header; rank 2 is prose. Judge it from the sample
 text, not the character count, and re-run with `--body 2`.
 
-### 3. Assign heading levels — human decision
+### 3. Declare the column count — human decision
+
+Read `[columns]`. The report lists where line starts cluster, but bands appear
+for a table exactly as they do for columns, so that count settles nothing.
+
+Render a page and look at it:
+
+```bash
+okou presentation screenshot --input <source.pdf> --out shots
+```
+
+Then pass `--columns N`. This is not cosmetic: with the count wrong, lines are
+ordered straight down the page, so the line before a heading at the top of
+column 2 is the last line of column 1 and every heading gap becomes noise.
+
+The declared count is written into the template as `w:cols` and reported with
+the measured column width and gutter.
+
+### 4. Assign heading levels — human decision
 
 Read the `sample` column under `[inferred styles]` and decide what each cluster
 actually is:
@@ -73,7 +91,7 @@ Write it as an argument; the right side takes `Title`, `Subtitle`,
 
 Skipping this shifts every level by one.
 
-### 4. Set the bottom margin — human decision
+### 5. Set the bottom margin — human decision
 
 Read `[margins]` and take the whole `suggested` row, not the `measured` row.
 
@@ -89,14 +107,14 @@ Override either with `--bottom <cm>`. `build_reference.py` uses this suggestion
 by default, so a non-symmetric layout no longer needs the flag — pass it only to
 disagree with the report.
 
-### 5. Build the template
+### 6. Build the template
 
 ```bash
 python3 scripts/build_reference.py styles.json reference.docx \
         --map 1=Heading1,2=Title,3=Heading2
 ```
 
-### 6. Verify
+### 7. Verify
 
 ```bash
 python3 scripts/verify_roundtrip.py reference.docx styles.json \
@@ -114,7 +132,7 @@ values.
 Fields the analysis could not measure are skipped rather than compared, so a
 `NOT MEASURED` space-after is not a failure.
 
-### 7. Package and deliver
+### 8. Package and deliver
 
 ```bash
 python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output dir> \
@@ -137,7 +155,7 @@ python3 scripts/set_style.py reference.docx "Source Code" --create --font "Conso
 python3 scripts/set_header_footer.py reference.docx --header "Company" --footer "Page " --page-number
 ```
 
-Re-run step 6 with `--structure-only`, then step 7.
+Re-run step 7 with `--structure-only`, then step 8.
 
 The full reconciliation compares the template against `styles.json`, so it fails
 on any value you deliberately changed. `--structure-only` keeps the dangling
@@ -145,7 +163,7 @@ reference check and drops that comparison.
 
 ## Rules
 
-- Steps 2, 3 and 4 are human decisions; do not let a script stand in for them.
+- Steps 2 to 5 are human decisions; do not let a script stand in for them.
 - Take margins from the `suggested` row, never the `measured` row.
 - The source PDF's header and footer are not carried over. Add them with
   `set_header_footer.py` if the recurring content reported in step 1 matters.
@@ -165,3 +183,4 @@ reference check and drops that comparison.
 | Space after reads NOT MEASURED | Every paragraph is followed by a table, list or heading, so no gap exists to measure; the template keeps pandoc's default |
 | Heading before/after look off | They are derived, not recorded. The report prints the raw baseline gaps beside them; override with `set_style.py --before/--after` and re-verify using `--structure-only` |
 | Verify fails after editing a style by hand | Expected; re-run it with `--structure-only` |
+| Heading gaps are near zero on a multi-column source | `--columns` was not declared; redo step 3 |
