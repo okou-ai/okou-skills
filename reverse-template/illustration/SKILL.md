@@ -67,6 +67,19 @@ Then delete every subject, object, place and name from the style record. What
 remains must still describe a way of drawing; move anything else back to
 content.
 
+Write every style line as a drawing instruction that names the near miss it
+excludes. A line that only names the family collapses into the nearest common
+style — flat vector, cel anime, stock watercolour — whatever the reference
+actually was.
+
+| Instead of | Write |
+|---|---|
+| flat gouache shapes | paint varies in value inside every shape, never a flat digital fill |
+| thin dark contour | shapes meet at their colour edges, no outline; only the eyes and leaf veins carry a drawn line |
+| botanical motifs | each sprig painted with its own texture and veins, not a single-colour silhouette |
+| soft watercolour | wet washes that bloom and granulate; almost nothing in the picture is a flat area |
+| closed eyes | heavy lids as grey-shadowed lens shapes under one fine dark line |
+
 State the style under these heads, from the references only:
 
 | Head | State |
@@ -80,6 +93,7 @@ State the style under these heads, from the references only:
 | Detail | which areas carry detail, which stay plain |
 | Light | direction, rim, glow, haze, or no light description at all |
 | Composition | crop, weight, repeated shapes, the rhythm every reference keeps |
+| Frame | how the art meets the canvas: edge to edge, a vignette, or a visible margin — and how wide |
 | Finish | grade, bloom, chromatic shift, fade, print registration |
 | Subject convention | face treatment, cast, count, scale, what the subject does |
 
@@ -157,6 +171,7 @@ pass an image to it.
 | Generated pieces repeat the reference's subject | The subject leaked into the style record; run the deletion test in step 3 again and rewrite the prompt template |
 | `check_piece.py` fails on line width | Step 2's measurement, not your estimate, goes in the package |
 | Generated pieces carry outlines the reference has none of | The measurement said `NO drawn contour`; remove every outline word from the prompt and say shapes meet at their colour edges |
+| A generated piece mounts the art inside a paper border | The Frame line is missing or too weak; say the paint reaches all four edges |
 | Generated pieces read as flat vector against a painted reference | Flatness under about 60% means paint varies inside each shape; say so, and name what must not be flat |
 | Every generated piece looks the same | Too few dials, or the prompt template has no placeholders |
 | A colour appears that no reference uses | The palette dial has no list of allowed values |
