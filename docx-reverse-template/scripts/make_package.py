@@ -337,6 +337,20 @@ def build(orig, ref, outdir, name=None):
             "and a full-width title needs a second section, which "
             "`--reference-doc` cannot add.",
         ]
+
+    # An inverted hierarchy is the source's own value, reproduced rather than
+    # corrected. Say so, or the next person silently "fixes" it.
+    LADDER = ["Title", "heading 1", "heading 2", "heading 3",
+              "heading 4", "heading 5", "heading 6"]
+    sizes = [(n, st[n.lower()]["size"]) for n in LADDER
+             if st.get(n.lower()) and st[n.lower()].get("size")]
+    for (an, a), (bn, b) in zip(sizes, sizes[1:]):
+        if b >= a:
+            limits.append(
+                f"`{bn}` is {b}pt against `{an}` at {a}pt — the source's own "
+                f"value, copied as it is rather than corrected. Change it only "
+                f"to depart from the source deliberately.")
+            break
     limits = "\n".join("\n".join(textwrap.wrap(l, 76, initial_indent="- ",
                                               subsequent_indent="  "))
                        for l in limits)

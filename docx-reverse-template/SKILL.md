@@ -125,6 +125,9 @@ Hand over the whole directory.
 
 ## Rules
 
+- Reproduce the source, do not correct it. An inverted heading hierarchy or
+  a style left at Word's default is the source's own value; the package
+  records it as deliberate.
 - Do not edit `w:styleId`. Pandoc matches on `w:name`, so the numeric styleIds
   produced by localised Word builds work as they are.
 - Do not invent style names outside Pandoc's set; they are never referenced.
