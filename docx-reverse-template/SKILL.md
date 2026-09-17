@@ -51,25 +51,35 @@ Set the paper size whenever step 2 printed `ACTION REQUIRED`. Everything else in
 this step is optional.
 
 ```bash
+# Paper size, and the header/footer values step 1 flagged. The left side of
+# each --replace is text the source's own header literally says; the right
+# side is what every document built from the template should say instead.
 python3 scripts/set_header_footer.py reference.docx --paper A4 \
         --replace "DOC-2026-001=[DOC ID]" --replace "Jane Doe=[OWNER]"
 
+# Change the column layout. Not needed to keep the one the source already has.
 python3 scripts/set_header_footer.py reference.docx --columns 2 --column-gap 20
 python3 scripts/set_header_footer.py reference.docx --columns 1
 
+# Read the current style values back out
 python3 scripts/set_style.py reference.docx --list
 
 python3 scripts/set_style.py reference.docx "Block Text" \
         --font "Georgia" --size 10.5 --color 6C757D --before 6 --after 6
 
 python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
-
 ```
 
-When step 1 flagged literal header or footer text, swap the values with
-`--replace`. It edits the text in place, so tab columns, border rules, a
-first-page variant and any table in the footer survive. It exits non-zero when a
-value is not found, and composes with the other flags in one invocation.
+`--replace` matters because the source's header is inherited byte for byte.
+Whatever it literally says — document number, version, owner, date — is copied
+into every document produced from this template, so the source's own values
+have to come out. It edits the text in place, so tab columns, border rules, a
+first-page variant and any table in the footer survive; rebuilding the part
+with `--header` or `--footer` would flatten all of that. It exits non-zero when
+a value is not found, and composes with the other flags in one invocation.
+
+Page numbers are not affected. Anything step 1 listed as `[fields: ...]` is
+computed by Word when the document opens and is already correct everywhere.
 
 `--columns` **changes** the layout; it is not needed to preserve one. A
 multi-column source is already multi-column in the template, because `w:cols`
