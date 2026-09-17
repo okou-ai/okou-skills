@@ -28,10 +28,9 @@ Note from the report: which required styles are missing, the paper size, margins
 and column count, and — if a `REVIEW` block appears — the literal header and
 footer text.
 
-That literal text is copied verbatim into every document made from the template.
-Document numbers, versions, owners and dates belonging to the source have to be
-replaced in step 3. Page numbers and section names shown as `[fields: ...]` are
-computed by Word and need no action.
+Literal header and footer text is copied verbatim into every document made
+from the template, so replace the source's own numbers, versions, owners and
+dates in step 3. `[fields: ...]` are computed by Word and need no action.
 
 Ignore the exit code and continue.
 
@@ -41,9 +40,8 @@ Ignore the exit code and continue.
 python3 scripts/build_reference.py <source.docx> reference.docx
 ```
 
-Missing styles are filled in automatically. The output splits them into
-"derived" and "using pandoc's default spacing". Only the second group may need
-step 3; otherwise go straight to step 4.
+Missing styles are filled in automatically. Only the ones listed as "using
+pandoc's default spacing" may need step 3; otherwise go to step 4.
 
 ### 3. Set the paper size, and adjust styles
 
@@ -70,40 +68,24 @@ python3 scripts/set_style.py reference.docx "Block Text" \
 python3 scripts/set_style.py reference.docx "Source Code" --create --font "Consolas" --size 9
 ```
 
-`--replace` matters because the source's header is inherited byte for byte.
-Whatever it literally says — document number, version, owner, date — is copied
-into every document produced from this template, so the source's own values
-have to come out. It edits the text in place, so tab columns, border rules, a
-first-page variant and any table in the footer survive; rebuilding the part
-with `--header` or `--footer` would flatten all of that. It exits non-zero when
+`--replace` edits the text in place, so tab columns, border rules, a
+first-page variant and any table in the footer survive. It exits non-zero when
 a value is not found, and composes with the other flags in one invocation.
 
-Page numbers are not affected. Anything step 1 listed as `[fields: ...]` is
-computed by Word when the document opens and is already correct everywhere.
+`--columns` **changes** the layout and is not needed to preserve one: a
+multi-column source is already multi-column in the template. Changing the count
+on an unequal-width layout drops the per-column widths, which the output says.
 
-`--columns` **changes** the layout; it is not needed to preserve one. A
-multi-column source is already multi-column in the template, because `w:cols`
-rides along in `sectPr` with the paper size and margins. Step 1 reports the
-count, the gutter and any unequal widths so the inheritance is visible.
-
-Everything about the columns is read from the document, not assumed: the gutter
-is kept unless `--column-gap` overrides it, a count that is already correct is
-left untouched so per-column widths survive, and 24pt is used only when the
-document sets no gutter at all — which the output says. Changing the count on an
-unequal-width layout cannot keep those widths, and that is reported rather than
-done quietly.
-
-`--header` / `--footer` rebuild the part from scratch and flatten all of that.
-Use them only for a template whose header and footer are plain text, or when
-adding one that does not exist:
+`--header` / `--footer` rebuild the part and flatten all of that. Use them only
+on a plain-text header or footer, or to add one that does not exist:
 
 ```bash
 python3 scripts/set_header_footer.py reference.docx \
         --footer "Confidential - page " --page-number
 ```
 
-Either way only the kind being set is touched, so a logo in the header survives
-a footer change.
+Only the kind being set is touched, so a logo in the header survives a footer
+change.
 
 Pass the `w:name` of the style (`heading 2`, `Body Text`), case-insensitive.
 Add `--create` for a style the template does not define.
@@ -136,23 +118,10 @@ the text as Normal.
 python3 scripts/make_package.py <source.docx> reference.docx <output dir>
 ```
 
-The package is three files: `SKILL.md`, `reference.docx` and `source.docx`.
-`SKILL.md` has a `name` and `description` in its frontmatter, so the directory
-loads as a skill and triggers on its own — drop it into a skills path rather
-than explaining it. It carries the style values, the source's
-outline, and what else to take from `source.docx` when writing a new
-document of this kind.
+Append anything you hit that the scripts could not read to "Known limits" in
+the package's `SKILL.md`.
 
-Hand over the whole directory. `reference.docx` on its own says nothing about
-how it was built or what it is for.
-
-`make_package.py` writes what it read out of the files, and the multi-column
-limits
-that follow from the layout. It cannot know what you hit working on this
-document. Append those to "Known limits" in the package's `SKILL.md` before
-handing it over — a style the source left at Word's default, a heading
-hierarchy that reads inverted, a header that needed hand-written XML. The next
-person meets the same thing and has nothing else to go on.
+Hand over the whole directory.
 
 ## Rules
 

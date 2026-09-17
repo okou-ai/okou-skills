@@ -43,8 +43,6 @@ rank   size   colour  chars  lines  pages  sample
 2      10.5  #242121    737     33      5  This report covers the first  <- the real body
 ```
 
-Every paragraph metric and the threshold separating headings from body come
-from this group, and a wrong pick corrupts all of them silently.
 
 ### 2. Declare the column count
 
@@ -58,12 +56,7 @@ Render a page and look at it:
 okou presentation screenshot --input <source.pdf> --out shots
 ```
 
-Then pass `--columns N`. This is not cosmetic: with the count wrong, lines are
-ordered straight down the page, so the line before a heading at the top of
-column 2 is the last line of column 1 and every heading gap becomes noise.
-
-The declared count is written into the template as `w:cols` and reported with
-the measured column width and gutter.
+Then pass `--columns N`.
 
 ### 3. Assign heading levels
 
@@ -98,17 +91,13 @@ two ways and says which:
 - the top margin **exceeds** the bound, so the layout is not symmetric and the
   rounded bound is suggested instead
 
-Override either with `--bottom <cm>`. `build_reference.py` uses this suggestion
-by default, so a non-symmetric layout no longer needs the flag — pass it only to
-disagree with the report.
+`--bottom <cm>` overrides it; the suggestion is used by default.
 
-The suggested row snaps to a table of common layout values. A margin that is
-not in that table, or a `measured` value that sits between two of them, lands
-on the wrong one. Check the suggestion against the `measured` row; where they
-disagree by more than rounding, measure it yourself and pass `--top`, `--left`
-or `--right`. A two-column document gives you a free check: the two columns
-must come out the same width, since one edge is set by the gutter and the
-other by the right margin.
+The suggested row rounds to a table of common values, so check it against
+`measured`. Where they disagree by more than rounding, measure it yourself and
+pass `--top`, `--left` or `--right`. On a two-column document the two columns
+must come out the same width — one edge comes from the gutter and the other
+from the right margin, so that is a free check.
 
 ### 5. Build the template
 
@@ -124,16 +113,8 @@ python3 scripts/verify_roundtrip.py reference.docx styles.json \
         --map 1=Heading1,2=Title,3=Heading2
 ```
 
-Pass the same `--map`. Without it the group-to-style match is guessed from
-size and colour, which reports a false failure when two groups resolve to one
-style.
-
-The exit code must be 0. It catches dangling style references and reconciles
-the output's size, colour, spacing, indent and alignment against the inferred
-values.
-
-Fields the analysis could not measure are skipped rather than compared, so a
-`NOT MEASURED` space-after is not a failure.
+Pass the same `--map`, or two groups resolving to one style read as a failure.
+The exit code must be 0. A `NOT MEASURED` space-after is not a failure.
 
 ### 7. Package and deliver
 
@@ -142,28 +123,13 @@ python3 scripts/make_package.py <source.pdf> reference.docx styles.json <output 
         --map 1=Heading1,2=Title,3=Heading2 --body 2
 ```
 
-Pass `--map`, `--body` and every margin you overrode (`--top`, `--right`,
-`--bottom`, `--left`) through verbatim. They are every choice made along the
-way, and `SKILL.md` is the only place they get written down — including in the
-command it records for re-deriving the analysis. A correction left out here is
-lost the moment anyone rebuilds the template.
+Pass `--map`, `--body` and every margin you overrode through verbatim;
+`SKILL.md` is the only place they are recorded.
 
-The package is three files: `SKILL.md`, `reference.docx` and `source.pdf`.
-`SKILL.md` has a `name` and `description` in its frontmatter, so the directory
-loads as a skill and triggers on its own — drop it into a skills path rather
-than explaining it. It carries the style values, the choices made, the source's
-outline, and what else to take from `source.pdf` when writing a new
-document of this kind.
+Append anything you hit that the scripts could not measure to "Known limits"
+in the package's `SKILL.md`.
 
-Hand over the whole directory. `reference.docx` on its own says nothing about
-how it was built or what it is for.
-
-`make_package.py` writes what the scripts measured, and the multi-column limits
-that follow from the layout. It cannot know what you hit working on this
-document. Append those to "Known limits" in the package's `SKILL.md` before
-handing it over — a style the source left at Word's default, a heading
-hierarchy that reads inverted, a header that needed hand-written XML. The next
-person meets the same thing and has nothing else to go on.
+Hand over the whole directory.
 
 ### Optional: adjust styles, add a header or footer
 
@@ -175,11 +141,8 @@ python3 scripts/set_header_footer.py reference.docx --header "Company" --footer 
 python3 scripts/set_header_footer.py reference.docx --header 'Title\tv2.3'   # left / right columns
 ```
 
-Re-run step 6 with `--structure-only`, then step 7.
-
-The full reconciliation compares the template against `styles.json`, so it fails
-on any value you deliberately changed. `--structure-only` keeps the dangling
-reference check and drops that comparison.
+Re-run step 6 with `--structure-only` — the full check fails on any value you
+changed on purpose — then step 7.
 
 ## Rules
 
