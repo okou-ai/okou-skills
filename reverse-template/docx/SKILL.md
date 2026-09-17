@@ -7,6 +7,53 @@ description: "Reverse-engineer an existing Word document into a loadable templat
 
 Takes one `.docx` and produces a template package directory ready to hand over.
 
+Run every command below from `reverse-template/docx/`.
+
+## Before anything — an article, or a form?
+
+Look at the rendered pages.
+
+An **article** is written top to bottom and could be written again at another
+length on another subject — a report, a manual, a policy. A **form** is one
+object with a fixed set of entries, and a new one fills the same entries — a
+resume, an invoice, a certificate.
+
+Stay here only for an article whose body runs as one stream; one column, or
+columns of equal width, is one stream. Judge on what the document is, not on
+how it looks — a plain single-column resume is still a form.
+
+### Otherwise: publish the source itself
+
+A style sheet drops those silently. Publish the file and stop here.
+
+Write `package/SKILL.md` and put nothing else in `package/`:
+
+````markdown
+---
+name: <template-slug>
+description: <what this document is, in one line>
+---
+
+Follow the source file's own styling. It is the authority for page size,
+margins, typography, colour, and the position of every block.
+
+Replace the content, keep the composition:
+
+- <one line per entry a new document has to fill>
+````
+
+Name the entries off the rendered pages, and write nothing they do not show.
+
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
+  --title "<user-visible template name>" \
+  --kind document \
+  --source <the original .docx> \
+  --package package
+```
+
+Say the template exists only after the command succeeds.
+
 ## Prerequisites
 
 ```bash
