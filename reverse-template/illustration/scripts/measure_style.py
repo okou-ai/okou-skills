@@ -156,21 +156,32 @@ def lines(rows, w, h):
     is that shape's fill, so taking the modal dark colour over the whole image
     reports dark paint as the ink."""
     thin = max(2, int(w * 0.015))
-    runs, ink_px = [], []
+    runs, ink_px, drawn = [], [], 0
     for y in range(0, h, max(1, h // 400)):
         row = rows[y]
-        run = []
+        run, start = [], 0
         for x in range(w):
             c = row[x]
             if luma(c) < 110:
+                if not run:
+                    start = x
                 run.append(c)
             else:
                 if 0 < len(run) <= thin:
                     runs.append(len(run))
                     ink_px.extend(run)
+                    # A drawn contour carries lighter paint on both sides. The
+                    # edge of a dark shape carries the shape on one side, so
+                    # counting every thin dark run reports an outline on a
+                    # style that never draws one.
+                    left = row[start - 1] if start > 0 else None
+                    core = min(luma(v) for v in run)
+                    if left is not None and luma(left) > core + 40 and luma(row[x]) > core + 40:
+                        drawn += 1
                 run = []
     if len(runs) < 20 or not ink_px:
         return {"present": False}
+    drawn_share = round(drawn / len(runs), 2)
     ink = collections.Counter((c[0] >> 3 << 3, c[1] >> 3 << 3, c[2] >> 3 << 3)
                               for c in ink_px).most_common(1)[0][0]
     c = collections.Counter(runs)
@@ -179,7 +190,8 @@ def lines(rows, w, h):
     # comes out several times too fine.
     width = c.most_common(1)[0][0]
     band = [r for r, k in c.items() if abs(r - width) <= max(1, width * 0.3) for _ in range(k)]
-    return {"present": True, "color": HEX(ink), "width_px": width,
+    return {"present": True, "contour": drawn_share >= 0.3, "contour_share": drawn_share,
+            "color": HEX(ink), "width_px": width,
             "width_pct_of_canvas": round(100 * width / w, 2),
             "width_range_px": [min(band), max(band)], "samples": len(runs)}
 
@@ -267,8 +279,20 @@ def report(ms):
             print(f"  subject     box {s['box_pct'][0]}x{s['box_pct'][1]}% of canvas, ink {s['ink_pct']}%, "
                   f"{'centred' if s['centred'] else 'off-centre'}")
             print(f"              margins L{mg['left']} R{mg['right']} T{mg['top']} B{mg['bottom']} %")
-        print(f"  lines       " + (f"#{l['color']}  width {l.get('width_px')}px "
-              f"({l.get('width_pct_of_canvas')}% of canvas, range {l.get('width_range_px')}, {l.get('samples')} runs)" if l["present"] else "no dark line structure"))
+        if not l["present"]:
+            print("  lines       no dark line structure")
+        else:
+            print(f"  lines       #{l['color']}  width {l.get('width_px')}px "
+                  f"({l.get('width_pct_of_canvas')}% of canvas, range {l.get('width_range_px')},"
+                  f" {l.get('samples')} runs)")
+            if l.get("contour"):
+                print(f"              drawn contour: {l.get('contour_share')} of dark runs have"
+                      f" lighter paint on both sides")
+            else:
+                print(f"              NO drawn contour: only {l.get('contour_share')} of dark runs"
+                      f" have lighter paint on both\n              sides. Shapes meet at their"
+                      f" colour edges; the value above is the darkest\n              paint, not an"
+                      f" outline. Do not put an outline in the package.")
         print(f"  surface     flat {f['flat_pct']}%  grain {f['grain']}  edge ramp {f['edge_px']}px")
         if m["low_res"]:
             print(f"  LOW RES     {c['w']}x{c['h']} is under {MIN_SIDE}px. Palette, line colour and"

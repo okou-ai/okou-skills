@@ -72,7 +72,7 @@ State the style under these heads, from the references only:
 | Head | State |
 |---|---|
 | Medium | painted, inked, vector, 3D, collage, print, photographic, mixed |
-| Line | present or absent, closed or open, uniform or tapered, cap shape |
+| Line | the measurement's contour verdict first, then closed or open, uniform or tapered, cap shape |
 | Shape | rounded or angular, geometric or organic, how forms simplify |
 | Value | flat fill, cel steps and how many, gradient modelling, hatching, wash |
 | Colour | what the lead, support and accent each do |
@@ -156,6 +156,8 @@ pass an image to it.
 |---|---|
 | Generated pieces repeat the reference's subject | The subject leaked into the style record; run the deletion test in step 3 again and rewrite the prompt template |
 | `check_piece.py` fails on line width | Step 2's measurement, not your estimate, goes in the package |
+| Generated pieces carry outlines the reference has none of | The measurement said `NO drawn contour`; remove every outline word from the prompt and say shapes meet at their colour edges |
+| Generated pieces read as flat vector against a painted reference | Flatness under about 60% means paint varies inside each shape; say so, and name what must not be flat |
 | Every generated piece looks the same | Too few dials, or the prompt template has no placeholders |
 | A colour appears that no reference uses | The palette dial has no list of allowed values |
 | Generated pieces flood the whole canvas | The locked frame is missing the ink coverage and the unpainted ground; "vignette" alone does not hold |

@@ -55,6 +55,10 @@ def check(refs, piece):
 
     rl = [m["lines"] for m in refs if m["lines"]["present"]]
     if rl and piece["lines"]["present"]:
+        want = {bool(l.get("contour")) for l in rl}
+        got = bool(piece["lines"].get("contour"))
+        row("drawn contour", "/".join("yes" if v else "no" for v in want),
+            "yes" if got else "no", got in want)
         row("line colour", "#" + rl[0]["color"], "#" + piece["lines"]["color"],
             min(dist(rgb(piece["lines"]["color"]), rgb(l["color"])) for l in rl) <= 40)
         lo, hi = band([l["width_pct_of_canvas"] for l in rl], 0.35)
