@@ -49,38 +49,36 @@ prose under a repeated header, footer, or page number is a document.
 Only for the pdf and docx branches. The presentation branch rebuilds pages in
 HTML, so composition is not a problem it has.
 
-Those two branches produce a `reference.docx`: paper size, margins, columns,
-per-style fonts and spacing, a header and a footer. No composition — no
-sidebar, no panel behind a block of text, no floating photo, no grid of cards.
-A resume, a certificate, an invoice, or a brochure usually keeps its identity
-in exactly those things.
+Those two branches produce a `reference.docx`, and pandoc pours one stream of
+paragraphs into it. The gates below are the list of what that reproduces. A
+source passes to the branch only when every gate passes; anything else goes to
+`source-style/SKILL.md`, which keeps the source file itself.
 
 ```bash
 pip install pymupdf        # PDF only
 python3 scripts/assess_layout.py <source.pdf|source.docx>
 ```
 
-| Verdict | Go to |
+| Gate | Passes when |
 |---|---|
-| `flow` | the branch check 1 named |
-| `composed` | `source-style/SKILL.md` |
-| `check` | render a page and decide; blocks placed side by side at different widths, or text over a fill, mean `source-style` |
+| columns | one column, or columns of equal width |
+| blocks side by side | no fill or image has text beside it at the same height |
+| page art | fills and images cover under a quarter of the page, page chrome excluded |
+| dividing rules | no vertical rule runs 40% of the page height or more |
+| paragraph rules | no horizontal rule sits against a line of text |
 
-On a PDF it splits each page at its vertical corridors and keeps the regions
-that run down the page. One region is a flow. Two of equal width are columns,
-which `w:cols` reproduces. Two of unequal width are a sidebar, which nothing in
-a style sheet holds. A narrow strip of right-aligned dates is a tab stop rather
-than a region — a region has to carry its share of the page's text.
+A `.docx` is gated on its markup instead: floating shapes, text boxes,
+positioned frames, short wide tables whose cells hold prose, and unequal
+`w:cols` widths. It has no paragraph-rule gate — `build_reference.py` copies
+`styles.xml` across whole, so a rule carried on a style survives.
 
-It then measures fill and image coverage, after subtracting whatever repeats in
-the same place on most pages, because a header band and a logo are chrome the
-branch already reproduces.
+The exit code is 0 for `flow` and 1 for `composed`; the report names the gates
+that failed and, where the gap is the branch's own tooling rather than the
+format, says so.
 
-Colour is the weaker of the two signals and only the second is about it: a
-sidebar drawn in plain text with a hairline rule covers no area at all.
-
-On a `.docx` it reads the markup instead: floating shapes, text boxes,
-positioned frames, and short wide tables whose cells hold prose.
+Widen the list by widening the branch, not by overriding a gate here. A wrong
+`flow` is silent — the template comes out looking plausible with the sidebar
+gone — and a wrong `composed` only costs editability.
 
 ## Deliverables
 

@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Say whether a document's look survives a style-only template.
+"""Let a source onto the docx or pdf branch only when every gate passes.
 
-The docx and pdf branches produce a `reference.docx`: a style sheet. Pandoc
-pours one stream of paragraphs into it, top to bottom, in one column or in
-equal columns. That reproduces paper size, margins, per-style type, a header
-and a footer — and nothing that depends on where a block sits. A sidebar, a
-panel behind text, a floating photo, a grid of cards: a source whose identity
-lives in those goes to the source-style branch instead.
+Those branches produce a `reference.docx`: a style sheet that pandoc pours one
+stream of paragraphs into, in one column or in equal columns. The gates below
+are the list of what that reproduces. Anything outside the list goes to the
+source-style branch, which keeps the source file itself — a template that is
+less editable, but that loses nothing.
+
+The gates are a whitelist on purpose. A wrong `flow` is silent: the template
+comes out looking plausible with the sidebar gone. A wrong `composed` only
+costs editability.
 """
 
 import argparse
@@ -17,33 +20,39 @@ import statistics
 import sys
 import zipfile
 
-FLOW = "flow"
-COMPOSED = "composed"
-CHECK = "check"
-
 GRID_X, GRID_Y = 60, 84
 CELLS = GRID_X * GRID_Y
-
-# Share of the page covered by fills and images that are not page chrome.
-# Measured: an A4 report with a brand band, a logo and a shaded table lands at
-# 0.045 once its chrome is subtracted; a sidebar resume at 0.333.
-COMPOSED_INK = 0.12
-FLOW_INK = 0.06
 
 BIN_PT = 2.0            # x and y resolution when looking for a gutter
 CORRIDOR_PT = 8.0       # narrower than this is letter spacing, not a gutter
 CORRIDOR_NOISE = 0.03   # a gutter may be crossed by a spanning title or figure
 TALL_REGION = 0.5       # a region this much of the body height runs down the page
-WIDTH_RATIO = 1.25      # wider a gap than this between two regions and they are
-                        # not columns of one grid
 CHAR_SHARE = 0.08       # a column of right-aligned dates is a tab stop, not a
                         # region; it holds almost none of the page's text
+WIDTH_RATIO = 1.25      # wider a gap than this and two regions are not columns
 RUNNING_BAND = 0.12     # a running head or foot lives this far into the page
+PAGE_ART = 0.25         # a fill or image this large is decoration, not a table
+                        # row: nothing is beside it, so the test above lets it by
+LONG_RULE = 0.4         # a vertical rule this much of the page height divides
+                        # the page; a table's cell borders are far shorter
+RULE_TO_TEXT = 12.0     # a rule this close to a line of text is its border
+LATTICE_PT = 20.0       # a horizontal rule with a vertical one this close is
+                        # part of a table, which pandoc does reproduce
+BESIDE_OVERLAP = 0.5    # text level with a block over this much of its height
+                        # is beside it, not above or below it
 
 
 def fail(message):
     print(f"error: {message}", file=sys.stderr)
     raise SystemExit(2)
+
+
+class Gate:
+    def __init__(self, name, ok, detail, hint=None):
+        self.name = name
+        self.ok = ok
+        self.detail = detail
+        self.hint = hint
 
 
 def cells_of(rect, width, height):
@@ -58,21 +67,43 @@ def rect_key(rect):
     return (round(rect.x0), round(rect.y0), round(rect.x1), round(rect.y1))
 
 
-def page_shapes(page):
+def page_fills(page):
     """Filled drawings and images, minus the page background."""
     width, height = page.rect.width, page.rect.height
-    shapes = []
+    fills, images = [], []
     for drawing in page.get_drawings():
-        fill = drawing.get("fill")
-        if fill is None or min(fill) > 0.95:  # unfilled or near-white: not ink
+        colour = drawing.get("fill")
+        if colour is None or min(colour) > 0.95:
             continue
         rect = drawing["rect"]
         if rect.width * rect.height > 0.98 * width * height:
             continue
-        shapes.append(rect)
+        fills.append(rect)
     for image in page.get_images(full=True):
-        shapes.extend(page.get_image_rects(image[0]))
-    return shapes
+        images.extend(page.get_image_rects(image[0]))
+    return fills, images
+
+
+def page_rules(page):
+    """Horizontal and vertical strokes, as (x0, y0, x1, y1)."""
+    horizontal, vertical = [], []
+    for drawing in page.get_drawings():
+        if drawing.get("color") is None:
+            continue
+        for item in drawing["items"]:
+            if item[0] == "l":
+                (ax, ay), (bx, by) = (item[1].x, item[1].y), (item[2].x, item[2].y)
+            elif item[0] == "re":
+                rect = item[1]
+                ax, ay, bx, by = rect.x0, rect.y0, rect.x1, rect.y1
+            else:
+                continue
+            dx, dy = abs(bx - ax), abs(by - ay)
+            if dy <= 1 < dx:
+                horizontal.append((min(ax, bx), (ay + by) / 2, max(ax, bx), (ay + by) / 2))
+            elif dx <= 1 < dy:
+                vertical.append(((ax + bx) / 2, min(ay, by), (ax + bx) / 2, max(ay, by)))
+    return horizontal, vertical
 
 
 def page_lines(page):
@@ -85,13 +116,8 @@ def page_lines(page):
     return out
 
 
-def side_by_side(lines):
-    """Split one page's lines at vertical corridors and keep the tall regions.
-
-    A sidebar and a column look the same here; what separates them is width.
-    Pandoc writes equal columns from one `w:cols`, so equal regions stay
-    reproducible and unequal ones do not.
-    """
+def regions_of(lines):
+    """Split one page's lines at the vertical corridors that run its height."""
     if len(lines) < 8:
         return None
 
@@ -109,16 +135,14 @@ def side_by_side(lines):
     for (bx0, by0, bx1, by1), _ in lines:
         i0 = max(0, int((bx0 - x0) / BIN_PT))
         i1 = min(nx, int((bx1 - x0) / BIN_PT) + 1)
-        j0 = max(0, int((by0 - y0) / BIN_PT))
-        j1 = min(ny, int((by1 - y0) / BIN_PT) + 1)
-        rows = range(j0, j1)
+        rows = range(max(0, int((by0 - y0) / BIN_PT)), min(ny, int((by1 - y0) / BIN_PT) + 1))
         for i in range(i0, i1):
             occupied[i].update(rows)
 
     limit = CORRIDOR_NOISE * ny
     clear = [len(rows) <= limit for rows in occupied]
 
-    regions, start = [], None
+    spans, start = [], None
     for i, empty in enumerate(clear + [True]):
         if not empty and start is None:
             start = i
@@ -127,14 +151,14 @@ def side_by_side(lines):
             while gap_end < nx and clear[gap_end]:
                 gap_end += 1
             if gap_end == nx or (gap_end - i) * BIN_PT >= CORRIDOR_PT:
-                regions.append((start, i))
+                spans.append((start, i))
                 start = None
     if start is not None:
-        regions.append((start, nx))
+        spans.append((start, nx))
 
     total_chars = sum(len(text) for _, text in lines) or 1
     measured = []
-    for a, b in regions:
+    for a, b in spans:
         left, right = x0 + a * BIN_PT, x0 + b * BIN_PT
         inside = [
             (bbox, text)
@@ -143,14 +167,12 @@ def side_by_side(lines):
         ]
         if not inside:
             continue
-        span = max(bbox[3] for bbox, _ in inside) - min(bbox[1] for bbox, _ in inside)
-        chars = sum(len(text) for _, text in inside)
         measured.append(
             {
                 "left": left,
                 "width": right - left,
-                "span": span,
-                "share": chars / total_chars,
+                "span": max(b[3] for b, _ in inside) - min(b[1] for b, _ in inside),
+                "share": sum(len(t) for _, t in inside) / total_chars,
             }
         )
 
@@ -159,7 +181,7 @@ def side_by_side(lines):
         for r in measured
         if r["span"] >= TALL_REGION * body_height and r["share"] >= CHAR_SHARE
     ]
-    return {"body_height": body_height, "regions": measured, "tall": tall}
+    return {"body_height": body_height, "tall": tall}
 
 
 def assess_pdf(path):
@@ -170,98 +192,178 @@ def assess_pdf(path):
 
     doc = pymupdf.open(path)
     pages = len(doc)
-    shapes_per_page, repeats = [], collections.Counter()
-    line_repeats = collections.Counter()
-    lines_per_page = []
-
-    for page in doc:
-        shapes = page_shapes(page)
-        for rect in shapes:
-            repeats[rect_key(rect)] += 1
-        shapes_per_page.append((page.rect.width, page.rect.height, shapes))
-        lines = page_lines(page)
-        band = RUNNING_BAND * page.rect.height
-        for bbox, text in lines:
-            # Only a line near the top or bottom edge can be a running head or
-            # foot. Body text that happens to repeat is still body text.
-            if bbox[1] <= band or bbox[3] >= page.rect.height - band:
-                line_repeats[(round(bbox[1]), text)] += 1
-        lines_per_page.append(lines)
-
-    # A shape or a line at the same place on most pages is a header band, a
-    # footer rule, a logo or a running head. set_header_footer.py reproduces
-    # those, so they are not evidence of composition.
     chrome_at = max(2, pages * 0.6)
 
-    raw_cov, net_cov = [], []
-    for width, height, shapes in shapes_per_page:
-        raw, net = set(), set()
-        for rect in shapes:
-            covered = cells_of(rect, width, height)
-            raw |= covered
-            if pages > 1 and repeats[rect_key(rect)] >= chrome_at:
-                continue
-            net |= covered
-        raw_cov.append(len(raw) / CELLS)
-        net_cov.append(len(net) / CELLS)
+    shape_repeats, rule_repeats, line_repeats = (
+        collections.Counter(),
+        collections.Counter(),
+        collections.Counter(),
+    )
+    per_page = []
+    for page in doc:
+        fills, images = page_fills(page)
+        horizontal, vertical = page_rules(page)
+        lines = page_lines(page)
+        for rect in fills + images:
+            shape_repeats[rect_key(rect)] += 1
+        for rule in horizontal + vertical:
+            rule_repeats[tuple(round(v) for v in rule)] += 1
+        band = RUNNING_BAND * page.rect.height
+        for bbox, text in lines:
+            # Only a line near an edge can be a running head or foot. Body text
+            # that happens to repeat is still body text.
+            if bbox[1] <= band or bbox[3] >= page.rect.height - band:
+                line_repeats[(round(bbox[1]), text)] += 1
+        per_page.append(
+            {
+                "size": (page.rect.width, page.rect.height),
+                "fills": fills,
+                "images": images,
+                "horizontal": horizontal,
+                "vertical": vertical,
+                "lines": lines,
+            }
+        )
 
-    ink_raw = statistics.median(raw_cov)
-    ink_net = statistics.median(net_cov)
+    def is_chrome_shape(rect):
+        return pages > 1 and shape_repeats[rect_key(rect)] >= chrome_at
 
-    verdicts, shapes_seen = [], None
-    for lines in lines_per_page:
+    def is_chrome_rule(rule):
+        return pages > 1 and rule_repeats[tuple(round(v) for v in rule)] >= chrome_at
+
+    # ── gate: columns ────────────────────────────────────────────────────────
+    column_counts, ratios, unequal_pages, measured_pages = [], [], 0, 0
+    for page in per_page:
         body = [
             (bbox, text)
-            for bbox, text in lines
+            for bbox, text in page["lines"]
             if not (pages > 1 and line_repeats[(round(bbox[1]), text)] >= chrome_at)
         ]
-        result = side_by_side(body)
-        if result is None:
+        found = regions_of(body)
+        if found is None:
             continue
-        shapes_seen = shapes_seen or result
-        tall = result["tall"]
-        if len(tall) < 2:
-            verdicts.append((FLOW, len(tall)))
-        else:
+        measured_pages += 1
+        tall = found["tall"]
+        column_counts.append(len(tall))
+        if len(tall) >= 2:
             widths = [r["width"] for r in tall]
             ratio = max(widths) / min(widths)
-            verdicts.append((COMPOSED if ratio > WIDTH_RATIO else FLOW, len(tall), ratio))
+            ratios.append(ratio)
+            if ratio > WIDTH_RATIO or len(tall) > 2:
+                unequal_pages += 1
 
-    report = [
-        "[layout]",
-        f"  pages                 {pages}",
-    ]
-    if verdicts:
-        composed_pages = sum(1 for v in verdicts if v[0] == COMPOSED)
-        widest = max((v[2] for v in verdicts if len(v) > 2), default=1.0)
-        columns = statistics.median([v[1] for v in verdicts])
-        report.append(f"  full-height regions   {columns:.0f} on the median page")
-        if widest > 1.0:
-            report.append(f"  widest width ratio    {widest:.2f} (columns are 1.00)")
-        report.append(f"  pages side by side    {composed_pages}/{len(verdicts)}")
-        region_verdict = COMPOSED if composed_pages * 2 >= len(verdicts) else FLOW
+    if measured_pages == 0:
+        gates = [
+            Gate(
+                "columns",
+                False,
+                "too few lines to tell a gutter from a margin",
+                "A scan or an image-only export has no text to measure.",
+            )
+        ]
+        columns = 0
     else:
-        report.append("  full-height regions   not measurable (too few lines)")
-        region_verdict = None
+        columns = statistics.median(column_counts)
+        widest = max(ratios, default=1.0)
+        if unequal_pages * 2 >= measured_pages:
+            detail = f"{columns:.0f} regions, widths differ by {widest:.2f}x"
+        elif columns >= 2:
+            detail = f"{columns:.0f} equal columns, widths differ by {widest:.2f}x"
+        else:
+            detail = "one column"
+        gates = [Gate("columns", unequal_pages * 2 < measured_pages, detail)]
 
-    report += [
-        "",
-        "[ink]",
-        f"  covered, all fills    {ink_raw:.3f} of the median page",
-        f"  covered, minus chrome {ink_net:.3f} of the median page",
-    ]
+    # ── gate: blocks side by side ────────────────────────────────────────────
+    # A fill or an image with text beside it at the same height is one block
+    # among several: a sidebar panel, a card in a grid, a wrapped photo. One
+    # that spans the flow — a shaded table row, a full-width figure — is not.
+    beside = 0
+    for page in per_page:
+        for rect in page["fills"] + page["images"]:
+            if is_chrome_shape(rect):
+                continue
+            height = rect.y1 - rect.y0
+            if height <= 0:
+                continue
+            for bbox, _ in page["lines"]:
+                overlap = min(bbox[3], rect.y1) - max(bbox[1], rect.y0)
+                outside = bbox[2] < rect.x0 - 2 or bbox[0] > rect.x1 + 2
+                if outside and overlap >= BESIDE_OVERLAP * min(height, bbox[3] - bbox[1]):
+                    beside += 1
+                    break
+    gates.append(
+        Gate(
+            "blocks side by side",
+            beside == 0,
+            "none" if not beside else f"{beside} fills or images with text beside them",
+        )
+    )
 
-    if region_verdict == COMPOSED:
-        return COMPOSED, report, "the page splits into side-by-side regions of unequal width"
-    if ink_net >= COMPOSED_INK:
-        if pages == 1:
-            return COMPOSED, report, f"{ink_net:.3f} of the page is fill or image"
-        return COMPOSED, report, f"{ink_net:.3f} of the page is fill or image that is not chrome"
-    if region_verdict == FLOW and ink_net <= FLOW_INK:
-        return FLOW, report, "one stream of text, and no fill beyond the page chrome"
-    if region_verdict is None:
-        return CHECK, report, "too few lines to tell a gutter from a margin"
-    return CHECK, report, f"{ink_net:.3f} sits between a report's chrome and a composed page"
+    # ── gate: page art ───────────────────────────────────────────────────────
+    # Full-bleed decoration passes the test above, because nothing is beside it.
+    coverage = []
+    for page in per_page:
+        width, height = page["size"]
+        net = set()
+        for rect in page["fills"] + page["images"]:
+            if not is_chrome_shape(rect):
+                net |= cells_of(rect, width, height)
+        coverage.append(len(net) / CELLS)
+    ink = statistics.median(coverage)
+    gates.append(
+        Gate("page art", ink <= PAGE_ART, f"{ink:.3f} of the median page, chrome excluded")
+    )
+
+    # ── gate: dividing rules ─────────────────────────────────────────────────
+    dividers = 0
+    longest = 0.0
+    for page in per_page:
+        height = page["size"][1]
+        for rule in page["vertical"]:
+            if is_chrome_rule(rule):
+                continue
+            length = rule[3] - rule[1]
+            longest = max(longest, length / height)
+            if length >= LONG_RULE * height:
+                dividers += 1
+    gates.append(
+        Gate(
+            "dividing rules",
+            dividers == 0,
+            "none" if not dividers else f"{dividers} vertical, longest {longest:.0%} of the page",
+        )
+    )
+
+    # ── gate: paragraph rules ────────────────────────────────────────────────
+    borders = 0
+    for page in per_page:
+        for rule in page["horizontal"]:
+            if is_chrome_rule(rule):
+                continue
+            x0, y, x1, _ = rule
+            in_table = any(
+                v[1] - LATTICE_PT <= y <= v[3] + LATTICE_PT and x0 - 2 <= v[0] <= x1 + 2
+                for v in page["vertical"]
+            )
+            if in_table:
+                continue
+            near_text = any(
+                abs(bbox[3] - y) <= RULE_TO_TEXT or abs(bbox[1] - y) <= RULE_TO_TEXT
+                for bbox, _ in page["lines"]
+            )
+            if near_text:
+                borders += 1
+    gates.append(
+        Gate(
+            "paragraph rules",
+            borders == 0,
+            "none" if not borders else f"{borders} rules under or over a line of text",
+            "set_style.py cannot write w:pBdr yet; a --border-bottom flag would "
+            "move these inside the list.",
+        )
+    )
+
+    return gates
 
 
 DOCX_MARKS = [
@@ -272,14 +374,22 @@ DOCX_MARKS = [
 
 
 def assess_docx(path):
+    """A docx needs fewer gates than a PDF.
+
+    build_reference.py copies styles.xml across whole, so a rule carried on a
+    style as w:pBdr survives — which is why there is no paragraph-rule gate
+    here. Only what pandoc's single paragraph stream cannot express is gated.
+    """
     try:
         with zipfile.ZipFile(path) as zf:
             body = zf.read("word/document.xml")
     except (KeyError, zipfile.BadZipFile):
         fail(f"{path} is not a readable .docx")
 
-    found = [(name, len(pattern.findall(body))) for name, pattern in DOCX_MARKS]
-    found = [(name, n) for name, n in found if n]
+    gates = []
+    for name, pattern in DOCX_MARKS:
+        found = len(pattern.findall(body))
+        gates.append(Gate(name, found == 0, "none" if not found else str(found)))
 
     # A table of two or three rows whose cells hold prose is page scaffolding,
     # not data: a resume's sidebar, a two-up block, a header card. A data table
@@ -297,17 +407,24 @@ def assess_docx(path):
                 prose_cells += 1
         if columns >= 2 and rows <= 2 and prose_cells:
             layout_tables += 1
+    gates.append(
+        Gate("layout table", layout_tables == 0, "none" if not layout_tables else str(layout_tables))
+    )
 
-    marks = found + ([("layout table", layout_tables)] if layout_tables else [])
-    report = ["[composition marks]"]
-    for name, n in marks:
-        report.append(f"  {name:24s} {n}")
-    if not marks:
-        report.append("  none — the body is a linear flow of paragraphs")
+    # Unequal columns come from one w:cols with explicit widths, which the
+    # branch keeps, but only one section may define them.
+    widths = re.findall(rb'<w:col [^>]*w:w="(\d+)"', body)
+    if len(widths) >= 2:
+        values = [int(w) for w in widths]
+        equal = max(values) / min(values) <= WIDTH_RATIO
+        gates.append(
+            Gate("columns", equal, f"{len(values)} columns, widths differ by "
+                 f"{max(values) / min(values):.2f}x")
+        )
+    else:
+        gates.append(Gate("columns", True, "one column"))
 
-    if marks:
-        return COMPOSED, report, ", ".join(f"{n} {name}" for name, n in marks)
-    return FLOW, report, "the body is a linear flow of paragraphs"
+    return gates
 
 
 def main():
@@ -320,31 +437,29 @@ def main():
 
     ext = os.path.splitext(args.source)[1].lower()
     if ext == ".pdf":
-        verdict, report, why = assess_pdf(args.source)
+        gates = assess_pdf(args.source)
     elif ext == ".docx":
-        verdict, report, why = assess_docx(args.source)
+        gates = assess_docx(args.source)
     else:
         fail(f"{ext or args.source}: run this on the .pdf or .docx only")
 
     print(f"[source]\n  {args.source}\n")
-    print("\n".join(report))
+    print("[gates]")
+    for gate in gates:
+        print(f"  {'pass' if gate.ok else 'FAIL'}  {gate.name:22s} {gate.detail}")
     print()
 
-    if verdict == FLOW:
+    failed = [gate for gate in gates if not gate.ok]
+    if not failed:
         print("[verdict]  flow  ->  stay on this branch")
-        print(f"  {why}")
+        print("  every gate passed, so a reference.docx reproduces this page")
         return 0
-    if verdict == COMPOSED:
-        print("[verdict]  composed  ->  reverse-template/source-style/SKILL.md")
-        print(f"  {why}: a reference.docx cannot hold this.")
-        return 1
-    print("[verdict]  check — look at a rendered page")
-    print(f"  {why}")
-    print(f"    okou presentation screenshot --input {args.source} --out shots")
-    print(
-        "  Blocks placed side by side with different widths, or text over a fill:\n"
-        "  source-style. One stream of text down the page: stay here."
-    )
+
+    print("[verdict]  composed  ->  reverse-template/source-style/SKILL.md")
+    print(f"  outside the list: {', '.join(gate.name for gate in failed)}")
+    for gate in failed:
+        if gate.hint:
+            print(f"  note: {gate.hint}")
     return 1
 
 
