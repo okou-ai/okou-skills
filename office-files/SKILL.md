@@ -96,7 +96,7 @@ soffice --headless -env:UserInstallation=file:///tmp/lo --convert-to pdf --outdi
 
 Convert first and install only on failure. Three things make that ordering necessary:
 
-- **`libreoffice-writer` is absent from the image.** Only `-impress` and `-draw` ship, so the Writer filters do not exist and a bare `soffice` fails with `Error: source file could not be loaded`. Installing it pulls 9 packages and 66 MB.
+- **`libreoffice-writer` is absent from the image.** Only `-impress` and `-draw` ship, so the Writer filters do not exist and a bare `soffice` fails with `Error: source file could not be loaded`. Installing it pulls 9 packages. Budget about 180 MB of disk: 52 MB of package files, 13 MB of downloaded debs, and — the part that dominates — 111 MB of package indexes written into `/var/lib/apt/lists/` by the `apt-get update` the line above requires.
 - **`apt-get update` has to come first.** `/var/lib/apt/lists/` ships empty, so installing without it reports `Package 'libreoffice-writer' has no installation candidate`, which reads like the package is missing from the archive rather than uncached.
 - **The root filesystem can be rolled back mid-run.** Observed in this sandbox: an install that worked earlier in a run was gone later, and `pip --user` packages with it. Only `/home/user/workspace` was unaffected. Re-running the line above recovers.
 
