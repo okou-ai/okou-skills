@@ -47,6 +47,14 @@ cp -a vm0-skills/hackernews ./.claude/skills/
 
 After installation, restart Claude Code, then ask "What skills are available?" to see installed skills.
 
+## Skills kept elsewhere
+
+Reverse-engineering a file into a template lives in
+[`vm0-ai/Template-artifact/reverse-template`](https://github.com/vm0-ai/Template-artifact/tree/main/reverse-template),
+where one router covers all four branches — `presentation`, `docx`, `pdf` and
+`source-style`. The `docx-reverse-template` and `pdf-reverse-template` skills
+moved there so a run can be routed to the right one.
+
 ## Contributing
 
 To add a new skill or improve an existing one:
