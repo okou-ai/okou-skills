@@ -230,6 +230,46 @@ def to_lines(spans, columns=1, left=None, right=None):
     return out
 
 
+def fit_top(spans, npages):
+    """The text-block top, solved rather than measured.
+
+    A glyph box starts below the text block by a fixed fraction of the font
+    size, so the topmost line of a page reports a margin that is too small, and
+    by a different amount for every font size. Two sizes are two equations:
+        y0 = T + a * size
+    Fitting y0 on size gives the intercept T, the real top margin, with the
+    per-font offset a falling out as the slope.
+
+    Returns None when every page starts at the same size, which leaves the two
+    unknowns inseparable, or when the fit contradicts itself.
+    """
+    top = {}
+    for sp in spans:
+        cur = top.get(sp["page"])
+        if cur is None or sp["bbox"][1] < cur[1]:
+            top[sp["page"]] = (sp["size"], sp["bbox"][1])
+    pts = list(top.values())
+    if len({z for z, _ in pts}) < 2:
+        return None
+    n = len(pts)
+    mx = sum(z for z, _ in pts) / n
+    my = sum(y for _, y in pts) / n
+    den = sum((z - mx) ** 2 for z, _ in pts)
+    if not den:
+        return None
+    sl = sum((z - mx) * (y - my) for z, y in pts) / den
+    T = my - sl * mx
+    # y grows downward, and a glyph box reaches above the block top by its
+    # ascent, so the solved top is below every box top by a fraction of one
+    # em: the slope is a small negative number and T sits between the highest
+    # box and one em under it. Anything else means the pages do not share a
+    # block top and the fit is meaningless.
+    hi, big = min(y for _, y in pts), max(z for z, _ in pts)
+    if not (-0.5 < sl < 0) or not (hi <= T <= hi + big):
+        return None
+    return T
+
+
 def measure_spacing(lines, body_key, col_left, col_right):
     """Line advance, space after, first-line indent, heading spacing, alignment."""
     B = [l for l in lines if l["key"] == body_key and not l["filler"]]
@@ -426,10 +466,13 @@ def analyze(path, body_pick=None, columns=1):
     else:
         left_pt, right_edge = edges(body_spans)
     right_pt = W - right_edge
-    # Top: prefer page 2 onward; a title block inflates the first page.
+    # Top: solve it from two font sizes where the document offers them, and
+    # fall back to the highest glyph box otherwise. The fallback always reads
+    # a little small, because a glyph box starts below the text block.
     not_first = [s for s in body_spans if s["page"] > 0]
     top_src = not_first or body_spans
-    top_pt = min(s["bbox"][1] for s in top_src)
+    top_fit = fit_top(body_spans, doc.page_count)
+    top_pt = top_fit if top_fit is not None else min(s["bbox"][1] for s in top_src)
     # Bottom: page breaks rarely land exactly at the bottom of the text block,
     # so the measurement is always >= the real value. Take the minimum across
     # non-final pages as the tightest upper bound.
@@ -440,7 +483,7 @@ def analyze(path, body_pick=None, columns=1):
             per_page[s["page"]] = max(per_page[s["page"]], s["bbox"][3])
     bottom_bound_pt = (H - max(per_page.values())) if per_page else None
 
-    top_cm = snap(CM(top_pt))[0]
+    top_cm = round(CM(top_pt), 2) if top_fit is not None else snap(CM(top_pt))[0]
     bottom_suggested, geom_notes = None, []
     if filler_count:
         geom_notes.append(f"{filler_count} leader or rule spans were excluded from "
