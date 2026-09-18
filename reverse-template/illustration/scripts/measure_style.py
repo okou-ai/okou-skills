@@ -27,12 +27,27 @@ def load(path):
     RGB rotates every colour one channel to the left."""
     pix = pymupdf.Pixmap(path)
     if pix.colorspace is None or pix.colorspace.n != 3:
-        pix = pymupdf.Pixmap(pymupdf.csRGB, pix)
+        pix = pymupdf.Pixmap(pymupdf.csRGB, pix)   # keeps alpha when present
 
     def rows_of(p, step=1):
         s, n, st = p.samples, p.n, p.stride
-        return [[(s[y * st + x * n], s[y * st + x * n + 1], s[y * st + x * n + 2])
-                 for x in range(0, p.width, step)] for y in range(0, p.height, step)]
+        if n < 4:
+            return [[(s[y * st + x * n], s[y * st + x * n + 1], s[y * st + x * n + 2])
+                     for x in range(0, p.width, step)] for y in range(0, p.height, step)]
+
+        # Composite transparency over white. Generated line art arrives as RGBA
+        # with a transparent ground, and the bytes under alpha=0 are whatever
+        # the encoder left there - usually dark. Reading them as colour reports
+        # a black-ground picture and every axis after it is wrong.
+        def px(i):
+            a = s[i + 3]
+            if a == 255:
+                return (s[i], s[i + 1], s[i + 2])
+            f = a / 255.0
+            return tuple(round(s[i + k] * f + 255 * (1 - f)) for k in range(3))
+
+        return [[px(y * st + x * n) for x in range(0, p.width, step)]
+                for y in range(0, p.height, step)]
 
     small = pymupdf.Pixmap(pix)
     while small.width > 320:
