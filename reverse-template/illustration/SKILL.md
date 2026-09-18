@@ -1,6 +1,6 @@
 ---
 name: illustration-reverse-template
-description: "Reverse a reference picture into a style prompt, show the user pictures made from it, revise until they approve, then save it as their template. Use when a user uploads an image style to reuse, asks to extract a prompt from a picture, wants their own image template, or asks for more images in the style of a picture they supplied."
+description: "Reverse a reference picture into a style prompt, show the user pictures made from it, revise until they approve, then save it as their template. Use when a user uploads an image style to reuse, asks to extract a prompt from a picture, wants their own image template, asks to train, forge or lock a new illustration style, or asks for more images in the style of a picture they supplied."
 ---
 
 # Turn a reference picture into the user's own style
@@ -38,8 +38,15 @@ python3 -c "import pymupdf"     # else: pip install pymupdf
 
 Download every `[Web file]` with `okou web download-file`. Keep PNG or JPEG.
 
-With no reference at all, ask for the intended use, which decides the canvas,
-then write the frame from the brief and go to step 4. Steps 2 and 3 need pixels.
+Ask for what is missing, and nothing else:
+
+- **intended use** — blog cover, product card, marketing poster, in-app spot
+  illustration. It decides the canvas and the frame.
+- **a slug** — kebab-case, the name the saved style is called by. Propose two
+  or three from the reference if the user has none.
+
+With no reference at all, write the frame from the brief and go to step 4.
+Steps 2 and 3 need pixels.
 
 Three or more references separate a locked axis from a dial. With one, ask for
 more; if none arrive, record in `design-system.md` which axes stay unsettled
@@ -108,6 +115,19 @@ State the style under these heads, from the references only:
 | Finish | grade, bloom, chromatic shift, fade, print registration |
 | Subject convention | face treatment, cast, count, scale, what the subject does |
 
+Then name the dials — what changes from piece to piece. Three to seven. These
+carry across styles:
+
+| Dial | What it varies |
+|---|---|
+| Palette | a hex set, or a named palette family |
+| Scene metaphor | the per-piece concept. The scene IS the metaphor — never a generic filing cabinet with relabelled tabs |
+| Complexity | L1 single subject / L2 small scene / L3 full vignette |
+| Cast | the character in this piece, not a mascot the style is stuck with |
+| Props | native to the theme — a crane for construction, a press for publishing |
+| Accent marks | the small repeated motif: dots, ticks, sparkles, ink dabs |
+| Mood | posture and register, built from what is visible |
+
 ### 4. Write the style prompt
 
 Write the prompt first; it is the deliverable. Its first third carries the
@@ -121,7 +141,8 @@ template:
   percentage: the references are rarely that size. State how much of the sheet
   the art covers and whether the ground stays unpainted — without it the model
   floods the sheet and the paper stops being a colour.
-- **Dials** — one line per axis, with the values the references used.
+- **Dials** — one line per dial named in step 3, with the values the
+  references used and what else the dial may take.
 - **Not in the frame** — techniques absent from every reference.
 - **Prompt template** — one prompt with a placeholder per dial, opening on the
   locked frame.
@@ -141,8 +162,13 @@ python3 scripts/check_piece.py --refs <ref> [<ref> ...] --piece <generated> [...
 ```
 
 Generate three at a time — that is the ceiling on generations in flight —
-each on a subject the references do not carry. Keep the ones with the fewest
-axes outside range.
+each on a subject the references do not carry, and each moving a different
+dial: another scene metaphor, another complexity level, another palette value.
+Three pieces of the same subject show the style sitting still, not flexing.
+
+Keep the ones with the fewest axes outside range. Use the built-in image model;
+if it fails for this style, say so and ask how to proceed rather than routing
+to another provider.
 
 Read the failing axes: they name what the prompt did not hold. Correct the
 prompt and generate again.
@@ -168,7 +194,8 @@ motif or composition. Look at the kept piece for those before delivering.
 
 Put in the reply:
 
-- the pictures as markdown images, one line of subject under each;
+- the pictures as markdown images, one line under each naming its subject and
+  the dials it moved — "L1, sage palette, single character";
 - one line saying these were generated from the style in their reference.
 
 Then ask one question: does this style look right.
@@ -200,6 +227,28 @@ Only after the user says the style is right.
 
 Save the approved prompt together with the approved pictures: the prompt is
 what later generations run, the pictures are what the user recognises it by.
+Under the slug from step 1, that is:
+
+```text
+<slug>/
+  SKILL.md                 frontmatter with the trigger phrases, the locked
+                           frame, the dials, the prompt with its placeholders,
+                           and two or three example briefs
+  ref-<subject>-<dial>.png the approved pictures
+```
+
+Run it once under its own name before reporting it exists, and check the
+output still matches the approved pictures.
+
+Then report, in this order: what the style is called and how to invoke it, the
+link to the picture the user approved, and anything still open — a dial with
+one value, a complexity level never tested, an axis that departs from the
+reference.
+
+Register it as a selectable style only when the user asks: the resource goes to
+`illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its entry to the Open
+Design registry in `vm0-ai/okou` as `vm0:image-style:<slug>` with a selection
+description of 150 characters or less, and each pull request links the other.
 
 ## Rules
 
@@ -220,6 +269,10 @@ what later generations run, the pictures are what the user recognises it by.
   rewrite of the prompt.
 - Rotate the cast and the scene across a series. A locked frame is not a
   locked mascot.
+- Use the built-in image model. When it cannot hold a style, say so; do not
+  route to another provider without asking.
+- Nothing is published from an untested style. Run it once under its own name
+  first.
 
 ## Troubleshooting
 
