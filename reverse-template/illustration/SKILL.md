@@ -141,8 +141,7 @@ carry across styles:
 Write the prompt first; it is the deliverable. Its first third carries the
 locked frame, then the subject, then the dials, then what must not appear.
 
-Keep these behind it, and write them into files only when the user asks for a
-template:
+Keep these behind it, and write them into the package at step 8:
 
 - **Locked frame** — one line per axis, measured values included. State the
   contour width in pixels at the canvas the package delivers, not only as a
@@ -233,30 +232,55 @@ Repeat until the user says it is right.
 
 Only after the user says the style is right.
 
-Save the approved prompt together with the approved pictures: the prompt is
-what later generations run, the pictures are what the user recognises it by.
-Under the slug from step 1, that is:
+Build the package under the slug from step 1:
 
 ```text
 <slug>/
   SKILL.md                 frontmatter with the trigger phrases, the locked
                            frame, the dials, the prompt with its placeholders,
                            and two or three example briefs
+  design-system.md         the measurement table per reference, the verdict
+                           table, and the axes a single reference could not
+                           settle
   ref-<subject>-<dial>.png the approved pictures
 ```
 
-Run it once under its own name before reporting it exists, and check the
-output still matches the approved pictures.
+Leave the user's references out of the package; the primary one is published
+beside it as the source. With no reference at all, publish an approved picture
+as the source instead.
 
-Then report, in this order: what the style is called and how to invoke it, the
-link to the picture the user approved, and anything still open — a dial with
-one value, a complexity level never tested, an axis that departs from the
-reference.
+Generate one piece from the `SKILL.md` you just wrote rather than from the
+prompt in your notes, and check it still matches the approved pictures.
+Publish only after that.
 
-Register it as a selectable style only when the user asks: the resource goes to
-`illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its entry to the Open
-Design registry in `vm0-ai/okou` as `vm0:image-style:<slug>` with a selection
-description of 150 characters or less, and each pull request links the other.
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
+  --title "<user-visible style name>" \
+  --kind illustration \
+  --source <the primary reference> \
+  --package <slug>
+```
+
+`--source` takes PNG, JPEG, BMP or WebP. Convert anything else — AVIF, HEIC,
+GIF, TIFF, JPEG 2000, Netpbm — and pass the PNG:
+
+```bash
+ffmpeg -loglevel error -y -i <ref.heic> <ref.png>
+```
+
+Say the template exists only after the command succeeds; name the specific
+blocker if it fails.
+
+Then report, in this order: what the style is called and that it is under
+Custom in the template picker, the link to the picture the user approved, and
+anything still open — a dial with one value, a complexity level never tested,
+an axis that departs from the reference.
+
+Register it as a built-in selectable style only when the user asks: the
+resource goes to `illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its
+entry to the Open Design registry in `vm0-ai/okou` as `vm0:image-style:<slug>`
+with a selection description of 150 characters or less, and each pull request
+links the other.
 
 ## Rules
 
@@ -279,8 +303,10 @@ description of 150 characters or less, and each pull request links the other.
   locked mascot.
 - Use the built-in image model. When it cannot hold a style, say so; do not
   route to another provider without asking.
-- Nothing is published from an untested style. Run it once under its own name
-  first.
+- Nothing is published from an untested style. Generate one piece from the
+  written `SKILL.md` first.
+- The user's reference files are never part of the package. The primary one is
+  the published source; the rest served steps 2 and 3 and stop there.
 
 ## Troubleshooting
 
