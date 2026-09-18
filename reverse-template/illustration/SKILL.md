@@ -1,12 +1,13 @@
 ---
 name: illustration-reverse-template
-description: "Reverse-engineer reference images into a loadable illustration template: SKILL.md, design-system.md and the reference art. Use when asked to reverse an image style, save a picture's look as a reusable template, build a style from reference art, or make more images in the style of an uploaded picture."
+description: "Turn reference art, or a brief, into one locked illustration style: a package holding SKILL.md, design-system.md and the references, verified by generating from it. Use when asked to reverse an image style, save a picture's look as a reusable template, build or train a new house style, forge a style from references, or make more images in the style of an uploaded picture."
 ---
 
-# Reverse reference images into an illustration template
+# Turn reference art into one locked illustration style
 
-Input: images of one style. Output: a directory holding `SKILL.md`,
-`design-system.md` and the references as `ref-<subject>-<dial>.png`.
+Input: images of one style, or a brief when no reference exists. Output: a
+directory holding `SKILL.md`, `design-system.md` and the references as
+`ref-<subject>-<dial>.png`.
 
 Run every command below from `reverse-template/illustration/`.
 
@@ -18,13 +19,12 @@ picture is one arrangement the user wants back.
 For one picture, write the prompt that recreates it and stop. Continue here
 only for a style.
 
-## Or the interactive route
+## Which entry
 
-The `style-forge` workflow covers the same ground with a confirm gate: it
-generates variations, waits for the user to pick one, then registers the result
-as a slash command in the Open Design registry. Use it when the user wants to
-choose a direction. Use this guide when the package is the deliverable, and run
-`scripts/measure_style.py` and `scripts/check_piece.py` from either route.
+| The user brings | Start at |
+|---|---|
+| references whose look should be reproduced | step 1 |
+| a brief and no reference, or references plus a wish to choose a direction | step 0 |
 
 ## Prerequisites
 
@@ -33,6 +33,27 @@ python3 -c "import pymupdf"     # else: pip install pymupdf
 ```
 
 ## Steps
+
+### 0. Offer directions, then stop
+
+Only when the user is choosing rather than reproducing.
+
+Ask for whatever is missing: the intended use, which decides the canvas, and a
+kebab-case slug, or offer two or three.
+
+Generate two to four variations that hold one frame and move one or two dials.
+
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou generate image --provider built-in \
+  --raw-prompt "<the frame, one dial changed>"
+```
+
+Show them together, one line each naming the dials moved. Then stop. Continue
+only when the user picks one, asks for another round, or drops the direction.
+Never lock a frame the user has not seen.
+
+The picked variation becomes a reference for step 2, alongside anything the
+user supplied.
 
 ### 1. Collect the references
 
@@ -152,10 +173,19 @@ and repeat until both pass and look right.
 
 ### 6. Deliver
 
-Hand over the whole directory. To register it as a selectable style, follow the
-`style-template` workflow: the resource goes to `illustration-template/<slug>/`
-in `vm0-ai/vm0-skills` and its entry to the Open Design registry in
-`vm0-ai/okou`.
+Hand over the whole directory.
+
+Register it as a selectable style only when the user asked for that: the
+resource goes to `illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its
+entry to the Open Design registry in `vm0-ai/okou` as
+`vm0:image-style:<slug>`, and each pull request links the other.
+
+To make it a slash command as well, create a workflow from the same package:
+
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou workflow create <slug> --dir <slug>/ \
+  --display-name "<Display Name>" --description "<one line, with the trigger phrases>"
+```
 
 `okou user-template publish` takes `presentation` and `document` only. Do not
 pass an image to it.
@@ -170,7 +200,9 @@ pass an image to it.
   subject or content type absent from them is not a rule.
 - Name observable technique, never an artist, studio, brand or product.
 - Numbers in the package come from step 2, not from reading the image.
-- Step 5 is mandatory.
+- Step 5 is mandatory. So is the stop in step 0, whenever step 0 runs.
+- Rotate the cast and the scene across a series. A locked frame is not a
+  locked mascot.
 
 ## Troubleshooting
 
