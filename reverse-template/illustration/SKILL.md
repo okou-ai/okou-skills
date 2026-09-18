@@ -291,6 +291,8 @@ description of 150 characters or less, and each pull request links the other.
 | The drawing fills the frame however the prompt words it | Two rounds is enough; place it with `compose.py` |
 | The check passes but the piece looks wrong | Medium, shape language or subject convention is missing from the locked frame |
 | `LOW RES` in the measurement | Ask for a larger file. Keep aspect, ground colour, ink coverage and centring; leave colour and stroke out of the locked frame |
+| The reference is a scan or a photograph of a painting | Its hairline border is stepped past, and the ground axis is skipped when the art covers the canvas. Nothing else changes |
+| The generator has no canvas at the reference's ratio | Generate at the nearest size and crop centrally to the reference's ratio |
 | Background reads as `textured` on a flat style | The reference is a JPEG; re-export as PNG or accept the grain figure it reports |
 | One reference only | Record the unsettled axes; do not write ranges you cannot support |
 | The user approves without comment on the first showing | Save it. Do not invite more rounds |

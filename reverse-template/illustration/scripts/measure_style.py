@@ -81,11 +81,38 @@ def background(rows, w, h, box=None):
             strips += [rows[y][x] for x in range(0, int(x0 * 0.8), max(1, w // 120)) for y in range(0, h, 3)]
         if w - x1 > 0.015 * w:
             strips += [rows[y][x] for x in range(int(x1 + (w - x1) * 0.2), w, max(1, w // 120)) for y in range(0, h, 3)]
-    ring = strips or ([rows[y][x] for y in (0, 1, h - 2, h - 1) for x in range(0, w, 3)]
-                      + [rows[y][x] for x in (0, 1, w - 2, w - 1) for y in range(0, h, 3)])
+    # A scan leaves a hairline of pure white or black around the plate. Reading
+    # it as the ground reports a white-ground picture for a painting that runs
+    # edge to edge, so step past any uniform frame first.
+    def uniform_row(y):
+        c = rows[y][w // 2]
+        return (c in ((255, 255, 255), (0, 0, 0))
+                and all(rows[y][x] == c for x in range(0, w, max(1, w // 40))))
+
+    def uniform_col(x):
+        c = rows[h // 2][x]
+        return (c in ((255, 255, 255), (0, 0, 0))
+                and all(rows[y][x] == c for y in range(0, h, max(1, h // 40))))
+
+    top_i = 0
+    while top_i < 6 and uniform_row(top_i):
+        top_i += 1
+    bot_i = h - 1
+    while h - 1 - bot_i < 6 and uniform_row(bot_i):
+        bot_i -= 1
+    left_i = 0
+    while left_i < 6 and uniform_col(left_i):
+        left_i += 1
+    right_i = w - 1
+    while w - 1 - right_i < 6 and uniform_col(right_i):
+        right_i -= 1
+    ring = strips or (
+        [rows[y][x] for y in (top_i, top_i + 1, bot_i - 1, bot_i) for x in range(left_i, right_i, 3)]
+        + [rows[y][x] for x in (left_i, left_i + 1, right_i - 1, right_i) for y in range(top_i, bot_i, 3)])
     mode = collections.Counter(ring).most_common(1)[0][0]
     spread = statistics.median(dist(c, mode) for c in ring)
-    corners = [rows[0][0], rows[0][w - 1], rows[h - 1][0], rows[h - 1][w - 1]]
+    corners = [rows[top_i][left_i], rows[top_i][right_i],
+               rows[bot_i][left_i], rows[bot_i][right_i]]
     corner_spread = max(dist(a, b) for a in corners for b in corners)
     kind = "flat" if spread <= 4 and corner_spread <= 10 else (
         "gradient" if corner_spread > 24 and spread <= 24 else "textured")

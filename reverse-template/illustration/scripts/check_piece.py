@@ -46,10 +46,15 @@ def check(refs, piece):
     row("canvas", "/".join(f"{w}x{h}" for w, h in rc), f"{pc[0]}x{pc[1]}",
         abs(piece["canvas"]["aspect"] - min(ra, key=lambda a: abs(a - piece["canvas"]["aspect"]))) <= 0.02)
 
-    rbg = [rgb(m["background"]["color"]) for m in refs]
-    pbg = rgb(piece["background"]["color"])
-    row("background colour", "#" + refs[0]["background"]["color"], "#" + piece["background"]["color"],
-        min(dist(pbg, c) for c in rbg) <= 20)
+    # A reference whose art covers the canvas has no ground to compare; what
+    # the reader returns there is the painting, or a scan's hairline.
+    if all(m["background"]["kind"].startswith("none") for m in refs):
+        out.append(f"  {'background colour':20} {'no ground: art covers it':>26} {'-':>26}  n/a")
+    else:
+        rbg = [rgb(m["background"]["color"]) for m in refs]
+        pbg = rgb(piece["background"]["color"])
+        row("background colour", "#" + refs[0]["background"]["color"],
+            "#" + piece["background"]["color"], min(dist(pbg, c) for c in rbg) <= 20)
     row("background kind", "/".join({m["background"]["kind"] for m in refs}), piece["background"]["kind"],
         piece["background"]["kind"] in {m["background"]["kind"] for m in refs})
 
