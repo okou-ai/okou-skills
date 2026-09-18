@@ -1,13 +1,23 @@
 ---
 name: illustration-reverse-template
-description: "Turn reference art, or a brief, into one locked illustration style: a package holding SKILL.md, design-system.md and the references, verified by generating from it. Use when asked to reverse an image style, save a picture's look as a reusable template, build or train a new house style, forge a style from references, or make more images in the style of an uploaded picture."
+description: "Turn reference art, or a brief, into a reusable style prompt plus one picture generated from it and measured against the reference. Use when asked to reverse an image style, extract a prompt from a picture, save a look as a reusable template, build or train a house style, or make more images in the style of an uploaded picture."
 ---
 
-# Turn reference art into one locked illustration style
+# Turn reference art into a reusable style prompt
 
-Input: images of one style, or a brief when no reference exists. Output: a
-directory holding `SKILL.md`, `design-system.md` and the references as
-`ref-<subject>-<dial>.png`.
+Input: images of one style, or a brief when no reference exists.
+
+Deliver two things, always:
+
+- **the style prompt** — the locked frame in its first third, one placeholder
+  per dial, ready to paste;
+- **one picture** generated from it on a subject the references do not carry.
+
+Build the package of files only when the user asks for a template or a
+registered style.
+
+Choose for the user. Never stop to ask which variation to keep: the measurement
+in step 5 decides it.
 
 Run every command below from `reverse-template/illustration/`.
 
@@ -19,13 +29,6 @@ picture is one arrangement the user wants back.
 For one picture, write the prompt that recreates it and stop. Continue here
 only for a style.
 
-## Which entry
-
-| The user brings | Start at |
-|---|---|
-| references whose look should be reproduced | step 1 |
-| a brief and no reference, or references plus a wish to choose a direction | step 0 |
-
 ## Prerequisites
 
 ```bash
@@ -34,30 +37,12 @@ python3 -c "import pymupdf"     # else: pip install pymupdf
 
 ## Steps
 
-### 0. Offer directions, then stop
-
-Only when the user is choosing rather than reproducing.
-
-Ask for whatever is missing: the intended use, which decides the canvas, and a
-kebab-case slug, or offer two or three.
-
-Generate two to four variations that hold one frame and move one or two dials.
-
-```bash
-npx --yes --package="${CLI_PKG_URL}" okou generate image --provider built-in \
-  --raw-prompt "<the frame, one dial changed>"
-```
-
-Show them together, one line each naming the dials moved. Then stop. Continue
-only when the user picks one, asks for another round, or drops the direction.
-Never lock a frame the user has not seen.
-
-The picked variation becomes a reference for step 2, alongside anything the
-user supplied.
-
 ### 1. Collect the references
 
 Download every `[Web file]` with `okou web download-file`. Keep PNG or JPEG.
+
+With no reference at all, ask for the intended use, which decides the canvas,
+then write the frame from the brief and go to step 4. Steps 2 and 3 need pixels.
 
 Three or more references separate a locked axis from a dial. With one, ask for
 more; if none arrive, record in `design-system.md` which axes stay unsettled
@@ -126,20 +111,14 @@ State the style under these heads, from the references only:
 | Finish | grade, bloom, chromatic shift, fade, print registration |
 | Subject convention | face treatment, cast, count, scale, what the subject does |
 
-### 4. Write the package
+### 4. Write the style prompt
 
-```text
-<slug>/
-  SKILL.md                     the template
-  design-system.md             the measured evidence
-  ref-<subject>-<dial>.png     the references, unchanged
-```
+Write the prompt first; it is the deliverable. Its first third carries the
+locked frame, then the subject, then the dials, then what must not appear.
 
-`SKILL.md` carries frontmatter (`name`, `description` with the phrases that
-should trigger it) and these sections:
+Keep these behind it, and write them into files only when the user asks for a
+template:
 
-- **Brief → piece** — how to turn a one-line brief into a full spec by choosing
-  a value for every dial.
 - **Locked frame** — one line per axis, measured values included. State the
   contour width in pixels at the canvas the package delivers, not only as a
   percentage: the references are rarely that size. State how much of the sheet
@@ -156,31 +135,42 @@ table, and the axes a single reference could not settle.
 
 Write the prompt template so the locked frame occupies its first third.
 
-### 5. Generate two pieces and check them
+### 5. Generate, measure, choose
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou generate image --provider built-in \
-  --raw-prompt "<the package's prompt template, dials filled in>"
+  --raw-prompt "<the style prompt, dials filled in>"
 python3 scripts/check_piece.py --refs <ref> [<ref> ...] --piece <generated> [...]
 ```
 
-Use different dial values for the two pieces, and a subject absent from the
-references. Exit code must be 0.
+Generate two or three at once, each on a subject the references do not carry.
+Keep the one with the fewest axes outside range. On a tie, look at them and say
+which axis decided it.
 
-Then look at both pieces for what the check cannot see: medium, line quality,
-shape language, subject conventions, motif, composition. Correct the package
-and repeat until both pass and look right.
+Read the failing axes of the one you kept: they name what the prompt did not
+hold. Correct the prompt and generate again. Stop when the kept piece passes,
+or when two more rounds do not reduce the count — then deliver it and say which
+axes still fail.
+
+The check cannot see medium, line quality, shape language, subject conventions,
+motif or composition. Look at the kept piece for those before delivering.
 
 ### 6. Deliver
 
-Hand over the whole directory.
+Give the user the style prompt and the picture, in the reply itself:
 
-Register it as a selectable style only when the user asked for that: the
-resource goes to `illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its
-entry to the Open Design registry in `vm0-ai/okou` as
-`vm0:image-style:<slug>`, and each pull request links the other.
+- the prompt in a fenced block, with `{PLACEHOLDER}` for every dial and one
+  filled example line under it;
+- the picture as a markdown image so it renders;
+- the axes that still fail, if any, in one line each.
 
-To make it a slash command as well, create a workflow from the same package:
+Write the package only when the user asks for a template:
+`SKILL.md`, `design-system.md` and the references in one directory. Register it
+as a selectable style only when asked: the resource goes to
+`illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its entry to the Open
+Design registry in `vm0-ai/okou` as `vm0:image-style:<slug>`, and each pull
+request links the other. To make it a slash command, create a workflow from the
+same directory:
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou workflow create <slug> --dir <slug>/ \
@@ -200,7 +190,8 @@ pass an image to it.
   subject or content type absent from them is not a rule.
 - Name observable technique, never an artist, studio, brand or product.
 - Numbers in the package come from step 2, not from reading the image.
-- Step 5 is mandatory. So is the stop in step 0, whenever step 0 runs.
+- Step 5 is mandatory. Deliver a picture you generated, never only a prompt.
+- Choose the variation yourself and say why. Do not hand the user a menu.
 - Rotate the cast and the scene across a series. A locked frame is not a
   locked mascot.
 

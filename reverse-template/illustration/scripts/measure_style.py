@@ -199,24 +199,33 @@ def lines(rows, w, h):
 def surface(rows, w, h, bg):
     """Flat fill or modelled, hard edges or soft, clean or grainy.
 
-    flat_pct  — pixels whose four neighbours match them; a gradient or a
-                painterly wash drops this sharply.
+    flat_pct  — pixels with no structural edge under them. The threshold rides
+                on the measured grain: a flat shape under a heavy paper texture
+                has neighbours that differ everywhere, and a fixed threshold
+                reports it as modelled.
     edge_px   — how many pixels a colour boundary takes to cross over; a
                 vector edge is 1-2, a watercolour bleed is far wider.
-    grain     — mean neighbour difference inside flat areas.
+    grain     — mean neighbour difference where no edge runs.
     """
     step = max(1, w // 320)
-    same = tot = 0
-    grain = []
+    deltas = []
     for y in range(step, h - step, step):
         for x in range(step, w - step, step):
             c = rows[y][x]
             nb = (rows[y][x - step], rows[y][x + step], rows[y - step][x], rows[y + step][x])
-            d = max(dist(c, n) for n in nb)
-            tot += 1
-            if d <= 6:
-                same += 1
-                grain.append(statistics.mean(dist(c, n) for n in nb))
+            deltas.append((max(dist(c, n) for n in nb),
+                           statistics.mean(dist(c, n) for n in nb)))
+    if not deltas:
+        return {"flat_pct": 0.0, "grain": 0.0, "edge_px": None, "edge_samples": 0}
+    quiet = [m for d, m in deltas if d <= 6]
+    grain = statistics.mean(quiet) if quiet else 0.0
+    if not quiet or len(quiet) * 4 < len(deltas):
+        # A textured sheet: re-read the grain from the calmest tenth, then let
+        # the flatness threshold ride on it.
+        calm = sorted(m for _, m in deltas)[: max(1, len(deltas) // 10)]
+        grain = statistics.mean(calm)
+    thresh = max(6.0, grain * 3.0)
+    same = sum(1 for d, _ in deltas if d <= thresh)
     ramps = []
     for y in range(0, h, max(1, h // 120)):
         row = rows[y]
@@ -229,8 +238,9 @@ def surface(rows, w, h, bg):
                 ramps.append(x2 - start + 1)
                 x = x2 + 1
             x += 1
-    return {"flat_pct": round(100 * same / max(1, tot), 1),
-            "grain": round(statistics.mean(grain), 2) if grain else 0.0,
+    return {"flat_pct": round(100 * same / len(deltas), 1),
+            "grain": round(grain, 2),
+            "flat_threshold": round(thresh, 1),
             "edge_px": round(statistics.median(ramps), 1) if ramps else None,
             "edge_samples": len(ramps)}
 
