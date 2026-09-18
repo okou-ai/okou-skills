@@ -36,7 +36,15 @@ python3 -c "import pymupdf"     # else: pip install pymupdf
 
 ### 1. Collect the references
 
-Download every `[Web file]` with `okou web download-file`. Keep PNG or JPEG.
+Download every `[Web file]` with `okou web download-file`.
+
+The scripts read PNG, JPEG, TIFF, BMP, GIF, JPEG 2000 and Netpbm. They do not
+read WebP, AVIF, HEIC or ICO — the formats a phone or a web page hands over.
+Convert those before step 2, and keep the original:
+
+```bash
+ffmpeg -loglevel error -y -i <ref.webp> <ref.png>
+```
 
 Ask for what is missing, and nothing else:
 
@@ -293,6 +301,7 @@ description of 150 characters or less, and each pull request links the other.
 | `LOW RES` in the measurement | Ask for a larger file. Keep aspect, ground colour, ink coverage and centring; leave colour and stroke out of the locked frame |
 | The reference is a scan or a photograph of a painting | Its hairline border is stepped past, and the ground axis is skipped when the art covers the canvas. Nothing else changes |
 | The generator has no canvas at the reference's ratio | Generate at the nearest size and crop centrally to the reference's ratio |
+| `unknown image file format` on a reference | It is WebP, AVIF, HEIC or ICO. Convert to PNG with ffmpeg and measure that |
 | Background reads as `textured` on a flat style | The reference is a JPEG; re-export as PNG or accept the grain figure it reports |
 | One reference only | Record the unsettled axes; do not write ranges you cannot support |
 | The user approves without comment on the first showing | Save it. Do not invite more rounds |
