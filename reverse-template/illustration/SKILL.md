@@ -11,7 +11,9 @@ Deliver two things, always:
 
 - **the style prompt** — the locked frame in its first third, one placeholder
   per dial, ready to paste;
-- **one picture** generated from it on a subject the references do not carry.
+- **three or four pictures** generated from it, each on a subject the
+  references do not carry. One picture shows the prompt ran; a set shows the
+  style holds when the subject changes.
 
 Build the package of files only when the user asks for a template or a
 registered style.
@@ -143,14 +145,26 @@ npx --yes --package="${CLI_PKG_URL}" okou generate image --provider built-in \
 python3 scripts/check_piece.py --refs <ref> [<ref> ...] --piece <generated> [...]
 ```
 
-Generate two or three at once, each on a subject the references do not carry.
-Keep the one with the fewest axes outside range. On a tie, look at them and say
-which axis decided it.
+Generate three at a time — that is the ceiling on generations in flight —
+each on a subject the references do not carry. Keep the ones with the fewest
+axes outside range.
 
-Read the failing axes of the one you kept: they name what the prompt did not
-hold. Correct the prompt and generate again. Stop when the kept piece passes,
-or when two more rounds do not reduce the count — then deliver it and say which
-axes still fail.
+Read the failing axes: they name what the prompt did not hold. Correct the
+prompt and generate again.
+
+Some axes never come back from the prompt. When two rounds do not move one,
+stop rewriting and fix it after the fact where that is possible. Scale and
+placement on a plain ground is the common one:
+
+```bash
+python3 scripts/compose.py --ref <reference> --piece <generated> --out <placed>
+```
+
+It scales the drawing's ink box to the fractions the reference measures and
+places it at the reference's margins, touching nothing inside the drawing.
+
+Deliver only pieces the gate passes, or say which axes still fail and why the
+prompt could not hold them.
 
 The check cannot see medium, line quality, shape language, subject conventions,
 motif or composition. Look at the kept piece for those before delivering.
@@ -161,7 +175,8 @@ Give the user the style prompt and the picture, in the reply itself:
 
 - the prompt in a fenced block, with `{PLACEHOLDER}` for every dial and one
   filled example line under it;
-- the picture as a markdown image so it renders;
+- the pictures as markdown images so they render, one line of subject under
+  each;
 - the axes that still fail, if any, in one line each.
 
 Write the package only when the user asks for a template:
@@ -190,7 +205,7 @@ pass an image to it.
   subject or content type absent from them is not a rule.
 - Name observable technique, never an artist, studio, brand or product.
 - Numbers in the package come from step 2, not from reading the image.
-- Step 5 is mandatory. Deliver a picture you generated, never only a prompt.
+- Step 5 is mandatory. Deliver pictures you generated, never only a prompt.
 - Choose the variation yourself and say why. Do not hand the user a menu.
 - Rotate the cast and the scene across a series. A locked frame is not a
   locked mascot.
@@ -208,6 +223,8 @@ pass an image to it.
 | A colour appears that no reference uses | The palette dial has no list of allowed values |
 | Generated pieces flood the whole canvas | The locked frame is missing the ink coverage and the unpainted ground; "vignette" alone does not hold |
 | The medium drifts to pencil or crayon | Name the wet behaviour — washes pooling at the stroke edges — and name the media to avoid |
+| A generated piece renders on a black ground | It is RGBA with a transparent ground; the scripts composite over white, and so must anything you hand the user |
+| The drawing fills the frame however the prompt words it | Two rounds is enough; place it with `compose.py` |
 | The check passes but the piece looks wrong | Medium, shape language or subject convention is missing from the locked frame |
 | `LOW RES` in the measurement | Ask for a larger file. Keep aspect, ground colour, ink coverage and centring; leave colour and stroke out of the locked frame |
 | Background reads as `textured` on a flat style | The reference is a JPEG; re-export as PNG or accept the grain figure it reports |
