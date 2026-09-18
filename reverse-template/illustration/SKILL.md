@@ -1,25 +1,20 @@
 ---
 name: illustration-reverse-template
-description: "Turn reference art, or a brief, into a reusable style prompt plus one picture generated from it and measured against the reference. Use when asked to reverse an image style, extract a prompt from a picture, save a look as a reusable template, build or train a house style, or make more images in the style of an uploaded picture."
+description: "Reverse a reference picture into a style prompt, show the user pictures made from it, revise until they approve, then save it as their template. Use when a user uploads an image style to reuse, asks to extract a prompt from a picture, wants their own image template, or asks for more images in the style of a picture they supplied."
 ---
 
-# Turn reference art into a reusable style prompt
+# Turn a reference picture into the user's own style
 
-Input: images of one style, or a brief when no reference exists.
+Input: images of one style, or a brief when no reference exists. Output: a
+style prompt the user has approved, saved as their template.
 
-Deliver two things, always:
+No reversal is complete. Measurement settles canvas, ground, palette, stroke,
+coverage and placement. Medium, drawing and subject convention are read by eye
+and are partly wrong on the first pass. The user closes that gap by looking at
+pictures, so the path is: reverse, show, revise, save.
 
-- **the style prompt** — the locked frame in its first third, one placeholder
-  per dial, ready to paste;
-- **three or four pictures** generated from it, each on a subject the
-  references do not carry. One picture shows the prompt ran; a set shows the
-  style holds when the subject changes.
-
-Build the package of files only when the user asks for a template or a
-registered style.
-
-Choose for the user. Never stop to ask which variation to keep: the measurement
-in step 5 decides it.
+Choose among your own candidates without asking — the gate ranks them. Stop
+before saving, always: never save a prompt the user has not seen pictures from.
 
 Run every command below from `reverse-template/illustration/`.
 
@@ -163,37 +158,61 @@ python3 scripts/compose.py --ref <reference> --piece <generated> --out <placed>
 It scales the drawing's ink box to the fractions the reference measures and
 places it at the reference's margins, touching nothing inside the drawing.
 
-Deliver only pieces the gate passes, or say which axes still fail and why the
+Show only pieces the gate passes, or say which axes still fail and why the
 prompt could not hold them.
 
 The check cannot see medium, line quality, shape language, subject conventions,
 motif or composition. Look at the kept piece for those before delivering.
 
-### 6. Deliver
+### 6. Show the set and ask what to change
 
-Give the user the style prompt and the picture, in the reply itself:
+Put in the reply:
 
-- the prompt in a fenced block, with `{PLACEHOLDER}` for every dial and one
-  filled example line under it;
-- the pictures as markdown images so they render, one line of subject under
-  each;
-- the axes that still fail, if any, in one line each.
+- the pictures as markdown images, one line of subject under each;
+- the style prompt in a fenced block, `{PLACEHOLDER}` for every dial;
+- the axes that still fail, one line each, in plain words.
 
-Write the package only when the user asks for a template:
-`SKILL.md`, `design-system.md` and the references in one directory. Register it
-as a selectable style only when asked: the resource goes to
-`illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its entry to the Open
-Design registry in `vm0-ai/okou` as `vm0:image-style:<slug>`, and each pull
-request links the other. To make it a slash command, create a workflow from the
-same directory:
+Then ask one question: what should change. Name two or three things you already
+suspect are off, drawn from the failing axes and from what you see, so there is
+something to react to instead of a blank prompt. Three is the ceiling; a list
+longer than that reads as a survey.
+
+Stop there. Do not save anything yet.
+
+### 7. Revise, then show again
+
+The user speaks about the look — the lines are too heavy, it is too colourful,
+the faces are wrong. Turn each correction into one line of the locked frame
+that names the near miss it excludes, the same form as step 3. Nothing else in
+the prompt changes.
+
+Regenerate the set with step 5 and show it again. One round of corrections at a
+time; do not bundle two rounds into one reply.
+
+Repeat until the user says it is right.
+
+### 8. Save it as the user's template
+
+Only after the user approves.
+
+`okou user-template publish` takes `presentation` and `document` only:
+`USER_TEMPLATE_KINDS` has no image kind, and passing an image fails. Until it
+does, save the approved prompt as a workflow the user can call by name:
 
 ```bash
+mkdir -p <slug> && cp <approved-prompt>.md <slug>/SKILL.md
 npx --yes --package="${CLI_PKG_URL}" okou workflow create <slug> --dir <slug>/ \
   --display-name "<Display Name>" --description "<one line, with the trigger phrases>"
 ```
 
-`okou user-template publish` takes `presentation` and `document` only. Do not
-pass an image to it.
+`<slug>/SKILL.md` carries frontmatter (`name`, `description` with the phrases
+that should trigger it), the locked frame, the dials, the prompt with its
+placeholders, and the approved pictures as references.
+
+Register it as a selectable style only when the user asks: the resource goes to
+`illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its entry to the Open
+Design registry in `vm0-ai/okou` as `vm0:image-style:<slug>`, and each pull
+request links the other.
 
 ## Rules
 
@@ -205,8 +224,13 @@ pass an image to it.
   subject or content type absent from them is not a rule.
 - Name observable technique, never an artist, studio, brand or product.
 - Numbers in the package come from step 2, not from reading the image.
-- Step 5 is mandatory. Deliver pictures you generated, never only a prompt.
-- Choose the variation yourself and say why. Do not hand the user a menu.
+- Step 5 is mandatory. Show pictures you generated, never only a prompt.
+- Choose among your own candidates yourself. Do not hand the user a menu of
+  variations.
+- Step 6 stops. Saving before the user has seen pictures and approved them is
+  the one thing this skill must never do.
+- A correction from the user is one more line in the locked frame, not a
+  rewrite of the prompt.
 - Rotate the cast and the scene across a series. A locked frame is not a
   locked mascot.
 
@@ -229,3 +253,6 @@ pass an image to it.
 | `LOW RES` in the measurement | Ask for a larger file. Keep aspect, ground colour, ink coverage and centring; leave colour and stroke out of the locked frame |
 | Background reads as `textured` on a flat style | The reference is a JPEG; re-export as PNG or accept the grain figure it reports |
 | One reference only | Record the unsettled axes; do not write ranges you cannot support |
+| The user approves without comment on the first showing | Save it. Do not invite more rounds |
+| The user's correction contradicts the reference | Follow the user. Note in the saved file which axis now departs from the reference |
+| Two corrections arrive at once | Fold both into the locked frame, regenerate once, show once |
