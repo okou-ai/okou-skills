@@ -69,8 +69,10 @@ jq -r '[ .candidates[0].content.parts[]
          | select((.thought // false) | not)
          | (.inlineData // .inline_data)
          | select(. != null) ]
-       | last | .data' /tmp/nano_banana_response.json | base64 -d > /tmp/nano_banana_output.png
+       | last | .data // empty' /tmp/nano_banana_response.json | base64 -d > /tmp/nano_banana_output.png
 ```
+
+If generation was refused or safety-blocked there is no image part at all, and the command above writes an empty file. Check the size before using the output, and read `candidates[0].finishReason` and the text parts to find out why.
 
 ### 4. Edit an Existing Image (Image-to-Image)
 
@@ -178,7 +180,7 @@ PREV_IMG=$(jq -r '[ .candidates[0].content.parts[]
                     | select((.thought // false) | not)
                     | (.inlineData // .inline_data)
                     | select(. != null) ]
-                  | last | .data' /tmp/nano_banana_response.json)
+                  | last | .data // empty' /tmp/nano_banana_response.json)
 
 jq -n --arg img "$PREV_IMG" '{
   contents: [
