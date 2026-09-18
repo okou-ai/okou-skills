@@ -5,8 +5,8 @@ description: "Reverse a reference picture into a style prompt, show the user pic
 
 # Turn a reference picture into the user's own style
 
-Input: images of one style, or a brief when no reference exists. Output: a
-style prompt the user has approved, saved as their template.
+Input: images of one style, or a brief when no reference exists. Output: the
+user's own style, saved once they have seen what it makes and said it is right.
 
 No reversal is complete. Measurement settles canvas, ground, palette, stroke,
 coverage and placement. Medium, drawing and subject convention are read by eye
@@ -158,26 +158,29 @@ python3 scripts/compose.py --ref <reference> --piece <generated> --out <placed>
 It scales the drawing's ink box to the fractions the reference measures and
 places it at the reference's margins, touching nothing inside the drawing.
 
-Show only pieces the gate passes, or say which axes still fail and why the
-prompt could not hold them.
+Show only pieces the gate passes. When an axis will not come back, keep the
+best set and carry that one sentence into step 6.
 
 The check cannot see medium, line quality, shape language, subject conventions,
 motif or composition. Look at the kept piece for those before delivering.
 
-### 6. Show the set and ask what to change
+### 6. Show the pictures and ask whether the style is right
 
 Put in the reply:
 
 - the pictures as markdown images, one line of subject under each;
-- the style prompt in a fenced block, `{PLACEHOLDER}` for every dial;
-- the axes that still fail, one line each, in plain words.
+- one line saying these were generated from the style in their reference.
 
-Then ask one question: what should change. Name two or three things you already
-suspect are off, drawn from the failing axes and from what you see, so there is
-something to react to instead of a blank prompt. Three is the ceiling; a list
-longer than that reads as a survey.
+Then ask one question: does this style look right.
 
-Stop there. Do not save anything yet.
+This is a yes or no, not a survey. Do not list the axes, do not ask what to
+fix, do not offer options. When something still departs from the reference
+after step 5 did what it could, say it in one plain sentence — the lines came
+out heavier than the reference, the palette runs warmer — and leave it there.
+
+Show the prompt only if the user asks for it.
+
+Stop. Save nothing yet.
 
 ### 7. Revise, then show again
 
@@ -193,26 +196,10 @@ Repeat until the user says it is right.
 
 ### 8. Save it as the user's template
 
-Only after the user approves.
+Only after the user says the style is right.
 
-`okou user-template publish` takes `presentation` and `document` only:
-`USER_TEMPLATE_KINDS` has no image kind, and passing an image fails. Until it
-does, save the approved prompt as a workflow the user can call by name:
-
-```bash
-mkdir -p <slug> && cp <approved-prompt>.md <slug>/SKILL.md
-npx --yes --package="${CLI_PKG_URL}" okou workflow create <slug> --dir <slug>/ \
-  --display-name "<Display Name>" --description "<one line, with the trigger phrases>"
-```
-
-`<slug>/SKILL.md` carries frontmatter (`name`, `description` with the phrases
-that should trigger it), the locked frame, the dials, the prompt with its
-placeholders, and the approved pictures as references.
-
-Register it as a selectable style only when the user asks: the resource goes to
-`illustration-template/<slug>/` in `vm0-ai/vm0-skills`, its entry to the Open
-Design registry in `vm0-ai/okou` as `vm0:image-style:<slug>`, and each pull
-request links the other.
+Save the approved prompt together with the approved pictures: the prompt is
+what later generations run, the pictures are what the user recognises it by.
 
 ## Rules
 
@@ -227,8 +214,8 @@ request links the other.
 - Step 5 is mandatory. Show pictures you generated, never only a prompt.
 - Choose among your own candidates yourself. Do not hand the user a menu of
   variations.
-- Step 6 stops. Saving before the user has seen pictures and approved them is
-  the one thing this skill must never do.
+- Step 6 stops, and asks one yes-or-no question. Saving before the user has
+  seen pictures and approved them is the one thing this skill must never do.
 - A correction from the user is one more line in the locked frame, not a
   rewrite of the prompt.
 - Rotate the cast and the scene across a series. A locked frame is not a
@@ -254,5 +241,6 @@ request links the other.
 | Background reads as `textured` on a flat style | The reference is a JPEG; re-export as PNG or accept the grain figure it reports |
 | One reference only | Record the unsettled axes; do not write ranges you cannot support |
 | The user approves without comment on the first showing | Save it. Do not invite more rounds |
+| The user asks what could be better | Now name the axes that still fail, two or three, shortest first |
 | The user's correction contradicts the reference | Follow the user. Note in the saved file which axis now departs from the reference |
 | Two corrections arrive at once | Fold both into the locked frame, regenerate once, show once |
