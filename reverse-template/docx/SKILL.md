@@ -42,25 +42,39 @@ name: <template-slug>
 description: <what this document is, in one line>
 ---
 
-Make the new document by editing `<source filename>`. Do not rebuild the page,
-and do not redraw its background, artwork, rules, or type.
+Make the new document by editing a copy of `<source filename>`. Everything that
+is not wording stays exactly as the file has it.
 
-Copy `<source filename>`, edit `word/document.xml` inside the copy, and change
-nothing else in the archive. Replace these strings and only these:
+Hold unchanged:
 
-| Current text | Replace with |
+- the formatting carried by the text — the `<w:rPr>` and `<w:pPr>` of every run
+  and paragraph you touch: font, size, colour, weight, alignment, spacing;
+- <the background, artwork, rules and other decoration this document carries>;
+- page size and margins;
+- every entry in the zip other than `word/document.xml`, byte for byte.
+
+Change only the text inside `<w:t>`. These hold the wording, in reading order:
+
+| Current text | Holds |
 |---|---|
-| `<one run's text>` | <what a new document puts there> |
+| `<one run's text>` | <what a new document says there> |
+
+To add or drop a <line/row/section>, copy or delete a whole `<w:p>` of the same
+kind and edit its text. Never build a paragraph from scratch and never let one
+fall back to a style default; that is how the formatting slips.
 
 Rewrite the entry in the zip. Opening and saving the file through python-docx or
 LibreOffice rewrites parts that must stay byte-identical.
 
-Keep each replacement near the length of the text it replaces so the layout
-holds.
+<the document's own size constraint, when it has one — a card stays on one page>
 
 Re-author the design only when the user asks for a new document in this style,
 rather than for this document with new wording.
 ````
+
+The invariant is the rule; the table only says where the wording lives. A closed
+list of strings would leave a new document with one more line, or one fewer, no
+way to stay inside it.
 
 One row per run, named off `--slots` and the rendered pages; write nothing they
 do not show. A label and its value are usually separate runs — give the value a
@@ -178,3 +192,4 @@ whole directory.
 | Header text sits outside the text area | Step 1 reports the tab stop; rebuild the header with `--header 'left\tright'`, which places it from the margins |
 | A docx saved by WPS fails to parse | Re-save it from Word, restart at step 1 |
 | A fixed structure comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
+| A rendered page drops the text held in content controls | LibreOffice exports those as form fields, whose appearance font carries no CJK. Render with `--convert-to png`, or export the PDF with `ExportFormFields` false |
