@@ -2,9 +2,11 @@
 """Report what a .docx offers as a Pandoc --reference-doc.
 
 Usage:  python3 inspect_docx.py source.docx
+        python3 inspect_docx.py source.docx --slots
 
 Read-only. Exit code 0 means it is usable as is; 1 means build_reference.py
-needs to fill gaps first.
+needs to fill gaps first. --slots takes the fixed-structure route instead and
+lists the body runs a new document replaces; it always exits 0.
 """
 import collections
 import sys, zipfile, re, os
@@ -89,6 +91,50 @@ def para_props(z, name_to_id, names):
                      jc.group(1) if jc else None,
                      "keepNext" if "<w:keepNext" in p else None))
     return rows
+
+
+def slots(path):
+    """List the body runs a fixed-structure template can replace.
+
+    One row per <w:r> that holds text, because a run is the largest unit whose
+    <w:t> can be swapped without touching formatting. A run inside a field
+    holds a result Word recomputes on open, so it is marked rather than
+    offered as replaceable.
+    """
+    from xml.etree import ElementTree as ET
+    W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+
+    z = zipfile.ZipFile(path)
+    root = ET.fromstring(z.read("word/document.xml"))
+    z.close()
+
+    print(f"===== {os.path.basename(path)} =====\n")
+    print("[replaceable runs] one row per <w:r>. Match a row's text, never a")
+    print("                   paragraph's — two rows sharing a p number are two")
+    print("                   separate strings.\n")
+
+    for p_index, p in enumerate(root.iter(W + "p"), 1):
+        simple = {r for f in p.iter(W + "fldSimple") for r in f.iter(W + "r")}
+        depth = 0
+        rows = []
+        for r in p.iter(W + "r"):
+            opened = depth
+            for child in r:
+                if child.tag != W + "fldChar":
+                    continue
+                kind = child.get(W + "fldCharType")
+                if kind == "begin":
+                    depth += 1
+                elif kind == "end":
+                    depth = max(0, depth - 1)
+            text = "".join(t.text or "" for t in r.iter(W + "t"))
+            if text:
+                rows.append((text, opened > 0 or depth > 0 or r in simple))
+        for r_index, (text, is_field) in enumerate(rows, 1):
+            mark = "   <- field result, recomputed by Word" if is_field else ""
+            print(f"  p{p_index:<4} r{r_index:<4} {text!r}{mark}")
+    print()
+    return 0
 
 
 def main(path):
@@ -326,7 +372,10 @@ def main(path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    if len(args) == 2 and args[1] == "--slots":
+        sys.exit(slots(args[0]))
+    if len(args) != 1:
         print(__doc__)
         sys.exit(2)
-    sys.exit(main(sys.argv[1]))
+    sys.exit(main(args[0]))
