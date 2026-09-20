@@ -6,7 +6,7 @@ independent of the VM0 connector catalog.
 Skills follow the [Agent Skills specification](https://agentskills.io/specification).
 
 Skills owned by a VM0 connector live with the connector definition in
-[vm0-connectors](https://github.com/vm0-ai/vm0-connectors).
+[vm0-connectors](https://github.com/okou-ai/vm0-connectors).
 
 ## Principles
 
@@ -23,7 +23,7 @@ There are multiple ways to install and use these skills:
 
 ```bash
 # Add marketplace
-/plugin marketplace add vm0-ai/vm0-skills
+/plugin marketplace add okou-ai/vm0-skills
 
 # Install specific skills
 /plugin install github-copilot@vm0-skills
@@ -34,7 +34,7 @@ There are multiple ways to install and use these skills:
 
 ```bash
 # Clone the repository
-git clone https://github.com/vm0-ai/vm0-skills.git
+git clone https://github.com/okou-ai/vm0-skills.git
 
 # Copy to personal skills directory
 cp -a vm0-skills/github-copilot ~/.claude/skills/
@@ -53,7 +53,7 @@ To add a new skill or improve an existing one:
 
 1. If the skill belongs to a VM0 connector, contribute it under
    `connectors/<connector-ref>/skill/` in
-   [vm0-connectors](https://github.com/vm0-ai/vm0-connectors).
+   [vm0-connectors](https://github.com/okou-ai/vm0-connectors).
 2. For an independent skill, follow the
    [Agent Skills specification](https://agentskills.io/specification).
 3. Include a `SKILL.md` file with tested usage examples.
