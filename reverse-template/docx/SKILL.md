@@ -48,7 +48,7 @@ Change only the text inside `<w:t>`. Everything else stays exactly as the file
 has it: the rest of `word/document.xml`, and every other entry in the archive,
 byte for byte.
 
-These hold the wording, in reading order:
+The wording sits here, in reading order:
 
 | Current text | Holds |
 |---|---|
@@ -67,13 +67,11 @@ Re-author the design only when the user asks for a new document in this style,
 rather than for this document with new wording.
 ````
 
-The invariant is the rule; the table only says where the wording lives. A closed
-list of strings would leave a new document with one more line, or one fewer, no
-way to stay inside it.
-
 One row per run, named off `--slots` and the rendered pages; write nothing they
 do not show. A label and its value are usually separate runs — give the value a
 row and leave the label out. Leave a field's run out too; Word recomputes it.
+Word the table as where the wording sits, never as the set of edits allowed — a
+new document may need one line more, or one fewer.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
