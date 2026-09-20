@@ -7,7 +7,7 @@ description: "Reverse-engineer a Word document into a loadable template skill: S
 
 Input: one `.docx`. Output for an article: a directory holding `SKILL.md`,
 `reference.docx` and `source.docx`. Output for a fixed structure: `SKILL.md`
-and the source alone.
+and a copy of the source beside it.
 
 Run every command below from `reverse-template/docx/`.
 
@@ -23,11 +23,18 @@ arrangement and changes the content — a resume, an invoice, a certificate.
 Judge on what the document is, not on how it looks — a plain single-column
 resume is still a fixed structure. An article continues at Prerequisites below.
 
-### A fixed structure: publish the source itself
+### A fixed structure: package the file and fill it in
 
-A style sheet drops those silently. Publish the file and stop here.
+A style sheet drops those silently, and no description reproduces a background
+image. Ship the file itself, and have each new document edit a copy of it.
 
-Write `package/SKILL.md` and put nothing else in `package/`:
+List the runs a new document replaces:
+
+```bash
+python3 scripts/inspect_docx.py <source.docx> --slots
+```
+
+Copy the source into `package/`, then write `package/SKILL.md` beside it:
 
 ````markdown
 ---
@@ -35,15 +42,29 @@ name: <template-slug>
 description: <what this document is, in one line>
 ---
 
-Follow the source file's own styling. It is the authority for page size,
-margins, typography, colour, and the position of every block.
+Make the new document by editing `<source filename>`. Do not rebuild the page,
+and do not redraw its background, artwork, rules, or type.
 
-Replace the content, keep the composition:
+Copy `<source filename>`, edit `word/document.xml` inside the copy, and change
+nothing else in the archive. Replace these strings and only these:
 
-- <one line per entry a new document has to fill>
+| Current text | Replace with |
+|---|---|
+| `<one run's text>` | <what a new document puts there> |
+
+Rewrite the entry in the zip. Opening and saving the file through python-docx or
+LibreOffice rewrites parts that must stay byte-identical.
+
+Keep each replacement near the length of the text it replaces so the layout
+holds.
+
+Re-author the design only when the user asks for a new document in this style,
+rather than for this document with new wording.
 ````
 
-Name the entries off the rendered pages, and write nothing they do not show.
+One row per run, named off `--slots` and the rendered pages; write nothing they
+do not show. A label and its value are usually separate runs — give the value a
+row and leave the label out. Leave a field's run out too; Word recomputes it.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
@@ -52,6 +73,9 @@ npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
   --source <the original .docx> \
   --package package
 ```
+
+`--source` and the copy in `package/` are both needed: the first is what the
+catalog shows, the second is the only one a later run can open.
 
 Say the template exists only after the command succeeds.
 
@@ -153,3 +177,4 @@ whole directory.
 | Output carries the source's number or owner | `set_header_footer.py --replace` |
 | Header text sits outside the text area | Step 1 reports the tab stop; rebuild the header with `--header 'left\tright'`, which places it from the margins |
 | A docx saved by WPS fails to parse | Re-save it from Word, restart at step 1 |
+| A fixed structure comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
