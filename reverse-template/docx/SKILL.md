@@ -61,9 +61,8 @@ fall back to a style default; that is how the formatting slips.
 Rewrite the entry in the zip. Opening and saving the file through python-docx or
 LibreOffice rewrites parts that must stay byte-identical.
 
-Write the wording the new document needs; its length is yours to choose. Render
-the result and look — if the text has outgrown <the page, the card, its box>,
-shorten the wording, never the type or the spacing.
+Render the result and look — if the text has outgrown <the page, the card, its
+box>, shorten the wording, never the type or the spacing.
 
 Re-author the design only when the user asks for a new document in this style,
 rather than for this document with new wording.
