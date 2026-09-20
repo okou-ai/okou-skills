@@ -42,18 +42,13 @@ name: <template-slug>
 description: <what this document is, in one line>
 ---
 
-Make the new document by editing a copy of `<source filename>`. Everything that
-is not wording stays exactly as the file has it.
+Make the new document by editing a copy of `<source filename>`.
 
-Hold unchanged:
+Change only the text inside `<w:t>`. Everything else stays exactly as the file
+has it: the rest of `word/document.xml`, and every other entry in the archive,
+byte for byte.
 
-- the formatting carried by the text — the `<w:rPr>` and `<w:pPr>` of every run
-  and paragraph you touch: font, size, colour, weight, alignment, spacing;
-- <the background, artwork, rules and other decoration this document carries>;
-- page size and margins;
-- every entry in the zip other than `word/document.xml`, byte for byte.
-
-Change only the text inside `<w:t>`. These hold the wording, in reading order:
+These hold the wording, in reading order:
 
 | Current text | Holds |
 |---|---|
