@@ -1,6 +1,6 @@
 ---
 name: presentation-reverse-template
-description: Convert a reference PPTX, PPT, PDF, image deck, or set of page screenshots into a reusable, editable, renderable, and publishable HTML Presentation Template. Use when a reference presentation should be reverse-engineered into a shared typography system, color roles, repeated components, motifs, chrome, and reference layouts, with ordered source-page images and a complete template package prepared for publication.
+description: Convert a reference PPTX, PPT, PDF of slides, image deck, or set of page screenshots into a reusable, editable, renderable, and publishable HTML Presentation Template. A PDF of prose pages is a document and belongs to reverse-template/pdf instead. Use when a reference presentation should be reverse-engineered into a shared typography system, color roles, repeated components, motifs, chrome, and reference layouts, with ordered source-page images and a complete template package prepared for publication.
 ---
 
 # Build an HTML template from a reference presentation
@@ -10,6 +10,8 @@ description: Convert a reference PPTX, PPT, PDF, image deck, or set of page scre
 Convert the user's reference presentation into a reusable HTML Presentation Template.
 
 The input may be a PPTX, PPT, PDF, image deck, or set of page screenshots. Regardless of the input format, the final deliverable must be an HTML presentation template package that conforms to the platform specification.
+
+A PDF of prose pages is a document, not a deck — a report, a contract, a resume, an invoice. One or two pages at a paper size is never slides, however sparse. Stop here and follow `../pdf/SKILL.md`; it is `reverse-template/pdf/` in `okou-ai/vm0-skills` when you reached this guide on its own. That guide publishes with `okou user-template publish --kind document`, so the result lands under Custom.
 
 The source provides visual and layout reference only. It does not determine the technical format of the final template.
 
