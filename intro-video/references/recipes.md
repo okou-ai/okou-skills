@@ -1,6 +1,6 @@
 # Recipes: what kind of intro video this is
 
-A recipe fixes the narrative spine, defaults, and production guidance for one intent. The spines reuse the narrative arcs and beat roles of the Okou intro-video template packs ([`Template-artifact/Template-IntroVideo`](https://github.com/vm0-ai/Template-artifact/tree/main/Template-IntroVideo)), so a controlled-route composition and a native HeyGen prompt tell the same story.
+A recipe fixes the narrative spine, defaults, and production guidance for one intent. The spines reuse the narrative arcs and beat roles of the Okou intro-video template packs ([`Template-artifact/Template-IntroVideo`](https://github.com/okou-ai/Template-artifact/tree/main/Template-IntroVideo)), so a controlled-route composition and a native HeyGen prompt tell the same story.
 
 Recipes are never shown to the user and the form has no intent selector; classify from the brief.
 
