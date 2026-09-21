@@ -2,10 +2,10 @@
 """Report what a .docx offers as a Pandoc --reference-doc.
 
 Usage:  python3 inspect_docx.py source.docx
-        python3 inspect_docx.py source.docx --slots
+        python3 inspect_docx.py source.docx --slots [--json]
 
 Read-only. Exit code 0 means it is usable as is; 1 means build_reference.py
-needs to fill gaps first. --slots lists body text runs to help locate edits
+needs to fill gaps first. --slots lists text locations across document parts
 after the reuse scope is chosen; it does not classify the document or decide
 which runs may change. A successful listing exits 0.
 """
@@ -14,6 +14,7 @@ import sys, zipfile, re, os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pandoc_styles as PS
+from docx_layout import Styles, body_candidates, choose_body, choose_section, sections, section_xml
 PS_LOWER = {n.lower() for n in PS.ALL}
 
 TWIP = lambda t: int(t) / 1440 * 2.54          # twips -> cm
@@ -94,49 +95,31 @@ def para_props(z, name_to_id, names):
     return rows
 
 
-def slots(path):
-    """List body text runs for locating edits within a chosen reuse scope.
-
-    One row per <w:r> that holds text, because a run is the largest unit whose
-    <w:t> can be swapped without touching formatting. A run inside a field
-    holds a result Word recomputes on open, so it is marked rather than
-    offered as replaceable. Runs without <w:t>, including underlined tabs,
-    are not listed.
-    """
-    from xml.etree import ElementTree as ET
-    W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-
-    z = zipfile.ZipFile(path)
-    root = ET.fromstring(z.read("word/document.xml"))
-    z.close()
-
+def slots(path, as_json=False):
+    from docx_slots import read_slots
+    records = read_slots(path)
+    if as_json:
+        import json
+        print(json.dumps(records, ensure_ascii=False, indent=2))
+        return 0
     print(f"===== {os.path.basename(path)} =====\n")
-    print("[body text runs] one row per <w:r> containing <w:t>.")
-    print("                 Use the selected reuse scope to decide which may change.")
-    print("                 Two rows sharing a p number are separate strings; inspect")
-    print("                 the page and XML for slots without text.\n")
-
-    for p_index, p in enumerate(root.iter(W + "p"), 1):
-        simple = {r for f in p.iter(W + "fldSimple") for r in f.iter(W + "r")}
-        depth = 0
-        rows = []
-        for r in p.iter(W + "r"):
-            opened = depth
-            for child in r:
-                if child.tag != W + "fldChar":
-                    continue
-                kind = child.get(W + "fldCharType")
-                if kind == "begin":
-                    depth += 1
-                elif kind == "end":
-                    depth = max(0, depth - 1)
-            text = "".join(t.text or "" for t in r.iter(W + "t"))
-            if text:
-                rows.append((text, opened > 0 or depth > 0 or r in simple))
-        for r_index, (text, is_field) in enumerate(rows, 1):
-            mark = "   <- field result, recomputed by Word" if is_field else ""
-            print(f"  p{p_index:<4} r{r_index:<4} {text!r}{mark}")
-    print()
+    print("[text locations] Addresses identify nodes; text alone is not a unique key.")
+    for paragraph in records:
+        print(f"\n{paragraph['part']}  p{paragraph['paragraph']}  style={paragraph['style']}")
+        print(f"  paragraph: {paragraph['text']!r}")
+        if paragraph['row']:
+            print(f"  table row: {paragraph['row']}")
+        if not paragraph['runs']:
+            print(f"  {paragraph['path']}  (no text; inspect spacing/artwork before cloning)")
+        for run in paragraph['runs']:
+            mark = " [field result: not editable]" if run['field'] else ""
+            print(f"  {run['path']}  {run['text']!r}{mark}")
+            if run.get('placeholder_name'):
+                linked = run.get('placeholder')
+                print(f"    placeholder {run['placeholder_name']!r}; showing={run.get('showing_placeholder', False)}")
+                print(f"    linked: {linked!r}")
+            if run.get('data_binding'):
+                print(f"    data binding: {run['data_binding']!r}; update the bound value when filling")
     return 0
 
 
@@ -175,10 +158,26 @@ def main(path):
 
     # --- page setup ---
     doc = z.read("word/document.xml").decode("utf-8", "replace")
-    sect = re.search(r"<w:sectPr\b.*?</w:sectPr>|<w:sectPr\b[^>]*/>", doc, re.S)
+    source_styles = Styles(z.read("word/styles.xml"))
+    print("\n[body candidates] flowing prose, ranked by non-whitespace characters")
+    for sid, count in body_candidates(doc, source_styles).most_common():
+        print(f"  {sid}: {count} characters")
+    print("\n[sections]")
+    for number, (section, paragraphs) in enumerate(sections(doc), 1):
+        margin = section.find("w:pgMar", {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"})
+        margins = {key.rsplit("}", 1)[-1]: value for key, value in margin.attrib.items()} if margin is not None else "(defaults)"
+        print(f"  {number}: {len(paragraphs)} main-flow paragraphs; margins {margins}")
+    body_sid = None
+    try:
+        body_sid = choose_body(doc, source_styles)
+        selected = choose_section(doc, source_styles, body_sid)
+        print(f"  selected: --section {selected}; body style {body_sid!r}")
+    except ValueError as error:
+        print(f"  REVIEW: {error}")
+        selected = None
     print("\n[page setup]")
-    if sect:
-        s = sect.group(0)
+    if selected is not None:
+        s = section_xml(doc, selected)
         pg = re.search(r"<w:pgSz[^>]*w:w=\"(\d+)\"[^>]*w:h=\"(\d+)\"", s) or \
              re.search(r"<w:pgSz[^>]*w:h=\"(\d+)\"[^>]*w:w=\"(\d+)\"", s)
         mar = dict(re.findall(r"w:(top|right|bottom|left)=\"(-?\d+)\"", s))
@@ -233,7 +232,7 @@ def main(path):
         else:
             print("  columns: 1 (none set)")
     else:
-        print("  no sectPr — output falls back to Word defaults")
+        print("  select a body style and section before building")
 
     # --- theme fonts ---
     if "word/theme/theme1.xml" in names:
@@ -296,7 +295,7 @@ def main(path):
     if direct["Normal"] * 100 >= 60 * total:
         print("  REVIEW: the document is formatted by hand; its styles carry nothing.")
         print("          Render it and extract styles from the render instead:")
-        print(f"            soffice --headless --convert-to pdf {os.path.basename(path)}")
+        print(f"            node ../scripts/render-document.mjs --input {os.path.basename(path)} --out source-render")
         print("          then follow extract-template/pdf/SKILL.md on that PDF.")
     else:
         targets = {"title": "Title", "heading 1": "Heading1", "heading 2": "Heading2",
@@ -320,11 +319,9 @@ def main(path):
                 sz, b = look(name)
                 print(f"            {name:24}{n:>4} paragraphs  {sz if sz else '-':>5}pt  {'bold' if b else ''}")
             ranked = sorted(custom, key=lambda c: -(look(c[0])[0] or 0))
-            pandoc_body = use.get("Normal", 0) + use.get(sid_of("body text"), 0) if "body text" in have else use.get("Normal", 0)
-            body_guess = max(custom, key=lambda c: c[1])
-            body_guess = body_guess[0] if body_guess[1] > pandoc_body else None
+            body_guess = id_to_name.get(body_sid) if body_sid else None
             heads = [c[0] for c in ranked if c[0] != body_guess]
-            guess = ([f"{body_guess}=BodyText"] if body_guess else []) + \
+            guess = ([f"__body__={body_guess}"] if body_guess else []) + \
                     [f"{h}={t}" for h, t in zip(heads, ("Title", "Heading1", "Heading2", "Heading3"))]
             print("          Map each onto the pandoc style whose part it plays (the size order")
             print("          below is a guess; check it against the document):")
@@ -347,8 +344,7 @@ def main(path):
                   "Title", "heading 1", "heading 2", "heading 3", "Block Text"]
     rows = para_props(z, have, key_styles)
     if rows:
-        print(f"\n[paragraph settings] pt. All of these carry over: build_reference.py "
-              f"copies styles.xml wholesale")
+        print("\n[paragraph settings] pt. Check these against the builder's reported rebasing and mappings.")
         print(f"  {'style':<18}{'id':<16}{'before':>7}{'after':>7}{'line':>12}"
               f"{'indent':>14}{'align':>8}  other")
         for n, sid, bf, af, ln, ind, jc, kn in rows:
@@ -376,8 +372,8 @@ def main(path):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    if len(args) == 2 and args[1] == "--slots":
-        sys.exit(slots(args[0]))
+    if len(args) in (2, 3) and args[1] == "--slots" and (len(args) == 2 or args[2] == "--json"):
+        sys.exit(slots(args[0], "--json" in args))
     if len(args) != 1:
         print(__doc__)
         sys.exit(2)

@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """Accept a reference.docx by converting a probe document and catching silent failures.
 
-Usage:  python3 verify_reference.py reference.docx [probe_out.docx]
+Usage:  python3 verify_reference.py reference.docx [probe_out.docx] [--render-dir <empty directory>]
 
 The failure this catches: when a style is missing, Pandoc still writes
 <w:pStyle w:val="Heading1"> but adds no definition. The document opens fine and
 the heading quietly renders as Normal, which is easy to miss by eye.
 
 Exit code 0 means it passed; 1 means dangling style references, a lost
-header/footer, or a missing paper size.
+header/footer, unsafe framed styles, a missing paper size, or missing/invisible
+probe text. Requires Node, LibreOffice Writer, Poppler and PyMuPDF.
 """
 import shutil
+import json
+from pathlib import Path
+from docx_layout import Styles, flow_style_issues
+from rendered_probe import check_rendered_probe
 import sys, os, re, zipfile, subprocess, tempfile
 
 PROBE = """---
@@ -90,17 +95,17 @@ def used_styles(z):
     return used
 
 
-def main(ref, keep=None):
-    tmp = tempfile.mkdtemp()
+def main(ref, keep=None, render_dir=None):
+    tmp = tempfile.mkdtemp(prefix="verify-reference-")
     md = os.path.join(tmp, "probe.md")
     out = keep or os.path.join(tmp, "probe.docx")
-    open(md, "w").write(PROBE)
+    Path(md).write_text(PROBE, encoding="utf-8")
 
     if not shutil.which("pandoc"):
 
         sys.exit("pandoc is not on PATH. Run: python3 ensure_pandoc.py")
 
-    r = subprocess.run(["pandoc", md, f"--reference-doc={ref}", "-o", out],
+    r = subprocess.run(["pandoc", md, f"--reference-doc={ref}", "--columns=20", "-o", out],
                        capture_output=True, text=True)
     if r.returncode != 0:
         print("FAIL  pandoc conversion failed:\n" + r.stderr)
@@ -109,6 +114,9 @@ def main(ref, keep=None):
     z = zipfile.ZipFile(out)
     defined, used = defined_styles(z), used_styles(z)
     dangling = sorted(used - defined)
+    layout_issues = flow_style_issues(Styles(z.read("word/styles.xml")))
+    for issue in layout_issues:
+        print(f"FAIL  {issue}")
 
     print(f"===== verifying {os.path.basename(ref)} =====\n")
     # Count what the template defines, not what the converted probe ended up
@@ -157,13 +165,37 @@ def main(ref, keep=None):
     if keep:
         print(f"\nProbe output kept at: {out}")
     print()
-    ok = not dangling and not lost and not no_paper
-    print("Result: " + ("PASS — ready to ship" if ok else "FAIL — see the markers above"))
+    ok = not dangling and not lost and not no_paper and not layout_issues
+    if ok:
+        render_dir = os.path.abspath(render_dir or os.path.join(tmp, "render"))
+        renderer = Path(__file__).resolve().parents[2] / "scripts" / "render-document.mjs"
+        try:
+            rendered = subprocess.run(["node", str(renderer), "--input", os.path.abspath(out),
+                                       "--out", render_dir], capture_output=True, text=True, timeout=300)
+            if rendered.returncode:
+                raise RuntimeError(rendered.stderr.strip() or "document render failed")
+            pdf = json.loads(rendered.stdout)["pdf"]
+            pg = re.search(r"<w:pgSz\b[^>]*/>", s).group(0)
+            width = int(re.search(r'w:w="(\d+)"', pg).group(1)) / 20
+            height = int(re.search(r'w:h="(\d+)"', pg).group(1)) / 20
+            failures = check_rendered_probe(pdf, width, height)
+            for failure in failures:
+                print(f"  FAIL  {failure}")
+            ok = not failures
+            print(f"Rendered probe: {render_dir}")
+        except (OSError, RuntimeError, ValueError, subprocess.TimeoutExpired) as error:
+            print(f"  FAIL  {error}")
+            ok = False
+    print("Result: " + ("PASS — structure and rendered probe checks; inspect the page images before publishing"
+                        if ok else "FAIL — see the markers above"))
     return 0 if ok else 1
 
 
 if __name__ == "__main__":
-    if len(sys.argv) not in (2, 3) or sys.argv[1] in ("-h", "--help"):
-        print(__doc__)
-        sys.exit(2)
-    sys.exit(main(sys.argv[1], sys.argv[2] if len(sys.argv) == 3 else None))
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("reference")
+    parser.add_argument("probe_out", nargs="?")
+    parser.add_argument("--render-dir", help="Empty directory for the PDF and all page images")
+    args = parser.parse_args()
+    sys.exit(main(args.reference, args.probe_out, args.render_dir))

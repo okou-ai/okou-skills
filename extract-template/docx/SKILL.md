@@ -10,6 +10,14 @@ resources match the selected reuse scope.
 
 Run every command below from `extract-template/docx/`.
 
+If the original has not been rendered, render it before choosing the reuse scope:
+
+```bash
+node ../scripts/render-document.mjs --input <source.docx> --out source-render
+```
+
+Inspect its page images. Use a new output directory for each later render.
+
 ## Choose the reuse scope
 
 Read [`../document-reuse.md`](../document-reuse.md), choose from representative
@@ -45,16 +53,20 @@ Instruct the skill to draft content using those rules and edit a copy of
 `example.docx`. Preserve the formatting of each kind of block. Add or remove
 repeating items by copying or deleting the matching paragraph, table row or
 section as a whole, keeping its formatting and required XML relationships.
+Include separator paragraphs in the copied group when they provide its spacing.
+Preserve run boundaries; clear unused fragments, including superscript text.
+Regenerate identifiers that must be unique in cloned blocks.
 Let text reflow and items grow within the recorded layout rules. Render the
 result to check the layout, content organization and expression. Continue at
 Publish the source package.
 
 ## Locate editable text when needed
 
-After choosing the scope, this optional inspector can locate body text runs:
+After choosing the scope, locate text across the document, headers and footers:
 
 ```bash
 python3 scripts/inspect_docx.py <source.docx> --slots
+python3 scripts/inspect_docx.py <source.docx> --slots --json
 ```
 
 It does not classify the document or identify which text may change. It lists
@@ -62,7 +74,22 @@ runs containing `<w:t>`, so check the rendered pages and XML for gaps without
 text, such as underlined tabs. Do not treat a field's cached result as editable
 text; Word recomputes it.
 
+Address edits by the part and node path, checking the old text before replacing
+it. Use the paragraph text to group split runs; retain their individual formatting
+and whitespace. Inspect linked placeholders and empty separator paragraphs.
+
+For a filled content control, remove `w:showingPlcHdr` so its value is treated
+as content. Preserve its placeholder definition for future empty values.
+If it has `w:dataBinding`, update the referenced custom XML value as well;
+do not leave the displayed value and its binding inconsistent.
+
 ## Publish the source package
+
+Before publishing, follow the package's own recipe on a disposable copy with
+sample content. Verify repeated values in the body, header and footer; exercise
+an added and removed item only where the selected scope permits it. Render all
+pages and compare the formatting, artwork, spacing and content with the original.
+Fix the recipe and repeat this check if it changes.
 
 ```bash
 node ../scripts/cover-page.mjs --input <the original .docx> --out cover.png
@@ -90,6 +117,7 @@ Say the template exists only after the command succeeds, then stop.
 ### Prerequisites
 
 ```bash
+python3 -m pip install --break-system-packages pymupdf
 python3 scripts/ensure_pandoc.py --dir ./vendor   # then run the export PATH line it prints
 ```
 
@@ -99,7 +127,9 @@ python3 scripts/ensure_pandoc.py --dir ./vendor   # then run the export PATH lin
 python3 scripts/inspect_docx.py <source.docx>
 ```
 
-Note the missing required styles, the paper size, and every `REVIEW` line.
+Note the missing required styles, numbered sections, body candidates and every
+`REVIEW` line. Check the body style and section against a body page. Map a
+heading by its role there; a style named `Heading1` may belong to the cover.
 `[styles in use]` decides how to extract the visual styles:
 
 - the document uses its own style names: run step 2 with the `--map` it
@@ -113,11 +143,15 @@ Ignore the exit code.
 
 ```bash
 python3 scripts/build_reference.py <source.docx> reference.docx \
-        [--map 'Memo Title=Title,Section Head=Heading1,Body Copy=BodyText']
+        [--map 'Memo Title=Title,Section Head=Heading1,__body__=Body Copy'] \
+        [--section <1-based body section number>]
 ```
 
-Missing styles are filled in. If it prints `ACTION REQUIRED`, set the paper
-size in step 3.
+Use `__body__` to choose an existing source style for ordinary paragraphs;
+this does not modify the source. Check the reported section selection. If
+selection is ambiguous, pass the section and body style read from the source.
+Resolve each `ACTION REQUIRED` before continuing. Do not strip a cover's frame
+or change its colours to force it into a body-heading role.
 
 ### 3. Adjust
 
@@ -147,11 +181,13 @@ Style names are the `w:name`, case-insensitive. `set_style.py` options:
 ### 4. Verify
 
 ```bash
-python3 scripts/verify_reference.py reference.docx
+python3 scripts/verify_reference.py reference.docx --render-dir verified-probe
 ```
 
-Exit code must be 0. Dangling style → step 2. No paper size → step 3 with
-`--paper`.
+Exit code must be 0. Inspect every probe page for the correct heading roles,
+body placement and required visual assets before packaging. Dangling or framed
+styles → step 2. No paper size → step 3 with `--paper`. After a correction,
+verify again into a new directory.
 
 ### 5. Package
 
@@ -203,4 +239,4 @@ succeeds.
 | Header text sits outside the text area | Step 1 reports the tab stop; rebuild the header with `--header 'left\tright'`, which places it from the margins |
 | A docx saved by WPS fails to parse | Re-save it from Word, restart at step 1 |
 | A slot-filling template comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
-| A rendered page drops the text held in content controls | LibreOffice exports those as form fields, whose appearance font carries no CJK. Render with `--convert-to png`, or export the PDF with `ExportFormFields` false |
+| Content-control text disappears or loses its font, colour or rules | Render with `../scripts/render-document.mjs`; use its flattened PDF and proportional page images |

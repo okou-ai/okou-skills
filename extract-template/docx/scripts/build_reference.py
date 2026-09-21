@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """Turn any .docx into a usable Pandoc --reference-doc template.
 
-Usage:  python3 build_reference.py source.docx reference.docx [--map 'Memo Title=Title,Section Head=Heading1,Body Copy=BodyText']
+Usage:  python3 build_reference.py source.docx reference.docx
+          [--map 'Memo Title=Title,Section Head=Heading1,__body__=Body Copy']
+          [--section <1-based body section number>]
 
 Three things happen:
-  1. The source stylesheet, theme, header/footer, numbering and page setup are
-     carried over byte for byte.
+  1. The source theme, header/footer and numbering are retained. Page setup
+     comes from the selected body section, including inherited header/footer.
   2. The body is replaced with a style sampler: one paragraph per style, whose
      text is the style name.
   3. Missing Pandoc styles are added. Heading levels are derived from the
      neighbouring levels already in the document; anything else is taken from
      pandoc's default template and rebased onto the document's body font.
+     Reported body rebasing and explicit mappings update the stylesheet.
 
 Requires pandoc on PATH.
 """
@@ -18,6 +21,7 @@ import sys, os, re, zipfile, shutil, subprocess, tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pandoc_styles as PS
+from docx_layout import Styles, choose_body, choose_section, flow_style_issues, section_xml
 
 HALF2PT = lambda h: int(h) / 2
 PT2HALF = lambda pt: int(round(pt * 2))
@@ -155,7 +159,7 @@ def _log_recipe(target, argv):
         pass
 
 
-def build(src_path, out_path, mapping=None):
+def build(src_path, out_path, mapping=None, section=None):
     with zipfile.ZipFile(src_path) as src:
         members = [(i.filename, src.read(i.filename)) for i in src.infolist()]
         names = [f for f, _ in members]
@@ -163,6 +167,11 @@ def build(src_path, out_path, mapping=None):
     styles = blob["word/styles.xml"].decode("utf-8", "replace")
     doc = blob["word/document.xml"].decode("utf-8", "replace")
     src_doc = doc          # the document as written, before the body becomes a sampler
+
+    source_styles = Styles(styles)
+    body_sid = choose_body(src_doc, source_styles, mapping, section)
+    section_number = choose_section(src_doc, source_styles, body_sid, section)
+    print(f"  body style: {body_sid!r}; source section: {section_number}")
 
     have = style_map(styles)
     # Every style pandoc's own reference.docx defines is one pandoc may emit;
@@ -213,9 +222,8 @@ def build(src_path, out_path, mapping=None):
             injected.append(n)
         styles = styles.replace("</w:styles>", "".join(blocks) + "</w:styles>")
 
-    # body -> style sampler; sectPr kept as is (header/footer refs, paper, margins)
-    sect = re.search(r"<w:sectPr\b.*?</w:sectPr>|<w:sectPr\b[^>]*/>", doc, re.S)
-    sect_xml = sect.group(0) if sect else "<w:sectPr/>"
+    # Keep the selected body section's geometry and effective header/footer refs.
+    sect_xml = section_xml(src_doc, section_number)
     # Make the closing section continuous. A single-section source never says,
     # and the default (nextPage) makes any section break inserted later start
     # a new page. CT_SectPr order: header/footer refs, footnotePr, endnotePr,
@@ -244,11 +252,9 @@ def build(src_path, out_path, mapping=None):
         if re.search(r"<w:t\b[^>]*>[^<]*\S", _para):
             _ps = re.search(r'<w:pStyle w:val="([^"]+)"', _para)
             _use[_ps.group(1) if _ps else "Normal"] += 1
-    _body_sid = _use.most_common(1)[0][0] if _use else "Normal"
+    _body_sid = body_sid
     _body_targets = ("body text", "first paragraph", "compact")
     _body_ids = {have[n][0] for n in _body_targets if n in have}
-    if (mapping or {}).get("__body__"):
-        _body_sid = have[mapping["__body__"].lower()][0]
     if _body_sid not in _body_ids:
         for n in _body_targets:
             if n not in have:
@@ -314,12 +320,13 @@ def build(src_path, out_path, mapping=None):
               "heading4": "heading 4", "heading5": "heading 5", "heading6": "heading 6"}
     NAMING = r"(?:name|aliases|basedOn|next|link|autoRedefine|hidden|uiPriority|semiHidden|unhideWhenUsed|qFormat|locked|personal\w*|rsid)"
     for src_name, target in (mapping or {}).items():
+        if src_name == "__body__":
+            continue
         tkey = TARGET.get(target.lower().replace(" ", ""), target.lower())
         src_hit, tgt_hit = have.get(src_name.lower()), have.get(tkey)
         if not src_hit or not tgt_hit:
-            print(f"  --map: {src_name!r} -> {target}: "
-                  f"{'source style not found' if not src_hit else 'target not found'}")
-            continue
+            raise ValueError(f"--map {src_name!r} -> {target}: "
+                             f"{'source style not found' if not src_hit else 'target not found'}")
         sxml, (tsid, txml) = src_hit[1], tgt_hit
         new = re.sub(r"<w:pPr>.*?</w:pPr>|<w:pPr/>|<w:rPr>.*?</w:rPr>|<w:rPr/>", "", txml, flags=re.S)
         props = "".join(m.group(0) for m in re.finditer(r"<w:pPr>.*?</w:pPr>|<w:rPr>.*?</w:rPr>", sxml, re.S))
@@ -337,6 +344,10 @@ def build(src_path, out_path, mapping=None):
             styles = re.sub(rf'<w:style\b[^>]*w:styleId="{re.escape(tsid)}".*?</w:style>', lambda m: new, styles, count=1, flags=re.S)
         have[tkey] = (tsid, new)
         print(f"  mapped {src_name!r} -> {target}")
+
+    issues = flow_style_issues(Styles(styles))
+    if issues:
+        raise ValueError("Not a flowing reference template:\n  " + "\n  ".join(issues))
 
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as out:
         for fn, data in members:
@@ -366,8 +377,7 @@ def build(src_path, out_path, mapping=None):
         print(f"  .   {', '.join(unavailable)}: absent from pandoc's default template "
               f"too; the writer generates them, nothing to add")
 
-    print("\n  Paragraph settings of existing styles carry over unchanged — styles.xml "
-          "is copied\n  wholesale and only appended to. Run inspect_docx.py to see the values.")
+    print("\n  Source styles are retained except for the reported body rebasing and mappings.")
 
     if derived:
         print(f"\n  OK  {len(derived)} heading levels derived from neighbouring levels "
@@ -386,13 +396,17 @@ def build(src_path, out_path, mapping=None):
             row = _spacing_of(styles, sid)
             tag = "  <- this document's body text, match against it" if n == "Body Text" else ""
             print(f"     {n:<18}{row[0]:>7}{row[1]:>7}{row[2]:>8}{tag}")
-        print("     Adjust with set_style.py if needed; the template is deliverable "
-              "either way.")
+        print("     Compare the rendered probe with the source before packaging.")
 
 
 if __name__ == "__main__":
     a = sys.argv[1:]
     mp = None
+    section = None
+    if "--section" in a:
+        i = a.index("--section")
+        section = int(a[i + 1])
+        a = a[:i] + a[i + 2:]
     if "--map" in a:
         i = a.index("--map")
         mp = dict(kv.split("=", 1) for kv in a[i + 1].split(",") if "=" in kv)
@@ -400,5 +414,8 @@ if __name__ == "__main__":
     if len(a) != 2 or a[0] in ("-h", "--help"):
         print(__doc__)
         sys.exit(2)
-    build(a[0], a[1], mp)
+    try:
+        build(a[0], a[1], mp, section)
+    except ValueError as error:
+        sys.exit(f"ACTION REQUIRED: {error}")
     _log_recipe(a[1], sys.argv)
