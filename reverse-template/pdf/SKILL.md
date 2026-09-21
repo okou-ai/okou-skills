@@ -6,35 +6,32 @@ description: "Reverse-engineer a PDF into a loadable template skill: SKILL.md, r
 # Reverse a PDF into a template package
 
 Input: one `.pdf`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.pdf`. Output for a fixed structure: `SKILL.md`
-and the source alone.
+`reference.docx` and `source.pdf`. Output for a form, a card or a record:
+`SKILL.md` and the source alone.
 
 **If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
 pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `reverse-template/pdf/`.
 
-## Before anything — an article, or a fixed structure?
+## Before anything — which kind of document?
 
-Look at the rendered pages.
+Look at the rendered pages and classify with
+[`../document-kinds.md`](../document-kinds.md): **form**, **card**, **record**
+or **article**. That file is the only place the four are defined; the routes
+below are how this branch packages each of them.
 
-An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a manual, a policy. A **fixed structure**
-is the whole document as one arrangement of blocks, and a new one keeps that
-arrangement and changes the content — a resume, an invoice, a certificate.
+An **article** continues at Prerequisites below and ends in a style sheet.
+A form, a card and a record all take the route immediately below, and differ
+only in what their package body says.
 
-Judge on what the document is, not on how it looks — a plain single-column
-resume is still a fixed structure. An article continues at Prerequisites below.
+## A form, a card or a record: publish the source itself
 
-A fixed structure divides again on whether its pages leave blanks. One that does
-is a form, and its two sections below differ in what a new document is allowed
-to rewrite; read both before writing the package.
+A style sheet drops the arrangement, the artwork and the wording alike. Publish
+the file and stop here.
 
-### A fixed structure: publish the source itself
-
-A style sheet drops those silently. Publish the file and stop here.
-
-Write `package/SKILL.md` and put nothing else in `package/`:
+Write `package/SKILL.md` and put nothing else in `package/`. Open it with the
+styling note, which is the same for all three:
 
 ````markdown
 ---
@@ -44,34 +41,36 @@ description: <what this document is, in one line>
 
 Follow the source file's own styling. It is the authority for page size,
 margins, typography, colour, and the position of every block.
-
-Replace the content, keep the composition:
-
-- <one line per entry a new document has to fill>
 ````
 
-Name the entries off the rendered pages, and write nothing they do not show.
+Then add the body its kind calls for.
 
-```bash
-npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
-  --title "<user-visible template name>" \
-  --kind document \
-  --source <the original .pdf> \
-  --package package
-```
+### A record: keep the sections, replace what is under them
 
-Say the template exists only after the command succeeds.
+````markdown
+Keep the section headings. Replace the content under them, and repeat or drop a
+whole block where the list is a different length this time:
+
+- <one line per section, saying what a new one puts under it>
+````
+
+Say which lists vary in length, because that is what a new instance gets wrong.
+
+### A card: keep the composition, and shorten rather than resize
+
+````markdown
+Keep the artwork and where each line sits. Replace the wording:
+
+- <one line per line of text on the page>
+
+If a replacement no longer fits where it sits, shorten the wording. Never
+change the type, the spacing, or the position.
+````
 
 ### A form: fill the blanks, keep the rest word for word
 
-A fixed structure whose pages leave blanks is a **form** — a contract, an
-invoice, an application, a certificate with a name to enter. A resume leaves
-none: every line of it is replaced. A form's blanks are the only part a new
-document writes, and everything outside them is the document itself rather than
-a sample of one, so "replace the content" above is the wrong instruction here. A
-new agreement fills in the party and keeps its indemnity clause to the letter.
-
-List the blanks rather than reading them off the page:
+The blanks are the only part a new document writes. List them rather than
+reading them off the page:
 
 ```bash
 pip install pymupdf
@@ -83,8 +82,6 @@ first is a character: a run of underscores, a rule drawn under spaces, and a
 parenthetical instruction such as `(NAME)`. Check the list against the rendered
 pages before writing the table — one field can show as two marks, and an acronym
 that nothing defines nearby still reads as a blank.
-
-Package and publish exactly as above, with the entry list replaced by:
 
 ````markdown
 Fill the blanks. Every other word is the document: reproduce it exactly, and
@@ -100,6 +97,18 @@ Name a blank by the sentence it sits in, not by its line number, and give one
 row per field — two marks around one name are one row. Where the source numbers
 its sections and cites them by number, say so: adding or dropping a section
 means renumbering the citations with it.
+
+### Publishing, for all three
+
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
+  --title "<user-visible template name>" \
+  --kind document \
+  --source <the original .pdf> \
+  --package package
+```
+
+Say the template exists only after the command succeeds.
 
 ## Prerequisites
 

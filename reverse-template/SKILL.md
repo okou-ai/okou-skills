@@ -41,5 +41,9 @@ Four rules override the table:
   slides — is that page's kind, not artwork.
 
 `cd` into the branch directory; every path inside a branch guide is relative to
-it. The two document guides open by checking whether a style sheet can hold this
-particular file, and publish the source itself when it cannot.
+it. Both document guides open by classifying the file with
+[`document-kinds.md`](document-kinds.md) — form, card, record or article — and
+only an article ends in a style sheet; the other three publish the source
+itself, because a style sheet carries neither the arrangement, the artwork nor
+the wording. They read that one file so a document does not get a different
+package for having arrived as a `.docx` rather than a `.pdf`.

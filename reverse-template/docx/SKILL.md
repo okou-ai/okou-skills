@@ -6,24 +6,23 @@ description: "Reverse-engineer a Word document into a loadable template skill: S
 # Reverse a docx into a template package
 
 Input: one `.docx`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.docx`. Output for a fixed structure: `SKILL.md`
-and a copy of the source beside it.
+`reference.docx` and `source.docx`. Output for a form, a card or a record:
+`SKILL.md` and a copy of the source beside it.
 
 Run every command below from `reverse-template/docx/`.
 
-## Before anything — an article, or a fixed structure?
+## Before anything — which kind of document?
 
-Look at the rendered pages.
+Look at the rendered pages and classify with
+[`../document-kinds.md`](../document-kinds.md): **form**, **card**, **record**
+or **article**. That file is the only place the four are defined, and the PDF
+branch answers the question the same way, so one document does not get a
+different package for having arrived as a `.docx`.
 
-An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a manual, a policy. A **fixed structure**
-is the whole document as one arrangement of blocks, and a new one keeps that
-arrangement and changes the content — a resume, an invoice, a certificate.
+An **article** continues at Prerequisites below. The other three take the route
+immediately below, and differ only in the closing line of the package body.
 
-Judge on what the document is, not on how it looks — a plain single-column
-resume is still a fixed structure. An article continues at Prerequisites below.
-
-### A fixed structure: package the file and fill it in
+### A form, a card or a record: package the file and fill it in
 
 A style sheet drops those silently, and no description reproduces a background
 image. Ship the file itself, and have each new document edit a copy of it.
@@ -73,6 +72,20 @@ do not show. A label and its value are usually separate runs — give the value 
 row and leave the label out. Leave a field's run out too; Word recomputes it.
 Word the table as where the wording sits, never as the set of edits allowed — a
 new document may need one line more, or one fewer.
+
+Close the body with the line its kind calls for, which is the whole of the
+difference between the three:
+
+- **Record** — "Repeat or drop a whole block where a list is a different length
+  this time." Name the lists that vary; that is what a new instance gets wrong.
+- **Card** — "Never change the type, the spacing, or the position." The table
+  above already tells it to shorten rather than resize; this forbids the other
+  way out.
+- **Form** — "Fill the blanks. Every other word is the document: reproduce it
+  exactly, and never paraphrase, summarise, renumber, or drop a passage that has
+  no blank in it." Then give the table one row per blank rather than per run,
+  and say so where the source cites its own sections by number, because dropping
+  one means renumbering the citations with it.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
@@ -185,5 +198,5 @@ whole directory.
 | Output carries the source's number or owner | `set_header_footer.py --replace` |
 | Header text sits outside the text area | Step 1 reports the tab stop; rebuild the header with `--header 'left\tright'`, which places it from the margins |
 | A docx saved by WPS fails to parse | Re-save it from Word, restart at step 1 |
-| A fixed structure comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
+| A form, card or record comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
 | A rendered page drops the text held in content controls | LibreOffice exports those as form fields, whose appearance font carries no CJK. Render with `--convert-to png`, or export the PDF with `ExportFormFields` false |
