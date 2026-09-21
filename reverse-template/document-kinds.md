@@ -17,7 +17,36 @@ one has to keep**, and each kind answers that differently.
 | Record | the section headings | grow and shrink block by block, by repeating or dropping a whole block |
 | Article | the styles | run to any length; sections come and go |
 
-Read the rendered pages and take the first match.
+Read the rendered pages and walk this, in order. The sections below define each
+kind; this decides which one you are in.
+
+```
+Q1  Does the page leave a blank?
+      A typographic gap: a run of underscores, a rule drawn under spaces, a
+      bracketed or parenthesised instruction, an initial line. A placeholder
+      word that reads as ordinary text — `Facilitator name` — is not a blank,
+      it is content to replace.
+        no  -> Q2
+        yes -> Q1a
+
+Q1a Is most of the page wording that carries obligation or meaning, which a
+    new one must not restate in its own words?
+        yes -> FORM
+        no  -> Q2      an invitation's `[insert here]` leaves here
+
+Q2  Is the page carried by artwork, with the text down to a handful of short
+    lines and no sections?
+        yes -> CARD
+        no  -> Q3
+
+Q3  Would the next instance keep these same section headings?
+        yes -> RECORD
+        no  -> ARTICLE
+```
+
+Q1 is asked first because a contract reads as an article until its blanks are
+noticed, and Q1a exists because all three non-article kinds carry placeholders.
+Drop Q1a and every card with a bracketed placeholder becomes a form.
 
 ## 1. Form — blanks set into text that otherwise stands word for word
 
