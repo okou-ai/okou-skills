@@ -379,7 +379,7 @@ python3 set_header_footer.py reference.docx --replace 'OLD=NEW'
 python3 verify_reference.py reference.docx
 ```
 
-Scripts are in `reverse-template/docx`. Change the style definition;
+Scripts are in `extract-template/docx`. Change the style definition;
 formatting applied to selected text does not change the template.
 
 ## Limits
@@ -441,13 +441,13 @@ def build(orig, ref, outdir, name=None):
                       " converting, unzip reference.docx, replace the bracketed text in"
                       " `word/header*.xml` and `word/footer*.xml`, and zip it back; or run"
                       " `set_header_footer.py --replace 'OLD=NEW'` from"
-                      " `reverse-template/docx`.")
+                      " `extract-template/docx`.")
     elif pg["hf"]:
         limits.append("The header and footer still carry the source's own title, document"
                       " number, version or owner. Replace that text in `word/header*.xml`"
                       " and `word/footer*.xml` before converting, or run"
                       " `set_header_footer.py --replace 'OLD=NEW'` from"
-                      " `reverse-template/docx`.")
+                      " `extract-template/docx`.")
 
     # An inverted hierarchy is the source's own value, reproduced rather than
     # corrected. Say so, or the next person silently "fixes" it.

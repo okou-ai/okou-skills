@@ -34,17 +34,17 @@ def docx_flow(src):
     name = os.path.splitext(os.path.basename(src))[0]
     out = f"{RUNS}/docx_{name}"; shutil.rmtree(out, ignore_errors=True); os.makedirs(out)
     log = []
-    S = f"{SK}/reverse-template/docx/scripts"
+    S = f"{SK}/extract-template/docx/scripts"
     rc, o = sh(f"python3 {S}/inspect_docx.py {src}", cwd=out); log.append(("inspect", rc, o))
     if "formatted by hand" in o:
-        # the inspector says: render it and reverse the render
+        # the inspector says: render it and extract styles from the render
         rd = f"{RUNS}/render_{name}"; os.makedirs(rd, exist_ok=True)
         pdf = f"{rd}/{name}.pdf"
         for _ in range(3):
             sh(f"soffice --headless --convert-to pdf --outdir {rd} {src}", cwd=rd)
             if os.path.exists(pdf): break
             import time; time.sleep(2)
-        log.append(("-> pdf-reverse-template on the render", 0, ""))
+        log.append(("-> pdf-extract-template on the render", 0, ""))
         nm, plog, pkg, srcpdf = pdf_flow(pdf, 1, tag=f"docx_{name}")
         return name, log + plog, pkg, f"/tmp/corpus/{name}.pdf"
     mp = re.search(r"--map '([^']+)'", o)
@@ -80,7 +80,7 @@ def auto_map(js):
 def pdf_flow(src, columns, tag=None):
     name = os.path.splitext(os.path.basename(src))[0]
     out = f"{RUNS}/{tag or 'pdf_' + name}"; shutil.rmtree(out, ignore_errors=True); os.makedirs(out)
-    S = f"{SK}/reverse-template/pdf/scripts"; log = []
+    S = f"{SK}/extract-template/pdf/scripts"; log = []
     cols = f" --columns {columns}" if columns > 1 else ""
     rc, o = sh(f"python3 {S}/analyze_pdf.py {src}{cols} --json {out}/styles.json", cwd=out); log.append(("analyze", rc, o))
     if rc: return name, log, None, None

@@ -1,9 +1,9 @@
 ---
-name: reverse-template
-description: "Decide what an uploaded file is — a deck, a Word document, a PDF document, or artwork — and hand it to the reverse-engineering guide that matches. Use when asked to reverse a deck or a document, extract a template from a file, turn a PDF into a Word template, save an image style as a reusable template, apply a company template to Markdown, or save a file's visual language as a reusable template."
+name: extract-template
+description: "Decide what an uploaded file is — a deck, a Word document, a PDF document, or artwork — and hand it to the template-extraction guide that matches. Use when asked to extract a template from a deck or document, turn a PDF into a Word template, save an image style as a reusable template, apply a company template to Markdown, or save a file's visual language as a reusable template."
 ---
 
-# Reverse a file into a reusable template
+# Extract a reusable template from a file
 
 Look at what the file holds, decide what it is, follow that guide to the end.
 
@@ -32,7 +32,7 @@ Four rules override the table:
 - A deliverable the user names beats the table. "Turn these slides into a Word
   template" is `docx/`; "save this report's look as a presentation template" is
   `presentation/`.
-- Reverse the authoring file when it sits beside an export of itself: `.docx`
+- Extract from the authoring file when it sits beside an export of itself: `.docx`
   over its PDF, `.pptx` over its PDF.
 - One or two pages at a paper size is never slides, however sparse. A resume and
   an invoice carry as little text as a slide and are still documents.

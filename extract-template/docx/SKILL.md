@@ -1,14 +1,14 @@
 ---
-name: docx-reverse-template
-description: "Reverse-engineer a Word document into a template skill for filling slots, reusing structure and expression, or applying its visual style. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc."
+name: docx-extract-template
+description: "Extract a template skill from a Word document for filling slots, reusing structure and expression, or applying its visual style. Use when asked to extract a Word template, build a reference.docx, apply a company template to Markdown, or set up --reference-doc."
 ---
 
-# Reverse a docx into a template package
+# Extract a template package from a docx
 
 Input: one `.docx`. Output: a loadable skill package whose instructions and
 resources match the selected reuse scope.
 
-Run every command below from `reverse-template/docx/`.
+Run every command below from `extract-template/docx/`.
 
 ## Choose the reuse scope
 

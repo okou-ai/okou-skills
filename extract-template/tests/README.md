@@ -1,9 +1,9 @@
 # Corpus harness
 
 ```bash
-mkdir -p /tmp/corpus && cd /tmp/corpus && python3 <repo>/reverse-template/tests/gen_corpus.py   # 9 docx
+mkdir -p /tmp/corpus && cd /tmp/corpus && python3 <repo>/extract-template/tests/gen_corpus.py   # 9 docx
 soffice --headless --convert-to pdf --outdir . *.docx                                            # 9 PDFs
-python3 <repo>/reverse-template/tests/harness.py docx pdf                                        # both routes
+python3 <repo>/extract-template/tests/harness.py docx pdf                                        # both routes
 ```
 
 `harness.py` runs each guide step by step on every corpus file, converts
