@@ -6,32 +6,31 @@ description: "Reverse-engineer a PDF into a loadable template skill: SKILL.md, r
 # Reverse a PDF into a template package
 
 Input: one `.pdf`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.pdf`. Output for a form, a card or a record:
-`SKILL.md` and the source alone.
+`reference.docx` and `source.pdf`. Output when anything must survive that a
+style sheet cannot carry: `SKILL.md` and the source alone.
 
 **If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
 pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `reverse-template/pdf/`.
 
-## Before anything — which kind of document?
+## Before anything — what must survive?
 
-Look at the rendered pages and classify with
-[`../document-kinds.md`](../document-kinds.md): **form**, **card**, **record**
-or **article**. That file is the only place the four are defined; the routes
-below are how this branch packages each of them.
+Answer the six questions in
+[`../document-properties.md`](../document-properties.md) against the rendered
+pages. Each `yes` adds a clause to the package; all six `no` is the only case
+whose asset is a style sheet.
 
-An **article** continues at Prerequisites below and ends in a style sheet.
-A form, a card and a record all take the route immediately below, and differ
-only in what their package body says.
+All six `no` — continue at Prerequisites below and build `reference.docx`.
+Any `yes` — take the route immediately below.
 
-## A form, a card or a record: publish the source itself
+## Any `yes`: publish the source itself
 
-A style sheet drops the arrangement, the artwork and the wording alike. Publish
+A style sheet carries neither fixed wording, nor blocks, nor artwork. Publish
 the file and stop here.
 
 Write `package/SKILL.md` and put nothing else in `package/`. Open it with the
-styling note, which is the same for all three:
+styling note, which every one of these packages carries:
 
 ````markdown
 ---
@@ -43,34 +42,17 @@ Follow the source file's own styling. It is the authority for page size,
 margins, typography, colour, and the position of every block.
 ````
 
-Then add the body its kind calls for.
+Then add one clause per `yes`, in question order. Write nothing for a `no`.
 
-### A record: keep the sections, replace what is under them
-
-````markdown
-Keep the section headings. Replace the content under them, and repeat or drop a
-whole block where the list is a different length this time:
-
-- <one line per section, saying what a new one puts under it>
-````
-
-Say which lists vary in length, because that is what a new instance gets wrong.
-
-### A card: keep the composition, and shorten rather than resize
+**1 — wording that must survive.** Name the passages, then:
 
 ````markdown
-Keep the artwork and where each line sits. Replace the wording:
-
-- <one line per line of text on the page>
-
-If a replacement no longer fits where it sits, shorten the wording. Never
-change the type, the spacing, or the position.
+Reproduce these passages exactly: <where they are>. Never paraphrase,
+summarise, renumber, or drop one. Where the source cites its own sections by
+number, dropping one means renumbering the citations with it.
 ````
 
-### A form: fill the blanks, keep the rest word for word
-
-The blanks are the only part a new document writes. List them rather than
-reading them off the page:
+**2 — blanks.** List them rather than reading them off the page:
 
 ```bash
 pip install pymupdf
@@ -80,25 +62,46 @@ python3 scripts/find_blanks.py <source.pdf>
 It reports three kinds, because a PDF writes a blank three ways and only the
 first is a character: a run of underscores, a rule drawn under spaces, and a
 parenthetical instruction such as `(NAME)`. Check the list against the rendered
-pages before writing the table — one field can show as two marks, and an acronym
-that nothing defines nearby still reads as a blank.
+pages — one field can show as two marks, and an acronym that nothing defines
+nearby still reads as a blank. Then one row per field, not per mark:
 
 ````markdown
-Fill the blanks. Every other word is the document: reproduce it exactly, and
-never paraphrase, summarise, renumber, or drop a passage that has no blank in
-it.
-
 | Blank | Holds |
 |---|---|
 | `<the blank as the page shows it>` | <what a new document puts there> |
 ````
 
-Name a blank by the sentence it sits in, not by its line number, and give one
-row per field — two marks around one name are one row. Where the source numbers
-its sections and cites them by number, say so: adding or dropping a section
-means renumbering the citations with it.
+**3 — blocks that come back.** In reading order:
 
-### Publishing, for all three
+````markdown
+Keep these blocks and what each holds:
+
+- <one line per block>
+````
+
+**4 — lists of a different length each time.** Name them, then:
+
+````markdown
+Repeat or drop a whole block of the same kind for: <the lists>. Never build one
+from scratch and never let one fall back to a style default.
+````
+
+**5 — artwork carries the page.**
+
+````markdown
+Keep the artwork and where each line sits. If a replacement no longer fits,
+shorten the wording — never the type, the spacing, or the position.
+````
+
+**6 — computed values.** Beside the field, write the arithmetic:
+
+````markdown
+| Field | Computed as |
+|---|---|
+| <field> | <the arithmetic> |
+````
+
+### Publishing
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \

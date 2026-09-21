@@ -6,23 +6,22 @@ description: "Reverse-engineer a Word document into a loadable template skill: S
 # Reverse a docx into a template package
 
 Input: one `.docx`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.docx`. Output for a form, a card or a record:
-`SKILL.md` and a copy of the source beside it.
+`reference.docx` and `source.docx`. Output when anything must survive that a
+style sheet cannot carry: `SKILL.md` and a copy of the source beside it.
 
 Run every command below from `reverse-template/docx/`.
 
-## Before anything — which kind of document?
+## Before anything — what must survive?
 
-Look at the rendered pages and classify with
-[`../document-kinds.md`](../document-kinds.md): **form**, **card**, **record**
-or **article**. That file is the only place the four are defined, and the PDF
-branch answers the question the same way, so one document does not get a
+Answer the six questions in
+[`../document-properties.md`](../document-properties.md) against the rendered
+pages. The PDF branch answers the same six, so one document does not get a
 different package for having arrived as a `.docx`.
 
-An **article** continues at Prerequisites below. The other three take the route
-immediately below, and differ only in the closing line of the package body.
+All six `no` — continue at Prerequisites below and build `reference.docx`.
+Any `yes` — take the route immediately below.
 
-### A form, a card or a record: package the file and fill it in
+### Any `yes`: package the file and fill it in
 
 A style sheet drops those silently, and no description reproduces a background
 image. Ship the file itself, and have each new document edit a copy of it.
@@ -73,19 +72,22 @@ row and leave the label out. Leave a field's run out too; Word recomputes it.
 Word the table as where the wording sits, never as the set of edits allowed — a
 new document may need one line more, or one fewer.
 
-Close the body with the line its kind calls for, which is the whole of the
-difference between the three:
+Then close with one clause per `yes` from `../document-properties.md`, in
+question order, and nothing for a `no`:
 
-- **Record** — "Repeat or drop a whole block where a list is a different length
-  this time." Name the lists that vary; that is what a new instance gets wrong.
-- **Card** — "Never change the type, the spacing, or the position." The table
-  above already tells it to shorten rather than resize; this forbids the other
-  way out.
-- **Form** — "Fill the blanks. Every other word is the document: reproduce it
-  exactly, and never paraphrase, summarise, renumber, or drop a passage that has
-  no blank in it." Then give the table one row per blank rather than per run,
-  and say so where the source cites its own sections by number, because dropping
-  one means renumbering the citations with it.
+- **1 wording** — "Reproduce these passages exactly: <where>. Never paraphrase,
+  summarise, renumber, or drop one." Where the source cites its own sections by
+  number, say that dropping one means renumbering the citations with it. Give
+  the table a row per blank rather than per run wherever this applies.
+- **2 blanks** — `python3 scripts/inspect_docx.py <source.docx> --slots` already
+  lists the runs; keep the rows that are typographic gaps.
+- **3 blocks** — the table above is this clause.
+- **4 varying lists** — "Repeat or drop a whole block of the same kind for:
+  <the lists>." Name them; that is what a new instance gets wrong.
+- **5 artwork** — "Never change the type, the spacing, or the position." The
+  table already says to shorten rather than resize; this forbids the other way
+  out.
+- **6 computed values** — write the arithmetic beside the field.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
@@ -198,5 +200,5 @@ whole directory.
 | Output carries the source's number or owner | `set_header_footer.py --replace` |
 | Header text sits outside the text area | Step 1 reports the tab stop; rebuild the header with `--header 'left\tright'`, which places it from the margins |
 | A docx saved by WPS fails to parse | Re-save it from Word, restart at step 1 |
-| A form, card or record comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
+| A packaged source comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
 | A rendered page drops the text held in content controls | LibreOffice exports those as form fields, whose appearance font carries no CJK. Render with `--convert-to png`, or export the PDF with `ExportFormFields` false |
