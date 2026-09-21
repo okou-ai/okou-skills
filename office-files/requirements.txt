@@ -1,0 +1,4 @@
+pypandoc_binary==1.17
+python-docx==1.2.0
+PyMuPDF==1.28.2
+openpyxl==3.1.5
