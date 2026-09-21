@@ -15,6 +15,29 @@
   color: var(--pl-ink);
   font-family: var(--pl-font-body);
 }
+/* Optional brand backgrounds sit behind content and never affect its geometry. */
+.pl-stage::before,
+.pl-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.pl-stage::before {
+  background-image: var(--pl-bg-image, none);
+  background-size: var(--pl-bg-size, cover);
+  background-position: var(--pl-bg-position, center);
+  background-repeat: var(--pl-bg-repeat, no-repeat);
+  opacity: var(--pl-bg-opacity, 1);
+}
+.pl-stage::after {
+  background-image: var(--pl-motif-image, none);
+  background-size: var(--pl-motif-size, contain);
+  background-position: var(--pl-motif-position, right center);
+  background-repeat: var(--pl-motif-repeat, no-repeat);
+  opacity: var(--pl-motif-opacity, 1);
+}
 .pl-layout {
   position: relative;
   z-index: 1;

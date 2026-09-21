@@ -5,6 +5,17 @@
   --pl-font-display: Arial, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --pl-font-body: Arial, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --pl-bg: #ffffff;
+  /* Optional background field/image and decorative motif; neutral defaults stay plain. */
+  --pl-bg-image: none;
+  --pl-bg-size: cover;
+  --pl-bg-position: center;
+  --pl-bg-repeat: no-repeat;
+  --pl-bg-opacity: 1;
+  --pl-motif-image: none;
+  --pl-motif-size: contain;
+  --pl-motif-position: right center;
+  --pl-motif-repeat: no-repeat;
+  --pl-motif-opacity: 1;
   --pl-ink: #202124;
   --pl-muted: #5f6368;
   --pl-surface: #f5f5f5;

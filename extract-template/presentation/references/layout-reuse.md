@@ -4,7 +4,7 @@ Use this reference while extracting a presentation package and writing its autho
 
 ## Source inventory and selection
 
-Inspect every source page before grouping layouts. Two pages can share a layout when they have equivalent content regions, proportions, hierarchy, and visual treatment. A split cover and centered cover are distinct even though both are covers. Record intentional layout variants rather than flattening them into a few representative pages.
+Inspect every source page before grouping layouts. Two pages can share a layout when they have equivalent content regions, proportions, and hierarchy; preserve different background treatments as separate theme variants. A split cover and centered cover are distinct even though both are covers. Record intentional layout variants rather than flattening them into a few representative pages.
 
 Write `layouts/source-index.json` and summarize it in `layouts/README.md`. A useful entry is:
 
@@ -44,7 +44,7 @@ The package has three cooperating parts:
 | File | Responsibility |
 | --- | --- |
 | `styles/layout.css` | Namespaced `.pl-*` structures and component geometry for the shared fragments; preserve the installed library copy. |
-| `styles/theme.css` | Shared brand palette, typography, spacing, surfaces, borders, and component treatments, using the documented `--pl-*` tokens. |
+| `styles/theme.css` | Shared brand palette, typography, spacing, background variants, borders, and component treatments, using the documented `--pl-*` tokens. |
 | `layouts/chrome.html` | Repeated brand framing such as logos, footers, page markers, and motifs; style it in the shared theme. |
 
 Read the starter `theme.css` for the supported token names. Map these tokens to the source design system, directly or with `var(--source-token)` aliases. Load `layout.css` first and `theme.css` second. The starter theme is a neutral fallback, not evidence of the user's brand; replace its defaults where the source establishes a rule and label any remaining fallback choices in `design-system.md`.
@@ -55,8 +55,24 @@ The library separates reusable relationships from brand treatment, but it does n
 
 Keep source-specific structural styles in an optional `styles/template.css`. Link them from the shell if used, while retaining the same brand typography and color roles. Do not use full-page screenshots as backgrounds to imitate a missing editable layout.
 
-When the source uses different light, dark, or colored surfaces, define their complete foreground/background pairs in the shared theme. Apply variants to the outer stage by documented page role or a source-layout class, and scope the corresponding logo/motif treatment there. For example, `.pl-stage[data-layout="section-divider"]` can select the source's divider palette without changing the generic fragment. Do not collapse all roles to one background, or invent a dark-page requirement when it was not observed.
+## Background variants
 
+Preserve observed background treatments as theme variants rather than flattening the deck to one solid color. In `design-system.md`, record each variant's source pages, base color, image/texture assets, placement/crop/scale, paired text/logo colors, and suitable page roles or content density. Quiet pages are an intentional variant too. Do not prescribe a number of variants, a color rotation, or decorations absent from the source.
+
+Select the layout for its content relationships and capacity, then select a compatible background for the slide's role, readability, and the deck's visual rhythm. Use a separate stage attribute such as `data-surface="accent"`; names are package-defined, not a universal palette. The same layout can use several surfaces without copying its fragment. A theme may provide layout-based defaults, but an explicit surface must override those defaults.
+
+The shared stage has a base `--pl-bg` color and two optional layers behind content:
+
+| Layer | Shared tokens | Use |
+| --- | --- | --- |
+| Background field/image (`::before`) | `--pl-bg-image`, `--pl-bg-size`, `--pl-bg-position`, `--pl-bg-repeat`, `--pl-bg-opacity` | Source-derived photography, texture, or color-field composition. |
+| Decorative motif (`::after`) | `--pl-motif-image`, `--pl-motif-size`, `--pl-motif-position`, `--pl-motif-repeat`, `--pl-motif-opacity` | Source-derived ornaments, cropped edge shapes, or repeated marks. |
+
+Both image tokens default to `none`. Values accept normal CSS background syntax, including multiple images; asset URLs resolve relative to `styles/theme.css`. These layers neither occupy layout space nor intercept clicks. Keep meaningful images in content regions, and logos/footers in chrome; do not repeat the same ornament in both chrome and a background layer.
+
+Define surface selectors in `theme.css`, for example `.pl-stage[data-surface="accent"]`. Each variant must specify its compatible ink, muted text, accent, panel, border, chart-series and table-header colors, plus the appropriate logo. Changing the base color alone is insufficient. Place visible motifs in the source's permitted areas—typically empty edges, display-title areas, or behind opaque panels—and retain quiet backgrounds for dense content when that matches the source. Do not use low-opacity texture as a substitute for checking actual text contrast.
+
+Check each defined background variant on representative compatible layouts. Also confirm that one unchanged layout can switch between compatible surfaces without moving its content or altering its typography. Source layout and background evidence remain separate from the generic layout catalog.
 
 ## Installing and assembling
 

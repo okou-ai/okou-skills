@@ -53,7 +53,7 @@ The command writes ordered source-page images named `page-001.png`, `page-002.pn
 Inspect the complete rendered presentation and prioritize five kinds of information:
 
 1. **Typography system:** font families, display and body faces, size hierarchy, weights, line heights, letter spacing, and CJK fallbacks.
-2. **Color roles:** primary and alternate backgrounds, body text, muted text, accents, borders, states, and data-series colors. Record what each color does, not only its value.
+2. **Color roles:** primary and alternate backgrounds, body text, muted text, accents, borders, states, and data-series colors. Record each background variant's source pages, usage, and paired text/logo treatment, not only its color value.
 3. **Repeated components:** recurring content structures such as cards, labels, metrics, charts, tables, quotes, steps, and image frames, including their fixed and variable parts.
 4. **Motifs:** recurring decorative shapes, textures, lines, geometry, illustration treatments, or compositional gestures that carry the presentation's identity.
 5. **Chrome:** page numbers, headers, footers, logos, edge markers, persistent navigation, and other framing elements repeated across pages.
@@ -118,12 +118,15 @@ Name source layouts by content purpose, such as `cover`, `section-divider`, `two
 
 Map the extracted brand into `styles/theme.css`, using the scaffold's `--pl-*` tokens and `.pl-*` semantic classes. Keep `.pl-title` separate from `.pl-metric`. Put shared brand framing in `layouts/chrome.html`; generic fragments carry content relationships rather than logos or brand ornaments. Source-specific compositions can retain their own editable structures and use the same brand rules.
 
+Preserve the source's background variety as reusable theme variants, selected independently from layout geometry. The shared scaffold supports optional background-image and motif layers; keep them neutral until source evidence establishes their treatment. See the background section in [references/layout-reuse.md](references/layout-reuse.md).
+
 The generated package's `SKILL.md` and `layouts/README.md` must explicitly instruct later authors to:
 
 1. Read `design-system.md` and `layouts/source-index.json` first, and prefer a source layout whose regions and capacity fit the content.
 2. Read `layouts/common/catalog.json` when no source layout fits, then use the selected fragment with `styles/layout.css`, the same `styles/theme.css`, and `layouts/chrome.html` in `_shell.html`.
-3. Adapt or split content to keep the brand's typography and spacing; do not shrink text with page-specific inline styles. Catalog capacities are selection guidance and require checking the actual content and language.
-4. Create a new structure only for a genuine gap, preserving the shared brand rules and documenting the addition.
+3. Choose a compatible source-derived background variant independently of the layout, using its documented page roles and contrast pairings.
+4. Adapt or split content to keep the brand's typography and spacing; do not shrink text with page-specific inline styles. Catalog capacities are selection guidance and require checking the actual content and language.
+5. Create a new structure only for a genuine gap, preserving the shared brand rules and documenting the addition.
 
 Neither source layouts nor the generic catalog require forcing unsuitable new content into an existing file.
 
