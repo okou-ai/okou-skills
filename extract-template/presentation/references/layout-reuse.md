@@ -44,8 +44,8 @@ The package has three cooperating parts:
 | File | Responsibility |
 | --- | --- |
 | `styles/layout.css` | Namespaced `.pl-*` structures and component geometry for the shared fragments; preserve the installed library copy. |
-| `styles/theme.css` | Shared brand palette, typography, spacing, background variants, borders, and component treatments, using the documented `--pl-*` tokens. |
-| `layouts/chrome.html` | Repeated brand framing such as logos, footers, page markers, and motifs; style it in the shared theme. |
+| `styles/theme.css` | Shared brand palette, typography, spacing, reusable background fields/decorations, borders, and component treatments, using the documented `--pl-*` tokens. |
+| `layouts/chrome.html` | Repeated brand framing such as logos, footers, and page markers; style it in the shared theme. |
 
 Read the starter `theme.css` for the supported token names. Map these tokens to the source design system, directly or with `var(--source-token)` aliases. Load `layout.css` first and `theme.css` second. The starter theme is a neutral fallback, not evidence of the user's brand; replace its defaults where the source establishes a rule and label any remaining fallback choices in `design-system.md`.
 
@@ -55,11 +55,39 @@ The library separates reusable relationships from brand treatment, but it does n
 
 Keep source-specific structural styles in an optional `styles/template.css`. Link them from the shell if used, while retaining the same brand typography and color roles. Do not use full-page screenshots as backgrounds to imitate a missing editable layout.
 
-## Background variants
+## Background elements and combinations
 
-Preserve observed background treatments as theme variants rather than flattening the deck to one solid color. In `design-system.md`, record each variant's source pages, base color, image/texture assets, placement/crop/scale, paired text/logo colors, and suitable page roles or content density. Quiet pages are an intentional variant too. Do not prescribe a number of variants, a color rotation, or decorations absent from the source.
+Extract reusable ingredients from the user's source, then preserve how the source combines them. Record three linked inventories in `design-system.md`:
 
-Select the layout for its content relationships and capacity, then select a compatible background for the slide's role, readability, and the deck's visual rhythm. Use a separate stage attribute such as `data-surface="accent"`; names are package-defined, not a universal palette. The same layout can use several surfaces without copying its fragment. A theme may provide layout-based defaults, but an explicit surface must override those defaults.
+| Inventory | Record |
+| --- | --- |
+| Background fields | IDs, source pages, canvas fill and background blocks/bands/splits, their colors, shapes, proportions, edge anchors, and paired foreground/logo treatment. |
+| Content-independent decorations | IDs, source pages, editable geometry or asset paths, native colors/aspect ratio, and observed scale, rotation, cropping, opacity, repetition, and placement. Reuse one asset across placements instead of baking a new full-page image for each. |
+| Combination recipes | IDs referencing the fields and decorations, source pages, layer order, placements, usable content regions, intended page roles/density, and allowed variations. Mark source-observed combinations separately from inferred adaptations. |
+
+A content-independent decoration can be removed or reused without changing the slide's factual message. Charts, value-encoding shapes, process arrows, product screenshots, and case-specific illustrations belong to content. Card fills or title underlines that move with their content belong to components. A branded edge shape or texture can belong to the background. Judge the element's role rather than its file format or whether it looks decorative.
+
+Implement simple fields and shapes as editable CSS/SVG. Retain isolated original artwork and textures under `assets/` when useful, preserving transparency and aspect ratio. Never crop source text or data into a reusable decoration; when an element is obscured, label any reconstructed geometry as inferred. Preserve original colors and documented alternatives rather than assuming arbitrary recoloring, stretching, or rotation is faithful.
+
+Keep field styles and decoration styles independently reusable in `styles/theme.css`, for example through `data-surface` and `data-decoration` on the outer stage. Names are package-defined, not a universal palette. A recipe selects a compatible pair and its placement; it need not duplicate content HTML or become a flattened image. For example, a package that actually defines these two elements could assemble:
+
+```html
+<div class="stage pl-stage" data-layout="two-column"
+     data-surface="paper" data-decoration="arc-upper-right">
+  <!-- Shared chrome and the chosen editable content fragment. -->
+</div>
+```
+
+Use the surface selector for the base fill, color fields, and foreground palette, and the decoration selector for motif geometry/assets and placement. Scope compatible motif color/asset variants to their surface when required by the source. Document which pairs are valid; extracting two fields and three decorations does not establish six usable combinations. A theme may supply defaults, but explicit choices must override them.
+
+The generated package's authoring instructions must describe how to choose and combine these elements:
+
+1. Prefer an observed recipe that suits the page's role and content density. Preserve its paired text, logo, component, and chart colors.
+2. Check that the selected layout's content regions respect the recipe's usable area. Keep the source-first selection order above. Layout and background remain separately reusable, but a large background block can constrain the space available to content.
+3. If adaptation is needed, stay within the documented placement, scale, crop, color, and repetition rules; record an inferred combination as such. Keep decorations out of body-copy regions unless the source explicitly supports that treatment.
+4. For dense content, prefer a compatible quiet recipe, including no decoration when appropriate. If a combination cannot fit, prefer changing the recipe before revisiting the layout. Do not displace a fitting source layout or shrink the brand's typography solely to accommodate decoration.
+
+Quiet source pages are intentional recipes too. Do not impose a fixed number of backgrounds, rotate colors mechanically, or invent decorations to fill an inventory. Preserve visual rhythm through the source's page-role guidance rather than binding one background permanently to each layout ID.
 
 The shared stage has a base `--pl-bg` color and two optional layers behind content:
 
@@ -70,9 +98,9 @@ The shared stage has a base `--pl-bg` color and two optional layers behind conte
 
 Both image tokens default to `none`. Values accept normal CSS background syntax, including multiple images; asset URLs resolve relative to `styles/theme.css`. These layers neither occupy layout space nor intercept clicks. Keep meaningful images in content regions, and logos/footers in chrome; do not repeat the same ornament in both chrome and a background layer.
 
-Define surface selectors in `theme.css`, for example `.pl-stage[data-surface="accent"]`. Each variant must specify its compatible ink, muted text, accent, panel, border, chart-series and table-header colors, plus the appropriate logo. Changing the base color alone is insufficient. Place visible motifs in the source's permitted areas—typically empty edges, display-title areas, or behind opaque panels—and retain quiet backgrounds for dense content when that matches the source. Do not use low-opacity texture as a substitute for checking actual text contrast.
+Each surface must specify its compatible ink, muted text, accent, panel, border, chart-series and table-header colors, plus the appropriate logo. Changing the base color alone is insufficient. Place visible motifs in the source's permitted areas—typically empty edges, display-title areas, or behind opaque panels. Do not use low-opacity texture as a substitute for checking actual text contrast.
 
-Check each defined background variant on representative compatible layouts. Also confirm that one unchanged layout can switch between compatible surfaces without moving its content or altering its typography. Source layout and background evidence remain separate from the generic layout catalog.
+Check the source-observed recipes and representative documented adaptations on compatible layouts. Also confirm that one unchanged layout can switch between compatible recipes without moving its content or altering its typography. Source layout, element, and combination evidence remain separate from the generic layout catalog.
 
 ## Installing and assembling
 

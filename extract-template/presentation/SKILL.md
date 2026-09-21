@@ -18,7 +18,7 @@ The source provides visual and layout reference only. It does not determine the 
 - Reimplement the template in HTML and CSS.
 - Reproduce the presentation's visual language and layout system, not the source file's internal object structure.
 - The template must support new content instead of merely reproducing the original presentation.
-- Preserve every meaningfully distinct source layout. Consolidate pages only when their structure, proportions, and visual treatment are equivalent, and keep the source-page mapping.
+- Preserve every meaningfully distinct source layout. Pages with equivalent content structure and proportions may share a layout; preserve their background and decoration differences separately, with source-page mappings.
 - Never use full-page screenshots in place of editable HTML layouts.
 - Reusable source logos, fonts, and textures may be retained as template assets.
 - Scripts prepare page images, copy the shared layout scaffold, and assemble previews. The AI determines typography, color roles, components, motifs, chrome, and source layout meaning by inspecting the rendered pages.
@@ -53,9 +53,9 @@ The command writes ordered source-page images named `page-001.png`, `page-002.pn
 Inspect the complete rendered presentation and prioritize five kinds of information:
 
 1. **Typography system:** font families, display and body faces, size hierarchy, weights, line heights, letter spacing, and CJK fallbacks.
-2. **Color roles:** primary and alternate backgrounds, body text, muted text, accents, borders, states, and data-series colors. Record each background variant's source pages, usage, and paired text/logo treatment, not only its color value.
+2. **Color roles and background fields:** primary fills, background blocks/bands/splits, body text, muted text, accents, borders, states, and data-series colors. Preserve field geometry and compatible foreground colors as well as color values.
 3. **Repeated components:** recurring content structures such as cards, labels, metrics, charts, tables, quotes, steps, and image frames, including their fixed and variable parts.
-4. **Motifs:** recurring decorative shapes, textures, lines, geometry, illustration treatments, or compositional gestures that carry the presentation's identity.
+4. **Content-independent decoration:** reusable shapes, textures, lines, geometry, or illustration treatments that carry identity without encoding the slide's message or data. Preserve these as separate elements with source-page evidence and placement rules; meaningful imagery and diagrams remain content.
 5. **Chrome:** page numbers, headers, footers, logos, edge markers, persistent navigation, and other framing elements repeated across pages.
 
 Also capture the rules required to implement reusable layouts:
@@ -67,6 +67,8 @@ Also capture the rules required to implement reusable layouts:
 - which rules stay fixed and which may vary with the content.
 
 Implement these rules as shared HTML/CSS variables, base styles, and components instead of scattering them across individual sample pages. Distinguish observed source rules from neutral fallback choices for components the source does not establish; do not describe those choices as extracted facts.
+
+Extract background fields and decorative elements separately, then record the source's combinations and their permitted adaptations. The package must retain both reusable elements and guidance for combining them, including layering, cropping, text-safe regions, and suitable page roles. Follow the background section in [references/layout-reuse.md](references/layout-reuse.md).
 
 ### 3. Implement the HTML template
 
@@ -96,7 +98,7 @@ Use this package shape:
 ```text
 <template-slug>/
   SKILL.md                 # template metadata and usage instructions
-  design-system.md         # visual rules, component rules, and asset notes
+  design-system.md         # visual rules, background elements/recipes, and asset notes
   layouts/
     README.md              # selection order and assembly instructions
     source-index.json      # every source page mapped to its preserved layout
@@ -106,7 +108,7 @@ Use this package shape:
       catalog.json         # generic purposes, regions, and capacity guidance
       <layout-name>.html   # 44 shared generic content fragments
     _shell.html            # canvas, stylesheet links, navigation, slide markers
-    chrome.html            # shared brand logo, footer, motifs, and edge elements
+    chrome.html            # shared brand logo, footer, page markers, and edge elements
   styles/
     layout.css             # generic layout structures; keep the shared copy intact
     theme.css              # one shared brand theme, including component treatment
@@ -118,13 +120,13 @@ Name source layouts by content purpose, such as `cover`, `section-divider`, `two
 
 Map the extracted brand into `styles/theme.css`, using the scaffold's `--pl-*` tokens and `.pl-*` semantic classes. Keep `.pl-title` separate from `.pl-metric`. Put shared brand framing in `layouts/chrome.html`; generic fragments carry content relationships rather than logos or brand ornaments. Source-specific compositions can retain their own editable structures and use the same brand rules.
 
-Preserve the source's background variety as reusable theme variants, selected independently from layout geometry. The shared scaffold supports optional background-image and motif layers; keep them neutral until source evidence establishes their treatment. See the background section in [references/layout-reuse.md](references/layout-reuse.md).
+Implement reusable background-field and decoration styles in `styles/theme.css`, with source-backed combinations documented in `design-system.md`. Select these independently from content layout, subject to the combination's usable content area. The scaffold's background-image and motif layers support this composition; no brand-specific background choices are preinstalled.
 
 The generated package's `SKILL.md` and `layouts/README.md` must explicitly instruct later authors to:
 
 1. Read `design-system.md` and `layouts/source-index.json` first, and prefer a source layout whose regions and capacity fit the content.
 2. Read `layouts/common/catalog.json` when no source layout fits, then use the selected fragment with `styles/layout.css`, the same `styles/theme.css`, and `layouts/chrome.html` in `_shell.html`.
-3. Choose a compatible source-derived background variant independently of the layout, using its documented page roles and contrast pairings.
+3. Read the background element and recipe inventories in `design-system.md`. Prefer a source-observed combination of background fields and decoration, then adapt within its documented color, placement, crop, and content-area rules. Use a compatible quiet recipe for dense content when available.
 4. Adapt or split content to keep the brand's typography and spacing; do not shrink text with page-specific inline styles. Catalog capacities are selection guidance and require checking the actual content and language.
 5. Create a new structure only for a genuine gap, preserving the shared brand rules and documenting the addition.
 
@@ -202,6 +204,7 @@ The task is complete only when all of the following are true:
 - no full-page screenshot substitutes for an editable layout;
 - the HTML presentation supports navigation with all four arrow keys;
 - typography, color roles, repeated components, motifs, and chrome are represented in the shared design system;
+- background fields and content-independent decorations are reusable separately, with source-observed recipes and explicit combination guidance in the generated package;
 - no unobserved content type has been turned into a prohibition, including images when the source contains none;
 - every reusable asset is packaged and every logo, font, texture, and stylesheet path resolves;
 - representative source-page rebuilds and all generic layouts have been rendered to verify the extracted design information and brand adaptation;

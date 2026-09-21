@@ -5,7 +5,9 @@
   --pl-font-display: Arial, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --pl-font-body: Arial, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --pl-bg: #ffffff;
-  /* Optional background field/image and decorative motif; neutral defaults stay plain. */
+  /* Extract fields and content-independent decoration as reusable elements.
+     Define their selectors and compatible combinations from the source in this
+     theme; document recipes in design-system.md. Neutral defaults stay plain. */
   --pl-bg-image: none;
   --pl-bg-size: cover;
   --pl-bg-position: center;
