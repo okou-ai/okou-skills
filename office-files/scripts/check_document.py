@@ -280,7 +280,7 @@ def bind_render_manifest(report, path):
     """Bind the renderer's complete success snapshot, including editable input.
 
     Bad snapshots become findings so the actual PDF pages remain available for
-    diagnosis. Native PDFs need not have a render manifest.
+    diagnosis. Both Word exports and native PDF candidates can have a manifest.
     """
     inputs = report["inputs"]
     try:
@@ -307,9 +307,14 @@ def bind_render_manifest(report, path):
             require(actual["sha256"] == digest.lower(), f"Manifest {name} does not match the current file; render again.")
 
         outputs = manifest.get("outputs")
-        require(isinstance(outputs, dict) and {"pdf", "docx"}.issubset(outputs), "The render manifest must declare both PDF and DOCX outputs.")
+        require(isinstance(outputs, dict) and "pdf" in outputs and
+                set(outputs).issubset({"pdf", "docx"}),
+                "The render manifest must declare a PDF and, when present, its paired DOCX.")
+        require("docx" not in inputs or "docx" in outputs,
+                "The paired DOCX is absent from the render manifest.")
         bind("pdf", outputs["pdf"], output=True)
-        bind("docx", outputs["docx"], output=True)
+        if "docx" in outputs:
+            bind("docx", outputs["docx"], output=True)
         bind("source", manifest.get("source"))
         if manifest.get("reference") is not None:
             bind("reference", manifest["reference"])
@@ -362,7 +367,7 @@ def inspect(pdf, out, docx=None, expectations=None, render=None):
     review = {
         "schema_version": 1,
         "inspection_sha256": sha256(out / "inspection.json"),
-        "instructions": "Open every PNG. Record observations for all four criteria on each page; use pass only after checking it. For pages without tables or figures, explicitly record that observation. Explain each warning. If you repair a file, run inspect again and review the new images.",
+        "instructions": "Open every PNG. Record observations for all five criteria on each page; use pass only after checking it. For pages without tables or figures, explicitly record that observation. Explain each warning. If you repair a file, run inspect again and review the new images.",
         "pages": [{"number": page["number"], "image_sha256": page["image"]["sha256"], "criteria": {name: {"status": "pending", "observations": ""} for name in CRITERIA}} for page in report["pages"]],
         "warning_acknowledgements": [{"finding_id": finding["id"], "observations": ""} for finding in report["findings"] if finding["severity"] == "warning"],
     }

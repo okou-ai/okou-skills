@@ -231,6 +231,33 @@ class DocumentQATest(unittest.TestCase):
         self.finish_review_fixture()
         self.assertEqual(qa.accept(self.out)["inputs"], report["inputs"])
 
+    def test_native_pdf_manifest_binds_authoring_resources_without_word(self):
+        self.make_pdf()
+        manifest = self.make_render_manifest()
+        data = json.loads(manifest.read_text())
+        data['outputs'].pop('docx')
+        data['reference'] = None
+        qa.write_json(manifest, data)
+        report = qa.inspect(self.pdf, self.out, render=manifest)
+        self.assertFalse(self.codes(report, 'blocker'))
+        self.assertNotIn('docx', report['inputs'])
+        self.assertIn('resource_001', report['inputs'])
+        self.finish_review_fixture()
+        qa.accept(self.out)
+        Path(data['resources'][0]['path']).write_text('Changed native authoring asset')
+        with self.assertRaisesRegex(ValueError, 'resource_001 changed'):
+            qa.accept(self.out)
+        self.assertFalse((self.out / 'acceptance.json').exists())
+
+    def test_native_pdf_manifest_cannot_vouch_for_an_unlisted_word_file(self):
+        self.make_pdf()
+        manifest = self.make_render_manifest()
+        data = json.loads(manifest.read_text())
+        docx = data['outputs'].pop('docx')['path']
+        qa.write_json(manifest, data)
+        report = qa.inspect(self.pdf, self.out, docx=docx, render=manifest)
+        self.assertIn('invalid_render_manifest', self.codes(report, 'blocker'))
+
     def test_changed_source_revokes_acceptance_and_blocks_reinspection(self):
         self.make_pdf()
         manifest = self.make_render_manifest()

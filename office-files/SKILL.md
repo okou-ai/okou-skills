@@ -1,70 +1,109 @@
 ---
 name: office-files
-description: Generate or edit docx, xlsx and PDF deliverables with reusable document styling, preserved source layouts, and rendered-page verification.
+description: Create and edit Word, PDF and Excel files using task-appropriate authoring tools, preserved source layouts, and rendered-page verification.
 ---
 
 # Office files
 
-Keep content, layout and output format separate. Use the same document foundation
-for PDF and Word; do not classify requests into a fixed list of document types.
-A filename extension selects a renderer, not a writing structure.
+Keep content, layout and output format separate. Choose tools from the task and
+preservation requirements, not a mandatory intermediate format. Keep the actual
+authoring source, data and assets for revisions. Do not classify requests into a
+fixed list of document types or impose one writing structure.
 
 ## Choose from the actual constraints
 
-- **New prose, no supplied template:** author Markdown, then use the default
-  renderer below. It provides a neutral editorial-paper foundation: warm paper,
-  one restrained ink accent, serif display hierarchy, readable body text,
-  balanced tables, captions, page numbers and pagination. It does not invent a
-  logo, cover, section sequence, or page-count target.
-- **A selected template/package:** follow its own authoring instructions and
-  preserve its style. Run the rendered-page check below on the final PDF too.
-  A `reference.docx` carries styles; it does not carry the source's body,
-  fixed positions, forms, signatures, fields or reusable content skeleton.
-- **Editing an existing document:** start from that file. Preserve required
-  wording, fields, relationships and layout. Make focused edits in its native
-  source. Do not round-trip an existing Word file through Markdown and claim
-  that its structure is preserved. The renderer accepts a finished DOCX
-  without rewriting its bytes and produces its PDF preview/export.
-- **Fixed-position layout or a native PDF template:** use the template's native
-  renderer/source. Apply the shared checks to the resulting PDF. Do not force
-  it into the flowing-prose default, rasterise whole pages, or rebuild untouched
-  content merely to change the delivery format.
-- **Spreadsheet calculations or tabular data:** use openpyxl; see xlsx below.
+| Task or constraint | Authoring route |
+| --- | --- |
+| New editable Word with deliberate sections, tables or page layout | Native `docx` (Node.js) or `python-docx`; read [Word authoring](references/word-authoring.md) |
+| Edit existing Word, fill slots, retain revisions/comments/fields | Work on a copy of the supplied DOCX; choose focused library edits or OOXML patches from the Word guide |
+| New flowing prose naturally expressed as Markdown | Use the optional Pandoc prose route below, or Pandoc's appropriate reader, filters and writer |
+| PDF-only with designed typography, multi-column or fixed-position layout | ReportLab, native Typst, or a working HTML/CSS renderer; read [PDF authoring](references/pdf-authoring.md) |
+| Modify an existing PDF or fill its fields | Preserve the PDF and use native field editing or targeted overlays; see the PDF guide |
+| Matching Word and PDF deliverables | Author Word with the chosen tool, then export the actual DOCX to PDF |
+| Selected template/package | Follow its native recipe and preserve its content/layout contract |
+| Spreadsheet calculations or tabular data | Use openpyxl; see xlsx below |
 
-Read [references/document-layout.md](references/document-layout.md) when
-selecting language, arranging figures/tables, preserving templates, or resolving
-an inspection finding. For new untemplated prose, also read
-[references/editorial-patterns.md](references/editorial-patterns.md) before
-writing the Markdown. Infer constraints from the request and source; ask only
-when missing information changes the intended result.
+Render supplied documents before editing when their layout matters. A Pandoc
+`reference.docx` supplies styles, not a preserved body, form, fixed geometry or
+content skeleton. Do not round-trip existing Word through Markdown and claim
+preservation. Keep untouched content native and editable; do not flatten pages
+to images. New documents may define styles directly in code or native templates.
 
-## Setup for PDF / Word
+Read [document-layout.md](references/document-layout.md) for page design and
+verification. Read only the authoring guide needed for the selected route.
+Infer ordinary details; ask only when missing information changes the result.
+
+## Shared verification setup
 
 Resolve this skill's directory as `OFFICE_FILES_DIR` in each shell invocation.
-The scripts find the bundled Pandoc binary themselves, so PATH setup is unnecessary.
+Install only the selected route's dependencies. The shared PDF inspector needs:
 
 ```bash
-pip install --break-system-packages --quiet -r "$OFFICE_FILES_DIR/requirements.txt"
+python3 -m pip install --break-system-packages --quiet PyMuPDF==1.28.2
 ```
 
-The default route requires LibreOffice **Writer** for both PDF export and Word
-preview. If the renderer reports it missing, install it and retry:
+Word preview/export also needs LibreOffice **Writer**; a native PDF does not.
+If conversion reports a missing Writer/filter, install it and retry:
 
 ```bash
 sudo apt-get update -qq
 sudo apt-get install -y -qq libreoffice-writer
 ```
 
-Fonts must be installed on the rendering host. The Okou image carries Noto Sans,
-Noto Sans CJK and Noto complex-script families. Check `fc-match` if a font warning
-or wrong glyph shape appears. Dependencies are pinned in `requirements.txt`;
-`render.json` records the actual Pandoc and LibreOffice versions used.
+Fonts must exist on the authoring/rendering host. Check the selected family with
+`fc-match`, including the correct CJK region or complex-script family. Do not
+turn an old environment failure into a ban on an engine: verify the actual
+dependency and output. `requirements.txt` installs the full maintained test
+toolchain; the route guides list smaller authoring installs.
 
 If the toolchain is unavailable, explain the blocked export/preview. Return a
 usable source when possible, clearly marked as not visually verified. Do not
 claim a successful PDF or verified Word file, or silently change the format.
 
-## New prose: design, author, then render
+## Native authoring: create or edit, then prepare for inspection
+
+Use the selected library or template to produce a finished `edited.docx` or
+`report.pdf`. Retain the script and input data separately from formatting code
+when that makes revisions reusable. Then prepare the actual output:
+
+```bash
+python3 "$OFFICE_FILES_DIR/scripts/render_document.py" edited.docx \
+  --out generated/document --format both --resource build_docx.py
+
+python3 "$OFFICE_FILES_DIR/scripts/render_document.py" report.pdf \
+  --out generated/document --resource build_pdf.py --resource data.json
+```
+
+These are alternative examples; list resources that actually exist. Repeat
+`--resource` for the authoring source, original/template, data, filters and assets
+used by an external authoring pipeline. The helper records hashes; it does not
+execute those files or discover their dependencies. Rebuild the output after
+source changes, then prepare and inspect it again. This records the current
+files, not proof that an external generator used them.
+
+The helper preserves supplied DOCX/PDF bytes. DOCX gets a LibreOffice PDF export
+for preview and optional delivery. PDF stays PDF, without Pandoc, Word libraries
+or LibreOffice; it cannot be turned into editable Word by changing `--format`.
+For matching Word/PDF output, supply the finished DOCX. The original files are
+never overwritten or house-styled. LibreOffice pagination is verified, not
+identical rendering in every Microsoft Word version.
+
+## Optional Pandoc prose route
+
+Use this convenience route when its flowing-prose structure fits. It is not a
+restriction on Pandoc's readers, extensions, Lua filters, citations, templates
+or output engines. For those workflows, run Pandoc with the required options,
+then pass the finished DOCX/PDF and its authoring resources to the shared helper.
+Do not squeeze native layout into Markdown merely to use this wrapper.
+
+```bash
+python3 -m pip install --break-system-packages --quiet pypandoc_binary==1.17 python-docx==1.2.0
+```
+
+The wrapper finds the bundled Pandoc itself. Before writing new untemplated
+Markdown, read [editorial-patterns.md](references/editorial-patterns.md). Its
+optional editorial foundation supplies typography, tables and page numbers;
+it does not invent a logo, cover, section order or page-count target.
 
 Before writing, state a one-sentence visual direction based on the audience,
 language and information shape (for example, “quiet editorial paper with one
@@ -123,25 +162,13 @@ python3 "$OFFICE_FILES_DIR/scripts/render_document.py" doc.md \
   --out generated/document --format both --reference theme.docx
 ```
 
-For a finished or edited Word source:
-
-```bash
-python3 "$OFFICE_FILES_DIR/scripts/render_document.py" edited.docx \
-  --out generated/document --format both
-```
-
-The input and output directories must differ when their filenames would collide.
-Original documents/references are never overwritten or house-styled. The default
-flow exports PDF from the actual delivered DOCX, rather than generating the two
-formats independently. LibreOffice's rendering is verified; fidelity in every
-Word version is not implied.
-
-Outputs include `render.json` (inputs, hashes, engine versions, delivery choices)
-and `expectations.json` (heading/opening-text relationships). Add important exact
-wording and figure/reference pairs to the expectations when relevant. Compilation
-alone leaves the candidate in `needs-inspection` state. The default design is
-applied only to new untemplated Markdown; a supplied reference or existing Word
-file remains the visual authority.
+Use an output directory separate from the source. All routes produce `render.json`
+(inputs, hashes, helper engine versions and delivery choices) and
+`expectations.json`. Markdown supplies heading/opening-text relationships;
+native files start with empty expectations. Add important exact wording and
+figure/reference pairs from the request/source when relevant. Compilation or
+copying alone leaves a candidate in `needs-inspection`. The house theme is only
+applied to new untemplated Markdown, never to supplied files or templates.
 
 ## Inspect, repair, then deliver
 
@@ -152,11 +179,12 @@ python3 "$OFFICE_FILES_DIR/scripts/check_document.py" inspect \
   --expectations generated/document/expectations.json --out generated/document/qa
 ```
 
-Pass `--render` for this helper's output: it binds the source, reference, local
-image resources and completed render to the inspected files. A failed new
-render cannot reuse an old export's acceptance. For native PDF output omit
-`--docx` and `--render`; provide expectations when source relationships are
-known. Read `inspection.json`, open the generated page images, and review
+The command above uses a Word export named `doc`; use the actual filenames.
+For native PDF, omit `--docx` and retain `--render` and `--expectations`. Pass
+`--render` for every output prepared by the helper: it binds the source,
+reference, declared resources and completed preparation to the inspected files.
+A failed new render cannot reuse an old export's acceptance. Read
+`inspection.json`, open the generated page images, and review
 **every page** for legibility/density, hierarchy, composition/rhythm,
 pagination/grouping and figures/tables. Inspect Word's actual exported pages,
 not its XML alone. For composition/rhythm, record the page's focal point,
@@ -170,8 +198,9 @@ intentional rather than mechanically identical.
 - Complete each page's `review.json` observations only after inspecting it;
   acknowledge heuristic warnings with a concrete reason. A generated review
   form or a contact sheet alone is not visual acceptance.
-- Use at most two repair rounds. If still blocked, explain the specific defect
-  and provide the source or a clearly identified draft; do not label it final.
+- Repair and repeat the affected inspection until the result meets the request.
+  If a concrete tool/source limitation prevents completion, explain the defect
+  and provide a clearly identified draft or usable source, not a claimed final.
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/check_document.py" accept generated/document/qa

@@ -11,19 +11,22 @@ preserved, fixed-position elements, exact wording/fields, changing-length lists
 or tables, and calculated values. These properties can coexist. They do not
 require a user-facing category picker or a fixed document-type enumeration.
 
-For new flowing prose, the default renderer creates a reference from Pandoc's
-own style set, applies the maintained theme, and exports the final Word file to
-PDF. For an existing file or template, preserve its own dimensions and style.
-A single theme is not a replacement for a form's content or a designed page.
+Choose a native Word/PDF tool when the structure or layout needs it. The optional
+Pandoc prose route creates a reference from Pandoc's style set, applies the
+maintained theme, and exports the final Word file to PDF. Other authoring routes
+use the same page checks without adopting that theme or a Markdown intermediate.
+For existing files/templates, preserve their dimensions, style and content
+contract. A single theme is not a replacement for a form or a designed page.
 
 ## Default visual language
 
-The untemplated default uses a warm editorial-paper system: restrained ink-blue,
+The optional Pandoc foundation uses a warm editorial-paper system: restrained ink-blue,
 warm neutrals, serif display hierarchy, sans body text, hairline rules and
 print-safe tables. It is intentionally brand-neutral and avoids generic UI
 cards, gradients and heavy decoration. Authors still decide the opening focal
-point, information grouping and page rhythm; read `editorial-patterns.md` before
-writing a new document.
+point, information grouping and page rhythm. Native authoring may define a
+different coherent visual direction directly in code or a template. Read
+`editorial-patterns.md` when using the maintained Markdown components.
 
 Do not force this visual language onto a user reference, an existing Word file,
 a form or a native PDF template. A theme can make consistent typography; it
@@ -114,7 +117,10 @@ record the actual reason instead of blindly treating every flag as failure.
 Conversely, zero machine findings does not waive the visual review. Acceptance
 is tied to the exact final PDF/DOCX and page images, not an earlier iteration.
 Pass the helper's `render.json` to inspection so source/template/image edits or
-a later failed render also invalidate that snapshot.
+a later failed render also invalidate that snapshot. For externally authored
+DOCX/PDF, declare the script, data and local assets with repeated `--resource`
+arguments when preparing the final file. The snapshot is not an automatic build
+system: rebuild with the chosen authoring tool before refreshing the snapshot.
 
 Retain the native source for subsequent "make it more spacious" changes. Modify
 styles/layout and verify content stability rather than asking the model to

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Render general prose to editable Word and a PDF of that exact Word file.
+"""Prepare native DOCX/PDF or render Markdown for shared page verification.
 
 No document-type classification. A supplied DOCX is copied without rewriting;
-a supplied reference controls styles. Only new, untemplated prose gets the
-house theme. Output is a candidate until check_document.py accepts it.
+a supplied reference controls styles. Only new, untemplated Markdown gets the
+house theme. A native PDF is preserved without a Word intermediate. Output is
+a candidate until check_document.py accepts it.
 """
 
 import argparse
@@ -18,8 +19,6 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 from urllib.parse import unquote, urlparse
-
-from document_style import build_reference, polish_document
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 
@@ -222,26 +221,37 @@ def export_pdf(docx_path, output_dir):
     return pdf_path, run([binary, "--version"]).strip()
 
 
-def render(source, output_dir, output_format="both", lang=None, reference=None):
+def render(source, output_dir, output_format=None, lang=None, reference=None, resources=()):
     source, output_dir = Path(source).resolve(), Path(output_dir).resolve()
-    if source.suffix.lower() not in (".md", ".markdown", ".docx"):
-        raise ValueError("Input must be Markdown or DOCX. Preserve existing PDFs with their source tool.")
+    native_pdf = source.suffix.lower() == ".pdf"
+    if source.suffix.lower() not in (".md", ".markdown", ".docx", ".pdf"):
+        raise ValueError("Input must be Markdown, a finished DOCX, or a finished PDF.")
     if not source.is_file():
         raise ValueError(f"Source file does not exist: {source}")
+    output_format = output_format or ("pdf" if native_pdf else "both")
+    if output_format not in ("pdf", "docx", "both"):
+        raise ValueError("Output format must be pdf, docx, or both.")
+    if native_pdf and output_format != "pdf":
+        raise ValueError("A PDF input cannot produce editable Word. Author DOCX separately or supply its native source.")
     reference = Path(reference).resolve() if reference else None
-    if reference and (source.suffix.lower() == ".docx" or not reference.is_file()):
+    if reference and (source.suffix.lower() not in (".md", ".markdown") or not reference.is_file()):
         raise ValueError("--reference requires a Markdown input and an existing reference DOCX.")
+    resource_paths = sorted({Path(path).resolve() for path in resources})
+    for path in resource_paths:
+        if not path.is_file():
+            raise ValueError(f"Resource file does not exist: {path}")
     output_dir.mkdir(parents=True, exist_ok=True)
-    targets = [output_dir / (source.stem + ext) for ext in (".docx", ".pdf")]
+    extensions = (".pdf",) if native_pdf else (".docx", ".pdf")
+    targets = [output_dir / (source.stem + ext) for ext in extensions]
     targets += [output_dir / name for name in ("expectations.json", "render.json")]
     for target in targets:
-        for original in (source, reference):
+        for original in (source, reference, *resource_paths):
             if original and (target.resolve() == original or
                              (target.exists() and target.samefile(original))):
                 raise ValueError("Output would overwrite an input. Choose a separate output directory.")
     write_json(output_dir / "render.json", {"status": "rendering", "source": str(source)})
     try:
-        return render_candidate(source, output_dir, output_format, lang, reference)
+        return render_candidate(source, output_dir, output_format, lang, reference, resource_paths)
     except Exception as error:
         write_json(output_dir / "render.json", {"status": "failed", "source": str(source),
                                                 "error": str(error)})
@@ -266,27 +276,44 @@ def local_resources(value, parent):
     return paths
 
 
-def render_candidate(source, output_dir, output_format, lang, reference):
+def render_candidate(source, output_dir, output_format, lang, reference, resource_paths=()):
     # Everything is built in isolation. A failed export cannot reuse an old PDF.
     with tempfile.TemporaryDirectory(prefix=".document-", dir=output_dir) as staging:
         stage = Path(staging)
         docx_path = stage / (source.stem + ".docx")
+        pdf_path = stage / (source.stem + ".pdf")
         versions = {}
-        resources, warnings = [], []
+        resources = [{"path": str(path), "sha256": sha256(path)} for path in resource_paths]
+        warnings = []
         expectations = {"required_text": [], "same_page": []}
         source_hash = sha256(source)
         reference_hash = sha256(reference) if reference else None
-        if source.suffix.lower() == ".docx":
+        if source.suffix.lower() == ".pdf":
+            import pymupdf
+
+            shutil.copyfile(source, pdf_path)
+            with pymupdf.open(pdf_path) as document:
+                if not document.is_pdf or document.needs_pass or len(document) == 0:
+                    raise ValueError("Expected a readable, unencrypted PDF with pages.")
+            versions["pymupdf"] = pymupdf.VersionBind
+            theme = "source-preserved"
+            artifacts = (pdf_path,)
+        elif source.suffix.lower() == ".docx":
             shutil.copyfile(source, docx_path)
             theme = "source-preserved"
         else:
+            # Native files do not need the Markdown author's dependencies.
+            from document_style import build_reference, polish_document
+
             pandoc = find_pandoc()
             versions["pandoc"] = run([pandoc, "--version"]).splitlines()[0]
             ast = json.loads(run([pandoc, str(source), "-f", "markdown-smart", "-t", "json"]))
             validate_source(ast)
             apply_design_components(ast)
-            resources = [{"path": str(path), "sha256": sha256(path)}
-                         for path in sorted(local_resources(ast, source.parent))]
+            existing = {item["path"] for item in resources}
+            resources.extend({"path": str(path), "sha256": sha256(path)}
+                             for path in sorted(local_resources(ast, source.parent))
+                             if str(path) not in existing)
             lang = language_of(ast, lang)
             ast.setdefault("meta", {})["lang"] = {"t": "MetaString", "c": lang}
             if not reference:
@@ -312,13 +339,15 @@ def render_candidate(source, output_dir, output_format, lang, reference):
                 polish_document(docx_path, lang)
             theme = "reference-preserved" if reference else "default"
             expectations = source_expectations(ast)
-        validate_docx(docx_path)
-        pdf_path, versions["libreoffice"] = export_pdf(docx_path, stage)
+        if source.suffix.lower() != ".pdf":
+            validate_docx(docx_path)
+            pdf_path, versions["libreoffice"] = export_pdf(docx_path, stage)
+            artifacts = (docx_path, pdf_path)
         if (source_hash != sha256(source) or (reference and reference_hash != sha256(reference)) or
                 any(item["sha256"] != sha256(item["path"]) for item in resources)):
             raise RuntimeError("An input changed during rendering; rerun against a stable source.")
         outputs = {}
-        for path in (docx_path, pdf_path):
+        for path in artifacts:
             destination = output_dir / path.name
             # Replacing directory entries never follows an existing output
             # symlink/hardlink to another file.
@@ -342,13 +371,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("--out", type=Path, required=True, help="Output directory, separate from input")
-    parser.add_argument("--format", choices=("pdf", "docx", "both"), default="both",
-                        help="Files to deliver. Both are rendered; PDF is also the Word preview.")
+    parser.add_argument("--format", choices=("pdf", "docx", "both"),
+                        help="Delivery files; defaults to pdf for PDF input, otherwise both. Word always gets a PDF preview.")
     parser.add_argument("--lang", help="BCP 47 language; overrides Markdown lang metadata")
     parser.add_argument("--reference", type=Path, help="Style reference for NEW Markdown prose only")
+    parser.add_argument("--resource", type=Path, action="append", default=[],
+                        help="Bind an authoring script, data, template, filter or asset to verification; repeat for each file.")
     args = parser.parse_args()
     try:
-        result = render(args.source, args.out, args.format, args.lang, args.reference)
+        result = render(args.source, args.out, args.format, args.lang, args.reference, args.resource)
     except (ValueError, RuntimeError, OSError, KeyError, ET.ParseError,
             subprocess.TimeoutExpired, zipfile.BadZipFile) as error:
         parser.exit(1, f"Render failed: {error}\n")

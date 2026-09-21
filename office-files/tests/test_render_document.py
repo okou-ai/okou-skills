@@ -74,6 +74,65 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(source_expectations(ast), {'required_text': [], 'same_page': []})
 
 
+class NativePdfTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.source = self.root / 'native.pdf'
+        with pymupdf.open() as pdf:
+            for width, height in ((500, 300), (400, 600)):
+                page = pdf.new_page(width=width, height=height)
+                page.insert_text((40, 60), 'Native PDF with its own page geometry.')
+            pdf.save(self.source)
+
+    def test_native_pdf_preserves_bytes_and_geometry_without_word_tools(self):
+        script = self.root / 'build.py'
+        script.write_text('# retained authoring recipe\n')
+        before = self.source.read_bytes()
+        with patch('render_document.find_pandoc', side_effect=AssertionError('No Pandoc needed')), \
+             patch('render_document.export_pdf', side_effect=AssertionError('No Writer needed')):
+            result = render(self.source, self.root / 'out', resources=[script])
+        self.assertEqual(set(result['outputs']), {'pdf'})
+        self.assertEqual(result['deliver'], ['pdf'])
+        self.assertEqual(result['resources'][0]['path'], str(script))
+        self.assertEqual(Path(result['outputs']['pdf']['path']).read_bytes(), before)
+        self.assertEqual(self.source.read_bytes(), before)
+        self.assertFalse((self.root / 'out' / 'native.docx').exists())
+        with pymupdf.open(result['outputs']['pdf']['path']) as pdf:
+            self.assertEqual([(p.rect.width, p.rect.height) for p in pdf], [(500, 300), (400, 600)])
+
+    def test_pdf_does_not_claim_an_editable_word_conversion(self):
+        for output_format in ('docx', 'both'):
+            with self.subTest(output_format=output_format), self.assertRaisesRegex(ValueError, 'editable Word'):
+                render(self.source, self.root / 'out', output_format=output_format)
+        with self.assertRaisesRegex(ValueError, '--reference requires a Markdown'):
+            render(self.source, self.root / 'out', reference=self.source)
+
+    def test_source_and_declared_resources_cannot_be_overwritten(self):
+        with self.assertRaisesRegex(ValueError, 'overwrite an input'):
+            render(self.source, self.root)
+        destination = self.root / 'out'
+        destination.mkdir()
+        recipe = destination / 'render.json'
+        recipe.write_text('An authoring resource with a reserved output name.')
+        before = recipe.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'overwrite an input'):
+            render(self.source, destination, resources=[recipe])
+        self.assertEqual(recipe.read_bytes(), before)
+
+    def test_bad_pdf_replaces_previous_success_with_a_failed_snapshot(self):
+        destination = self.root / 'out'
+        result = render(self.source, destination)
+        previous = Path(result['outputs']['pdf']['path']).read_bytes()
+        self.source.write_bytes(b'not a PDF')
+        with self.assertRaises((RuntimeError, ValueError)):
+            render(self.source, destination)
+        manifest = json.loads((destination / 'render.json').read_text())
+        self.assertEqual(manifest['status'], 'failed')
+        self.assertEqual(Path(result['outputs']['pdf']['path']).read_bytes(), previous)
+
+
 @unittest.skipUnless(shutil.which('soffice'), 'LibreOffice Writer is required')
 class ExportTests(unittest.TestCase):
     @classmethod
