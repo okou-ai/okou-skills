@@ -1,78 +1,68 @@
 ---
 name: docx-reverse-template
-description: "Reverse-engineer a Word document into a loadable template skill: SKILL.md, reference.docx and the source document. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc."
+description: "Reverse-engineer a Word document into a template skill for filling slots, reusing structure and expression, or applying its visual style. Use when asked to reverse a docx, build a reference.docx, extract a Word template, apply a company template to Markdown, or set up --reference-doc."
 ---
 
 # Reverse a docx into a template package
 
-Input: one `.docx`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.docx`. Output for a fixed structure: `SKILL.md`
-and a copy of the source beside it.
+Input: one `.docx`. Output: a loadable skill package whose instructions and
+resources match the selected reuse scope.
 
 Run every command below from `reverse-template/docx/`.
 
-## Before anything — an article, or a fixed structure?
+## Choose the reuse scope
 
-Look at the rendered pages.
+Read [`../document-reuse.md`](../document-reuse.md), choose from representative
+rendered pages and the user's purpose, then use the matching section below.
+For style extraction, continue at [Style extraction](#style-extraction).
 
-An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a manual, a policy. A **fixed structure**
-is the whole document as one arrangement of blocks, and a new one keeps that
-arrangement and changes the content — a resume, an invoice, a certificate.
+## Slot filling
 
-Judge on what the document is, not on how it looks — a plain single-column
-resume is still a fixed structure. An article continues at Prerequisites below.
+Copy the source to `package/template.docx`. Write `package/SKILL.md` with the
+slot map and filling instructions from the shared guide. Locate each slot in
+the document's XML and record enough context to distinguish repeated blanks.
 
-### A fixed structure: package the file and fill it in
+Tell the generated skill to edit only those slots in a copy of `template.docx`.
+Replace their text inside `<w:t>` while preserving run and paragraph
+properties. Slots may use non-text XML such as an underlined `<w:tab/>`.
+Record their blank area and how to insert a value while preserving fixed
+labels, alignment and underline extent. Replacing a tab outright can move
+the text that follows it; verify the filled rendering.
 
-A style sheet drops those silently, and no description reproduces a background
-image. Ship the file itself, and have each new document edit a copy of it.
+Patch the affected XML entries in the ZIP; preserve all other entries as they
+are. Opening and saving through python-docx or LibreOffice can rewrite parts
+outside the slots. Render the filled copy and verify the values fit and the
+rest of the document is unchanged. Continue at Publish the source package.
 
-List the runs a new document replaces:
+## Structure and expression reuse
+
+Copy the source to `package/example.docx`. Write `package/SKILL.md` with the
+structure and writing rules from the shared guide, grounded in the source's
+actual wording. Include where each kind of new content belongs, what may vary
+in length or number, and which passages remain fixed.
+
+Instruct the skill to draft content using those rules and edit a copy of
+`example.docx`. Preserve the formatting of each kind of block. Add or remove
+repeating items by copying or deleting the matching paragraph, table row or
+section as a whole, keeping its formatting and required XML relationships.
+Let text reflow and items grow within the recorded layout rules. Render the
+result to check the layout, content organization and expression. Continue at
+Publish the source package.
+
+## Locate editable text when needed
+
+After choosing the scope, this optional inspector can locate body text runs:
 
 ```bash
 python3 scripts/inspect_docx.py <source.docx> --slots
 ```
 
-Copy the source into `package/`, then write `package/SKILL.md` beside it:
+It does not classify the document or identify which text may change. It lists
+runs containing `<w:t>`, so check the rendered pages and XML for gaps without
+text, such as underlined tabs. Do not treat a field's cached result as editable
+text; Word recomputes it.
 
-````markdown
----
-name: <template-slug>
-description: <what this document is, in one line>
----
-
-Make the new document by editing a copy of `<source filename>`.
-
-Change only the text inside `<w:t>`. Everything else stays exactly as the file
-has it: the rest of `word/document.xml`, and every other entry in the archive,
-byte for byte.
-
-The wording sits here, in reading order:
-
-| Current text | Holds |
-|---|---|
-| `<one run's text>` | <what a new document says there> |
-
-To add or drop a <line/row/section>, copy or delete a whole `<w:p>` of the same
-kind and edit its text. Never build a paragraph from scratch and never let one
-fall back to a style default; that is how the formatting slips.
-
-Rewrite the entry in the zip. Opening and saving the file through python-docx or
-LibreOffice rewrites parts that must stay byte-identical.
-
-Render the result and look — if the text has outgrown <the page, the card, its
-box>, shorten the wording, never the type or the spacing.
-
-Re-author the design only when the user asks for a new document in this style,
-rather than for this document with new wording.
-````
-
-One row per run, named off `--slots` and the rendered pages; write nothing they
-do not show. A label and its value are usually separate runs — give the value a
-row and leave the label out. Leave a field's run out too; Word recomputes it.
-Word the table as where the wording sits, never as the set of edits allowed — a
-new document may need one line more, or one fewer.
+## Publish the source package
 
 ```bash
 node ../scripts/cover-page.mjs --input <the original .docx> --out cover.png
@@ -93,15 +83,15 @@ reader opens, the second is the only one a later run can open. Publish without
 `--cover` and `--page-count` only when `cover-page.mjs` failed; report what it
 said.
 
-Say the template exists only after the command succeeds.
+Say the template exists only after the command succeeds, then stop.
 
-## Prerequisites
+## Style extraction
+
+### Prerequisites
 
 ```bash
 python3 scripts/ensure_pandoc.py --dir ./vendor   # then run the export PATH line it prints
 ```
-
-## Steps
 
 ### 1. Inspect
 
@@ -110,13 +100,13 @@ python3 scripts/inspect_docx.py <source.docx>
 ```
 
 Note the missing required styles, the paper size, and every `REVIEW` line.
-`[styles in use]` decides the route:
+`[styles in use]` decides how to extract the visual styles:
 
 - the document uses its own style names: run step 2 with the `--map` it
   prints, after checking which pandoc style each name plays the part of;
 - the document is formatted by hand (`Normal` with direct formatting): its
-  styles carry nothing. Render it as the inspector says and follow
-  `../pdf/SKILL.md` on the render instead of continuing here.
+  styles carry nothing. Render it as the inspector says and follow the Style
+  extraction steps in `../pdf/SKILL.md` on the render instead of continuing here.
 Ignore the exit code.
 
 ### 2. Build
@@ -212,5 +202,5 @@ succeeds.
 | Output carries the source's number or owner | `set_header_footer.py --replace` |
 | Header text sits outside the text area | Step 1 reports the tab stop; rebuild the header with `--header 'left\tright'`, which places it from the margins |
 | A docx saved by WPS fails to parse | Re-save it from Word, restart at step 1 |
-| A fixed structure comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
+| A slot-filling template comes back redrawn in a similar style | Its package carries no copy of the source, so there was nothing to edit. Add the file and republish |
 | A rendered page drops the text held in content controls | LibreOffice exports those as form fields, whose appearance font carries no CJK. Render with `--convert-to png`, or export the PDF with `ExportFormFields` false |

@@ -5,8 +5,9 @@ Usage:  python3 inspect_docx.py source.docx
         python3 inspect_docx.py source.docx --slots
 
 Read-only. Exit code 0 means it is usable as is; 1 means build_reference.py
-needs to fill gaps first. --slots takes the fixed-structure route instead and
-lists the body runs a new document replaces; it always exits 0.
+needs to fill gaps first. --slots lists body text runs to help locate edits
+after the reuse scope is chosen; it does not classify the document or decide
+which runs may change. A successful listing exits 0.
 """
 import collections
 import sys, zipfile, re, os
@@ -94,12 +95,13 @@ def para_props(z, name_to_id, names):
 
 
 def slots(path):
-    """List the body runs a fixed-structure template can replace.
+    """List body text runs for locating edits within a chosen reuse scope.
 
     One row per <w:r> that holds text, because a run is the largest unit whose
     <w:t> can be swapped without touching formatting. A run inside a field
     holds a result Word recomputes on open, so it is marked rather than
-    offered as replaceable.
+    offered as replaceable. Runs without <w:t>, including underlined tabs,
+    are not listed.
     """
     from xml.etree import ElementTree as ET
     W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
@@ -109,9 +111,10 @@ def slots(path):
     z.close()
 
     print(f"===== {os.path.basename(path)} =====\n")
-    print("[replaceable runs] one row per <w:r>. Match a row's text, never a")
-    print("                   paragraph's — two rows sharing a p number are two")
-    print("                   separate strings.\n")
+    print("[body text runs] one row per <w:r> containing <w:t>.")
+    print("                 Use the selected reuse scope to decide which may change.")
+    print("                 Two rows sharing a p number are separate strings; inspect")
+    print("                 the page and XML for slots without text.\n")
 
     for p_index, p in enumerate(root.iter(W + "p"), 1):
         simple = {r for f in p.iter(W + "fldSimple") for r in f.iter(W + "r")}

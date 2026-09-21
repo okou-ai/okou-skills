@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Assemble the deliverable: SKILL.md, reference.docx and source.pdf.
+"""Assemble a style-extraction package: SKILL.md, reference.docx and source.pdf.
 
 Usage:
   python3 make_package.py <source.pdf> <reference.docx> <styles.json> <output dir> \
           [--map 1=Heading1,2=Title] [--body 2] [--name slug]
           [--top 2.4] [--right 1.8] [--bottom 2.2] [--left 1.8]
 
-Three files, no more. SKILL.md carries the usage, the measured style values,
-the choices made and the source's outline; reference.docx is the artifact
-pandoc consumes; source.pdf is the content reference. styles.json is not
-shipped because SKILL.md records the exact command that re-derives it, and the
-analysis is reproducible byte for byte.
+SKILL.md carries the usage, measured style values and extraction choices;
+reference.docx is the artifact pandoc consumes. source.pdf is retained for
+visual comparison and rebuilding the styles, not as a content model.
+styles.json is not shipped because SKILL.md records the command that
+re-derives it.
 
 Pass --map, --body and every margin you overrode through verbatim: they are
 every choice made along the way, and SKILL.md is the only place they are
@@ -216,7 +216,10 @@ description: {desc}
 
 # {name}
 
-`reference.docx` carries the styles. `{src}` is the document they were taken from.
+`reference.docx` carries the styles. `{src}` is the document they were taken from,
+kept for visual comparison and rebuilding the styles. Write and organize the
+content for the new task. Reuse the visual formatting; the source's section
+order, body wording and writing conventions are not requirements.
 
 ## Convert
 
@@ -247,7 +250,7 @@ The first paragraph after a heading gets `First Paragraph`; the rest get
 
 {page}
 
-{structure}## Adjust
+## Adjust
 
 ```bash
 python3 set_style.py reference.docx --list
@@ -347,24 +350,6 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
         rebuild = ("\n" + "\n".join(logged)).replace(
             "\npython3 build_reference.py", "python3 build_reference.py", 1)
 
-    # The outline is the only record of the source's *content* that survives.
-    # reference.docx carries no body text, so without it there is nothing to
-    # work from when the task is "another document like this one".
-    ol_lines = []
-    for o in d.get("outline") or []:
-        n = mapping.get(str(o["level"]), f"Heading{o['level']}")
-        lv = re.fullmatch(r"Heading(\d)", n)
-        depth = max(0, int(lv.group(1)) - 1) if lv else 0
-        ol_lines.append(f"{'  ' * depth}- {o['text']}  `{n}`  (p{o['page']})")
-    ol_md = "\n".join(ol_lines) or "_No headings were detected in the source._"
-    sampler = not ol_lines or all(
-        re.fullmatch(r"(heading|title|subtitle|标题)\s*\d*", o["text"].strip(), re.I)
-        for o in d.get("outline") or [])
-    structure = "" if sampler else (
-        "## Source structure\n\nBefore writing a new document of this kind, read `"
-        + src + "`. Keep its section\norder, its fixed wording (notices, defined terms,"
-        " table headers) and its\nterminology.\n\n" + "\n".join(ol_lines) + "\n\n")
-
     # Limits that follow from this template rather than from the skill. A
     # multi-column layout has two that bite immediately and neither is
     # obvious from the style table.
@@ -410,8 +395,8 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
                                   f"#{look['color']}" if look.get("color") else "") if v)
     desc = (f"Produce Word documents in the {name} house style"
             + (f" ({marks})" if marks else "")
-            + f". Use when asked to write, format, re-issue or restyle a document "
-              f"in this style, or to produce another document like {src}.")
+            + ". Use when asked to apply this visual style to new content "
+              "or restyle a document with its formatting.")
     # Quote it. The description carries hex colours, and " #" opens a comment
     # in an unquoted YAML scalar, so everything from the first colour onward -
     # including every trigger phrase - is dropped when the frontmatter is
@@ -424,7 +409,7 @@ def build(pdf, ref, jpath, outdir, mapping, margins, body=None, name=None):
         rebuild_block=(rebuild.lstrip("\n") if logged else "python3 build_reference.py styles.json reference.docx" + rebuild),
         spanblock=spanblock, cols_flag=cols_flag,
         limits=limits,
-        structure=structure, date=datetime.date.today().isoformat()))
+        date=datetime.date.today().isoformat()))
 
     print(f"Package written to {outdir}/")
     for f in sorted(os.listdir(outdir)):

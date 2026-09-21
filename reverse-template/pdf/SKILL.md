@@ -1,52 +1,53 @@
 ---
-name: reverse-template/pdf
-description: "Reverse-engineer a PDF into a loadable template skill: SKILL.md, reference.docx and the source PDF. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout."
+name: pdf-reverse-template
+description: "Reverse-engineer a PDF document into a template skill for filling slots, reusing structure and expression, or applying its visual style. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout."
 ---
 
 # Reverse a PDF into a template package
 
-Input: one `.pdf`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.pdf`. Output for a fixed structure: `SKILL.md`
-and the source alone.
+Input: one `.pdf`. Output: a loadable skill package whose instructions and
+resources match the selected reuse scope.
 
 **If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
 pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `reverse-template/pdf/`.
 
-## Before anything — an article, or a fixed structure?
+## Choose the reuse scope
 
-Look at the rendered pages.
+Read [`../document-reuse.md`](../document-reuse.md), choose from representative
+rendered pages and the user's purpose, then use the matching section below.
+For style extraction, continue at [Style extraction](#style-extraction).
 
-An **article** is written top to bottom and could be written again at another
-length on another subject — a report, a manual, a policy. A **fixed structure**
-is the whole document as one arrangement of blocks, and a new one keeps that
-arrangement and changes the content — a resume, an invoice, a certificate.
+## Slot filling
 
-Judge on what the document is, not on how it looks — a plain single-column
-resume is still a fixed structure. An article continues at Prerequisites below.
+Copy the source to `package/template.pdf`. Write `package/SKILL.md` with the
+slot map and filling instructions from the shared guide. For each slot,
+record its page, meaning and filling format. Use an existing PDF form field's
+name where available; otherwise record the blank's rectangle and text
+appearance from the page.
 
-### A fixed structure: publish the source itself
+Instruct the skill to fill a copy of `template.pdf` through its form fields or
+place text within the recorded blank areas. Keep the original page content
+and artwork intact; do not reconstruct the page or replace its fixed prose.
+Render the filled copy to verify the values fit and everything outside the
+slots remains unchanged. Continue at Publish the source package.
 
-A style sheet drops those silently. Publish the file and stop here.
+## Structure and expression reuse
 
-Write `package/SKILL.md` and put nothing else in `package/`:
+Copy the source to `package/example.pdf`. Write `package/SKILL.md` with the
+structure and writing rules from the shared guide, including source examples
+of the phrasing, tone and information order to reuse.
 
-````markdown
----
-name: <template-slug>
-description: <what this document is, in one line>
----
+Record the layout of the blocks a new document needs, with their typography,
+spacing and repeat-or-omit rules. Extract reusable artwork into the package
+when needed. A PDF is a visual and writing example, not an editable paragraph
+tree: tell the skill how to compose new content into that layout using the
+example and packaged assets, allowing the recorded parts to grow or repeat.
+Identify any wording that stays fixed. Render the result and compare both its
+layout and expression with the example. Continue at Publish the source package.
 
-Follow the source file's own styling. It is the authority for page size,
-margins, typography, colour, and the position of every block.
-
-Replace the content, keep the composition:
-
-- <one line per entry a new document has to fill>
-````
-
-Name the entries off the rendered pages, and write nothing they do not show.
+## Publish the source package
 
 ```bash
 node ../scripts/cover-page.mjs --input <the original .pdf> --out cover.png
@@ -62,18 +63,19 @@ npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
   --package package
 ```
 
-Publish without `--cover` and `--page-count` only when `cover-page.mjs`
-failed; report what it said. Say the template exists only after the command
-succeeds.
+Keep the source copy in `package/`; `--source` supplies the catalog document
+and does not replace the files a later run needs. Publish without `--cover`
+and `--page-count` only when `cover-page.mjs` failed; report what it said.
+Say the template exists only after the command succeeds, then stop.
 
-## Prerequisites
+## Style extraction
+
+### Prerequisites
 
 ```bash
 pip install pymupdf
 python3 scripts/ensure_pandoc.py --dir ./vendor   # then run the export PATH line it prints
 ```
-
-## Steps
 
 ### 1. Analyse
 
