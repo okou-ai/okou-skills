@@ -62,4 +62,9 @@ They also keep the source for visual comparison and rebuilding the styles;
 that copy is not a content model. Retain any reusable visual assets needed
 beyond the style file.
 
+Check required cover artwork and positioned blocks separately: `reference.docx`
+does not retain body content. Include a verified assembly recipe and its assets
+when style extraction needs them. When those blocks and their content structure
+must remain, use the source-based reuse scope above.
+
 The DOCX and PDF guides specify how to build, verify and publish each package.

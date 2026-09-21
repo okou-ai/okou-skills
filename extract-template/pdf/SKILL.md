@@ -13,6 +13,14 @@ pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `extract-template/pdf/`.
 
+If the original has not been rendered, render it before choosing scope:
+
+```bash
+node ../scripts/render-document.mjs --input <source.pdf> --out source-render
+```
+
+Use a new output directory for each render.
+
 ## Choose the reuse scope
 
 Read [`../document-reuse.md`](../document-reuse.md), choose from representative
@@ -92,11 +100,7 @@ Read the report:
 
 ### 2. Declare the column count
 
-```bash
-okou presentation screenshot --input <source.pdf> --out shots
-```
-
-Look at a page. Re-run step 1 with `--columns N`.
+Inspect the source page images. Re-run step 1 with `--columns N`.
 
 ### 3. Map the heading levels
 
