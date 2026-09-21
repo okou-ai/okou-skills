@@ -41,5 +41,5 @@ Four rules override the table:
   slides — is that page's kind, not artwork.
 
 `cd` into the branch directory; every path inside a branch guide is relative to
-it. The two document guides open by checking whether a style sheet can hold this
-particular file, and publish the source itself when it cannot.
+it. Both document guides start with
+[`document-reuse.md`](document-reuse.md) to choose the reuse scope and package.

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Assemble the deliverable: SKILL.md, reference.docx and source.docx.
+"""Assemble a style-extraction package: SKILL.md, reference.docx and source.docx.
 
 Usage:  python3 make_package.py <source.docx> <reference.docx> <output dir> [--name slug]
 
-Three files, no more. SKILL.md carries the usage, the measured style values and
-the source's outline; reference.docx is the artifact pandoc consumes;
-source.docx is the content reference. The style values are read back out of
-reference.docx, not hardcoded. --name sets the skill name and defaults to the
-output directory's name.
+SKILL.md carries the usage and measured style values; reference.docx is the
+artifact pandoc consumes. source.docx is retained for visual comparison and
+rebuilding the styles, not as a content model. The style values are read back
+out of reference.docx, not hardcoded. --name sets the skill name and defaults
+to the output directory's name.
 """
 import json
 import sys, os, re, shutil, zipfile, subprocess, datetime, textwrap
@@ -25,36 +25,6 @@ MD_MAP = [
     ("Pipe table", "Table"),
     ("`title:` in the YAML header", "Title"),
 ]
-
-
-def outline(path):
-    """The source document's headings, in reading order.
-
-    Matched on the style's w:name, not its styleId: a Word export localises the
-    id but keeps the name, so "heading 1" is reliable where "1" is not.
-    """
-    with zipfile.ZipFile(path) as z:
-        doc = z.read("word/document.xml").decode("utf-8", "replace")
-        sty = z.read("word/styles.xml").decode("utf-8", "replace")
-    name = {}
-    for m in re.finditer(r'<w:style\b[^>]*w:styleId="([^"]+)".*?</w:style>', sty, re.S):
-        n = re.search(r'<w:name w:val="([^"]+)"', m.group(0))
-        if n:
-            name[m.group(1)] = n.group(1)
-    out = []
-    for m in re.finditer(r"<w:p\b[^>]*>.*?</w:p>|<w:p\b[^>]*/>", doc, re.S):
-        para = m.group(0)
-        ps = re.search(r'<w:pStyle w:val="([^"]+)"', para)
-        if not ps:
-            continue
-        n = name.get(ps.group(1), ps.group(1))
-        lv = re.fullmatch(r"heading (\d)", n, re.I)
-        if not (lv or n in ("Title", "Subtitle")):
-            continue
-        t = literal_text(para)
-        if t:
-            out.append((n, int(lv.group(1)) if lv else 0, t))
-    return out
 
 
 def header_substitutions(orig, ref):
@@ -366,7 +336,9 @@ description: {desc}
 # {name}
 
 `reference.docx` carries the styles, header and footer. `{src}` is the document
-they were taken from.
+they were taken from, kept for visual comparison and rebuilding the styles.
+Write and organize the content for the new task. Reuse the visual formatting;
+the source's section order, body wording and writing conventions are not requirements.
 
 ## Convert
 
@@ -397,7 +369,7 @@ The first paragraph after a heading gets `First Paragraph`; the rest get
 
 {page}
 
-{structure}## Adjust
+## Adjust
 
 ```bash
 python3 set_style.py reference.docx --list
@@ -446,9 +418,6 @@ def build(orig, ref, outdir, name=None):
         page_lines.append(pg["cols"])
     page_lines += [f"- {h}" for h in pg["hf"]] or ["- No header or footer"]
 
-    # The outline is the only record of the source's *content* that survives.
-    # reference.docx carries no body text, so without it there is nothing to
-    # work from when the task is "another document like this one".
     # Limits that follow from this template rather than from the skill. A
     # multi-column layout has two that bite immediately and neither is
     # obvious from the style table.
@@ -510,16 +479,6 @@ def build(orig, ref, outdir, name=None):
                        for l in limits)
     limits = "\n" + limits if limits else ""
 
-    ol = outline(orig)
-    ol_md = "\n".join(f"{'  ' * max(0, lv - 1)}- {t}  `{n}`" for n, lv, t in ol) \
-        or "_The source has no headings to record._"
-    sampler = not ol or all(
-        re.fullmatch(r"(heading|title|subtitle|标题)\s*\d*", t.strip(), re.I) for _, _, t in ol)
-    structure = "" if sampler else (
-        "## Source structure\n\nBefore writing a new document of this kind, read `"
-        + src + "`. Keep its section\norder, its fixed wording (notices, defined terms,"
-        " table headers) and its\nterminology.\n\n" + ol_md + "\n\n")
-
     # The description is what makes an agent reach for this package at all, so
     # it names the look rather than describing the file.
     look = st.get("heading 1") or st.get("title") or st.get("body text") or {}
@@ -527,8 +486,8 @@ def build(orig, ref, outdir, name=None):
                                   f"#{look['color']}" if look.get("color") else "") if v)
     desc = (f"Produce Word documents in the {name} house style"
             + (f" ({marks})" if marks else "")
-            + f". Use when asked to write, format, re-issue or restyle a document "
-              f"in this style, or to produce another document like {src}.")
+            + ". Use when asked to apply this visual style to new content "
+              "or restyle a document with its formatting.")
     # Quote it. The description carries hex colours, and " #" opens a comment
     # in an unquoted YAML scalar, so everything from the first colour onward -
     # including every trigger phrase - is dropped when the frontmatter is
@@ -547,7 +506,7 @@ def build(orig, ref, outdir, name=None):
 
     open(os.path.join(outdir, "SKILL.md"), "w").write(SKILL.format(
         name=name, desc=desc, src=src, md_map=md, styles=rows,
-        page="\n".join(page_lines), structure=structure, limits=limits,
+        page="\n".join(page_lines), limits=limits,
         spanblock=spanblock, cols_flag=cols_flag,
         rebuild_block=rebuild_block,
         date=datetime.date.today().isoformat()))
