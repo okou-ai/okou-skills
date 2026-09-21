@@ -75,15 +75,23 @@ Word the table as where the wording sits, never as the set of edits allowed — 
 new document may need one line more, or one fewer.
 
 ```bash
+node ../scripts/cover-page.mjs --input <the original .docx> --out cover.png
+```
+
+```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
   --title "<user-visible template name>" \
   --kind document \
   --source <the original .docx> \
+  --cover cover.png \
+  --page-count <pageCount from cover-page.mjs> \
   --package package
 ```
 
-`--source` and the copy in `package/` are both needed: the first is what the
-catalog shows, the second is the only one a later run can open.
+`--source` and the copy in `package/` are both needed: the first is what a
+reader opens, the second is the only one a later run can open. Publish without
+`--cover` and `--page-count` only when `cover-page.mjs` failed; report what it
+said.
 
 Say the template exists only after the command succeeds.
 
@@ -162,8 +170,27 @@ python3 scripts/make_package.py <source.docx> reference.docx <out dir>
 ```
 
 The output directory name is the skill name; `--name` overrides it. Add
-anything the scripts could not read to the package's `Limits`. Hand over the
-whole directory.
+anything the scripts could not read to the package's `Limits`.
+
+### 6. Publish
+
+```bash
+node ../scripts/cover-page.mjs --input <source.docx> --out cover.png
+```
+
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
+  --title "<user-visible template name>" \
+  --kind document \
+  --source <source.docx> \
+  --cover cover.png \
+  --page-count <pageCount from cover-page.mjs> \
+  --package <out dir>
+```
+
+Publish without `--cover` and `--page-count` only when `cover-page.mjs`
+failed; report what it said. Say the template exists only after the command
+succeeds.
 
 ## Rules
 

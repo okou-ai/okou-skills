@@ -3,16 +3,18 @@
  * libreoffice.mjs — install document tools on demand and convert legacy PPT.
  *
  * PDF rendering requires Poppler. PPTX rendering and legacy PPT conversion
- * additionally require LibreOffice 24.2.2.2. Missing tools are installed
+ * additionally require LibreOffice 24.2.2.2 with Impress; rendering a Word
+ * document needs the same LibreOffice with Writer. Missing tools are installed
  * through apt only when needed. apt downloads and temporary files use the
  * writable filesystem with the most free space rather than filling the
  * sandbox root filesystem.
  *
  *   node scripts/libreoffice.mjs --ensure
+ *   node scripts/libreoffice.mjs --ensure-writer
  *   node scripts/libreoffice.mjs --ensure-poppler
  *   node scripts/libreoffice.mjs --input old.ppt --out converted.pptx
  */
-import { accessSync, constants } from "node:fs";
+import { accessSync, constants, realpathSync } from "node:fs";
 import {
   chmod,
   copyFile,
@@ -35,6 +37,36 @@ const LIBREOFFICE_APT_SERIES = "24.2.2";
 const MAX_SOURCE_BYTES = 100 * 1024 * 1024;
 const MIN_SCRATCH_BYTES = 512 * 1024 * 1024;
 const POPPLER_TOOLS = ["pdftocairo", "pdfinfo", "pdftohtml", "pdffonts"];
+
+/**
+ * The filter each document kind is converted by, and the file that proves it
+ * is installed.
+ *
+ * `soffice` on PATH does not mean a given format can be converted: the launcher
+ * ships with `libreoffice-core`, and each filter is a separate package that
+ * drops its own library beside it. A sandbox with Impress and no Writer answers
+ * every `soffice` probe and then converts a `.docx` to nothing, which is the
+ * failure this map exists to turn into an install.
+ */
+const LIBREOFFICE_COMPONENTS = {
+  impress: { package: "libreoffice-impress", library: "libsdlo.so" },
+  writer: { package: "libreoffice-writer", library: "libswlo.so" },
+};
+
+/** Whether the filter library sits in the program directory `soffice` runs from. */
+function hasComponent(soffice, component) {
+  if (!soffice) return false;
+  const { library } = LIBREOFFICE_COMPONENTS[component];
+  try {
+    accessSync(
+      path.join(path.dirname(realpathSync(soffice)), library),
+      constants.F_OK,
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -92,10 +124,10 @@ function missingPopplerTools(poppler) {
   return POPPLER_TOOLS.filter((tool) => !poppler[tool]);
 }
 
-function aptCandidate(output) {
+function aptCandidate(output, packageName) {
   const candidate = output.match(/^\s*Candidate:\s*(\S+)/imu)?.[1] || "";
   if (!candidate || candidate === "(none)") {
-    throw new Error("apt has no libreoffice-impress candidate");
+    throw new Error(`apt has no ${packageName} candidate`);
   }
   return candidate;
 }
@@ -209,7 +241,8 @@ async function removeAptScratch(directory, sudo) {
   }
 }
 
-async function ensureDocumentTools({ libreOffice, scratchRoot = "" }) {
+async function ensureDocumentTools({ component, scratchRoot = "" }) {
+  const libreOffice = Boolean(component);
   let soffice = "";
   let version = "";
   let source = "system";
@@ -222,10 +255,13 @@ async function ensureDocumentTools({ libreOffice, scratchRoot = "" }) {
     }
     if (soffice) version = assertPinnedVersion(soffice);
   }
-  const libreOfficeNeedsInstall = libreOffice && !soffice;
+  // The filter, not the launcher, is what decides whether this conversion can
+  // run, so a `soffice` that cannot open the format still needs an install.
+  const libreOfficeNeedsInstall =
+    libreOffice && (!soffice || !hasComponent(soffice, component));
   let poppler = resolvePopplerTools();
   let missingPoppler = missingPopplerTools(poppler);
-  if ((!libreOffice || soffice) && !missingPoppler.length) {
+  if (!libreOfficeNeedsInstall && !missingPoppler.length) {
     return {
       soffice,
       version,
@@ -259,18 +295,19 @@ async function ensureDocumentTools({ libreOffice, scratchRoot = "" }) {
     runApt(tools.aptGet, [...aptOptions, "update"], environment, tools.sudo);
     const packages = [];
     if (libreOfficeNeedsInstall) {
+      const componentPackage = LIBREOFFICE_COMPONENTS[component].package;
       const policy = runApt(
         tools.aptCache,
-        [...aptOptions, "policy", "libreoffice-impress"],
+        [...aptOptions, "policy", componentPackage],
         environment,
       );
-      const candidate = aptCandidate(policy);
+      const candidate = aptCandidate(policy, componentPackage);
       if (!isPinnedAptCandidate(candidate)) {
         throw new Error(
-          `apt libreoffice-impress candidate ${candidate} does not provide LibreOffice ${LIBREOFFICE_VERSION}`,
+          `apt ${componentPackage} candidate ${candidate} does not provide LibreOffice ${LIBREOFFICE_VERSION}`,
         );
       }
-      packages.push(`libreoffice-impress=${candidate}`);
+      packages.push(`${componentPackage}=${candidate}`);
     }
     if (missingPoppler.length) packages.push("poppler-utils");
 
@@ -285,8 +322,13 @@ async function ensureDocumentTools({ libreOffice, scratchRoot = "" }) {
       ], environment, tools.sudo);
     }
 
-    if (libreOfficeNeedsInstall) soffice = findExecutable("soffice");
+    if (libreOfficeNeedsInstall && !soffice) soffice = findExecutable("soffice");
     if (libreOffice && !soffice) throw new Error("apt completed but soffice is still unavailable");
+    if (libreOfficeNeedsInstall && !hasComponent(soffice, component)) {
+      throw new Error(
+        `apt completed but LibreOffice ${component} is still unavailable`,
+      );
+    }
     if (libreOffice) version = assertPinnedVersion(soffice);
     poppler = resolvePopplerTools();
     missingPoppler = missingPopplerTools(poppler);
@@ -309,11 +351,15 @@ async function ensureDocumentTools({ libreOffice, scratchRoot = "" }) {
 }
 
 export async function ensurePoppler({ scratchRoot = "" } = {}) {
-  return ensureDocumentTools({ libreOffice: false, scratchRoot });
+  return ensureDocumentTools({ component: "", scratchRoot });
 }
 
 export async function ensureLibreOffice({ scratchRoot = "" } = {}) {
-  return ensureDocumentTools({ libreOffice: true, scratchRoot });
+  return ensureDocumentTools({ component: "impress", scratchRoot });
+}
+
+export async function ensureLibreOfficeWriter({ scratchRoot = "" } = {}) {
+  return ensureDocumentTools({ component: "writer", scratchRoot });
 }
 
 async function assertPptx(file) {
@@ -380,11 +426,12 @@ function parseArgs(argv) {
   for (let index = 2; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--ensure") args.ensure = "libreoffice";
+    else if (arg === "--ensure-writer") args.ensure = "writer";
     else if (arg === "--ensure-poppler") args.ensure = "poppler";
     else if (arg === "--input") args.input = argv[++index];
     else if (arg === "--out") args.out = argv[++index];
     else if (arg === "--help" || arg === "-h") {
-      console.log("Usage: node scripts/libreoffice.mjs --ensure | --ensure-poppler | --input <deck.ppt> --out <deck.pptx>");
+      console.log("Usage: node scripts/libreoffice.mjs --ensure | --ensure-writer | --ensure-poppler | --input <deck.ppt> --out <deck.pptx>");
       process.exit(0);
     } else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -399,9 +446,11 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   try {
     const result = args.ensure === "libreoffice"
       ? await ensureLibreOffice()
-      : args.ensure === "poppler"
-        ? await ensurePoppler()
-        : await convertLegacyPpt(args.input, args.out);
+      : args.ensure === "writer"
+        ? await ensureLibreOfficeWriter()
+        : args.ensure === "poppler"
+          ? await ensurePoppler()
+          : await convertLegacyPpt(args.input, args.out);
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error(error.stack || error.message);

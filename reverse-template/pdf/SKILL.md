@@ -49,14 +49,22 @@ Replace the content, keep the composition:
 Name the entries off the rendered pages, and write nothing they do not show.
 
 ```bash
+node ../scripts/cover-page.mjs --input <the original .pdf> --out cover.png
+```
+
+```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
   --title "<user-visible template name>" \
   --kind document \
   --source <the original .pdf> \
+  --cover cover.png \
+  --page-count <pageCount from cover-page.mjs> \
   --package package
 ```
 
-Say the template exists only after the command succeeds.
+Publish without `--cover` and `--page-count` only when `cover-page.mjs`
+failed; report what it said. Say the template exists only after the command
+succeeds.
 
 ## Prerequisites
 
@@ -141,7 +149,7 @@ python3 scripts/make_package.py <source.pdf> reference.docx styles.json <out dir
 
 Pass every flag used in steps 1–5. The output directory name is the skill
 name; `--name` overrides it. Add anything the scripts could not measure to the
-package's `Limits`. Hand over the whole directory.
+package's `Limits`.
 
 ### Optional: adjust styles, add a header or footer
 
@@ -154,6 +162,26 @@ python3 scripts/set_header_footer.py reference.docx --header 'Title\tv2.3'   # l
 ```
 
 Then step 6 with `--structure-only`, then step 7.
+
+### 8. Publish
+
+```bash
+node ../scripts/cover-page.mjs --input <source.pdf> --out cover.png
+```
+
+```bash
+npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
+  --title "<user-visible template name>" \
+  --kind document \
+  --source <source.pdf> \
+  --cover cover.png \
+  --page-count <pageCount from cover-page.mjs> \
+  --package <out dir>
+```
+
+Publish without `--cover` and `--page-count` only when `cover-page.mjs`
+failed; report what it said. Say the template exists only after the command
+succeeds.
 
 ## Rules
 
