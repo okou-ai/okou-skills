@@ -65,32 +65,15 @@ position.
 
 The branch guide gives the packaging mechanics; the clauses above are its body.
 
-## How this composes
-
-Real documents answer several at once:
-
-| Document | 1 wording | 2 blanks | 3 blocks | 4 lists | 5 artwork |
-| --- | --- | --- | --- | --- | --- |
-| Services agreement | yes | yes | yes | — | — |
-| Meeting minutes | — | — | yes | yes | — |
-| Party invitation | — | yes | yes | — | yes |
-| Whitepaper | — | — | — | — | — |
-| Certificate | yes | yes | yes | — | yes |
-| Invoice | yes | yes | yes | yes | — |
-| Résumé | — | — | yes | yes | — |
-
-The whitepaper is the only style-sheet case. The certificate answers four at
-once, which is why the questions are asked separately.
-
 ## Where this is easy to get wrong
 
-- **Placeholder text does not answer question 1 or 2 on its own.** An agreement,
-  an invitation and a set of minutes all carry placeholders. Question 1 is about
-  the words that stay; question 2 is about typographic gaps.
+- **Placeholder text does not answer question 1 or 2 on its own.** Question 1 is
+  about the words that stay; question 2 is about typographic gaps. A page can
+  carry placeholders and answer `no` to both.
 - **Question 1 is the expensive one to miss.** A package that does not name the
-  clauses invites a new instance to rewrite an indemnity in its own words. The
-  others cost a re-run.
-- **A heading hierarchy is not question 3.** A whitepaper has headings and
-  answers `no`, because its next edition picks new ones.
+  binding wording invites a new instance to restate it in its own words. The
+  other four cost a re-run.
+- **Headings alone do not answer question 3.** They answer it only if the next
+  instance keeps those same headings.
 - **Sparse pages are not slides.** A page can hold less text than a slide and
   still be a document; the dispatcher's rule about paper sizes applies here too.
