@@ -18,11 +18,11 @@ The source provides visual and layout reference only. It does not determine the 
 - Reimplement the template in HTML and CSS.
 - Reproduce the presentation's visual language and layout system, not the source file's internal object structure.
 - The template must support new content instead of merely reproducing the original presentation.
-- Consolidate similar pages into reusable layouts instead of creating one-off templates for individual pages.
+- Preserve every meaningfully distinct source layout. Consolidate pages only when their structure, proportions, and visual treatment are equivalent, and keep the source-page mapping.
 - Never use full-page screenshots in place of editable HTML layouts.
 - Reusable source logos, fonts, and textures may be retained as template assets.
-- Scripts prepare viewable page images and delivery files only. The AI determines typography, color roles, components, motifs, chrome, and layout meaning by inspecting the rendered pages.
-- Packaged layouts are references, not a layout whitelist. A later generation task may use another layout when the new content calls for it, provided it retains the same design system.
+- Scripts prepare page images, copy the shared layout scaffold, and assemble previews. The AI determines typography, color roles, components, motifs, chrome, and source layout meaning by inspecting the rendered pages.
+- Prefer a preserved source layout when the new content fits. Otherwise use the shared generic library with the extracted brand theme; create a new layout only for a structure neither collection supports. Packaged layouts are not a whitelist.
 - The absence of a content type in the source is not a prohibition. In particular, a source presentation with no images must not cause the template to forbid images in future presentations.
 
 ## Workflow
@@ -66,7 +66,7 @@ Also capture the rules required to implement reusable layouts:
 - chart, table, label, and metric styling;
 - which rules stay fixed and which may vary with the content.
 
-Implement these rules as shared HTML/CSS variables, base styles, and components instead of scattering them across individual sample pages. Leave anything the source does not establish undefined rather than inventing it.
+Implement these rules as shared HTML/CSS variables, base styles, and components instead of scattering them across individual sample pages. Distinguish observed source rules from neutral fallback choices for components the source does not establish; do not describe those choices as extracted facts.
 
 ### 3. Implement the HTML template
 
@@ -77,30 +77,55 @@ Follow the platform's HTML Presentation specification:
 - implement recurring structures as reusable layouts and components;
 - give variable content clear semantic regions;
 - allow later generation tasks to replace text, images, and data;
-- make every layout render independently and reliably;
+- make every layout render reliably through the documented shared shell;
 - use package-relative resource paths and verify that every resource loads;
 - make the assembled HTML presentation support four-direction keyboard navigation: `ArrowLeft` and `ArrowUp` go to the previous slide, while `ArrowRight` and `ArrowDown` go to the next slide;
 - prefer normal document flow, Flexbox, and CSS Grid; reserve absolute positioning for fixed chrome, decoration layers, and intentional overlays;
 - implement text, shapes, cards, tables, and ordinary charts as editable HTML, CSS, or SVG.
 
-Use this package shape as a guide and omit unused files or directories:
+Read [references/layout-reuse.md](references/layout-reuse.md) when building the package. It defines source provenance, shared layout selection, and the brand CSS boundary. Install the bundled 44 generic layouts from the directory containing this guide:
+
+```bash
+node scripts/install-layout-library.mjs --package <template-slug>
+```
+
+The installer preserves existing source files and customized theme, shell, and chrome. It refuses a conflicting shared library file without overwriting it. These generic layouts supplement the source layouts; they are not 44 layouts extracted from the user's deck.
+
+Use this package shape:
 
 ```text
 <template-slug>/
   SKILL.md                 # template metadata and usage instructions
   design-system.md         # visual rules, component rules, and asset notes
   layouts/
-    README.md              # layout index, purposes, and content-region definitions
-    _shell.html            # shared canvas, fonts, chrome, and base structure
-    <layout-name>.html     # reusable example layout
+    README.md              # selection order and assembly instructions
+    source-index.json      # every source page mapped to its preserved layout
+    source/                # every meaningfully distinct original layout
+      <layout-name>.html
+    common/
+      catalog.json         # generic purposes, regions, and capacity guidance
+      <layout-name>.html   # 44 shared generic content fragments
+    _shell.html            # canvas, stylesheet links, navigation, slide markers
+    chrome.html            # shared brand logo, footer, motifs, and edge elements
   styles/
-    template.css           # shared CSS; may be inlined in _shell.html if required
+    layout.css             # generic layout structures; keep the shared copy intact
+    theme.css              # one shared brand theme, including component treatment
+    template.css           # optional source-layout-specific structure
   assets/                  # only the logos, fonts, textures, and other assets in use
 ```
 
-Name layouts by content purpose, such as `cover`, `section-divider`, `two-column`, `kpi-grid`, `image-left`, `table`, and `closing`. Add a layout only when it represents a meaningfully different, reusable structure.
+Name source layouts by content purpose, such as `cover`, `section-divider`, `two-column`, `kpi-grid`, `image-left`, `table`, and `closing`. Record every input page in `layouts/source-index.json`; equivalent pages may share a layout. Retain distinct compositions even if they have the same broad purpose. A few representative samples are not a substitute for this complete layout inventory.
 
-State clearly in `layouts/README.md` that the packaged files demonstrate page structures and visual language observed in the reference presentation. Later generation tasks should consult them but must not force new content into an existing layout or require every slide to match a packaged file. When needed, create a new layout while preserving the typography system, color roles, repeated components, motifs, and chrome.
+Map the extracted brand into `styles/theme.css`, using the scaffold's `--pl-*` tokens and `.pl-*` semantic classes. Keep `.pl-title` separate from `.pl-metric`. Put shared brand framing in `layouts/chrome.html`; generic fragments carry content relationships rather than logos or brand ornaments. Source-specific compositions can retain their own editable structures and use the same brand rules.
+
+The generated package's `SKILL.md` and `layouts/README.md` must explicitly instruct later authors to:
+
+1. Read `design-system.md` and `layouts/source-index.json` first, and prefer a source layout whose regions and capacity fit the content.
+2. Read `layouts/common/catalog.json` when no source layout fits, then use the selected fragment with `styles/layout.css`, the same `styles/theme.css`, and `layouts/chrome.html` in `_shell.html`.
+3. Adapt or split content to keep the brand's typography and spacing; do not shrink text with page-specific inline styles. Catalog capacities are selection guidance and require checking the actual content and language.
+4. Create a new structure only for a genuine gap, preserving the shared brand rules and documenting the addition.
+
+Neither source layouts nor the generic catalog require forcing unsuitable new content into an existing file.
 
 Original logos, fonts, and textures may be extracted and retained. Do not crop a full-page screenshot containing old text, old data, or one-off content and present it as a template asset.
 
@@ -108,7 +133,13 @@ If the reference presentation contains no images, record only that image usage w
 
 ### 4. Rebuild representative pages and validate the extraction
 
-Use the extracted design rules to rebuild a small number of representative pages. This reconstruction exists only to verify that the extracted information is correct. It is not a page-by-page rebuild of the source and does not generate the source-page images that will be uploaded.
+Use representative source pages to compare the extracted rules against the reference, while checking that the full source layout inventory remains represented. Also assemble every common layout with the shared brand theme and chrome:
+
+```bash
+node scripts/preview-layouts.mjs --package <template-slug>
+```
+
+This writes `<template-slug>/layouts/preview.html`. Existing customized shells must retain the documented slide markers and stylesheet links (see the layout-reuse reference). These rebuilds validate the package; they do not generate the source-page images that will be uploaded.
 
 Check whether the rebuilt pages reproduce:
 
@@ -119,18 +150,15 @@ Check whether the rebuilt pages reproduce:
 - the page margins, content safe area, and layout relationships;
 - the required behavior of `ArrowLeft`, `ArrowUp`, `ArrowRight`, and `ArrowDown`.
 
-Render a rebuilt HTML page to a local 1600×900 image when a visual comparison is useful:
+Render the common-layout preview to ordered local page images:
 
 ```bash
-agent-browser --allow-file-access set viewport 1600 900
-agent-browser --allow-file-access open \
-  file:///ABSOLUTE_PATH/<template-slug>/layouts/<layout-name>.html
-agent-browser screenshot \
-  <validation-dir>/<layout-name>.png
-agent-browser errors
+npx --yes --package="${CLI_PKG_URL}" okou presentation screenshot \
+  --input <template-slug>/layouts/preview.html \
+  --out <validation-dir>
 ```
 
-Compare the rebuild with the user's source-page images. If it reveals a mismatch, correct the extracted design rules and template implementation, then rebuild and check again. `<validation-dir>` is temporary local evidence: never pass it to `--pages` and do not upload its reconstructed screenshots.
+Use the same screenshot command on assembled source-layout examples for reference comparisons. Correct mismatches in shared theme/components, check dense tables and metrics as well as simple columns, and confirm CJK fallbacks and asset paths. If a composition cannot express the brand through these shared rules, use its preserved source layout or document the missing structure; do not silently replace the brand with the neutral starter theme. `<validation-dir>` is temporary local evidence: never pass it to `--pages` and do not upload its reconstructed screenshots.
 
 ### 5. Upload and publish the template
 
@@ -163,7 +191,9 @@ The task is complete only when all of the following are true:
 - the final deliverable is a platform-compliant HTML Presentation Template;
 - the source presentation's primary visual characteristics and layout language are retained;
 - the template supports new content instead of only reproducing the original pages;
-- similar pages have been consolidated into reusable layouts rather than page-specific templates;
+- every meaningfully distinct source layout is retained, with every source page mapped in `layouts/source-index.json`;
+- the 44 shared generic layouts supplement those originals and use one source-adapted brand theme and shared chrome;
+- later authoring instructions explicitly prefer fitting source layouts, consult the common catalog as needed, and preserve typography through content selection or splitting;
 - packaged layouts are explicitly identified as references and do not limit later generation tasks to those layouts;
 - text, shapes, cards, tables, and ordinary charts remain editable HTML, CSS, or SVG;
 - no full-page screenshot substitutes for an editable layout;
@@ -171,6 +201,6 @@ The task is complete only when all of the following are true:
 - typography, color roles, repeated components, motifs, and chrome are represented in the shared design system;
 - no unobserved content type has been turned into a prohibition, including images when the source contains none;
 - every reusable asset is packaged and every logo, font, texture, and stylesheet path resolves;
-- representative page rebuilds have verified the extracted design information;
+- representative source-page rebuilds and all generic layouts have been rendered to verify the extracted design information and brand adaptation;
 - template metadata, layout documentation, and content-region definitions are complete;
 - the normal template publication flow succeeds.
