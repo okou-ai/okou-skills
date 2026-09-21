@@ -5,9 +5,10 @@ description: "Reverse-engineer a Word document into a loadable template skill: S
 
 # Reverse a docx into a template package
 
-Input: one `.docx`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.docx`. Output when anything must survive that a
-style sheet cannot carry: `SKILL.md` and a copy of the source beside it.
+Input: one `.docx`. Output when all five questions in
+`../document-properties.md` answer `no`: a directory holding `SKILL.md`,
+`reference.docx` and `source.docx`. Output for any `yes`: `SKILL.md` and a
+copy of the source beside it.
 
 Run every command below from `reverse-template/docx/`.
 
@@ -15,16 +16,14 @@ Run every command below from `reverse-template/docx/`.
 
 Answer the five questions in
 [`../document-properties.md`](../document-properties.md) against the rendered
-pages. The PDF branch answers the same five, so one document does not get a
-different package for having arrived as a `.docx`.
+pages.
 
 All five `no` — continue at Prerequisites below and build `reference.docx`.
 Any `yes` — take the route immediately below.
 
 ### Any `yes`: package the file and fill it in
 
-A style sheet drops those silently, and no description reproduces a background
-image. Ship the file itself, and have each new document edit a copy of it.
+Ship the file itself, and have each new document edit a copy of it.
 
 List the runs a new document replaces:
 
@@ -42,9 +41,10 @@ description: <what this document is, in one line>
 
 Make the new document by editing a copy of `<source filename>`.
 
-Change only the text inside `<w:t>`. Everything else stays exactly as the file
-has it: the rest of `word/document.xml`, and every other entry in the archive,
-byte for byte.
+Change only the text inside `<w:t>`; where a blank is an underlined `<w:tab/>`,
+put the value in a `<w:t>` in its place inside the same run. Everything else
+stays exactly as the file has it: the rest of `word/document.xml`, and every
+other entry in the archive, byte for byte.
 
 The wording sits here, in reading order:
 
@@ -72,21 +72,18 @@ row and leave the label out. Leave a field's run out too; Word recomputes it.
 Word the table as where the wording sits, never as the set of edits allowed — a
 new document may need one line more, or one fewer.
 
-Then close with one clause per `yes` from `../document-properties.md`, in
-question order, and nothing for a `no`:
+Then paste the clause for each `yes` from `../document-properties.md`, in
+question order, nothing for a `no`. Two of them have docx mechanics:
 
-- **1 wording** — "Reproduce these passages exactly: <where>. Never paraphrase,
-  summarise, renumber, or drop one." Where the source cites its own sections by
-  number, say that dropping one means renumbering the citations with it. Give
-  the table a row per blank rather than per run wherever this applies.
-- **2 blanks** — `python3 scripts/inspect_docx.py <source.docx> --slots` already
-  lists the runs; keep the rows that are typographic gaps.
-- **3 blocks** — the table above is this clause.
-- **4 varying lists** — "Repeat or drop a whole block of the same kind for:
-  <the lists>." Name them; that is what a new instance gets wrong.
-- **5 artwork** — "Never change the type, the spacing, or the position." The
-  table already says to shorten rather than resize; this forbids the other way
-  out.
+- **2 blanks** — list them before pasting the table:
+
+  ```bash
+  python3 scripts/find_blanks.py <source.docx>
+  ```
+
+  `p`/`r` numbers are the `--slots` rows. An `underlined-tab` blank has no
+  `<w:t>` and no row; the package's `<w:tab/>` rule is how it is filled.
+- **3 blocks** — the run table above is this clause; paste nothing more.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \

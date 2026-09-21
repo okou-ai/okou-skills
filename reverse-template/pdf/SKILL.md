@@ -5,9 +5,10 @@ description: "Reverse-engineer a PDF into a loadable template skill: SKILL.md, r
 
 # Reverse a PDF into a template package
 
-Input: one `.pdf`. Output for an article: a directory holding `SKILL.md`,
-`reference.docx` and `source.pdf`. Output when anything must survive that a
-style sheet cannot carry: `SKILL.md` and the source alone.
+Input: one `.pdf`. Output when all five questions in
+`../document-properties.md` answer `no`: a directory holding `SKILL.md`,
+`reference.docx` and `source.pdf`. Output for any `yes`: `SKILL.md` and the
+source alone.
 
 **If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
 pages are slides rather than a document, use `../presentation/SKILL.md`.
@@ -18,19 +19,16 @@ Run every command below from `reverse-template/pdf/`.
 
 Answer the five questions in
 [`../document-properties.md`](../document-properties.md) against the rendered
-pages. Each `yes` adds a clause to the package; all five `no` is the only case
-whose asset is a style sheet.
+pages.
 
 All five `no` — continue at Prerequisites below and build `reference.docx`.
 Any `yes` — take the route immediately below.
 
-## Any `yes`: publish the source itself
+### Any `yes`: publish the source itself
 
-A style sheet carries neither fixed wording, nor blocks, nor artwork. Publish
-the file and stop here.
+Publish the file and stop here.
 
-Write `package/SKILL.md` and put nothing else in `package/`. Open it with the
-styling note, which every one of these packages carries:
+Write `package/SKILL.md` and put nothing else in `package/`. Open it with:
 
 ````markdown
 ---
@@ -42,58 +40,13 @@ Follow the source file's own styling. It is the authority for page size,
 margins, typography, colour, and the position of every block.
 ````
 
-Then add one clause per `yes`, in question order. Write nothing for a `no`.
-
-**1 — wording that must survive.** Name the passages, then:
-
-````markdown
-Reproduce these passages exactly: <where they are>. Never paraphrase,
-summarise, renumber, or drop one. Where the source cites its own sections by
-number, dropping one means renumbering the citations with it.
-````
-
-**2 — blanks.** List them rather than reading them off the page:
+Then paste the clause for each `yes` from `../document-properties.md`, in
+question order, nothing for a `no`. Question 2 lists its blanks from the file:
 
 ```bash
 pip install pymupdf
 python3 scripts/find_blanks.py <source.pdf>
 ```
-
-It reports three kinds, because a PDF writes a blank three ways and only the
-first is a character: a run of underscores, a rule drawn under spaces, and a
-parenthetical instruction such as `(NAME)`. Check the list against the rendered
-pages — one field can show as two marks, and an acronym that nothing defines
-nearby still reads as a blank. Then one row per field, not per mark:
-
-````markdown
-| Blank | Holds |
-|---|---|
-| `<the blank as the page shows it>` | <what a new document puts there> |
-````
-
-**3 — blocks that come back.** In reading order:
-
-````markdown
-Keep these blocks and what each holds:
-
-- <one line per block>
-````
-
-**4 — lists of a different length each time.** Name them, then:
-
-````markdown
-Repeat or drop a whole block of the same kind for: <the lists>. Never build one
-from scratch and never let one fall back to a style default.
-````
-
-**5 — artwork carries the page.**
-
-````markdown
-Keep the artwork and where each line sits. If a replacement no longer fits,
-shorten the wording — never the type, the spacing, or the position.
-````
-
-### Publishing
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \

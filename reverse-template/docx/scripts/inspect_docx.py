@@ -5,8 +5,8 @@ Usage:  python3 inspect_docx.py source.docx
         python3 inspect_docx.py source.docx --slots
 
 Read-only. Exit code 0 means it is usable as is; 1 means build_reference.py
-needs to fill gaps first. --slots takes the fixed-structure route instead and
-lists the body runs a new document replaces; it always exits 0.
+needs to fill gaps first. --slots serves the route that packages the source itself:
+it lists the body runs a new document replaces, and always exits 0.
 """
 import collections
 import sys, zipfile, re, os
@@ -94,7 +94,7 @@ def para_props(z, name_to_id, names):
 
 
 def slots(path):
-    """List the body runs a fixed-structure template can replace.
+    """List the body runs a packaged source lets a new document replace.
 
     One row per <w:r> that holds text, because a run is the largest unit whose
     <w:t> can be swapped without touching formatting. A run inside a field
