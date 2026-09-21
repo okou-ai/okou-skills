@@ -53,8 +53,8 @@ sudo apt-get install -y -qq libreoffice-writer
 Fonts must exist on the authoring/rendering host. Check the selected family with
 `fc-match`, including the correct CJK region or complex-script family. Do not
 turn an old environment failure into a ban on an engine: verify the actual
-dependency and output. `requirements.txt` installs the full maintained test
-toolchain; the route guides list smaller authoring installs.
+dependency and output. Install the dependencies listed for the selected route;
+use `requirements.txt` when the complete bundled toolchain is needed.
 
 If the toolchain is unavailable, explain the blocked export/preview. Return a
 usable source when possible, clearly marked as not visually verified. Do not
