@@ -26,6 +26,10 @@ arrangement and changes the content — a resume, an invoice, a certificate.
 Judge on what the document is, not on how it looks — a plain single-column
 resume is still a fixed structure. An article continues at Prerequisites below.
 
+A fixed structure divides again on whether its pages leave blanks. One that does
+is a form, and its two sections below differ in what a new document is allowed
+to rewrite; read both before writing the package.
+
 ### A fixed structure: publish the source itself
 
 A style sheet drops those silently. Publish the file and stop here.
@@ -57,6 +61,45 @@ npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
 ```
 
 Say the template exists only after the command succeeds.
+
+### A form: fill the blanks, keep the rest word for word
+
+A fixed structure whose pages leave blanks is a **form** — a contract, an
+invoice, an application, a certificate with a name to enter. A resume leaves
+none: every line of it is replaced. A form's blanks are the only part a new
+document writes, and everything outside them is the document itself rather than
+a sample of one, so "replace the content" above is the wrong instruction here. A
+new agreement fills in the party and keeps its indemnity clause to the letter.
+
+List the blanks rather than reading them off the page:
+
+```bash
+pip install pymupdf
+python3 scripts/find_blanks.py <source.pdf>
+```
+
+It reports three kinds, because a PDF writes a blank three ways and only the
+first is a character: a run of underscores, a rule drawn under spaces, and a
+parenthetical instruction such as `(NAME)`. Check the list against the rendered
+pages before writing the table — one field can show as two marks, and an acronym
+that nothing defines nearby still reads as a blank.
+
+Package and publish exactly as above, with the entry list replaced by:
+
+````markdown
+Fill the blanks. Every other word is the document: reproduce it exactly, and
+never paraphrase, summarise, renumber, or drop a passage that has no blank in
+it.
+
+| Blank | Holds |
+|---|---|
+| `<the blank as the page shows it>` | <what a new document puts there> |
+````
+
+Name a blank by the sentence it sits in, not by its line number, and give one
+row per field — two marks around one name are one row. Where the source numbers
+its sections and cites them by number, say so: adding or dropping a section
+means renumbering the citations with it.
 
 ## Prerequisites
 
