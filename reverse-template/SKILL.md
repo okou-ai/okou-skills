@@ -41,5 +41,5 @@ Four rules override the table:
   slides — is that page's kind, not artwork.
 
 `cd` into the branch directory; every path inside a branch guide is relative to
-it. Both document guides open with the five questions in
-[`document-properties.md`](document-properties.md).
+it. Both document guides open by choosing a route in
+[`document-routes.md`](document-routes.md).

@@ -5,31 +5,32 @@ description: "Reverse-engineer a Word document into a loadable template skill: S
 
 # Reverse a docx into a template package
 
-Input: one `.docx`. Output when all five questions in
-`../document-properties.md` answer `no`: a directory holding `SKILL.md`,
-`reference.docx` and `source.docx`. Output for any `yes`: `SKILL.md` and a
-copy of the source beside it.
+Input: one `.docx`. Output on the Style sheet route: a directory holding
+`SKILL.md`, `reference.docx` and `source.docx`. Output on the Slots and
+Composition routes: `SKILL.md` and a copy of the source beside it.
 
 Run every command below from `reverse-template/docx/`.
 
-## Before anything — what must survive?
+## Before anything — what may a new document change?
 
-Answer the five questions in
-[`../document-properties.md`](../document-properties.md) against the rendered
-pages.
+Choose the route in [`../document-routes.md`](../document-routes.md) from the
+rendered pages.
 
-All five `no` — continue at Prerequisites below and build `reference.docx`.
-Any `yes` — take the route immediately below.
+Style sheet — continue at Prerequisites below and build `reference.docx`.
+Slots or Composition — take the route immediately below.
 
-### Any `yes`: package the file and fill it in
+### Slots or Composition: package the file and edit a copy
 
 Ship the file itself, and have each new document edit a copy of it.
 
-List the runs a new document replaces:
+List the runs a new document can replace:
 
 ```bash
 python3 scripts/inspect_docx.py <source.docx> --slots
 ```
+
+A gap drawn as an underlined `<w:tab/>` holds no `<w:t>`, so `--slots` cannot
+list it. Take those off the rendered pages.
 
 Copy the source into `package/`, then write `package/SKILL.md` beside it:
 
@@ -69,21 +70,15 @@ rather than for this document with new wording.
 One row per run, named off `--slots` and the rendered pages; write nothing they
 do not show. A label and its value are usually separate runs — give the value a
 row and leave the label out. Leave a field's run out too; Word recomputes it.
-Word the table as where the wording sits, never as the set of edits allowed — a
-new document may need one line more, or one fewer.
 
-Then paste the clause for each `yes` from `../document-properties.md`, in
-question order, nothing for a `no`. Two of them have docx mechanics:
+The route decides what the table holds and how the package closes:
 
-- **2 blanks** — list them before pasting the table:
-
-  ```bash
-  python3 scripts/find_blanks.py <source.docx>
-  ```
-
-  `p`/`r` numbers are the `--slots` rows. An `underlined-tab` blank has no
-  `<w:t>` and no row; the package's `<w:tab/>` rule is how it is filled.
-- **3 blocks** — the run table above is this clause; paste nothing more.
+- **Slots** — a row per gap, and nothing else. Close with `Reproduce every
+  other run as it stands.` A row for a clause invites a rewrite of it.
+- **Composition** — a row per run a new instance rewrites. Word the table as
+  where the wording sits, never as the set of edits allowed; a new document may
+  need one line more, or one fewer. Keep the copy-or-delete rule above, and
+  name any passage that must stay word for word.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \

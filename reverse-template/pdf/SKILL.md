@@ -5,30 +5,27 @@ description: "Reverse-engineer a PDF into a loadable template skill: SKILL.md, r
 
 # Reverse a PDF into a template package
 
-Input: one `.pdf`. Output when all five questions in
-`../document-properties.md` answer `no`: a directory holding `SKILL.md`,
-`reference.docx` and `source.pdf`. Output for any `yes`: `SKILL.md` and the
-source alone.
+Input: one `.pdf`. Output on the Style sheet route: a directory holding
+`SKILL.md`, `reference.docx` and `source.pdf`. Output on the Slots and
+Composition routes: `SKILL.md` and the source alone.
 
 **If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
 pages are slides rather than a document, use `../presentation/SKILL.md`.
 
 Run every command below from `reverse-template/pdf/`.
 
-## Before anything — what must survive?
+## Before anything — what may a new document change?
 
-Answer the five questions in
-[`../document-properties.md`](../document-properties.md) against the rendered
-pages.
+Choose the route in [`../document-routes.md`](../document-routes.md) from the
+rendered pages.
 
-All five `no` — continue at Prerequisites below and build `reference.docx`.
-Any `yes` — take the route immediately below.
+Style sheet — continue at Prerequisites below and build `reference.docx`.
+Slots or Composition — take the route immediately below.
 
-### Any `yes`: publish the source itself
+### Slots or Composition: publish the source itself
 
-Publish the file and stop here.
-
-Write `package/SKILL.md` and put nothing else in `package/`. Open it with:
+Publish the file and stop here. Write `package/SKILL.md`, put nothing else in
+`package/`, and open it with the styling note:
 
 ````markdown
 ---
@@ -40,13 +37,16 @@ Follow the source file's own styling. It is the authority for page size,
 margins, typography, colour, and the position of every block.
 ````
 
-Then paste the clause for each `yes` from `../document-properties.md`, in
-question order, nothing for a `no`. Question 2 lists its blanks from the file:
+Then say what a new document changes, off the rendered pages, writing nothing
+they do not show:
 
-```bash
-pip install pymupdf
-python3 scripts/find_blanks.py <source.pdf>
-```
+- **Slots** — one line per gap the page leaves and what it holds, then
+  `Reproduce every other word as it stands.` A gap can print as two marks and
+  still be one field. Never word an entry as licence to rewrite a clause.
+- **Composition** — one line per block and what it holds, in reading order,
+  then `Repeat or drop a whole block of the same kind for <the lists that vary>.
+  Never build one from scratch and never let one fall back to a style default.`
+  Name any passage that must stay word for word.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
