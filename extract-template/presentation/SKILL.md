@@ -38,7 +38,7 @@ Preserve the original source and inspect every page in its original order. Estab
 - visual consistency across pages;
 - page roles such as cover, section divider, content, data, and closing pages.
 
-For PPT, PPTX, and PDF inputs, run this command from `extract-template/presentation/`:
+For PPT, PPTX, and PDF inputs, run this command from the directory containing this guide:
 
 ```bash
 node scripts/render-pages.mjs \
