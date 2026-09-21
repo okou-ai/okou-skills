@@ -1,44 +1,15 @@
 ---
 name: presentation-extract-template
-description: Extract a reusable, editable, renderable, and publishable HTML Presentation Template from a reference PPTX, PPT, PDF, image deck, or set of page screenshots. Use when a reference presentation's typography system, color roles, repeated components, motifs, chrome, and layouts should become a reusable template, with ordered source-page images and a complete package prepared for publication.
+description: Extract and publish a reusable HTML presentation template from PPTX, PPT, PDF, image decks, or page screenshots. Preserve the source's typography, layouts, backgrounds, decoration, and brand framing as editable structures and reusable assets.
 ---
 
-# Extract an HTML template from a reference presentation
+# Extract a presentation template
 
-## Goal
+Turn the reference into a platform-compliant HTML template for new content. The source defines its visual language; the output remains HTML regardless of input format.
 
-Convert the user's reference presentation into a reusable HTML Presentation Template.
+## 1. Inspect the source
 
-The input may be a PPTX, PPT, PDF, image deck, or set of page screenshots. Regardless of the input format, the final deliverable must be an HTML presentation template package that conforms to the platform specification.
-
-The source provides visual and layout reference only. It does not determine the technical format of the final template.
-
-## Principles
-
-- Reimplement the template in HTML and CSS.
-- Reproduce the presentation's visual language and layout system, not the source file's internal object structure.
-- The template must support new content instead of merely reproducing the original presentation.
-- Consolidate similar pages into reusable layouts instead of creating one-off templates for individual pages.
-- Never use full-page screenshots in place of editable HTML layouts.
-- Reusable source logos, fonts, and textures may be retained as template assets.
-- Scripts prepare viewable page images and delivery files only. The AI determines typography, color roles, components, motifs, chrome, and layout meaning by inspecting the rendered pages.
-- Packaged layouts are references, not a layout whitelist. A later generation task may use another layout when the new content calls for it, provided it retains the same design system.
-- The absence of a content type in the source is not a prohibition. In particular, a source presentation with no images must not cause the template to forbid images in future presentations.
-
-## Workflow
-
-### 1. Inspect the complete input
-
-Preserve the original source and inspect every page in its original order. Establish:
-
-- page ratio, canvas size, and page count;
-- primary content types;
-- recurring page structures;
-- typography, colors, and graphic material;
-- visual consistency across pages;
-- page roles such as cover, section divider, content, data, and closing pages.
-
-For PPT, PPTX, and PDF inputs, run this command from the directory containing this guide:
+Preserve the original and inspect every page in order, noting canvas ratio, page count, content types, page roles, and recurring structures. For PPT, PPTX, or PDF, run from this guide's directory:
 
 ```bash
 node scripts/render-pages.mjs \
@@ -46,103 +17,59 @@ node scripts/render-pages.mjs \
   --out <source-pages-dir>
 ```
 
-The command writes ordered source-page images named `page-001.png`, `page-002.png`, and so on.
+This writes ordered source images (`page-001.png`, `page-002.png`, …). Determine design rules from the rendered pages, not file structure alone.
 
-### 2. Extract the design system
+## 2. Extract the design system
 
-Inspect the complete rendered presentation and prioritize five kinds of information:
+Record in `design-system.md`:
 
-1. **Typography system:** font families, display and body faces, size hierarchy, weights, line heights, letter spacing, and CJK fallbacks.
-2. **Color roles:** primary and alternate backgrounds, body text, muted text, accents, borders, states, and data-series colors. Record what each color does, not only its value.
-3. **Repeated components:** recurring content structures such as cards, labels, metrics, charts, tables, quotes, steps, and image frames, including their fixed and variable parts.
-4. **Motifs:** recurring decorative shapes, textures, lines, geometry, illustration treatments, or compositional gestures that carry the presentation's identity.
-5. **Chrome:** page numbers, headers, footers, logos, edge markers, persistent navigation, and other framing elements repeated across pages.
+- Typography: display/body fonts, size hierarchy, weights, line heights, spacing, and CJK fallbacks.
+- Color and geometry: foreground/background roles, accents, chart colors, margins, content-safe areas, borders, radii, and image crops.
+- Repeated components and chrome: cards, metrics, tables, quotes, image frames, logos, headers, footers, and page markers.
+- Background fields and content-independent decorations: reusable elements, source-observed combinations, and allowed adaptations.
 
-Also capture the rules required to implement reusable layouts:
+Read [references/layout-reuse.md](references/layout-reuse.md) for the source inventory and background composition rules. Distinguish observed rules from inferred or fallback choices. An absent content type, such as images, is not a prohibition on future use.
 
-- page margins and the content safe area;
-- page roles and reusable reference layout types;
-- corner radii, borders, shadows, and image-cropping behavior;
-- chart, table, label, and metric styling;
-- which rules stay fixed and which may vary with the content.
-
-Implement these rules as shared HTML/CSS variables, base styles, and components instead of scattering them across individual sample pages. Leave anything the source does not establish undefined rather than inventing it.
-
-### 3. Implement the HTML template
-
-Follow the platform's HTML Presentation specification:
-
-- use the platform's required 16:9 slide canvas;
-- use shared design variables, base styles, and font declarations;
-- implement recurring structures as reusable layouts and components;
-- give variable content clear semantic regions;
-- allow later generation tasks to replace text, images, and data;
-- make every layout render independently and reliably;
-- use package-relative resource paths and verify that every resource loads;
-- make the assembled HTML presentation support four-direction keyboard navigation: `ArrowLeft` and `ArrowUp` go to the previous slide, while `ArrowRight` and `ArrowDown` go to the next slide;
-- prefer normal document flow, Flexbox, and CSS Grid; reserve absolute positioning for fixed chrome, decoration layers, and intentional overlays;
-- implement text, shapes, cards, tables, and ordinary charts as editable HTML, CSS, or SVG.
-
-Use this package shape as a guide and omit unused files or directories:
+## 3. Build the editable package
 
 ```text
 <template-slug>/
-  SKILL.md                 # template metadata and usage instructions
-  design-system.md         # visual rules, component rules, and asset notes
+  SKILL.md                 # usage and authoring instructions
+  design-system.md         # brand rules, background elements/recipes, asset notes
   layouts/
-    README.md              # layout index, purposes, and content-region definitions
-    _shell.html            # shared canvas, fonts, chrome, and base structure
-    <layout-name>.html     # reusable example layout
-  styles/
-    template.css           # shared CSS; may be inlined in _shell.html if required
-  assets/                  # only the logos, fonts, textures, and other assets in use
+    README.md              # layout selection and assembly instructions
+    source-index.json      # every source page mapped to a preserved layout
+    source/<name>.html     # distinct source compositions
+    _shell.html            # shared canvas, fonts, chrome, and navigation
+  styles/template.css      # shared layout, brand, and component styles
+  assets/                  # reusable logos, fonts, textures, and artwork
 ```
 
-Name layouts by content purpose, such as `cover`, `section-divider`, `two-column`, `kpi-grid`, `image-left`, `table`, and `closing`. Add a layout only when it represents a meaningfully different, reusable structure.
+Preserve every distinct source composition and prefer it when new content fits. Group equivalent structures, keeping background variants separate. When no source layout fits, add a documented layout in the same design system; packaged layouts are references, not a whitelist.
 
-State clearly in `layouts/README.md` that the packaged files demonstrate page structures and visual language observed in the reference presentation. Later generation tasks should consult them but must not force new content into an existing layout or require every slide to match a packaged file. When needed, create a new layout while preserving the typography system, color roles, repeated components, motifs, and chrome.
+Use a 16:9 canvas, shared CSS variables/components, and semantic regions for replaceable text, images, and data. Keep title and metric typography separate. Preserve hierarchy and spacing through content selection or splitting rather than page-specific font shrinking. Prefer normal flow, Flexbox, or Grid; use absolute positioning for chrome, decoration, and intentional overlays.
 
-Original logos, fonts, and textures may be extracted and retained. Do not crop a full-page screenshot containing old text, old data, or one-off content and present it as a template asset.
+Text, shapes, cards, tables, and ordinary charts must remain editable HTML/CSS/SVG. Retain isolated reusable artwork; never substitute a full-page screenshot for an editable layout or package old text/data as decoration.
 
-If the reference presentation contains no images, record only that image usage was not observed in the reference. Do not turn that observation into "no images," "text-only layouts," or another authoring restriction. When new content needs imagery, an image layout may be introduced with cropping, borders, corner radii, and composition that fit the design system.
+Document assembly through the shared shell, with working package-relative asset paths. Support all four navigation keys: `ArrowLeft`/`ArrowUp` go back; `ArrowRight`/`ArrowDown` go forward.
 
-### 4. Rebuild representative pages and validate the extraction
+The generated `SKILL.md` and `layouts/README.md` must direct authors to the design system and source index, explain source-first selection and background composition, and identify the shared styles and assembly steps.
 
-Use the extracted design rules to rebuild a small number of representative pages. This reconstruction exists only to verify that the extracted information is correct. It is not a page-by-page rebuild of the source and does not generate the source-page images that will be uploaded.
+## 4. Validate representative rebuilds
 
-Check whether the rebuilt pages reproduce:
-
-- the reference page structure;
-- the typography and color system;
-- the structure and styling of repeated components;
-- the position, proportion, and use of motifs and chrome;
-- the page margins, content safe area, and layout relationships;
-- the required behavior of `ArrowLeft`, `ArrowUp`, `ArrowRight`, and `ArrowDown`.
-
-Render a rebuilt HTML page to a local 1600×900 image when a visual comparison is useful:
+Rebuild representative source pages and background combinations, including documented adaptations. Confirm that the source inventory covers every page. Render the assembled examples:
 
 ```bash
-agent-browser --allow-file-access set viewport 1600 900
-agent-browser --allow-file-access open \
-  file:///ABSOLUTE_PATH/<template-slug>/layouts/<layout-name>.html
-agent-browser screenshot \
-  <validation-dir>/<layout-name>.png
-agent-browser errors
+npx --yes --package="${CLI_PKG_URL}" okou presentation screenshot \
+  --input <rebuilt-deck.html> \
+  --out <validation-dir>
 ```
 
-Compare the rebuild with the user's source-page images. If it reveals a mismatch, correct the extracted design rules and template implementation, then rebuild and check again. `<validation-dir>` is temporary local evidence: never pass it to `--pages` and do not upload its reconstructed screenshots.
+Compare structure, typography, colors, component styling, decoration placement, and safe areas against the source. Fix shared rules where needed; verify navigation, language fallbacks, and asset loading. Rebuilt images are local validation evidence, not source-page images for publication.
 
-### 5. Upload and publish the template
+## 5. Publish
 
-The completed template package must contain the platform-required:
-
-- template metadata and usage instructions;
-- reusable HTML layouts;
-- shared CSS;
-- logos, fonts, textures, and other reusable static assets;
-- layout and content-region definitions.
-
-Use the normal template publication flow for final delivery. The command uploads and commits the source file, ordered source-page images, and HTML template package together:
+Publish the source file, ordered original page images, and complete template package together:
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou presentation-template publish \
@@ -152,25 +79,6 @@ npx --yes --package="${CLI_PKG_URL}" okou presentation-template publish \
   --package <template-slug>
 ```
 
-The current `--source` option accepts PPTX or PDF. Convert and preserve a legacy PPT as PPTX before publishing. For an image deck or page screenshots, first create a PDF that preserves the original page order and retain the provenance of the original inputs.
+`--source` accepts PPTX or PDF. Convert legacy PPT to PPTX; for images/screenshots, create a PDF preserving page order and retain input provenance. `--pages` must contain only original source screenshots in filename order, never reconstructed validation images.
 
-`<source-pages-dir>` must contain only screenshots of the user's source pages. Their filename order determines upload order. Never mix reconstructed validation images into this directory. Claim that the template was created or published only after the publication command succeeds; report the specific blocker if it fails.
-
-## Completion criteria
-
-The task is complete only when all of the following are true:
-
-- the final deliverable is a platform-compliant HTML Presentation Template;
-- the source presentation's primary visual characteristics and layout language are retained;
-- the template supports new content instead of only reproducing the original pages;
-- similar pages have been consolidated into reusable layouts rather than page-specific templates;
-- packaged layouts are explicitly identified as references and do not limit later generation tasks to those layouts;
-- text, shapes, cards, tables, and ordinary charts remain editable HTML, CSS, or SVG;
-- no full-page screenshot substitutes for an editable layout;
-- the HTML presentation supports navigation with all four arrow keys;
-- typography, color roles, repeated components, motifs, and chrome are represented in the shared design system;
-- no unobserved content type has been turned into a prohibition, including images when the source contains none;
-- every reusable asset is packaged and every logo, font, texture, and stylesheet path resolves;
-- representative page rebuilds have verified the extracted design information;
-- template metadata, layout documentation, and content-region definitions are complete;
-- the normal template publication flow succeeds.
+Completion requires the editable package, source layout coverage, reusable background elements with composition guidance, successful validation, and a successful publication command. Report publication failures explicitly; do not claim delivery before it succeeds.
