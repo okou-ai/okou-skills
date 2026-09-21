@@ -21,8 +21,8 @@ The source provides visual and layout reference only. It does not determine the 
 - Preserve every meaningfully distinct source layout. Pages with equivalent content structure and proportions may share a layout; preserve their background and decoration differences separately, with source-page mappings.
 - Never use full-page screenshots in place of editable HTML layouts.
 - Reusable source logos, fonts, and textures may be retained as template assets.
-- Scripts prepare page images, copy the shared layout scaffold, and assemble previews. The AI determines typography, color roles, components, motifs, chrome, and source layout meaning by inspecting the rendered pages.
-- Prefer a preserved source layout when the new content fits. Otherwise use the shared generic library with the extracted brand theme; create a new layout only for a structure neither collection supports. Packaged layouts are not a whitelist.
+- Scripts prepare viewable page images and delivery files only. The AI determines typography, color roles, components, motifs, chrome, and source layout meaning by inspecting the rendered pages.
+- Prefer a preserved source layout when the new content fits. When no preserved layout supports the content, create a documented layout using the same design system. Packaged layouts are not a whitelist.
 - The absence of a content type in the source is not a prohibition. In particular, a source presentation with no images must not cause the template to forbid images in future presentations.
 
 ## Workflow
@@ -85,13 +85,7 @@ Follow the platform's HTML Presentation specification:
 - prefer normal document flow, Flexbox, and CSS Grid; reserve absolute positioning for fixed chrome, decoration layers, and intentional overlays;
 - implement text, shapes, cards, tables, and ordinary charts as editable HTML, CSS, or SVG.
 
-Read [references/layout-reuse.md](references/layout-reuse.md) when building the package. It defines source provenance, shared layout selection, and the brand CSS boundary. Install the bundled 44 generic layouts from the directory containing this guide:
-
-```bash
-node scripts/install-layout-library.mjs --package <template-slug>
-```
-
-The installer preserves existing source files and customized theme, shell, and chrome. It refuses a conflicting shared library file without overwriting it. These generic layouts supplement the source layouts; they are not 44 layouts extracted from the user's deck.
+Read [references/layout-reuse.md](references/layout-reuse.md) when building the package. It defines the source layout inventory, reuse priority, and background element/composition guidance.
 
 Use this package shape:
 
@@ -104,33 +98,26 @@ Use this package shape:
     source-index.json      # every source page mapped to its preserved layout
     source/                # every meaningfully distinct original layout
       <layout-name>.html
-    common/
-      catalog.json         # generic purposes, regions, and capacity guidance
-      <layout-name>.html   # 44 shared generic content fragments
-    _shell.html            # canvas, stylesheet links, navigation, slide markers
-    chrome.html            # shared brand logo, footer, page markers, and edge elements
+    _shell.html            # shared canvas, fonts, chrome, navigation, and base structure
   styles/
-    layout.css             # generic layout structures; keep the shared copy intact
-    theme.css              # one shared brand theme, including component treatment
-    template.css           # optional source-layout-specific structure
+    template.css           # extracted layout, brand, background, and component styles
   assets/                  # only the logos, fonts, textures, and other assets in use
 ```
 
 Name source layouts by content purpose, such as `cover`, `section-divider`, `two-column`, `kpi-grid`, `image-left`, `table`, and `closing`. Record every input page in `layouts/source-index.json`; equivalent pages may share a layout. Retain distinct compositions even if they have the same broad purpose. A few representative samples are not a substitute for this complete layout inventory.
 
-Map the extracted brand into `styles/theme.css`, using the scaffold's `--pl-*` tokens and `.pl-*` semantic classes. Keep `.pl-title` separate from `.pl-metric`. Put shared brand framing in `layouts/chrome.html`; generic fragments carry content relationships rather than logos or brand ornaments. Source-specific compositions can retain their own editable structures and use the same brand rules.
+Implement the extracted brand and reusable components in shared `styles/template.css`. Keep slide-title and metric typography separate. Preserve source compositions as editable structures, with shared brand framing in the shell or reusable components.
 
-Implement reusable background-field and decoration styles in `styles/theme.css`, with source-backed combinations documented in `design-system.md`. Select these independently from content layout, subject to the combination's usable content area. The scaffold's background-image and motif layers support this composition; no brand-specific background choices are preinstalled.
+Implement reusable background-field and decoration styles in the same shared CSS, with source-backed combinations documented in `design-system.md`. Select these independently from content layout, subject to the combination's usable content area.
 
 The generated package's `SKILL.md` and `layouts/README.md` must explicitly instruct later authors to:
 
 1. Read `design-system.md` and `layouts/source-index.json` first, and prefer a source layout whose regions and capacity fit the content.
-2. Read `layouts/common/catalog.json` when no source layout fits, then use the selected fragment with `styles/layout.css`, the same `styles/theme.css`, and `layouts/chrome.html` in `_shell.html`.
-3. Read the background element and recipe inventories in `design-system.md`. Prefer a source-observed combination of background fields and decoration, then adapt within its documented color, placement, crop, and content-area rules. Use a compatible quiet recipe for dense content when available.
-4. Adapt or split content to keep the brand's typography and spacing; do not shrink text with page-specific inline styles. Catalog capacities are selection guidance and require checking the actual content and language.
-5. Create a new structure only for a genuine gap, preserving the shared brand rules and documenting the addition.
+2. Read the background element and recipe inventories in `design-system.md`. Prefer a source-observed combination of background fields and decoration, then adapt within its documented color, placement, crop, and content-area rules. Use a compatible quiet recipe for dense content when available.
+3. Adapt or split content to keep the brand's typography and spacing; do not shrink text with page-specific inline styles. Recorded layout capacities are selection guidance and require checking the actual content and language.
+4. Create a new structure only when the source layouts do not support the content, preserving the shared brand rules and documenting the addition.
 
-Neither source layouts nor the generic catalog require forcing unsuitable new content into an existing file.
+Do not force unsuitable new content into a preserved source layout.
 
 Original logos, fonts, and textures may be extracted and retained. Do not crop a full-page screenshot containing old text, old data, or one-off content and present it as a template asset.
 
@@ -138,13 +125,7 @@ If the reference presentation contains no images, record only that image usage w
 
 ### 4. Rebuild representative pages and validate the extraction
 
-Use representative source pages to compare the extracted rules against the reference, while checking that the full source layout inventory remains represented. Also assemble every common layout with the shared brand theme and chrome:
-
-```bash
-node scripts/preview-layouts.mjs --package <template-slug>
-```
-
-This writes `<template-slug>/layouts/preview.html`. Existing customized shells must retain the documented slide markers and stylesheet links (see the layout-reuse reference). These rebuilds validate the package; they do not generate the source-page images that will be uploaded.
+Use representative source pages to compare the extracted rules against the reference, while checking that the full source layout inventory remains represented. Include the observed background combinations and representative documented adaptations. These rebuilds validate the package; they do not generate the source-page images that will be uploaded.
 
 Check whether the rebuilt pages reproduce:
 
@@ -155,15 +136,15 @@ Check whether the rebuilt pages reproduce:
 - the page margins, content safe area, and layout relationships;
 - the required behavior of `ArrowLeft`, `ArrowUp`, `ArrowRight`, and `ArrowDown`.
 
-Render the common-layout preview to ordered local page images:
+Render assembled HTML examples to ordered local page images:
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou presentation screenshot \
-  --input <template-slug>/layouts/preview.html \
+  --input <rebuilt-deck.html> \
   --out <validation-dir>
 ```
 
-Use the same screenshot command on assembled source-layout examples for reference comparisons. Correct mismatches in shared theme/components, check dense tables and metrics as well as simple columns, and confirm CJK fallbacks and asset paths. If a composition cannot express the brand through these shared rules, use its preserved source layout or document the missing structure; do not silently replace the brand with the neutral starter theme. `<validation-dir>` is temporary local evidence: never pass it to `--pages` and do not upload its reconstructed screenshots.
+Compare the rebuilds with the user's source-page images. Correct mismatches in shared styles/components and confirm the supported language fallbacks and asset paths. `<validation-dir>` is temporary local evidence: never pass it to `--pages` and do not upload its reconstructed screenshots.
 
 ### 5. Upload and publish the template
 
@@ -197,8 +178,7 @@ The task is complete only when all of the following are true:
 - the source presentation's primary visual characteristics and layout language are retained;
 - the template supports new content instead of only reproducing the original pages;
 - every meaningfully distinct source layout is retained, with every source page mapped in `layouts/source-index.json`;
-- the 44 shared generic layouts supplement those originals and use one source-adapted brand theme and shared chrome;
-- later authoring instructions explicitly prefer fitting source layouts, consult the common catalog as needed, and preserve typography through content selection or splitting;
+- later authoring instructions explicitly prefer fitting source layouts and preserve typography through content selection or splitting;
 - packaged layouts are explicitly identified as references and do not limit later generation tasks to those layouts;
 - text, shapes, cards, tables, and ordinary charts remain editable HTML, CSS, or SVG;
 - no full-page screenshot substitutes for an editable layout;
@@ -207,6 +187,6 @@ The task is complete only when all of the following are true:
 - background fields and content-independent decorations are reusable separately, with source-observed recipes and explicit combination guidance in the generated package;
 - no unobserved content type has been turned into a prohibition, including images when the source contains none;
 - every reusable asset is packaged and every logo, font, texture, and stylesheet path resolves;
-- representative source-page rebuilds and all generic layouts have been rendered to verify the extracted design information and brand adaptation;
+- representative source-page rebuilds and background combinations have been rendered to verify the extracted design information;
 - template metadata, layout documentation, and content-region definitions are complete;
 - the normal template publication flow succeeds.
