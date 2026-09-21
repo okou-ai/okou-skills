@@ -76,6 +76,7 @@ class DocumentQATest(unittest.TestCase):
         observations = {
             "legibility_and_density": "Fixture body is readable with generous spacing.",
             "hierarchy": "Fixture heading and body have a clear reading order.",
+            "composition_and_rhythm": "Fixture uses a balanced single-column composition.",
             "pagination_and_grouping": "All fixture content remains together on this page.",
             "tables_and_figures": "No tables or figures are present in this fixture.",
         }
@@ -110,7 +111,7 @@ class DocumentQATest(unittest.TestCase):
         missing_criterion = json.loads(json.dumps(full_review))
         del missing_criterion["pages"][1]["criteria"]["hierarchy"]
         qa.write_json(self.out / "review.json", missing_criterion)
-        with self.assertRaisesRegex(ValueError, "four visual criteria"):
+        with self.assertRaisesRegex(ValueError, "five visual criteria"):
             qa.accept(self.out)
         qa.write_json(self.out / "review.json", full_review)
         acceptance = qa.accept(self.out)

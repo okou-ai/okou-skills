@@ -19,8 +19,9 @@ import docx
 import pymupdf
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from render_document import (find_pandoc, inline_text, language_of, render,
-                             source_expectations, validate_docx, validate_source)
+from render_document import (apply_design_components, find_pandoc, inline_text,
+                             language_of, render, source_expectations,
+                             validate_docx, validate_source)
 from document_style import build_reference
 
 FIXTURES = Path(__file__).parent / 'fixtures'
@@ -50,6 +51,18 @@ class SourceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'would be lost'):
             validate_source({'blocks': [{'t': 'RawBlock', 'c': ['html', '<table>Important</table>']}]})
         validate_source({'blocks': [{'t': 'RawBlock', 'c': ['openxml', '<w:p/>']}]})
+
+    def test_design_classes_map_to_native_components_without_rewriting_text(self):
+        ast = {'blocks': [
+            {'t': 'Table', 'c': [['summary', ['metric-grid'], []], {}, [], {}, [], {}]},
+            {'t': 'Header', 'c': [1, ['', ['chapter'], []], [{'t': 'Str', 'c': 'Details'}]]},
+        ]}
+        apply_design_components(ast)
+        self.assertIn(['custom-style', 'MetricGrid'], ast['blocks'][0]['c'][0][2])
+        self.assertEqual(ast['blocks'][1]['t'], 'RawBlock')
+        self.assertIn('w:type="page"', ast['blocks'][1]['c'][1])
+        self.assertEqual(ast['blocks'][2]['t'], 'Header')
+        self.assertEqual(inline_text(ast['blocks'][2]['c'][2]), 'Details')
 
     def test_math_source_is_not_required_as_literal_pdf_text(self):
         ast = {'blocks': [
@@ -94,6 +107,30 @@ class ExportTests(unittest.TestCase):
     def test_default_export_has_no_missing_styles(self):
         for artifact in self.exports.values():
             validate_docx(artifact['outputs']['docx']['path'])
+
+    def test_editorial_components_render_as_word_styles_and_real_pages(self):
+        source = self.root / 'editorial.md'
+        source.write_text(
+            '---\nlang: zh-CN\ntitle: 版式样例\nsubtitle: 同一份内容，更清楚的层级\n---\n\n'
+            '::: {custom-style="Deck"}\n这是一段用于建立阅读节奏的导语。\n:::\n\n'
+            '| 88.3% | 20.2× | 121× |\n|---:|---:|---:|\n'
+            '| 内部运行占比 | 机器放大倍数差 | 模型成本差 |\n\n'
+            ': {#summary .metric-grid}\n\n'
+            '::: {custom-style="Key Takeaway"}\n工具不会自动创造构图；设计参照和逐页复核才会。\n:::\n\n'
+            '# 01 详细内容 {.chapter}\n\n正文从新页开始，并保持为可编辑文本。\n',
+            encoding='utf-8')
+        result = render(source, self.root / 'editorial-out')
+        document = docx.Document(result['outputs']['docx']['path'])
+        self.assertEqual(document._element.find(W + 'background').get(W + 'color'), 'F5F4ED')
+        self.assertEqual(document.tables[0]._tbl.tblPr.tblStyle.val, 'MetricGrid')
+        self.assertEqual(document.tables[0].rows[0].cells[0].paragraphs[0].style.name, 'Metric Value')
+        self.assertTrue(any(p.style.name == 'Deck' for p in document.paragraphs))
+        self.assertTrue(any(p.style.name == 'Key Takeaway' for p in document.paragraphs))
+        validate_docx(result['outputs']['docx']['path'])
+        with pymupdf.open(result['outputs']['pdf']['path']) as pdf:
+            self.assertGreaterEqual(len(pdf), 2)
+            self.assertNotIn('详细内容', pdf[0].get_text())
+            self.assertIn('详细内容', pdf[1].get_text())
 
     def test_long_table_keeps_rows_and_repeats_header(self):
         source = self.root / 'long-table.md'

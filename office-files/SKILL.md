@@ -12,9 +12,10 @@ A filename extension selects a renderer, not a writing structure.
 ## Choose from the actual constraints
 
 - **New prose, no supplied template:** author Markdown, then use the default
-  renderer below. It provides readable body text, heading hierarchy, lists,
-  tables, captions, page numbers and pagination without inventing branding,
-  a cover, sections, or a page-count target.
+  renderer below. It provides a neutral editorial-paper foundation: warm paper,
+  one restrained ink accent, serif display hierarchy, readable body text,
+  balanced tables, captions, page numbers and pagination. It does not invent a
+  logo, cover, section sequence, or page-count target.
 - **A selected template/package:** follow its own authoring instructions and
   preserve its style. Run the rendered-page check below on the final PDF too.
   A `reference.docx` carries styles; it does not carry the source's body,
@@ -32,7 +33,9 @@ A filename extension selects a renderer, not a writing structure.
 
 Read [references/document-layout.md](references/document-layout.md) when
 selecting language, arranging figures/tables, preserving templates, or resolving
-an inspection finding. Infer constraints from the request and source; ask only
+an inspection finding. For new untemplated prose, also read
+[references/editorial-patterns.md](references/editorial-patterns.md) before
+writing the Markdown. Infer constraints from the request and source; ask only
 when missing information changes the intended result.
 
 ## Setup for PDF / Word
@@ -61,11 +64,47 @@ If the toolchain is unavailable, explain the blocked export/preview. Return a
 usable source when possible, clearly marked as not visually verified. Do not
 claim a successful PDF or verified Word file, or silently change the format.
 
-## New prose: render one source
+## New prose: design, author, then render
+
+Before writing, state a one-sentence visual direction based on the audience,
+language and information shape (for example, “quiet editorial paper with one
+ink-blue accent; the KPI strip is the opening focal point”). This is a design
+constraint, not a document-type label. Decide the opening focal point and page
+rhythm before choosing components. Do not expect the renderer, a model name or
+a colour palette to create composition on its own.
 
 Write `doc.md` with semantic headings, paragraphs, lists, tables, captions,
 footnotes and images. Set language in YAML (`lang: zh-CN`, `en-US`, `ja-JP`, `ar`,
 etc.) or pass `--lang`. Metadata is optional; do not invent title/author/date.
+Use only the few editorial components that serve the content:
+
+```markdown
+::: {custom-style="Deck"}
+A concise opening statement that frames the document.
+:::
+
+| 88.3% | 20.2× | 121× |
+|------:|------:|-----:|
+| usage share | multiplier gap | cost gap |
+
+: {#opening-metrics .metric-grid}
+
+::: {custom-style="Key Takeaway"}
+One decision-relevant conclusion, not a decorative summary after every heading.
+:::
+
+# 01 First chapter {.chapter}
+
+::: {custom-style="Source Note"}
+Source: concise provenance and period.
+:::
+```
+
+`.metric-grid` creates an editable KPI strip rather than a screenshot.
+`.chapter` starts that heading on a new page; use it only for a deliberate
+chapter/cover transition, never to chase a page count. Other available styles
+are `Eyebrow`, `Pull Quote`, `Section Lead` and `Source Note`. See the patterns
+reference for selection rules and examples.
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/render_document.py" doc.md \
@@ -100,7 +139,9 @@ Word version is not implied.
 Outputs include `render.json` (inputs, hashes, engine versions, delivery choices)
 and `expectations.json` (heading/opening-text relationships). Add important exact
 wording and figure/reference pairs to the expectations when relevant. Compilation
-alone leaves the candidate in `needs-inspection` state.
+alone leaves the candidate in `needs-inspection` state. The default design is
+applied only to new untemplated Markdown; a supplied reference or existing Word
+file remains the visual authority.
 
 ## Inspect, repair, then deliver
 
@@ -116,11 +157,16 @@ image resources and completed render to the inspected files. A failed new
 render cannot reuse an old export's acceptance. For native PDF output omit
 `--docx` and `--render`; provide expectations when source relationships are
 known. Read `inspection.json`, open the generated page images, and review
-**every page** for legibility/density, hierarchy, pagination/grouping and
-figures/tables. Inspect Word's actual exported pages, not its XML alone.
+**every page** for legibility/density, hierarchy, composition/rhythm,
+pagination/grouping and figures/tables. Inspect Word's actual exported pages,
+not its XML alone. For composition/rhythm, record the page's focal point,
+balance of occupied and open space, and whether repeated page structures feel
+intentional rather than mechanically identical.
 
 - Fix machine blockers and visual defects in the source/style and rerender.
 - Do not reduce font size or squeeze spacing merely to fit fewer pages.
+- Repair a flat or monotonous page by changing grouping, emphasis, component
+  choice or page transition—not by adding arbitrary decoration.
 - Complete each page's `review.json` observations only after inspecting it;
   acknowledge heuristic warnings with a concrete reason. A generated review
   form or a contact sheet alone is not visual acceptance.

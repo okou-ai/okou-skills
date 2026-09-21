@@ -29,6 +29,22 @@ from docx.text.run import Run
 
 TABLE_TEXT_STYLE = "Okou Table Text"
 TABLE_HEADER_STYLE = "Okou Table Header"
+METRIC_VALUE_STYLE = "Metric Value"
+METRIC_LABEL_STYLE = "Metric Label"
+METRIC_GRID_STYLE_ID = "MetricGrid"
+
+# Editorial-paper palette. It is deliberately restrained: one ink-blue accent,
+# warm neutrals, and no decorative gradients or hard shadows. These defaults
+# are used only for new, untemplated prose.
+INK = "1B365D"
+PAPER = "F5F4ED"
+IVORY = "FAF9F5"
+WARM_SAND = "E8E6DC"
+BORDER_SOFT = "E5E3D8"
+NEAR_BLACK = "141413"
+DARK_WARM = "3D3D3A"
+OLIVE = "504E49"
+STONE = "6B6A64"
 
 # python-docx supplies setters for most properties. These schema orders cover
 # the few properties it does not expose, including bidi, language and row flags.
@@ -89,6 +105,31 @@ def _flag(parent, name: str, value: bool, order: tuple[str, ...]) -> None:
     _ordered_property(parent, name, order).set(qn("w:val"), "1" if value else "0")
 
 
+def _paragraph_decoration(style, *, fill: str | None = None,
+                          left_border: str | None = None,
+                          bottom_border: str | None = None) -> None:
+    """Apply print-safe paragraph decoration at the style level."""
+    properties = style.element.get_or_add_pPr()
+    if fill:
+        shading = _ordered_property(properties, "shd", _PPR_ORDER)
+        shading.set(qn("w:val"), "clear")
+        shading.set(qn("w:fill"), fill)
+    if left_border or bottom_border:
+        borders = _ordered_property(properties, "pBdr", _PPR_ORDER)
+        if left_border:
+            border = _ordered_property(borders, "left", ("top", "left", "bottom", "right", "between", "bar"))
+            border.set(qn("w:val"), "single")
+            border.set(qn("w:sz"), "14")
+            border.set(qn("w:space"), "8")
+            border.set(qn("w:color"), left_border)
+        if bottom_border:
+            border = _ordered_property(borders, "bottom", ("top", "left", "bottom", "right", "between", "bar"))
+            border.set(qn("w:val"), "single")
+            border.set(qn("w:sz"), "4")
+            border.set(qn("w:space"), "5")
+            border.set(qn("w:color"), bottom_border)
+
+
 @dataclass(frozen=True)
 class _Language:
     tag: str
@@ -135,12 +176,22 @@ def _language(lang: str) -> _Language:
     return _Language(tag, east_asia, east_asia_tag, complex_font, arabic or hebrew)
 
 
-def _font_properties(rpr, language: _Language, *, code: bool = False, size: float | None = None) -> None:
+def _font_properties(rpr, language: _Language, *, code: bool = False,
+                     serif: bool = False, size: float | None = None) -> None:
     fonts = _ordered_property(rpr, "rFonts", _RPR_ORDER)
-    fonts.set(qn("w:ascii"), "Noto Sans Mono" if code else "Noto Sans")
-    fonts.set(qn("w:hAnsi"), "Noto Sans Mono" if code else "Noto Sans")
-    fonts.set(qn("w:eastAsia"), language.east_asia)
-    fonts.set(qn("w:cs"), language.complex_font)
+    if code:
+        latin, east_asia, complex_font = "Noto Sans Mono", language.east_asia, language.complex_font
+    elif serif:
+        latin = "Noto Serif"
+        east_asia = language.east_asia.replace("Noto Sans CJK", "Noto Serif CJK")
+        complex_font = ("Noto Naskh Arabic" if language.complex_font == "Noto Sans Arabic"
+                        else language.complex_font.replace("Noto Sans", "Noto Serif"))
+    else:
+        latin, east_asia, complex_font = "Noto Sans", language.east_asia, language.complex_font
+    fonts.set(qn("w:ascii"), latin)
+    fonts.set(qn("w:hAnsi"), latin)
+    fonts.set(qn("w:eastAsia"), east_asia)
+    fonts.set(qn("w:cs"), complex_font)
     for theme in ("asciiTheme", "hAnsiTheme", "eastAsiaTheme", "cstheme", "csTheme"):
         fonts.attrib.pop(qn(f"w:{theme}"), None)
     language_property = _ordered_property(rpr, "lang", _RPR_ORDER)
@@ -167,14 +218,14 @@ def _style(document, name: str, base: str = "Normal"):
 
 def _paragraph_style(document, name: str, language: _Language, *, size: float = 11,
                      before: float = 0, after: float = 6, spacing: float = 1.45,
-                     bold: bool = False, color: str = "25313D", keep_next: bool = False,
-                     keep_lines: bool = False, code: bool = False):
+                     bold: bool = False, color: str = DARK_WARM, keep_next: bool = False,
+                     keep_lines: bool = False, code: bool = False, serif: bool = False):
     style = _style(document, name)
     style.font.size = Pt(size)
     style.font.bold = bold
     style.font.cs_bold = bold
     style.font.color.rgb = RGBColor.from_string(color)
-    _font_properties(style.element.get_or_add_rPr(), language, code=code, size=size)
+    _font_properties(style.element.get_or_add_rPr(), language, code=code, serif=serif, size=size)
     fmt = style.paragraph_format
     fmt.space_before, fmt.space_after = Pt(before), Pt(after)
     fmt.line_spacing = spacing
@@ -212,60 +263,124 @@ def _configure_styles(document: DocumentObject, language: _Language) -> None:
     if rpr is None:
         rpr = OxmlElement("w:rPr")
         run_defaults.append(rpr)
-    _font_properties(rpr, language, size=11)
+    _font_properties(rpr, language, size=10.5)
 
     for name in ("Normal", "Body Text", "First Paragraph", "Abstract", "Definition", "Bibliography"):
-        _paragraph_style(document, name, language)
+        _paragraph_style(document, name, language, size=10.5, after=7, spacing=1.5,
+                         color=DARK_WARM)
     # Pandoc uses Compact for both lists and table text. Keep lists at body size;
     # only actual table paragraphs receive the separate styles during polishing.
-    _paragraph_style(document, "Compact", language, after=3)
-    _paragraph_style(document, "Keep with Next", language, keep_next=True)
-    _paragraph_style(document, "Definition Term", language, after=3, bold=True, keep_next=True)
-    _paragraph_style(document, "Title", language, size=26, after=12, spacing=1.15,
-                     bold=True, color="172A3A", keep_next=True)
-    _paragraph_style(document, "Subtitle", language, size=13, after=10, spacing=1.3, color="465462", keep_next=True)
+    _paragraph_style(document, "Compact", language, size=10.5, after=3, spacing=1.45)
+    _paragraph_style(document, "Keep with Next", language, size=10.5, after=7,
+                     spacing=1.5, keep_next=True)
+    _paragraph_style(document, "Definition Term", language, size=10.5, after=3,
+                     bold=True, keep_next=True)
+
+    # Editorial hierarchy: serif carries display hierarchy while the sans body
+    # stays neutral and robust across scripts. Size and spacing do more work than
+    # repeated bold/color treatments.
+    _paragraph_style(document, "Title", language, size=30, before=36, after=8,
+                     spacing=1.08, color=NEAR_BLACK, keep_next=True, keep_lines=True,
+                     serif=True)
+    _paragraph_style(document, "Subtitle", language, size=15, after=13, spacing=1.3,
+                     color=OLIVE, keep_next=True, serif=True)
     for name in ("Author", "Date"):
-        _paragraph_style(document, name, language, size=10, after=6, spacing=1.3)
-    for level, size in enumerate((19, 15, 12.5, 11.5, 11, 11, 11, 11, 11), 1):
-        _paragraph_style(document, f"Heading {level}", language, size=size,
-                         before=18 if level == 1 else 13, after=6, spacing=1.2,
-                         bold=True, color="172A3A", keep_next=True, keep_lines=True)
+        _paragraph_style(document, name, language, size=8.5, after=5, spacing=1.25,
+                         color=STONE)
+    for level, size in enumerate((20, 15, 12.5, 11.5, 10.5, 10.5, 10.5, 10.5, 10.5), 1):
+        style = _paragraph_style(document, f"Heading {level}", language, size=size,
+                                 before=22 if level == 1 else 14, after=7, spacing=1.2,
+                                 bold=False, color=INK if level == 1 else NEAR_BLACK,
+                                 keep_next=True, keep_lines=True, serif=True)
+        if level == 1:
+            _paragraph_decoration(style, bottom_border=WARM_SAND)
     _paragraph_style(document, "Abstract Title", language, size=12.5, before=12,
-                     bold=True, keep_next=True)
-    _paragraph_style(document, "TOC Heading", language, size=19, before=18, after=6,
-                     bold=True, keep_next=True)
+                     color=NEAR_BLACK, keep_next=True, serif=True)
+    _paragraph_style(document, "TOC Heading", language, size=20, before=18, after=7,
+                     color=INK, keep_next=True, serif=True)
     for name in ("Caption", "Table Caption", "Image Caption"):
-        _paragraph_style(document, name, language, size=9.5, before=5, after=7,
-                         spacing=1.3, color="465462", keep_lines=True,
+        _paragraph_style(document, name, language, size=9, before=5, after=7,
+                         spacing=1.35, color=OLIVE, keep_lines=True,
                          keep_next=name == "Table Caption")
     for name in ("Footnote Text", "Footnote Block Text"):
-        _paragraph_style(document, name, language, size=9.5, after=4, spacing=1.3)
+        _paragraph_style(document, name, language, size=8.5, after=4, spacing=1.3,
+                         color=STONE)
+
+    # Reusable composition components. Authors opt into only the components that
+    # fit the content; these are not a mandatory report skeleton.
+    eyebrow = _paragraph_style(document, "Eyebrow", language, size=8.5, before=0,
+                               after=7, spacing=1.15, bold=True, color=INK,
+                               keep_next=True)
+    eyebrow.font.all_caps = True
+    _paragraph_style(document, "Deck", language, size=14, before=2, after=14,
+                     spacing=1.45, color=OLIVE, keep_next=True, serif=True)
+    takeaway = _paragraph_style(document, "Key Takeaway", language, size=11.5,
+                                before=8, after=13, spacing=1.45, color=DARK_WARM,
+                                keep_lines=True, serif=True)
+    takeaway.paragraph_format.left_indent = Pt(12)
+    takeaway.paragraph_format.right_indent = Pt(12)
+    _paragraph_decoration(takeaway, fill=IVORY, left_border=INK)
+    quote = _paragraph_style(document, "Pull Quote", language, size=15, before=10,
+                             after=12, spacing=1.5, color=INK, keep_lines=True,
+                             serif=True)
+    quote.paragraph_format.left_indent = Pt(11)
+    _paragraph_decoration(quote, left_border=INK)
+    _paragraph_style(document, "Section Lead", language, size=12, before=0,
+                     after=10, spacing=1.45, color=OLIVE, keep_next=True,
+                     serif=True)
+    _paragraph_style(document, "Source Note", language, size=8.5, before=3,
+                     after=8, spacing=1.3, color=STONE, keep_lines=True)
+    _paragraph_style(document, METRIC_VALUE_STYLE, language, size=20, before=2,
+                     after=2, spacing=1.05, color=INK, keep_next=True,
+                     keep_lines=True, serif=True)
+    _paragraph_style(document, METRIC_LABEL_STYLE, language, size=8.5, before=0,
+                     after=4, spacing=1.25, color=OLIVE, keep_lines=True)
+
     # python-docx assigns these built-in style IDs when it creates a header or
     # footer, but Pandoc's reference does not include their definitions.
     for name in ("Header", "Footer"):
-        style = _paragraph_style(document, name, language, size=9, after=0, spacing=1.2)
+        style = _paragraph_style(document, name, language, size=8.5, after=0,
+                                 spacing=1.2, color=STONE)
         # add_style normalizes their names to lowercase, while newly created
         # header/footer parts reference the capitalized built-in IDs.
         style.style_id = name
-    _paragraph_style(document, "Block Text", language, size=10.5, before=5, after=8, spacing=1.4)
+    _paragraph_style(document, "Block Text", language, size=10.5, before=5,
+                     after=8, spacing=1.45, color=OLIVE, serif=True)
     for name in ("Figure", "Captioned Figure"):
-        style = _paragraph_style(document, name, language, after=6, spacing=1.0,
-                                 keep_next=name == "Captioned Figure", keep_lines=True)
+        style = _paragraph_style(document, name, language, size=10.5, after=6,
+                                 spacing=1.0, keep_next=name == "Captioned Figure",
+                                 keep_lines=True)
         style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    _paragraph_style(document, "Source Code", language, size=9.5, before=5, after=7,
-                     spacing=1.2, code=True)
+    _paragraph_style(document, "Source Code", language, size=9, before=5, after=7,
+                     spacing=1.25, code=True)
     code = document.styles["Verbatim Char"]
     _font_properties(code.element.get_or_add_rPr(), language, code=True)
     if "Hyperlink" in document.styles:
-        document.styles["Hyperlink"].font.color.rgb = RGBColor.from_string("245B85")
+        document.styles["Hyperlink"].font.color.rgb = RGBColor.from_string(INK)
     for name, bold in ((TABLE_TEXT_STYLE, False), (TABLE_HEADER_STYLE, True)):
-        _paragraph_style(document, name, language, size=10, before=0, after=3,
-                         spacing=1.3, bold=bold, keep_next=bold)
+        _paragraph_style(document, name, language, size=9.5, before=0, after=3,
+                         spacing=1.3, bold=bold, keep_next=bold,
+                         color=DARK_WARM)
     # Pandoc uses a layout table for figures containing multiple blocks. Its
     # shipped reference omits this style, despite emitting the style reference.
     if "FigureTable" not in document.styles:
         figure_table = document.styles.add_style("FigureTable", WD_STYLE_TYPE.TABLE)
         figure_table.base_style = document.styles["Table"]
+    if METRIC_GRID_STYLE_ID not in {style.style_id for style in document.styles}:
+        metric_grid = document.styles.add_style("Metric Grid", WD_STYLE_TYPE.TABLE)
+        metric_grid.base_style = document.styles["Table"]
+        metric_grid.style_id = METRIC_GRID_STYLE_ID
+
+
+def _set_page_background(document: DocumentObject, color: str) -> None:
+    for existing in document._element.findall(qn("w:background")):
+        document._element.remove(existing)
+    background = OxmlElement("w:background")
+    background.set(qn("w:color"), color)
+    document._element.insert(0, background)
+    settings = document.settings.element
+    if settings.find(qn("w:displayBackgroundShape")) is None:
+        settings.append(OxmlElement("w:displayBackgroundShape"))
 
 
 def build_reference(pandoc_binary: str, output: Path, lang: str) -> None:
@@ -277,14 +392,15 @@ def build_reference(pandoc_binary: str, output: Path, lang: str) -> None:
     document = Document(BytesIO(result.stdout))
     language = _language(lang)
     _configure_styles(document, language)
+    _set_page_background(document, PAPER)
     for section in document.sections:
         section.page_width, section.page_height = Mm(210), Mm(297)
-        section.left_margin, section.right_margin = Mm(28), Mm(28)
-        section.top_margin, section.bottom_margin = Mm(24), Mm(24)
-        section.header_distance, section.footer_distance = Mm(12), Mm(12)
+        section.left_margin, section.right_margin = Mm(22), Mm(22)
+        section.top_margin, section.bottom_margin = Mm(20), Mm(22)
+        section.header_distance, section.footer_distance = Mm(10), Mm(11)
         paragraph = section.footer.paragraphs[0]
         paragraph.clear()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         paragraph.paragraph_format.space_before = Pt(0)
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.paragraph_format.keep_with_next = False
@@ -423,10 +539,58 @@ def _paragraph_direction(paragraph: Paragraph, language: _Language) -> None:
         run.font.complex_script = not code and strong in {"R", "AL"}
 
 
+def _polish_metric_grid(table: Table, language: _Language, usable_width: int) -> None:
+    """Turn a semantic metric-grid table into an editorial KPI strip."""
+    count = len(table.columns)
+    if not count:
+        return
+    properties = table._tbl.tblPr
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
+    width = _ordered_property(properties, "tblW", _TBLPR_ORDER)
+    width.set(qn("w:type"), "dxa")
+    width.set(qn("w:w"), str(round(usable_width / 635)))
+    column_widths = [usable_width // count] * count
+    column_widths[-1] += usable_width - sum(column_widths)
+    for column, column_width in zip(table.columns, column_widths):
+        column.width = column_width
+    margins = _ordered_property(properties, "tblCellMar", _TBLPR_ORDER)
+    for side, value in (("top", 150), ("left", 140), ("bottom", 120), ("right", 140)):
+        item = _ordered_property(margins, side, ("top", "left", "bottom", "right"))
+        item.set(qn("w:type"), "dxa")
+        item.set(qn("w:w"), str(value))
+    borders = _ordered_property(properties, "tblBorders", _TBLPR_ORDER)
+    order = ("top", "left", "bottom", "right", "insideH", "insideV")
+    for side in order:
+        border = _ordered_property(borders, side, order)
+        border.set(qn("w:val"), "single" if side in {"top", "bottom", "insideV"} else "nil")
+        border.set(qn("w:sz"), "5" if side in {"top", "bottom"} else "3")
+        border.set(qn("w:color"), INK if side in {"top", "bottom"} else BORDER_SOFT)
+    for row_index, row in enumerate(table.rows):
+        trpr = row._tr.get_or_add_trPr()
+        _flag(trpr, "tblHeader", False, _TRPR_ORDER)
+        _flag(trpr, "cantSplit", True, _TRPR_ORDER)
+        for column, span, cell in _physical_cells(row, table):
+            if column + span <= count:
+                cell.width = sum(column_widths[column:column + span])
+            shading = _ordered_property(cell._tc.get_or_add_tcPr(), "shd", _TCPR_ORDER)
+            shading.set(qn("w:val"), "clear")
+            shading.set(qn("w:fill"), IVORY)
+            for paragraph in cell.paragraphs:
+                paragraph.style = METRIC_VALUE_STYLE if row_index == 0 else METRIC_LABEL_STYLE
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                paragraph.paragraph_format.keep_with_next = row_index == 0
+                paragraph.paragraph_format.keep_together = True
+                _paragraph_direction(paragraph, language)
+
+
 def _polish_table(table: Table, language: _Language, usable_width: int, usable_height: int) -> None:
     # A FigureTable is a layout container, not a data grid. Keep its widths,
     # borderless appearance and paragraph styles, while pairing its content.
     style = table._tbl.tblPr.tblStyle
+    if style is not None and style.val == METRIC_GRID_STYLE_ID:
+        _polish_metric_grid(table, language, usable_width)
+        return
     if style is not None and style.val == "FigureTable":
         for row in table.rows:
             _flag(row._tr.get_or_add_trPr(), "cantSplit",
@@ -447,11 +611,11 @@ def _polish_table(table: Table, language: _Language, usable_width: int, usable_h
         border = _ordered_property(borders, side, border_order)
         border.set(qn("w:val"), "nil" if side in {"left", "right", "insideV"} else "single")
         border.set(qn("w:sz"), "4")
-        border.set(qn("w:color"), "CDD5DD")
+        border.set(qn("w:color"), BORDER_SOFT)
     if language.rtl:
         properties.get_or_add_bidiVisual().val = True
         table.alignment = WD_TABLE_ALIGNMENT.RIGHT
-    for row in table.rows:
+    for row_index, row in enumerate(table.rows):
         header = _is_header(row)
         trpr = row._tr.get_or_add_trPr()
         if header:
@@ -459,10 +623,10 @@ def _polish_table(table: Table, language: _Language, usable_width: int, usable_h
         _flag(trpr, "cantSplit", _row_height(row, table, usable_width) < usable_height / 12700 * .65,
               _TRPR_ORDER)
         for _, _, cell in _physical_cells(row, table):
-            if header:
+            if header or row_index % 2 == 0:
                 shading = _ordered_property(cell._tc.get_or_add_tcPr(), "shd", _TCPR_ORDER)
                 shading.set(qn("w:val"), "clear")
-                shading.set(qn("w:fill"), "EAF0F5")
+                shading.set(qn("w:fill"), WARM_SAND if header else IVORY)
             for paragraph in cell.paragraphs:
                 if paragraph.style.name in {"Compact", "Normal", "Body Text", "First Paragraph",
                                             TABLE_TEXT_STYLE, TABLE_HEADER_STYLE}:
@@ -532,6 +696,9 @@ def polish_document(path: Path, lang: str) -> None:
     """Polish a newly generated default DOCX; never pass a custom/user document."""
     document = Document(path)
     language = _language(lang)
+    # Pandoc does not carry the document-level w:background element from a
+    # reference document, so restore the default paper colour after conversion.
+    _set_page_background(document, PAPER)
     # Pandoc can reapply document metadata to docDefaults after reading the
     # reference. Keep that fallback consistent with the script-specific styles.
     if language.tag.lower().split("-")[0] in {"zh", "ja", "ko"}:
@@ -541,8 +708,17 @@ def polish_document(path: Path, lang: str) -> None:
     # also supports callers that generated a fresh DOCX with Pandoc defaults.
     for name, bold in ((TABLE_TEXT_STYLE, False), (TABLE_HEADER_STYLE, True)):
         if name not in document.styles:
-            _paragraph_style(document, name, language, size=10, after=3, spacing=1.3,
-                             bold=bold, keep_next=bold)
+            _paragraph_style(document, name, language, size=9.5, after=3,
+                             spacing=1.3, bold=bold, keep_next=bold,
+                             color=DARK_WARM)
+    for name, size, serif, color in (
+        (METRIC_VALUE_STYLE, 20, True, INK),
+        (METRIC_LABEL_STYLE, 8.5, False, OLIVE),
+    ):
+        if name not in document.styles:
+            _paragraph_style(document, name, language, size=size, after=3,
+                             spacing=1.2, serif=serif, color=color,
+                             keep_lines=True)
     section = document.sections[0]
     usable_width = int(section.page_width - section.left_margin - section.right_margin)
     usable_height = int(section.page_height - section.top_margin - section.bottom_margin)

@@ -54,20 +54,31 @@ class DocumentStyleTests(unittest.TestCase):
         section = document.sections[0]
         self.assertAlmostEqual(section.page_width.mm, 210, delta=.1)
         self.assertAlmostEqual(section.page_height.mm, 297, delta=.1)
-        self.assertAlmostEqual(section.left_margin.mm, 28, delta=.1)
-        self.assertAlmostEqual(section.right_margin.mm, 28, delta=.1)
-        self.assertEqual(document.styles["Normal"].font.size.pt, 11)
-        self.assertEqual(document.styles["Compact"].font.size.pt, 11)
+        self.assertAlmostEqual(section.left_margin.mm, 22, delta=.1)
+        self.assertAlmostEqual(section.right_margin.mm, 22, delta=.1)
+        self.assertAlmostEqual(section.top_margin.mm, 20, delta=.1)
+        self.assertAlmostEqual(section.bottom_margin.mm, 22, delta=.1)
+        self.assertEqual(document.styles["Normal"].font.size.pt, 10.5)
+        self.assertEqual(document.styles["Compact"].font.size.pt, 10.5)
         self.assertGreater(document.styles["Heading 1"].font.size, document.styles["Heading 2"].font.size)
         self.assertGreater(document.styles["Heading 2"].font.size, document.styles["Heading 3"].font.size)
         for name in ("Caption", "Image Caption", "Footnote Text", "Footnote Block Text"):
-            self.assertGreaterEqual(document.styles[name].font.size.pt, 9)
+            self.assertGreaterEqual(document.styles[name].font.size.pt, 8.5)
         self.assertTrue(document.styles["Keep with Next"].paragraph_format.keep_with_next)
         fields = section.footer._element.xpath(".//w:fldSimple")
         self.assertEqual([field.get(qn("w:instr")) for field in fields], ["PAGE"])
         self.assertEqual(document.styles["Footer"].style_id, "Footer")
         self.assertEqual(document.styles["Header"].style_id, "Header")
         self.assertFalse(section.header.paragraphs[0].text)
+        self.assertEqual(document._element.find(qn("w:background")).get(qn("w:color")), "F5F4ED")
+        self.assertIsNotNone(document.settings.element.find(qn("w:displayBackgroundShape")))
+        for name in ("Eyebrow", "Deck", "Key Takeaway", "Pull Quote", "Section Lead",
+                     "Source Note", "Metric Value", "Metric Label"):
+            self.assertIn(name, document.styles)
+        self.assertIn("MetricGrid", {style.style_id for style in document.styles})
+        title_fonts = document.styles["Title"].element.rPr.find(qn("w:rFonts"))
+        self.assertEqual(title_fonts.get(qn("w:ascii")), "Noto Serif")
+        self.assertEqual(title_fonts.get(qn("w:eastAsia")), "Noto Serif CJK SC")
 
     def test_polish_preserves_text_code_links_and_images_and_pairs_caption(self):
         image = self.root / "pixel.png"
@@ -124,10 +135,33 @@ class DocumentStyleTests(unittest.TestCase):
         self.assertEqual(table.rows[0]._tr.trPr.find(qn("w:tblHeader")).get(qn("w:val")), "1")
         self.assertTrue(all(p.paragraph_format.keep_with_next for cell in table.rows[0].cells for p in cell.paragraphs))
         self.assertEqual(table.rows[1]._tr.trPr.find(qn("w:cantSplit")).get(qn("w:val")), "1")
-        self.assertEqual(table.rows[1].cells[0].paragraphs[0].style.font.size.pt, 10)
+        self.assertEqual(table.rows[1].cells[0].paragraphs[0].style.font.size.pt, 9.5)
         list_paragraph = next(p for p in document.paragraphs if "Body-size list" in p.text)
-        self.assertEqual(list_paragraph.style.font.size.pt, 11)
+        self.assertEqual(list_paragraph.style.font.size.pt, 10.5)
         self.assertEqual(table.rows[1].cells[1].paragraphs[0].alignment, 2)  # right alignment survives
+
+    def test_metric_grid_is_a_distinct_balanced_component(self):
+        ast = json.loads(subprocess.run(
+            [self.pandoc, "-f", "markdown", "-t", "json"],
+            input=("| 88.3% | 20.2× | 121× |\n|---:|---:|---:|\n"
+                   "| internal share | machine multiplier | model cost |\n\n"
+                   ": {#summary .metric-grid}\n").encode(),
+            check=True, stdout=subprocess.PIPE,
+        ).stdout)
+        ast["blocks"][0]["c"][0][2].append(["custom-style", "MetricGrid"])
+        output = self.render(json.dumps(ast), input_format="json")
+        polish_document(output, "en")
+        document = Document(output)
+        table = document.tables[0]
+        self.assertEqual(table._tbl.tblPr.tblStyle.val, "MetricGrid")
+        self.assertEqual([p.style.name for p in table.rows[0].cells[0].paragraphs], ["Metric Value"])
+        self.assertEqual([p.style.name for p in table.rows[1].cells[0].paragraphs], ["Metric Label"])
+        self.assertTrue(all(p.alignment == 1 for row in table.rows for cell in row.cells for p in cell.paragraphs))
+        self.assertTrue(all(row._tr.trPr.find(qn("w:cantSplit")).get(qn("w:val")) == "1"
+                            for row in table.rows))
+        widths = [column.width for column in table.columns]
+        self.assertLess(max(widths) - min(widths), 2)
+        self.assertEqual(table.rows[0].cells[0]._tc.tcPr.find(qn("w:shd")).get(qn("w:fill")), "FAF9F5")
 
     def test_short_numeric_column_does_not_take_label_or_description_space(self):
         output = self.render(

@@ -124,6 +124,30 @@ def validate_source(value):
                 validate_source(child)
 
 
+def apply_design_components(ast):
+    """Map semantic Markdown classes to renderer-native document components.
+
+    The source stays portable Markdown. This small translation layer exists
+    because Pandoc preserves paragraph custom styles but does not map table
+    classes to Word table styles or heading classes to page-break properties.
+    """
+    for block in ast.get("blocks", []):
+        if block.get("t") == "Table":
+            attributes = block["c"][0]
+            if "metric-grid" in attributes[1]:
+                attributes[2] = [item for item in attributes[2] if item[0] != "custom-style"]
+                attributes[2].append(["custom-style", "MetricGrid"])
+    transformed = []
+    for block in ast.get("blocks", []):
+        if block.get("t") == "Header" and "chapter" in block["c"][1][1]:
+            transformed.append({
+                "t": "RawBlock",
+                "c": ["openxml", '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'],
+            })
+        transformed.append(block)
+    ast["blocks"] = transformed
+
+
 def source_expectations(ast):
     """Bind semantic headings to the opening text they introduce, not a page quota.
 
@@ -260,6 +284,7 @@ def render_candidate(source, output_dir, output_format, lang, reference):
             versions["pandoc"] = run([pandoc, "--version"]).splitlines()[0]
             ast = json.loads(run([pandoc, str(source), "-f", "markdown-smart", "-t", "json"]))
             validate_source(ast)
+            apply_design_components(ast)
             resources = [{"path": str(path), "sha256": sha256(path)}
                          for path in sorted(local_resources(ast, source.parent))]
             lang = language_of(ast, lang)

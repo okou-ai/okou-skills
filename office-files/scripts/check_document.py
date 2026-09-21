@@ -22,6 +22,7 @@ import pymupdf
 CRITERIA = (
     "legibility_and_density",
     "hierarchy",
+    "composition_and_rhythm",
     "pagination_and_grouping",
     "tables_and_figures",
 )
@@ -195,7 +196,9 @@ def inspect_page(report, page, out):
     image_name = f"page-{number:03d}.png"
     pixmap.save(out / image_name)
     dominant_ratio, dominant_color = pixmap.color_topusage()
-    blank = dominant_ratio > 0.99999 and all(channel >= 250 for channel in dominant_color[:3])
+    # Warm paper backgrounds are intentionally below RGB 250. A nearly uniform
+    # page with no visible text is still blank regardless of paper colour.
+    blank = dominant_ratio > 0.99999 and not spans
     clipped = []
     off_page = []
     for span in spans:
@@ -401,7 +404,7 @@ def accept(out):
         require(digest == page["image"]["sha256"] == by_number[number]["image_sha256"], f"Page {number}'s image changed; inspect and review again.")
         image_hashes[name] = digest
         criteria = by_number[number]["criteria"]
-        require(set(criteria) == set(CRITERIA), f"Page {number} must address all four visual criteria.")
+        require(set(criteria) == set(CRITERIA), f"Page {number} must address all five visual criteria.")
         for criterion, result in criteria.items():
             require(result["status"] == "pass" and isinstance(result["observations"], str) and bool(result["observations"].strip()), f"Page {number}: {criterion} needs a passed review with observations.")
     warnings = {finding["id"] for finding in report["findings"] if finding["severity"] == "warning"}

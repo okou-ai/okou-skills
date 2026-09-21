@@ -16,6 +16,20 @@ own style set, applies the maintained theme, and exports the final Word file to
 PDF. For an existing file or template, preserve its own dimensions and style.
 A single theme is not a replacement for a form's content or a designed page.
 
+## Default visual language
+
+The untemplated default uses a warm editorial-paper system: restrained ink-blue,
+warm neutrals, serif display hierarchy, sans body text, hairline rules and
+print-safe tables. It is intentionally brand-neutral and avoids generic UI
+cards, gradients and heavy decoration. Authors still decide the opening focal
+point, information grouping and page rhythm; read `editorial-patterns.md` before
+writing a new document.
+
+Do not force this visual language onto a user reference, an existing Word file,
+a form or a native PDF template. A theme can make consistent typography; it
+cannot decide which conclusion deserves the page or repair a poor information
+sequence.
+
 ## Text and hierarchy
 
 Use the theme's body/heading/list/caption styles rather than formatting each
@@ -88,9 +102,11 @@ For every page, check at readable scale:
 
 1. Text is legible; density, line length and paragraph separation support reading.
 2. Heading levels and emphasis create a clear hierarchy.
-3. Breaks keep related content understandable, with no isolated headings or
+3. The page has an intentional focal point and balanced rhythm; repeated page
+   structures are purposeful rather than mechanically identical.
+4. Breaks keep related content understandable, with no isolated headings or
    accidentally empty pages.
-4. Tables, charts, labels and footnotes fit without colliding or becoming tiny.
+5. Tables, charts, labels and footnotes fit without colliding or becoming tiny.
 
 Check program findings before visual signoff. Small-text/overlap/sparse-page
 heuristics may flag legitimate footnotes, superscripts or designed layouts;
