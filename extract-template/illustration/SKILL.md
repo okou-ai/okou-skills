@@ -1,22 +1,22 @@
 ---
-name: illustration-reverse-template
-description: "Reverse a reference picture into a style prompt, show the user pictures made from it, revise until they approve, then save it as their template. Use when a user uploads an image style to reuse, asks to extract a prompt from a picture, wants their own image template, asks to train, forge or lock a new illustration style, or asks for more images in the style of a picture they supplied."
+name: illustration-extract-template
+description: "Extract a style prompt from a reference picture, show the user pictures made from it, revise until they approve, then save it as their template. Use when a user uploads an image style to reuse, asks to extract a prompt from a picture, wants their own image template, asks to train, forge or lock a new illustration style, or asks for more images in the style of a picture they supplied."
 ---
 
-# Turn a reference picture into the user's own style
+# Extract a reusable style from a reference picture
 
 Input: images of one style, or a brief when no reference exists. Output: the
 user's own style, saved once they have seen what it makes and said it is right.
 
-No reversal is complete. Measurement settles canvas, ground, palette, stroke,
+No extraction is complete. Measurement settles canvas, ground, palette, stroke,
 coverage and placement. Medium, drawing and subject convention are read by eye
 and are partly wrong on the first pass. The user closes that gap by looking at
-pictures, so the path is: reverse, show, revise, save.
+pictures, so the path is: extract, show, revise, save.
 
 Choose among your own candidates without asking — the gate ranks them. Stop
 before saving, always: never save a prompt the user has not seen pictures from.
 
-Run every command below from `reverse-template/illustration/`.
+Run every command below from `extract-template/illustration/`.
 
 ## Before anything — a style, or this one picture?
 

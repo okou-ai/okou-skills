@@ -1,9 +1,9 @@
 ---
-name: presentation-reverse-template
-description: Convert a reference PPTX, PPT, PDF, image deck, or set of page screenshots into a reusable, editable, renderable, and publishable HTML Presentation Template. Use when a reference presentation should be reverse-engineered into a shared typography system, color roles, repeated components, motifs, chrome, and reference layouts, with ordered source-page images and a complete template package prepared for publication.
+name: presentation-extract-template
+description: Extract a reusable, editable, renderable, and publishable HTML Presentation Template from a reference PPTX, PPT, PDF, image deck, or set of page screenshots. Use when a reference presentation's typography system, color roles, repeated components, motifs, chrome, and layouts should become a reusable template, with ordered source-page images and a complete package prepared for publication.
 ---
 
-# Build an HTML template from a reference presentation
+# Extract an HTML template from a reference presentation
 
 ## Goal
 
@@ -38,7 +38,7 @@ Preserve the original source and inspect every page in its original order. Estab
 - visual consistency across pages;
 - page roles such as cover, section divider, content, data, and closing pages.
 
-For PPT, PPTX, and PDF inputs, run this command from `reverse-template/presentation/`:
+For PPT, PPTX, and PDF inputs, run this command from `extract-template/presentation/`:
 
 ```bash
 node scripts/render-pages.mjs \

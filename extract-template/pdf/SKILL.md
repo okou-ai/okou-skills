@@ -1,9 +1,9 @@
 ---
-name: pdf-reverse-template
-description: "Reverse-engineer a PDF document into a template skill for filling slots, reusing structure and expression, or applying its visual style. Use when asked to reverse a PDF, extract PDF styles, turn a PDF into a Word template, or analyse a PDF's layout."
+name: pdf-extract-template
+description: "Extract a template skill from a PDF document for filling slots, reusing structure and expression, or applying its visual style. Use when asked to extract a PDF template or its styles, turn a PDF into a Word template, or analyse a PDF's layout."
 ---
 
-# Reverse a PDF into a template package
+# Extract a template package from a PDF
 
 Input: one `.pdf`. Output: a loadable skill package whose instructions and
 resources match the selected reuse scope.
@@ -11,7 +11,7 @@ resources match the selected reuse scope.
 **If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
 pages are slides rather than a document, use `../presentation/SKILL.md`.
 
-Run every command below from `reverse-template/pdf/`.
+Run every command below from `extract-template/pdf/`.
 
 ## Choose the reuse scope
 

@@ -295,9 +295,9 @@ def main(path):
     total = sum(use.values()) or 1
     if direct["Normal"] * 100 >= 60 * total:
         print("  REVIEW: the document is formatted by hand; its styles carry nothing.")
-        print("          Render it and reverse the render instead:")
+        print("          Render it and extract styles from the render instead:")
         print(f"            soffice --headless --convert-to pdf {os.path.basename(path)}")
-        print("          then follow reverse-template/pdf/SKILL.md on that PDF.")
+        print("          then follow extract-template/pdf/SKILL.md on that PDF.")
     else:
         targets = {"title": "Title", "heading 1": "Heading1", "heading 2": "Heading2",
                    "heading 3": "Heading3", "body text": "BodyText"}

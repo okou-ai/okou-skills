@@ -1,5 +1,5 @@
 """Build a corpus of realistic docx documents covering many style situations.
-Each generator is a different real-world pattern the reverse skill must survive."""
+Each generator is a different real-world pattern the extraction skill must survive."""
 import docx, copy
 from docx import Document
 from docx.shared import Pt, Cm, Inches, RGBColor

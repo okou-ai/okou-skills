@@ -261,7 +261,7 @@ python3 analyze_pdf.py {src}{repro} --json styles.json     # verify needs this
 python3 verify_roundtrip.py reference.docx styles.json --structure-only
 ```
 
-Scripts are in `reverse-template/pdf`. Change the style definition;
+Scripts are in `extract-template/pdf`. Change the style definition;
 formatting applied to selected text does not change the template.
 
 ## Limits
