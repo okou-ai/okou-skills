@@ -41,10 +41,10 @@ Four rules override the table:
   slides — is that page's kind, not artwork.
 
 `cd` into the branch directory; every path inside a branch guide is relative to
-it. Both document guides open by asking what must survive, with the six
+it. Both document guides open by asking what must survive, with the five
 questions in [`document-properties.md`](document-properties.md) — fixed wording,
-blanks, recurring blocks, varying lists, artwork, computed values. A document
-that answers `no` to all six ends in a style sheet; any `yes` publishes the
+blanks, recurring blocks, varying lists, artwork. A document that answers `no`
+to all five ends in a style sheet; any `yes` publishes the
 source itself, because a style sheet carries none of those. They read that one
 file so a document does not get a different package for having arrived as a
 `.docx` rather than a `.pdf`.

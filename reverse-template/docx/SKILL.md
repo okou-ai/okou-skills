@@ -13,12 +13,12 @@ Run every command below from `reverse-template/docx/`.
 
 ## Before anything — what must survive?
 
-Answer the six questions in
+Answer the five questions in
 [`../document-properties.md`](../document-properties.md) against the rendered
-pages. The PDF branch answers the same six, so one document does not get a
+pages. The PDF branch answers the same five, so one document does not get a
 different package for having arrived as a `.docx`.
 
-All six `no` — continue at Prerequisites below and build `reference.docx`.
+All five `no` — continue at Prerequisites below and build `reference.docx`.
 Any `yes` — take the route immediately below.
 
 ### Any `yes`: package the file and fill it in
@@ -87,7 +87,6 @@ question order, and nothing for a `no`:
 - **5 artwork** — "Never change the type, the spacing, or the position." The
   table already says to shorten rather than resize; this forbids the other way
   out.
-- **6 computed values** — write the arithmetic beside the field.
 
 ```bash
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \

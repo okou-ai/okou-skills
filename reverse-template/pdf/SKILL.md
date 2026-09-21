@@ -16,12 +16,12 @@ Run every command below from `reverse-template/pdf/`.
 
 ## Before anything — what must survive?
 
-Answer the six questions in
+Answer the five questions in
 [`../document-properties.md`](../document-properties.md) against the rendered
-pages. Each `yes` adds a clause to the package; all six `no` is the only case
+pages. Each `yes` adds a clause to the package; all five `no` is the only case
 whose asset is a style sheet.
 
-All six `no` — continue at Prerequisites below and build `reference.docx`.
+All five `no` — continue at Prerequisites below and build `reference.docx`.
 Any `yes` — take the route immediately below.
 
 ## Any `yes`: publish the source itself
@@ -91,14 +91,6 @@ from scratch and never let one fall back to a style default.
 ````markdown
 Keep the artwork and where each line sits. If a replacement no longer fits,
 shorten the wording — never the type, the spacing, or the position.
-````
-
-**6 — computed values.** Beside the field, write the arithmetic:
-
-````markdown
-| Field | Computed as |
-|---|---|
-| <field> | <the arithmetic> |
 ````
 
 ### Publishing

@@ -4,14 +4,9 @@ Both document branches ask this before anything else, and they answer it here so
 that one document does not get a different package for having arrived as a
 `.docx` rather than a `.pdf`.
 
-Do not classify the file. There is no list of document types that stays
-complete, and a name chosen off a genre loses whatever the genre does not
-imply — a certificate is carried by its artwork *and* worded formally, and
-naming it one of the two drops the other.
-
-Ask the questions below instead. They are independent: answer each one, and each
-`yes` adds its clause to the package. A document that answers `no` to all of
-them is the only one whose reusable asset is a style sheet.
+The questions below are independent: answer each one, and each `yes` adds its
+clause to the package. A document that answers `no` to all of them is the only
+one whose reusable asset is a style sheet.
 
 ## The questions
 
@@ -61,40 +56,31 @@ be carrying the page.
 no longer fits, shorten the wording — never the type, the spacing or the
 position.
 
-### 6. Is any value computed from the others?
-
-A subtotal, a tax line, a total, a count, a duration.
-
-→ Write the arithmetic into the package beside the field, so a new document
-computes it rather than treating it as free text.
-
 ## What to deliver
 
 | | |
 | --- | --- |
 | Any question answered `yes` | Publish the source file. A style sheet carries none of those. |
-| All six answered `no` | Build the style sheet — the article route, `reference.docx`. |
+| All five answered `no` | Build the style sheet — the article route, `reference.docx`. |
 
 The branch guide gives the packaging mechanics; the clauses above are its body.
 
 ## How this composes
 
-Real documents answer several at once, which is the reason for asking
-separately rather than naming a type:
+Real documents answer several at once:
 
-| Document | 1 wording | 2 blanks | 3 blocks | 4 lists | 5 artwork | 6 computed |
-| --- | --- | --- | --- | --- | --- | --- |
-| Services agreement | yes | yes | yes | — | — | — |
-| Meeting minutes | — | — | yes | yes | — | — |
-| Party invitation | — | yes | yes | — | yes | — |
-| Whitepaper | — | — | — | — | — | — |
-| Certificate | yes | yes | yes | — | yes | — |
-| Invoice | yes | yes | yes | yes | — | yes |
-| Résumé | — | — | yes | yes | — | — |
+| Document | 1 wording | 2 blanks | 3 blocks | 4 lists | 5 artwork |
+| --- | --- | --- | --- | --- | --- |
+| Services agreement | yes | yes | yes | — | — |
+| Meeting minutes | — | — | yes | yes | — |
+| Party invitation | — | yes | yes | — | yes |
+| Whitepaper | — | — | — | — | — |
+| Certificate | yes | yes | yes | — | yes |
+| Invoice | yes | yes | yes | yes | — |
+| Résumé | — | — | yes | yes | — |
 
-The whitepaper is the only style-sheet case. The certificate and the invoice are
-the ones a four-way classification cannot hold: the certificate is artwork *and*
-fixed wording, and the invoice adds arithmetic that no document type implies.
+The whitepaper is the only style-sheet case. The certificate answers four at
+once, which is why the questions are asked separately.
 
 ## Where this is easy to get wrong
 
