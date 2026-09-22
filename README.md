@@ -1,4 +1,4 @@
-# vm0-skills
+# okou-skills
 
 A collection of reusable [Agent Skills](https://agentskills.io) that are
 independent of the VM0 connector catalog.
@@ -23,7 +23,7 @@ There are multiple ways to install and use these skills:
 
 ```bash
 # Add marketplace
-/plugin marketplace add okou-ai/vm0-skills
+/plugin marketplace add okou-ai/okou-skills
 
 # Install specific skills
 /plugin install github-copilot@vm0-skills
@@ -34,15 +34,15 @@ There are multiple ways to install and use these skills:
 
 ```bash
 # Clone the repository
-git clone https://github.com/okou-ai/vm0-skills.git
+git clone https://github.com/okou-ai/okou-skills.git
 
 # Copy to personal skills directory
-cp -a vm0-skills/github-copilot ~/.claude/skills/
-cp -a vm0-skills/hackernews ~/.claude/skills/
+cp -a okou-skills/github-copilot ~/.claude/skills/
+cp -a okou-skills/hackernews ~/.claude/skills/
 
 # Or copy to project directory
-cp -a vm0-skills/github-copilot ./.claude/skills/
-cp -a vm0-skills/hackernews ./.claude/skills/
+cp -a okou-skills/github-copilot ./.claude/skills/
+cp -a okou-skills/hackernews ./.claude/skills/
 ```
 
 After installation, restart Claude Code, then ask "What skills are available?" to see installed skills.
