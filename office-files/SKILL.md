@@ -16,7 +16,7 @@ fixed list of document types or impose one writing structure.
 | --- | --- |
 | New editable Word with deliberate sections, tables or page layout | Native `docx` (Node.js) or `python-docx`; read [Word authoring](references/word-authoring.md) |
 | Edit existing Word, fill slots, retain revisions/comments/fields | Work on a copy of the supplied DOCX; choose focused library edits or OOXML patches from the Word guide |
-| New flowing prose naturally expressed as Markdown | Use the optional Pandoc prose route below, or Pandoc's appropriate reader, filters and writer |
+| Simple text-led document with a straightforward flowing layout | Optionally use the Pandoc route below |
 | PDF-only with designed typography, multi-column or fixed-position layout | ReportLab, native Typst, or a working HTML/CSS renderer; read [PDF authoring](references/pdf-authoring.md) |
 | Modify an existing PDF or fill its fields | Preserve the PDF and use native field editing or targeted overlays; see the PDF guide |
 | Matching Word and PDF deliverables | Author Word with the chosen tool, then export the actual DOCX to PDF |
@@ -88,13 +88,16 @@ For matching Word/PDF output, supply the finished DOCX. The original files are
 never overwritten or house-styled. LibreOffice pagination is verified, not
 identical rendering in every Microsoft Word version.
 
-## Optional Pandoc prose route
+## Optional Pandoc route for simple documents
 
-Use this convenience route when its flowing-prose structure fits. It is not a
-restriction on Pandoc's readers, extensions, Lua filters, citations, templates
-or output engines. For those workflows, run Pandoc with the required options,
-then pass the finished DOCX/PDF and its authoring resources to the shared helper.
-Do not squeeze native layout into Markdown merely to use this wrapper.
+Use Pandoc as an optional shortcut for simple, text-led documents with a
+straightforward flowing layout. Prefer the native Word/PDF route for precise
+page composition or preserving an existing document.
+
+Retain an established Pandoc publishing workflow when it fits the source. Use
+its required readers, extensions, Lua filters, citations, templates and output
+engines directly, then pass the finished DOCX/PDF and authoring resources to
+the shared helper.
 
 ```bash
 python3 -m pip install --break-system-packages --quiet pypandoc_binary==1.17 python-docx==1.2.0

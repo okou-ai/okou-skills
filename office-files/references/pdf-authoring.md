@@ -13,7 +13,7 @@ PDF template, form or designed page.
 | Native typesetting, mathematics or a Typst template | Typst, authored in its own source format. |
 | Existing HTML/CSS design or print template | Its verified print renderer, such as Chromium or WeasyPrint. |
 | Existing PDF pages, fields or annotations | `pypdf` or PyMuPDF for supported edits; `pdfplumber` for text/table extraction. |
-| Semantic source with citations or established publishing filters | Pandoc with the suitable PDF engine and full required options. |
+| Simple text-led PDF or an established Pandoc publishing workflow | Optionally use Pandoc with the suitable PDF engine and full required options. |
 
 Keep the selected native source and assets. A visual revision should change
 layout/styles while preserving the approved content, without rebuilding the
@@ -111,10 +111,10 @@ support for running headers, counters, footnotes, grids and fragmentation.
 Wait for asset load completion explicitly; a successful print call with blank
 charts or fallback fonts is not a finished document.
 
-Pandoc can also render through an appropriate installed PDF engine using its
-own templates, citations, filters and extensions. Its convenience wrapper does
-not define the available feature set. Preserve an existing publishing toolchain
-when it serves the source correctly, and apply the same final-page checks.
+For a simple text-led PDF, Pandoc is an optional route through an appropriate
+installed PDF engine. Retain an established Pandoc publishing toolchain when it
+serves the source correctly, using its templates, citations, filters and
+extensions. Apply the same final-page checks.
 
 ## Existing PDFs and forms
 

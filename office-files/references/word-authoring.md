@@ -11,7 +11,7 @@ authority; use the shared layout guidance only where it leaves a choice.
 | Existing Word with simple, supported edits | Open the original with `python-docx`, edit only the necessary objects, and compare the result. |
 | Existing Word with revisions, content controls, unusual fields, embedded objects or complex relationships | Make focused OOXML changes while preserving all untouched package parts. |
 | Real reusable template containing placeholders | Use `docxtpl` and the template's existing styles and content skeleton. |
-| Semantic prose, citations, equations or conversion between supported formats | Use Pandoc with the relevant readers, extensions, filters, templates and options. |
+| Simple text-led Word or an established Pandoc publishing workflow | Optionally use Pandoc with the relevant readers, extensions, filters, templates and options. |
 
 ## New Word with `docx`
 
@@ -150,10 +150,11 @@ specific feature and check both revision semantics and rendering; do not claim
 redline preservation from the accepted-view PDF alone. Convert legacy `.doc`
 with a compatible office suite before DOCX editing and inspect that conversion.
 
-## Pandoc remains a full authoring/conversion option
+## Optional Pandoc for simple prose or existing publishing workflows
 
-Use the bundled Pandoc from the shared setup, or an appropriate installed
-version. The convenience renderer is not a restriction on Pandoc's ecosystem.
+Choose Pandoc for straightforward text-led Word or retain it for an established
+publishing workflow. Use the bundled Pandoc from the shared setup, or an
+appropriate installed version.
 When citations, cross-references, reader extensions or Lua filters are needed,
 invoke Pandoc directly with the required options, then verify its finished
 DOCX using the shared flow. Retain filters, references and resource files.

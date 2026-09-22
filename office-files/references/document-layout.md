@@ -11,10 +11,11 @@ preserved, fixed-position elements, exact wording/fields, changing-length lists
 or tables, and calculated values. These properties can coexist. They do not
 require a user-facing category picker or a fixed document-type enumeration.
 
-Choose a native Word/PDF tool when the structure or layout needs it. The optional
-Pandoc prose route creates a reference from Pandoc's style set, applies the
-maintained theme, and exports the final Word file to PDF. Other authoring routes
-use the same page checks without adopting that theme or a Markdown intermediate.
+Choose a native Word/PDF tool when the structure or layout needs it. For simple,
+text-led documents, the optional Pandoc route creates a reference from Pandoc's
+style set, applies the maintained theme, and exports the final Word file to PDF.
+Other authoring routes use the same page checks without adopting that theme or
+a Markdown intermediate.
 For existing files/templates, preserve their dimensions, style and content
 contract. A single theme is not a replacement for a form or a designed page.
 
