@@ -178,6 +178,39 @@ def check_expectation_targets(snapshot, expectations, data):
             raise ValueError(f"Table range mismatch: {key}; expected {table['ref']}, found {snapshot['tables'].get(key)}")
 
 
+def formula_coverage(snapshot, expectations, cell_results=()):
+    """Count independent formula checks; quick checks have no compared values."""
+    expected = {f"{item['sheet']}!{item['cell']}" for item in expectations["cells"]}
+    checked = {f"{item['sheet']}!{item['cell']}": item["matches"] for item in cell_results}
+    counts = ("all_formula_cells", "expected_formula_cells", "checked_formula_cells", "matched_formula_cells")
+    by_sheet = {sheet: dict.fromkeys(counts, 0) for sheet in snapshot["sheets"]}
+    for location in snapshot["formulas"]:
+        sheet = by_sheet[location.rsplit("!", 1)[0]]
+        sheet["all_formula_cells"] += 1
+        sheet["expected_formula_cells"] += location in expected
+        sheet["checked_formula_cells"] += location in checked
+        sheet["matched_formula_cells"] += checked.get(location, False)
+    total = {key: sum(sheet[key] for sheet in by_sheet.values()) for key in counts}
+    for count in [total, *by_sheet.values()]:
+        count["formula_cells_without_expectations"] = count["all_formula_cells"] - count["expected_formula_cells"]
+        count["unchecked_formula_cells"] = count["all_formula_cells"] - count["checked_formula_cells"]
+    missing_sheets = [name for name, count in by_sheet.items() if count["all_formula_cells"] and not count["expected_formula_cells"]]
+    return {
+        **total,
+        "by_sheet": by_sheet,
+        "formula_sheets_without_expectations": missing_sheets,
+        "key_result_coverage": "not_established_by_counts",
+        "missing_key_result_risk": (
+            "Formula cells without independent expectations may include requested or affected key results; "
+            "review those results and sheets before delivery."
+            if total["formula_cells_without_expectations"] else
+            "All formula cells have expectations; counts cannot establish their independence or coverage of non-formula key results."
+            if total["all_formula_cells"] else
+            "No formula cells; formula coverage does not establish coverage of non-formula key results."
+        ),
+    }
+
+
 def quick(args):
     source = Path(args.input).resolve(strict=True)
     if source.suffix.lower() != ".xlsx":
@@ -194,6 +227,7 @@ def quick(args):
         "status": "QUICK_CHECK_PASSED_NOT_VERIFIED", "delivery_allowed": False,
         "input": bindings[0], "sheet_count": len(snapshot["sheets"]),
         "formula_count": len(snapshot["formulas"]), "expected_cell_count": len(expectations["cells"]),
+        "formula_coverage": formula_coverage(snapshot, expectations),
         "checks": "Workbook structure, supported parts, error cells, references and expectation inputs.",
         "next": "Run verify for fresh independent values, render_workbook.py for visual review, then accept.",
         "limitations": "No recalculation, expected-value comparison or visual review was performed.",
@@ -304,6 +338,7 @@ def verify(args):
         report["calculation_basis"] = expectations["calculation_basis"]
         formula_count = len(before["formulas"])
         report["formula_count"] = formula_count
+        report["formula_coverage"] = formula_coverage(before, expectations)
         check_expectation_targets(before, expectations, args.data)
         if formula_count:
             engine = shutil.which("soffice")
@@ -332,6 +367,7 @@ def verify(args):
         report["candidate"] = fingerprint(candidate)
         report["bindings"].append(report["candidate"])
         report["cell_results"] = check_values(candidate, expectations, before["formulas"])
+        report["formula_coverage"] = formula_coverage(before, expectations, report["cell_results"])
         for result in report["cell_results"]:
             if not result["matches"]:
                 report["failures"].append(f"{result['sheet']}!{result['cell']}: expected {result['value']!r}, got {result['actual']!r}")

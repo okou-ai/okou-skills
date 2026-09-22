@@ -1,113 +1,84 @@
 # Excel authoring
 
-For ordinary new workbooks, use the JSON author below. Read script source only
-to investigate a specific failure or implement an unsupported feature. Set the
-package path in a separate shell command:
+Choose the authoring route once; read its interface, then run the scripts.
+Inspect implementation only for a concrete failure or an unsupported feature.
+
+| Task | Route |
+| --- | --- |
+| Tabular inputs → monthly/category totals, ratios, changes and charts | [Tabular summary builder](tabular-summary.md): raw CSV/JSON + a small report spec; emits formulas, ranges and independent expectations together |
+| Custom workbook layout or formulas outside that builder | [Workbook JSON spec](workbook-spec.md): reusable blocks, typed columns, formula fill and chart anchors |
+| Edit an existing file or use native Excel features | Preserve the source as described below; use Python/native Excel for the required edit |
+
+## Prepare
+
+Set the package path on its own line. Install missing dependencies once:
 
 ```bash
 export OFFICE_FILES_DIR="/absolute/path/to/office-files"
-```
-
-## 1. Prepare
-
-Install missing dependencies once:
-
-```bash
 python3 -m pip install --break-system-packages --quiet openpyxl==3.1.5 lxml==6.1.3 PyMuPDF==1.28.2
-sudo apt-get update
-sudo apt-get install -y libreoffice-calc
+sudo apt-get update -qq
+sudo apt-get install -y -qq libreoffice-calc
 ```
 
-Use a meaningful final filename before starting QA. Calc is required for
-formula recalculation and PDF preview; Writer alone cannot load XLSX.
+Calc provides formula recalculation and print previews; Writer alone cannot
+load XLSX. Choose the final filename before QA. Keep raw input data separate
+from presentation. For simulated data, generate inputs once, inspect the
+aggregates, then write conclusions supported by those aggregates.
 
-## 2. Author
+## Author
 
-Copy [the working JSON spec](../assets/workbook.json) to
-`generated/workbook.json`, replace its content/data, then run:
+For supported tabular summaries, follow the linked builder page and use
+`--prepare-review` to run authoring, quick checks, fresh calculation and preview
+in one command. Reuse its generated expectations and source bindings; no custom
+`build_spec.py` or `build_expectations.py` is needed for supported calculations.
+
+For a custom layout, copy [the workbook example](../assets/workbook.json), adapt
+it using the JSON reference, and run:
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/author_workbook.py" \
   --spec generated/workbook.json --output generated/operating-summary.xlsx
 ```
 
-Keep analysis and charts relevant to the requested decisions. Let content
-paginate naturally unless the user specifies a page limit.
+Use column `type: "date"` for real dates; `format: "date"` alone does not parse
+text. Reuse `blocks` and column `formula` templates instead of spelling out
+every cell address. Let content paginate naturally. Review actual clipping,
+misleading labels, broken references or unreadable text; passing checks do not
+call for another candidate solely to explore alternate styling.
 
-### JSON fields
-
-`version` is `1`; `sheets` is an ordered array. Only the fields below are
-supported; use Python for other features.
-
-| Field | Input |
-| --- | --- |
-| `theme` | Optional `font`, `font_size`, `accent`, `stripe`, `currency`, `chart_colors` (RGB hex strings without `#`) |
-| `styles` | Named style objects; built-ins are `normal`, `header`, `title`, `total`, `note` |
-| Sheet `name` | Unique Excel sheet name |
-| `start_cell`, `columns`, `rows` | Table starts at `A1` by default. Column objects take `header`, `width` and style fields. Rows are arrays matching the columns; strings starting `=` are formulas. Omit columns for rows without a header. |
-| `cells` | A1-address-to-value/object mapping, applied after rows. Cell objects take `value` **or** `formula`, optional `style`, style fields and `type: "date"` (ISO date) or `"text"` (literal text even if it begins `=`). |
-| Style fields | `font`, `font_size`, `bold`, `italic`, `color`, `fill`, `format`, `horizontal`, `vertical`, `wrap`, `border` (bottom-border color). `format`: `money`, `integer`, `decimal`, `percent`, `date`, `text`, or an Excel number-format string. |
-| `column_widths`, `row_heights` | Overrides such as `{"A": 18}` and `{"1": 32}` |
-| `merges` | A1 ranges, e.g. `["A1:F1"]`; other cells in each range must be empty |
-| `freeze`, `filter`, `table` | Freeze cell (e.g. `B2`), filter range (e.g. `A1:E20`), optional structured-table name for the columns/rows block |
-| `charts` | Chart objects described below |
-| `print` | Optional `orientation` (`portrait`/`landscape`), `area`, `title_rows` (e.g. `1:1`), `break_rows` (break after these row numbers) |
-
-Chart objects take `type` (`column`, `bar`, `line`), `title`, `data_sheet`,
-`data`, `categories`, `anchor`, optional `titles_from_data` (default true),
-`number_format`, `labels` (default false), `legend` (`b`, `t`, `l`, `r`, null),
-and `colors`. Data is a rectangular range with one series per column;
-categories is one column with the same number of data rows. `anchor: "A7:D21"`
-occupies those cells, inclusive. Set column widths and leave a row/column gutter
-between charts. Defaults use explicit grid anchors, cell fills and per-series
-label flags that survive Calc. When enabling labels, make the source-cell
-number format readable; Calc may ignore a label-specific format.
-
-The default print area includes cells and charts, fits one page wide and has
-unlimited height. Keep all content in the reviewed print area; use page breaks
-between logical blocks when a preview splits a chart or table. Literal wrapped
-text gets an estimated row height; check long text in the preview. Do not wrap
-formulas inside merged cells: Calc can drop the wrapping. Use an unmerged cell,
-or put a short formula result beside a separate literal label.
-
-### Existing files or advanced features
+### Existing files and advanced features
 
 Work on a copy with `load_workbook(..., data_only=False)` and save to a new
-output. Preserve unrelated sheets, formulas and formatting. After inserting or
-deleting rows/columns/sheets, update affected totals, cross-sheet formulas,
-table boundaries, chart ranges and defined names explicitly; openpyxl does not
-maintain them all. A valid formula can still reference the wrong row.
+output. Preserve unrelated content. After structural edits, explicitly update
+all affected totals, formulas, table/chart ranges and defined names; openpyxl
+does not maintain them all. Inventory pivots, macros, links and embedded objects
+first. Use a compatible native workflow for features openpyxl/Calc cannot
+preserve, with preservation checks before delivery.
 
-Inventory pivots, macros, external links and embedded objects first. Use a
-compatible native workflow when openpyxl/Calc cannot preserve required features;
-do not deliver a rewritten replacement without preservation checks.
+## Verify custom workbooks
 
-## 3. Check data, then recalculate once
-
-Derive key results independently from raw inputs (for example, Python sums),
-never from workbook caches or a copy of its formulas. Cover every requested or
-affected total, subtotal, ratio and cross-sheet indicator. Save expectations:
+The summary builder's `--prepare-review` performs this section automatically.
+For other routes, derive expected results from raw inputs, not workbook caches
+or copies of Excel formulas. Cover every requested or affected total, subtotal,
+ratio, cross-sheet indicator and plotted result. Check representative repeated
+row calculations and boundary rows; listing every repeated formula is not a
+substitute for covering all key outputs.
 
 ```json
 {
-  "calculation_basis": "Independently sum raw revenue inputs: 3000 + 48 + 380 = 3428.",
-  "range_review": "Data rows 2:4 are the three input months. Summary B3 sums Data B2:B4. MonthlyData and both chart source ranges cover these rows; no other data rows exist.",
+  "calculation_basis": "Raw revenues 3000 + 48 + 380 sum to 3428; calculated independently of workbook formulas.",
+  "range_review": "Data rows 2:4 contain all three months. MonthlyData and chart ranges cover these rows. Summary B3 is the revenue total.",
   "cells": [{"sheet": "Summary", "cell": "B3", "value": 3428}],
   "tables": [{"sheet": "Data", "name": "MonthlyData", "ref": "A1:E4"}]
 }
 ```
 
-Expand this example to cover the actual key results. `cells` must be nonempty,
-even without formulas; values can be strings, numbers, booleans or null.
-Numeric `abs_tol`/`rel_tol` default to zero; set appropriate tolerances for
-ratios. Include affected tables and describe the actual reference review in
-`range_review`; for new workbooks review initial ranges too.
-
-Use real files in these commands. Bind original raw inputs as `--data`; a spec
-containing literal simulated inputs may itself be that raw data. Bind authoring
-code and independent expectation code with repeatable `--resource`; for edits,
-also bind the original workbook. Formula workbooks need raw data and at least
-one independently expected formula result; this minimum is not full coverage.
+Expand the example for the actual requested outputs. `cells` must be nonempty,
+even without formulas; values may be strings, numbers, booleans or null. Set
+appropriate numeric `abs_tol`/`rel_tol` (defaults zero). Bind raw data with
+`--data` and authoring/expectation code with repeatable `--resource`; for edits,
+also bind the original workbook. A spec with literal simulated inputs can be
+the raw data. Use real files in these commands:
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/check_workbook.py" quick \
@@ -122,41 +93,43 @@ python3 "$OFFICE_FILES_DIR/scripts/check_workbook.py" verify \
   --expectations generated/workbook-expectations.json \
   --data generated/workbook.json \
   --resource "$OFFICE_FILES_DIR/scripts/author_workbook.py" \
-  --resource generated/build_expectations.py \
-  --out generated/workbook-qa
+  --resource generated/build_expectations.py --out generated/workbook-qa
 ```
 
-Fix quick-check errors before `verify`. Quick checks do not verify fresh formula
-results. Use a new QA directory for each changed candidate. `verify` clears old
-caches, recalculates in a private Calc profile, compares independent values and
-checks formula/sheet/table/chart-range/name preservation. Inspect
-`verification.json` for failures; do not remove a check to make it pass. Use a
-compatible engine if Calc changes a required formula, range or advanced feature.
+Fix quick-check errors before `verify`; quick does not compare fresh values.
+Verification clears stale caches, recalculates in a private Calc profile and
+checks values plus formula/sheet/table/chart-range/name preservation. Equivalent
+case and redundant sheet quotes are already normalized; use valid Excel quoting
+for names containing spaces or apostrophes. Do not change sound formulas to
+avoid that supported normalization.
 
-Formula-free files still require expected-value checks. Failed or missing
-verification is `UNVERIFIED`; do not describe its caches as verified.
+Read `failures` and `formula_coverage`: omitted sheets or key results need
+attention. Counts do not prove complete semantic coverage. A failed or missing
+verification is `UNVERIFIED`; do not remove checks to obtain a pass. Use a new
+QA directory for each changed candidate.
 
-## 4. Batch preview and deliver
+## Review and deliver
+
+For custom workbooks, generate the preview after verification:
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/render_workbook.py" --qa generated/workbook-qa
 ```
 
-Open `workbook-qa/preview/gallery/index.html` for the batch overview and inspect
-each page at readable size. Check the **recalculated candidate**, including
-number/date formats, formulas displayed as text, merged text, table pagination,
-labels, chart placement and print-area coverage. Record each reviewed page's
-`status: "pass"` and observations in `preview/review.json`; fix failures and
-repeat QA only after an actual change. Calc PDF preview does not establish
-native Excel rendering, nor does it review hidden/out-of-print-area content.
-
-Immediately before upload:
+Open the gallery for the overview, then every page at readable size in batches.
+Review the recalculated candidate: number/date formats, displayed formulas,
+merged text, tables, labels, chart placement and print coverage. Record a short,
+specific observation and `status: "pass"` for each reviewed page in
+`preview/review.json`. Fix actual defects and repeat QA after changes. Calc print
+previews do not establish native Excel appearance or cover hidden/nonprinting
+content; verify that the visible scope includes the intended deliverable.
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/check_workbook.py" accept --qa generated/workbook-qa
 ```
 
 Only `READY_TO_DELIVER` permits verified delivery. Upload the exact
-`candidate.path` returned by `accept`; for formula workbooks it is the
-recalculated file. Changes to bound files invalidate acceptance. Keep source
-workbooks, spec/code, raw data and QA records for revisions.
+`candidate.path` returned by `accept`, then provide its link promptly. Changes
+to bound files invalidate acceptance. Keep the source, raw data and QA records
+for revisions. Any requested retrospective follows delivery using existing
+logs; it does not require regenerating the files.

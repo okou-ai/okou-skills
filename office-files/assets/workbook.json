@@ -5,16 +5,16 @@
     {
       "name": "Data",
       "columns": [
-        {"header": "Month", "width": 18},
+        {"header": "Month", "width": 18, "type": "date", "format": "yyyy-mm"},
         {"header": "Revenue", "width": 18, "format": "money"},
         {"header": "Cost", "width": 18, "format": "money"},
-        {"header": "Profit", "width": 18, "format": "money"},
-        {"header": "Margin", "width": 16, "format": "percent"}
+        {"header": "Profit", "width": 18, "format": "money", "formula": "=B2-C2"},
+        {"header": "Margin", "width": 16, "format": "percent", "formula": "=IF(B2=0,\"\",D2/B2)"}
       ],
       "rows": [
-        ["July", 3000, 1800, "=B2-C2", "=IFERROR(D2/B2,0)"],
-        ["August", 48, 32, "=B3-C3", "=IFERROR(D3/B3,0)"],
-        ["September", 380, 260, "=B4-C4", "=IFERROR(D4/B4,0)"]
+        ["2026-01-01", 3000, 1800],
+        ["2026-02-01", 48, 32],
+        ["2026-03-01", 380, 260]
       ],
       "freeze": "B2",
       "filter": "A1:E4",

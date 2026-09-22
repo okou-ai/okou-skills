@@ -1,0 +1,10 @@
+date,service,booked,cost
+2026-01-08,Workspace booking,900,320
+2026-01-20,Equipment hire,480,210
+2026-01-28,Facilitation,0,75
+2026-02-03,Workspace booking,1050,370
+2026-02-15,Equipment hire,-80,-35
+2026-02-24,Facilitation,640,280
+2026-03-05,Workspace booking,1200,410
+2026-03-16,Equipment hire,550,230
+2026-03-27,Facilitation,700,300

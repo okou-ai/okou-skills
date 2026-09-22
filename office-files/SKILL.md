@@ -26,3 +26,5 @@ decision. Let content paginate naturally unless the user specifies a page limit.
 Resolve quick-check findings while drafting. Once content is stable, verify the
 final candidate, review its page gallery, and run acceptance before delivery.
 Keep sources and check records for revisions.
+Provide the download link as soon as the accepted file is uploaded. If a
+retrospective is requested, follow with it using existing logs and timestamps.
