@@ -1,22 +1,8 @@
 # Word authoring and editing
 
-Choose the authoring route from the required structure and the supplied source.
-A DOCX is an editable document package, not a screenshot or a compulsory
-Markdown intermediate. A supplied document or template remains the visual
-authority; use the shared layout guidance only where it leaves a choice.
+## Create with `docx`
 
-| Situation | Route |
-| --- | --- |
-| New Word document needing explicit styles, sections, tables and fields | `docx` for Node.js is a useful default; `python-docx` is also suitable when its API covers the content. |
-| Existing Word with simple, supported edits | Open the original with `python-docx`, edit only the necessary objects, and compare the result. |
-| Existing Word with revisions, content controls, unusual fields, embedded objects or complex relationships | Make focused OOXML changes while preserving all untouched package parts. |
-| Real reusable template containing placeholders | Use `docxtpl` and the template's existing styles and content skeleton. |
-| Simple text-led Word or an established Pandoc publishing workflow | Optionally use Pandoc with the relevant readers, extensions, filters, templates and options. |
-
-## New Word with `docx`
-
-Install in a task-local project so the authoring script can resolve its dependency.
-Retain `package-lock.json` with the source to reproduce the selected version.
+Install in the task's authoring directory:
 
 ```bash
 mkdir -p generated/word-author
@@ -25,9 +11,8 @@ npm init -y
 npm install --save-exact docx
 ```
 
-Save this minimal example as `author.cjs` in that directory. Pass an installed
-font family appropriate to the actual language; the example does not establish
-that any particular font exists on the rendering host.
+Save the example as `author.cjs`. Pass a font installed on the rendering host
+that supports the document's language.
 
 ```javascript
 const fs = require("node:fs/promises");
@@ -59,38 +44,36 @@ async function main() {
 main().catch((error) => { console.error(error); process.exitCode = 1; });
 ```
 
-Before delivery, set the page size, margins, language and styles for the task.
-Use semantic heading levels, numbering definitions and real page-number fields;
-do not simulate them with bold text, typed bullets or repeated spaces. Use
-paragraphs for paragraphs and explicit line breaks only within a paragraph.
-Assign table and column widths in consistent units within the usable page
-width. Repeat table headers where appropriate, and allow genuinely tall rows
-to continue rather than forcing an entire table onto one page. Keep images at
-their aspect ratio and captions with the relevant figure. A generated table of
-contents is a field whose updated content must be verified in the final export.
+Set page size, margins, language and styles for the document. Use native heading
+levels, numbering and page-number fields. Keep table/column widths within the
+usable page width; enable repeating header rows and row splitting as needed.
+Check that generated table-of-contents fields are updated in the final export.
 
-## Python creation and genuine templates
+## Edit with Python or fill a template
 
-Install only the libraries selected for the job:
+Run the installation command for the selected library:
 
 ```bash
 python3 -m pip install --break-system-packages python-docx
 python3 -m pip install --break-system-packages docxtpl
 ```
 
-`python-docx` can create native paragraphs, styles, tables, sections, headers and
-footers, or start with `Document("source.docx")`. Check that its API covers the
-features that must survive. Assigning `paragraph.text` or `cell.text` replaces
-their existing run content and can destroy local formatting or fields; it is
-not a general find-and-replace operation. For a supported small edit, target
-the intended runs and assert the match count before saving to a new file.
-Text may span multiple runs; never flatten the document just to make a phrase
-searchable. Some structures are not represented in the high-level API.
+### `python-docx`
 
-Use `docxtpl` when the source actually has placeholders, for example
-`{{ client_name }}`. A styled document without placeholders is not a mail-merge
-template. Keep placeholder syntax valid in its runs; use the library's explicit
-paragraph/row tags for repeated blocks rather than inventing XML replacement.
+Open the original with `Document("source.docx")` and save edits to a new file.
+Target the required runs and check the match count. Text can span multiple runs;
+preserve their formatting boundaries. Assigning `paragraph.text` or `cell.text`
+replaces all runs and can remove formatting or fields.
+
+Use focused OOXML edits below for features the library's API does not cover.
+For legacy `.doc`, convert with a compatible office suite and inspect the
+conversion before editing.
+
+### `docxtpl`
+
+Use a template containing placeholders such as `{{ client_name }}`. Keep
+placeholder syntax valid within runs and use the library's paragraph/row tags
+for repeated blocks.
 
 ```python
 from docxtpl import DocxTemplate
@@ -100,31 +83,23 @@ template.render({"client_name": "Example Company"}, autoescape=True)
 template.save("filled.docx")
 ```
 
-Check missing/unfilled placeholders, repeated rows, optional sections and
-longest realistic values. Preserve logos, headers, numbering, fields and
-dimensions supplied by the template. A Pandoc `--reference-doc` supplies styles
-and document properties; it does not reproduce this body-content skeleton.
+Check missing/unfilled placeholders, repeated rows, optional sections and long
+values. Preserve the template's styles, fields, headers and dimensions.
 
-## Focused OOXML changes to existing files
+## Make focused OOXML edits
 
-1. Keep the original immutable. Inventory ZIP parts, relationships and affected
-   content before editing; inspect headers/footers or other parts when the
-   requested text is not in `word/document.xml`.
-2. Locate the exact affected paragraphs/runs with namespace-aware XML handling.
-   Preserve formatting boundaries, hyperlinks, bookmarks, field instructions,
-   whitespace and revision boundaries. Do not merge differently formatted runs
-   or rewrite unrelated text to simplify replacement.
-3. Change the smallest supported structure. Preserve untouched parts as bytes;
-   update relationship IDs and content-type entries when adding/removing parts.
-   Do not pretty-print the entire package or silently accept tracked changes.
-4. Compare the part inventory and hashes, parsed XML and intended text delta.
-   Check referenced IDs/targets, relevant OOXML schema constraints, and the
-   original versus edited rendering. XML that parses successfully is not proof
-   of a valid Word document or preserved layout.
+1. Keep the original unchanged. Inventory ZIP parts and relationships; locate
+   the affected content, including headers/footers when needed.
+2. Use namespace-aware XML handling. Preserve run formatting, hyperlinks,
+   bookmarks, field instructions, whitespace and revision boundaries.
+3. Change only the necessary parts and preserve untouched parts byte-for-byte.
+   Update relationships and content-type entries when adding or removing parts.
+4. Compare part inventories, hashes and the intended text delta. Validate
+   referenced IDs/targets and relevant OOXML schema constraints, then compare
+   the original and edited rendering.
 
-This self-contained packaging example replaces an already-edited XML part and
-copies all other members without modifying their contents. It is not an XML
-editor or a schema validator, and it does not handle newly added parts.
+This example replaces an already-edited XML part. Make and validate the XML
+change separately; the example only packages replacements of existing parts.
 
 ```python
 from pathlib import Path
@@ -142,47 +117,18 @@ with ZipFile("source.docx") as original, ZipFile("edited.docx", "w") as edited:
         edited.writestr(member, original.read(member) if data is None else data)
 ```
 
-Tracked changes and comments need feature-aware handling: revision authors and
-IDs, insertion/deletion elements, paragraph-mark deletions, comment anchors,
-relationships and comment parts must remain coherent. Deleting visible text is
-not equivalent to accepting a revision. Use a validated implementation for the
-specific feature and check both revision semantics and rendering; do not claim
-redline preservation from the accepted-view PDF alone. Convert legacy `.doc`
-with a compatible office suite before DOCX editing and inspect that conversion.
+For tracked changes and comments, preserve revision authors/IDs, insertion and
+deletion elements, paragraph-mark deletions, comment anchors and their related
+parts. Do not silently accept revisions. Validate revision semantics as well as
+rendering; an accepted-view PDF cannot establish revision preservation.
 
-## Optional Pandoc for simple prose or existing publishing workflows
+## Font and language settings
 
-Choose Pandoc for straightforward text-led Word or retain it for an established
-publishing workflow. Use the bundled Pandoc from the shared setup, or an
-appropriate installed version.
-When citations, cross-references, reader extensions or Lua filters are needed,
-invoke Pandoc directly with the required options, then verify its finished
-DOCX using the shared flow. Retain filters, references and resource files.
+Check installed fonts and character coverage; setting a DOCX font name does not
+embed the font. For CJK, use the appropriate regional font and document language.
+For RTL, set paragraph direction and run-level complex-script properties, then
+inspect mixed-script text, numbers and punctuation. Retain template fonts unless
+the task requires a change.
 
-```bash
-PANDOC_BIN="$(python3 -c 'import pypandoc; print(pypandoc.get_pandoc_path())')"
-"$PANDOC_BIN" manuscript.md --from markdown --to docx \
-  --reference-doc style.docx --citeproc --bibliography references.bib \
-  --resource-path .:assets --output authored.docx
-```
-
-Supply only options/resources the task uses. Check feature fidelity instead of
-assuming every reader/writer round-trip preserves the input. Existing complex
-Word files should not take this route just for a small edit.
-
-## Fonts and final verification
-
-Check actual font availability and script coverage on the rendering host;
-setting a font name in DOCX does not embed it. CJK documents need an appropriate
-regional face and explicit document language, including Simplified versus
-Traditional Chinese when known. RTL needs paragraph direction and run-level
-complex-script settings, appropriate fonts and correct mixed-script ordering;
-right alignment alone is insufficient. Inspect numbers, punctuation, Latin
-identifiers and tables in the final pages. Do not apply blanket font replacement
-to a supplied template without a concrete need.
-
-Follow [the shared verification and delivery flow](../SKILL.md) on the actual
-finished DOCX. When delivering a matching PDF, export that DOCX; do not create a
-separate approximation with another renderer. Keep the native authoring source
-and dependencies for revisions. Explain any material differences between the
-verified rendering engine and the user's target Word environment.
+For simple prose or an existing publishing workflow, see [Pandoc](pandoc-authoring.md).
+Follow the [shared inspection and delivery steps](../SKILL.md) for the finished DOCX.

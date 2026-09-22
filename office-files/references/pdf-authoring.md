@@ -1,35 +1,15 @@
 # PDF authoring and editing
 
-A PDF-only task can use a native PDF workflow. Select the engine from the page
-layout, language, supplied source and edit requirements. A matching DOCX/PDF
-pair should instead export the actual final DOCX, as described in
-[Word authoring](word-authoring.md). Do not invent a Word intermediate for a
-PDF template, form or designed page.
-
-| Situation | Route |
-| --- | --- |
-| New flowing PDF with programmable paragraphs and tables | ReportLab Platypus. |
-| Fixed-position page or measured overlay | ReportLab Canvas, preserving the source's page geometry. |
-| Native typesetting, mathematics or a Typst template | Typst, authored in its own source format. |
-| Existing HTML/CSS design or print template | Its verified print renderer, such as Chromium or WeasyPrint. |
-| Existing PDF pages, fields or annotations | `pypdf` or PyMuPDF for supported edits; `pdfplumber` for text/table extraction. |
-| Simple text-led PDF or an established Pandoc publishing workflow | Optionally use Pandoc with the suitable PDF engine and full required options. |
-
-Keep the selected native source and assets. A visual revision should change
-layout/styles while preserving the approved content, without rebuilding the
-document through an unrelated format.
-
 ## ReportLab
+
+Use Platypus for flowing paragraphs, tables and pagination. Use Canvas for
+fixed-position pages or measured overlays; wrap and paginate its text explicitly.
 
 ```bash
 python3 -m pip install --break-system-packages reportlab
 ```
 
-Use Platypus flowables for paragraphs, tables, wrapping and pagination. Use
-Canvas when coordinates are part of the task; it does not automatically flow
-long text across lines or pages. This minimal script accepts a real font file
-instead of assuming a particular installed family. Run it with a compatible
-TrueType font whose glyphs cover the content.
+This example takes a TrueType font with glyph coverage for the content:
 
 ```python
 import sys
@@ -56,45 +36,36 @@ story = [
 document.build(story)
 ```
 
-Change page dimensions, hierarchy and spacing for the task or template. Escape
-content before passing it to ReportLab's paragraph markup; add only intentional
-formatting markup. Register the actual regular/bold/italic faces and their
-family mapping before relying on inline emphasis. Use paragraph cells and
-deliberate column widths for wrapping tables; repeat headers on continued
-tables and allow appropriate row splitting. Keep a short caption with its
-figure, but do not put an entire long section/table in an unbreakable container.
-
-For CJK, use a supported font with the required regional glyphs and configure
-CJK line breaking where needed. Font registration alone does not establish
-correct Arabic/Hebrew shaping or bidirectional layout. Confirm the installed
-ReportLab version and shaping support with representative mixed-script text;
-choose a verified shaping-capable route when needed. Do not reverse Unicode
-strings manually. A `.ttf` suffix is not proof of coverage, and CFF-based fonts
-are not interchangeable with the TrueType fonts supported by this example.
+- Set page dimensions, margins, hierarchy and spacing for the document.
+- Escape text passed to paragraph markup; add only intended formatting tags.
+- Use paragraph cells and explicit column widths for wrapping tables. Repeat
+  headers across pages, allow row splitting where needed, and keep captions with
+  figures. Avoid unbreakable containers taller than a page.
+- Register regular, bold and italic faces with their family mapping. This example
+  requires TrueType outlines; CFF-based fonts are not supported.
+- For CJK, use the appropriate regional glyphs and configure CJK line breaking.
+  For Arabic/Hebrew or mixed-direction text, verify shaping and bidirectional
+  support in the installed engine; switch to a verified engine if necessary.
+  Do not reverse Unicode strings manually.
 
 ## Typst and HTML/CSS
 
-For Typst, retain the `.typ` source, fonts, assets and package versions. Use the
-project's existing toolchain, or install the official compiler appropriate to
-the environment. `typst fonts` lists available families; `typst compile
-report.typ report.pdf` creates the PDF. Native Typst is available independently
-of Pandoc. Choose language/direction, font, paper and page numbering explicitly
-where relevant, and inspect mathematics, long tables and multilingual text.
+For native Typst, use the project's compiler or install the official build for
+the environment. Check available fonts with `typst fonts`, set language,
+direction, fonts and page settings, then run `typst compile report.typ report.pdf`.
+Inspect mathematics, long tables and multilingual text.
 
-For HTML/CSS, preserve the source's intended print design. WeasyPrint works for
-static HTML/CSS and does not execute page JavaScript:
+Use WeasyPrint for static HTML/CSS; it does not execute JavaScript:
 
 ```bash
 python3 -m pip install --break-system-packages weasyprint
 weasyprint report.html report.pdf
 ```
 
-Its native dependencies and supported CSS vary with the environment; resolve
-reported dependencies using the installation instructions for that platform.
-Use Chromium when the layout depends on browser behavior or JavaScript. Wait
-for fonts and images to finish loading before printing. Set the intended page
-size, margins, background printing and header/footer behavior rather than
-accepting browser defaults. Use print CSS deliberately, for example:
+Resolve native dependencies using the platform's installation instructions.
+Use Chromium when the design depends on browser behavior or JavaScript. Wait
+for fonts, images and charts to load before printing. Set page size, margins,
+background printing and headers/footers explicitly. Adapt print CSS to the design:
 
 ```css
 @page { size: A4; margin: 20mm; }
@@ -105,32 +76,23 @@ accepting browser defaults. Use print CSS deliberately, for example:
 }
 ```
 
-This is an example, not a stylesheet to apply over every template. Avoid
-unbreakable containers taller than a page. Verify the chosen engine's actual
-support for running headers, counters, footnotes, grids and fragmentation.
-Wait for asset load completion explicitly; a successful print call with blank
-charts or fallback fonts is not a finished document.
-
-For a simple text-led PDF, Pandoc is an optional route through an appropriate
-installed PDF engine. Retain an established Pandoc publishing toolchain when it
-serves the source correctly, using its templates, citations, filters and
-extensions. Apply the same final-page checks.
+Avoid unbreakable containers taller than a page. Check the engine's support for
+any running headers, counters, footnotes, grids and page breaks used by the design.
 
 ## Existing PDFs and forms
 
-Start with the supplied PDF and inspect its pages, rotation, media/crop boxes,
-text layer, annotations and fields. Use text extraction or `pdfplumber` tables
-as analysis inputs, not as evidence that the original layout can be recreated
-losslessly. OCR adds/searches a text layer for scanned pages; verify names,
-numbers and low-confidence text against the images.
+Inspect page sizes, rotation, media/crop boxes, text, annotations and fields
+before editing. Use `pypdf` or PyMuPDF for supported edits and `pdfplumber` for
+text/table extraction. For scans, use OCR and verify names, numbers and
+low-confidence text against the page images.
 
 ```bash
 python3 -m pip install --break-system-packages pypdf pdfplumber
 ```
 
-For an AcroForm, inspect `PdfReader("form.pdf").get_fields()` and fill actual
-field names/types. Clone the document so its form structure survives. The
-following example assumes an existing text field named `client_name`:
+For AcroForms, inspect `PdfReader("form.pdf").get_fields()` and use actual field
+names and types. Clone the document to retain its form structure. This example
+requires an existing text field named `client_name`:
 
 ```python
 from pypdf import PdfReader, PdfWriter
@@ -148,37 +110,18 @@ for page in writer.pages:
 writer.write("filled.pdf")
 ```
 
-Checkbox/radio values must match the field's actual appearance states. XFA,
-signed forms and unusual appearance/font structures may need a different
-implementation. Reopen to verify stored values and render to verify the visible
-appearance; either check alone is insufficient. Preserve editability unless
-the task calls for flattening. Editing signed content can invalidate its
-signature; do not claim that an edited copy remains signed.
+- Match checkbox/radio values to their actual appearance states. Check tool
+  support for XFA and unusual font/appearance structures before editing.
+- Reopen the PDF to verify stored values and render it to check visible field
+  appearances. Test fields, links and annotations in a compatible viewer.
+- Retain editable fields unless flattening was requested. Revalidate digital
+  signatures after editing signed content.
+- For a non-fillable form, add an overlay in measured blank regions. Match page
+  size, rotation, coordinate origins and crop boxes before merging. Check
+  clipping and line breaks with the actual values.
+- To remove content, use actual redaction and save a cleaned copy. Overlays,
+  cropping and flattening do not ensure removal. Check text, images, annotations,
+  attachments and metadata for remaining content.
 
-For a non-fillable form, place text in the measured blank regions with a PDF
-overlay. Match page sizes, rotation, coordinate origins and crop boxes before
-merging; do not cover or rebuild unrelated content. `pypdf` can merge overlay
-pages, while ReportLab can create the added text/graphics. Check text clipping,
-font size and line breaks for the actual values, not just short placeholders.
-
-**An overlay is not redaction.** White boxes, image overlays, cropping and hidden
-layers can leave the underlying content extractable. When removal is requested,
-use a tool's actual redaction operation, save an appropriately cleaned copy,
-and verify relevant text, images, annotations, attachments and metadata. Do not
-label a visual cover-up as secure removal or assume flattening removes all
-hidden information.
-
-## Final verification
-
-Follow [the shared verification and delivery flow](../SKILL.md) on the exact
-final PDF, using its native-PDF route and recording the source/engine needed to
-reproduce it. Inspect every rendered page for pagination, clipping, missing
-glyphs, table/figure placement and font substitution. Check extracted text and
-declared content expectations as well as the page images. For forms or other
-interactive PDFs, also test the functionality in a compatible viewer; page
-images cannot establish that fields, links or annotations work.
-
-Use the common layout guidance as applicable, while preserving a supplied
-design. Do not rasterize whole pages merely to hide layout or font problems.
-Keep a usable native source for future revisions; neither successful PDF
-creation nor tagged output alone proves accessibility conformance.
+Follow the [shared page verification and delivery steps](../SKILL.md) on the
+final PDF.
