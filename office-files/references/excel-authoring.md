@@ -11,17 +11,19 @@ Inspect implementation only for a concrete failure or an unsupported feature.
 
 ## Prepare
 
-Set the package path on its own line. Install missing dependencies once:
+Set the package path on its own line. Run setup once; it installs only missing
+or mismatched pinned dependencies and records actual setup time:
 
 ```bash
 export OFFICE_FILES_DIR="/absolute/path/to/office-files"
-python3 -m pip install --break-system-packages --quiet openpyxl==3.1.5 lxml==6.1.3 PyMuPDF==1.28.2
-sudo apt-get update -qq
-sudo apt-get install -y -qq libreoffice-calc
+python3 "$OFFICE_FILES_DIR/scripts/setup_office.py" spreadsheet \
+  --out generated/setup-spreadsheet.json
 ```
 
-Calc provides formula recalculation and print previews; Writer alone cannot
-load XLSX. Choose the final filename before QA. Keep raw input data separate
+The helper checks the actual Calc module, not just the LibreOffice executable.
+It supports Debian/Ubuntu installation and reports concrete missing requirements
+on other systems. Calc provides formula recalculation and print previews;
+Writer alone cannot load XLSX. Choose the final filename before QA. Keep raw input data separate
 from presentation. For simulated data, generate inputs once, inspect the
 aggregates, then write conclusions supported by those aggregates.
 Correct actual data errors, but do not repeatedly tune valid simulated inputs

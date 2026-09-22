@@ -139,8 +139,12 @@ then examine every page at readable size. Enlarge dense tables, small notes,
 Chinese punctuation and symbols as needed. Extractable text can still have
 invisible glyphs; text matching does not establish visible ink.
 
-Generating or opening a gallery never marks pages as passed. In `review.json`, record
-observations for all five criteria and mark each `pass` only after checking it:
+Generating or opening a gallery never marks pages as passed. In `review.json`,
+check all five criteria and mark each `pass` only after checking it. The compact
+format (`inspect --review-format compact`, also used by `prepare_document.py`)
+requires five explicit statuses plus one concise, page-specific observation;
+the verbose format uses separate observations per criterion. Both enforce the
+same checks and warning acknowledgements:
 
 | Criterion | Check |
 | --- | --- |

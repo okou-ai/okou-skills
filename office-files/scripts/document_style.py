@@ -574,17 +574,39 @@ def _has_explicit_widths(table: Table) -> bool:
     return bool(grid) and len(set(grid)) > 1
 
 
-def _size_default_columns(table: Table, usable_width: int, *, automatic: bool = False) -> None:
+def _minimum_cell_ems(text: str) -> float:
+    """Protect short labels and ordinary tokens without making prose unwrappable."""
+    minimum = 1.5
+    for line in text.splitlines():
+        width = _display_width(line)
+        # A short CJK label should read horizontally. Longer prose may wrap,
+        # but still needs several characters per line, not a one-glyph strip.
+        minimum = max(minimum, width if width <= 6 else 4)
+        latin = "".join(" " if unicodedata.east_asian_width(char) in {"W", "F"}
+                        else char for char in line)
+        for token in re.split(r"[\s/]+", latin):
+            minimum = max(minimum, min(12, _display_width(token)))
+        # Do not break ordinary amounts/percentages after a comma or decimal.
+        # Numeric tokens retain their full minimum even in descriptive cells.
+        for number in re.findall(r"[+\-−]?\d[\d,]*(?:\.\d+)?%?", line):
+            minimum = max(minimum, _display_width(number))
+    return minimum
+
+
+def _size_default_columns(table: Table, usable_width: int, *, automatic: bool = False,
+                          font_size: float = 9.5) -> None:
     count = len(table.columns)
     if not count or (not automatic and _has_explicit_widths(table)):
         return
     samples: list[list[float]] = [[] for _ in range(count)]
     headers = [0.0] * count
+    minimum_ems = [1.5] * count
     for row in table.rows:
         for column, span, cell in _physical_cells(row, table):
             if span != 1 or column >= count:
                 continue
             width = max((_display_width(line) for line in cell.text.splitlines()), default=0)
+            minimum_ems[column] = max(minimum_ems[column], _minimum_cell_ems(cell.text))
             if _is_header(row):
                 headers[column] = max(headers[column], width)
             else:
@@ -605,7 +627,29 @@ def _size_default_columns(table: Table, usable_width: int, *, automatic: bool = 
             others = 1 - shares[largest]
             shares = [maximum if index == largest else share * (1 - maximum) / others
                       for index, share in enumerate(shares)]
-    widths = [round(usable_width * share) for share in shares]
+    # The old relative weights could give a three-character heading only one
+    # character of actual room once Word subtracts the 5 pt side margins. Use
+    # physical lower bounds, including those margins and a font-metric buffer,
+    # then redistribute the remaining space with the existing content weights.
+    minimums = [(ems * font_size * 1.1 + 10) * 12700 for ems in minimum_ems]
+    if sum(minimums) >= usable_width:
+        # An intrinsically overfull table must still fit the page; leave the
+        # content/font intact for page review rather than silently shrinking it.
+        widths = [round(usable_width * minimum / sum(minimums)) for minimum in minimums]
+    else:
+        assigned = {}
+        pending = set(range(count))
+        while pending:
+            remaining = usable_width - sum(assigned.values())
+            total_share = sum(shares[index] for index in pending)
+            proposed = {index: remaining * shares[index] / total_share for index in pending}
+            constrained = {index for index in pending if proposed[index] < minimums[index]}
+            if not constrained:
+                assigned.update(proposed)
+                break
+            assigned.update({index: minimums[index] for index in constrained})
+            pending -= constrained
+        widths = [round(assigned[index]) for index in range(count)]
     widths[-1] += usable_width - sum(widths)
     table.autofit = False
     table_width = _ordered_property(table._tbl.tblPr, "tblW", _TBLPR_ORDER)
@@ -719,7 +763,8 @@ def _polish_table(table: Table, language: _Language, usable_width: int, usable_h
                 _polish_blocks(cell, language, int(cell.width or usable_width), usable_height,
                                automatic_table_widths=automatic_table_widths, theme=theme)
         return
-    _size_default_columns(table, usable_width, automatic=automatic_table_widths)
+    _size_default_columns(table, usable_width, automatic=automatic_table_widths,
+                          font_size=9.5 * theme.scale)
     properties = table._tbl.tblPr
     margins = _ordered_property(properties, "tblCellMar", _TBLPR_ORDER)
     for side, width in (("top", 80), ("left", 100), ("bottom", 80), ("right", 100)):

@@ -388,7 +388,9 @@ def quick(pdf, expectations, docx=None, render=None, docx_comparison=None):
     return report
 
 
-def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison=None):
+def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison=None,
+            review_format="verbose"):
+    require(review_format in {"verbose", "compact"}, "Review format must be verbose or compact.")
     out = Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     (out / "acceptance.json").unlink(missing_ok=True)
@@ -433,8 +435,12 @@ def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison
     review = {
         "schema_version": 2,
         "inspection_sha256": sha256(out / "inspection.json"),
-        "instructions": "Open every PNG. Record observations for all five criteria on each page; use pass only after checking it. For pages without tables or figures, explicitly record that observation. Explain each warning. If you repair a file, run inspect again and review the new images.",
-        "pages": [{"number": page["number"], "image_sha256": page["image"]["sha256"], "criteria": {name: {"status": "pending", "observations": ""} for name in CRITERIA}} for page in report["pages"]],
+        "instructions": "Open every PNG. Check all five criteria on every page; set each to pass only after checking it (fail or pending cannot pass acceptance). Record a concise page observation covering the checks, including absent tables/figures, or use separate observations per criterion. Explain each warning. If you repair a file, run inspect again and review the new images.",
+        "pages": [{"number": page["number"], "image_sha256": page["image"]["sha256"],
+                   "criteria": {name: "pending" if review_format == "compact" else
+                                {"status": "pending", "observations": ""} for name in CRITERIA},
+                   **({"observations": ""} if review_format == "compact" else {})}
+                  for page in report["pages"]],
         "warning_acknowledgements": [{"finding_id": finding["id"], "observations": ""} for finding in report["findings"] if finding["severity"] == "warning"],
     }
     write_json(out / "review.json", review)
@@ -482,7 +488,11 @@ def accept(out):
         criteria = by_number[number]["criteria"]
         require(set(criteria) == set(CRITERIA), f"Page {number} must address all five visual criteria.")
         for criterion, result in criteria.items():
-            require(result["status"] == "pass" and isinstance(result["observations"], str) and bool(result["observations"].strip()), f"Page {number}: {criterion} needs a passed review with observations.")
+            # Compact records share a page observation but still require an
+            # explicit status for every criterion. No omitted/default passes.
+            status = result if isinstance(result, str) else result.get("status")
+            observations = by_number[number].get("observations") if isinstance(result, str) else result.get("observations")
+            require(status == "pass" and isinstance(observations, str) and bool(observations.strip()), f"Page {number}: {criterion} needs a passed review with observations.")
     warnings = {finding["id"] for finding in report["findings"] if finding["severity"] == "warning"}
     acknowledgements = review["warning_acknowledgements"]
     require(len(acknowledgements) == len(warnings) and {item["finding_id"] for item in acknowledgements} == warnings, "Acknowledge each warning exactly once.")
@@ -517,6 +527,8 @@ def main():
     inspection.add_argument("--expectations", type=Path)
     inspection.add_argument("--render", type=Path, help="Bind a completed render.json, its outputs and all declared inputs.")
     inspection.add_argument("--docx-comparison", type=Path, help="Bind a passed original/edited Word preservation comparison (required for edits).")
+    inspection.add_argument("--review-format", choices=("verbose", "compact"), default="verbose",
+                            help="Compact: five explicit criterion statuses plus one concise observation per page; warnings remain separate.")
     acceptance = commands.add_parser("accept", help="Check all current hashes and completed visual review.")
     acceptance.add_argument("out", type=Path)
     args = parser.parse_args()
@@ -526,7 +538,8 @@ def main():
             print(json.dumps(report, ensure_ascii=False, indent=2))
             return 0 if report["passed"] else 2
         if args.command == "inspect":
-            report = inspect(args.pdf, args.out, args.docx, args.expectations, args.render, args.docx_comparison)
+            report = inspect(args.pdf, args.out, args.docx, args.expectations, args.render, args.docx_comparison,
+                             args.review_format)
             blockers = sum(f["severity"] == "blocker" for f in report["findings"])
             warnings = sum(f["severity"] == "warning" for f in report["findings"])
             print(f"Inspected {report['page_count']} pages: {blockers} blockers, {warnings} warnings. Browse {args.out / 'gallery/index.html'} and full page PNGs, then complete {args.out / 'review.json'}.")

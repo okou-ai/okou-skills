@@ -52,7 +52,7 @@ def width(text):
 
 
 def render(spec, output):
-    allowed = {"type", "title", "categories", "x", "x_label", "y_label", "series", "font", "accent", "palette"}
+    allowed = {"type", "title", "categories", "x", "x_label", "y_label", "series", "font", "accent", "palette", "width_inches", "height_inches"}
     if not isinstance(spec, dict) or set(spec) - allowed:
         raise ValueError(f"Chart fields: {', '.join(sorted(allowed))}")
     kind = spec.get("type", "bar")
@@ -69,6 +69,14 @@ def render(spec, output):
     labels = [spec.get(key, "") for key in ("title", "x_label", "y_label")]
     if any(not isinstance(v, str) for v in labels) or "font" in spec and not isinstance(spec["font"], str):
         raise ValueError("Titles, axis labels and font must be strings")
+    # A report figure should fit the text column at its intrinsic size. Growing
+    # the canvas with category count makes Pandoc shrink all labels when it fits
+    # the image to the page. Authors can request a different physical size.
+    dimensions = [spec.get("width_inches", 6.0), spec.get("height_inches", 3.6)]
+    for key, value in zip(("width_inches", "height_inches"), dimensions):
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value) or not 1 <= value <= 30):
+            raise ValueError(f"{key} must be a finite number from 1 to 30")
     for series in spec["series"]:
         if not isinstance(series, dict) or set(series) != {"name", "values"} or not isinstance(series["name"], str) or not series["name"].strip():
             raise ValueError("Each series needs a string name and a values array")
@@ -80,7 +88,7 @@ def render(spec, output):
         raise ValueError("palette/accent must contain RGB hex colors, with or without #")
     font, font_path = select_font(spec.get("font"), " ".join(labels + (categories or []) + ["0123456789.,-%"]))
     plt.rcParams.update({"text.parse_math": False, "axes.unicode_minus": False, "font.size": 11})
-    fig, ax = plt.subplots(figsize=(max(7.2, len(x) * 0.55) if categories else 7.2, 4.6), layout="constrained")
+    fig, ax = plt.subplots(figsize=dimensions, layout="constrained")
     gap = min((b - a for a, b in zip(x, x[1:])), default=1)
     bar_width = 0.8 * gap / len(spec["series"])
     for i, series in enumerate(spec["series"]):
@@ -93,7 +101,8 @@ def render(spec, output):
     if categories is not None:
         rotate = 30 if max(map(width, categories)) > 10 else 0
         ax.set_xticks(x, categories, rotation=rotate, ha="right" if rotate else "center")
-    ax.set_title(labels[0], fontproperties=font, fontsize=15, pad=14, wrap=True)
+    if labels[0]:
+        ax.set_title(labels[0], fontproperties=font, fontsize=15, pad=14, wrap=True)
     ax.set_xlabel(labels[1], fontproperties=font, labelpad=8)
     ax.set_ylabel(labels[2], fontproperties=font, labelpad=8)
     ax.ticklabel_format(axis="y", style="plain", useOffset=False)

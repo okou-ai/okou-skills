@@ -1,5 +1,5 @@
 ---
-title: Operating review
+title: Project review
 lang: en-US
 ---
 
@@ -8,17 +8,18 @@ requested report, keeping assumptions distinct from observed facts.
 
 # Decision summary
 
-Revenue increased from 120,000 to 138,000 in the two example periods. Explain
+Completed tasks increased from 18 to 22 in the two example periods. Explain
 the decision this report supports and the evidence for the recommendation.
+Across both periods, there were 40 completed tasks.
 
 # Operating figures
 
-The following figures are example amounts in the same currency.
+The following figures are fictional task counts.
 
-| Period | Revenue | Cost | Explanation |
+| Period | Planned | Completed | Explanation |
 | :--- | ---: | ---: | :--- |
-| January | 120,000 | 78,000 | First example period; replace with source data. |
-| February | 138,000 | 87,000 | Second example period; replace with source data. |
+| Week 1 | 20 | 18 | First example period; replace with source data. |
+| Week 2 | 24 | 22 | Second example period; replace with source data. |
 
 # Recommended action
 

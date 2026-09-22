@@ -20,12 +20,17 @@ For multiple independent deliverables, follow each relevant page. If the user
 supplies a template package, follow that package's entry point.
 
 Use the starter's working defaults before writing custom authoring code. Adapt
-content to the request; add charts or sections when they support the requested
-decision. Let content paginate naturally unless the user specifies a page limit.
+content to the requested sections, decisions and evidence. Do not expand a short
+report into extra scenarios, appendices or financial models without a task need.
+Let complete content paginate naturally unless the user specifies a page limit.
+For a time target, keep that scope and use the one-command setup/preparation
+routes below; never meet a deadline by dropping requested content or checks.
+Generate simulated inputs once and describe their actual results.
 
 Resolve quick-check findings while drafting. Once content is stable, verify the
 final candidate, review its page gallery, and run acceptance before delivery.
-Keep sources and check records for revisions.
+Repair observed defects together where possible; do not explore alternative
+styling after the candidate passes. Keep sources and check records for revisions.
 Immediately after uploading the accepted file, send a short assistant message
 containing the returned download URL. Then prepare any requested retrospective
 using existing logs and timestamps.
