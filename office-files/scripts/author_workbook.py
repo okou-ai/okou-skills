@@ -339,9 +339,10 @@ def add_charts(workbook, sheet, definitions, theme, formats):
         else:
             raise ValueError("Chart legend must be null, b, t, l or r")
         chart.y_axis.numFmt = formats.get(spec.get("number_format", "decimal"), spec.get("number_format", "#,##0.00"))
+        # Keep category labels outside the plot, including negative columns.
+        chart.x_axis.tickLblPos = "low"
         if kind == "bar":
             chart.x_axis.scaling.orientation = "maxMin"
-            chart.x_axis.tickLblPos = "low"
             chart.y_axis.crosses = "max"
         palette = spec.get("colors", theme.get("chart_colors", COLORS))
         if not isinstance(palette, list) or not palette:
