@@ -44,6 +44,11 @@ and a required volume is not proof of achievable capacity. When the requested
 problem analysis cannot establish a cause from the supplied data, identify what
 to check next instead of inventing a diagnosis. Use assumptions only to complete
 an explicitly needed calculation; label both the assumption and its consequence.
+Preserve the source's accounting scope. If a source says only "cost", do not
+silently classify it as direct cost, gross profit, operating profit or net profit.
+Use a plain label such as "revenue less the listed costs", or state one explicit
+cost-scope assumption and apply it consistently in every table and conclusion.
+Do not claim a category is both included and excluded elsewhere in the report.
 
 Use installed fonts covering the content. Optional style keys are `body_font`,
 `heading_font`, `east_asia_font`, `body_size_pt`, `accent` (six hex digits),

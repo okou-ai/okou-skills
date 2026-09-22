@@ -352,7 +352,7 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
             pandoc = find_pandoc()
             style = load_style(style_path) if style_path else None
             versions["pandoc"] = run([pandoc, "--version"]).splitlines()[0]
-            ast = json.loads(run([pandoc, str(source), "-f", "markdown-smart", "-t", "json"]))
+            ast = json.loads(run([pandoc, str(source), "-f", "markdown-smart+east_asian_line_breaks", "-t", "json"]))
             validate_source(ast)
             apply_design_components(ast)
             existing = {item["path"] for item in resources}
