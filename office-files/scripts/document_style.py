@@ -781,13 +781,19 @@ def _polish_table(table: Table, language: _Language, usable_width: int, usable_h
     if language.rtl:
         properties.get_or_add_bidiVisual().val = True
         table.alignment = WD_TABLE_ALIGNMENT.RIGHT
+    first_body_row = next((index for index, row in enumerate(table.rows) if not _is_header(row)), None)
     for row_index, row in enumerate(table.rows):
         header = _is_header(row)
         trpr = row._tr.get_or_add_trPr()
         if header:
             _flag(trpr, "tblHeader", True, _TRPR_ORDER)
-        _flag(trpr, "cantSplit", _row_height(row, table, usable_width, 9.5 * theme.scale)
-              < usable_height / 12700 * .65,
+        # LibreOffice 24.2 can silently drop the rest of a table when its
+        # header and first body row fill the page and that body row has
+        # cantSplit. Let only this continuation boundary split; keep ordinary
+        # short later rows together and retain the existing tall-row rule.
+        first_after_header = first_body_row is not None and first_body_row > 0 and row_index == first_body_row
+        _flag(trpr, "cantSplit", not first_after_header and
+              _row_height(row, table, usable_width, 9.5 * theme.scale) < usable_height / 12700 * .65,
               _TRPR_ORDER)
         for _, _, cell in _physical_cells(row, table):
             if header or row_index % 2 == 0:

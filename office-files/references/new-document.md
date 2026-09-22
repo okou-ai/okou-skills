@@ -31,6 +31,11 @@ for example `lang: zh-CN`. Use ordinary Markdown headings, lists and tables.
 Keep calculations in a data/model file; label assumptions and fictional inputs.
 Use the requested sections and only the supporting analysis needed for their
 decisions. Do not add manual chapter breaks or a page cap to shorten execution.
+Compute the metrics needed to explain the supplied data. Forecasts, counterfactual
+scenarios, payback models and numeric operating thresholds belong only in tasks
+that request them; missing causal evidence calls for a stated uncertainty and a
+validation action. Keep toolchain names and local file paths in QA/chat, not in
+the business report, unless the user asks for implementation details.
 
 Use installed fonts covering the content. Optional style keys are `body_font`,
 `heading_font`, `east_asia_font`, `body_size_pt`, `accent` (six hex digits),
@@ -73,7 +78,10 @@ text presence alone does not establish correct reasoning. For example:
 
 Replace these example checks with actual requirements. Use `same_page` only
 for a necessary grouping, with distinctive body text rather than repeated table
-headers. Do not invent a requirement that an entire table and chart share a page
+headers. Each item is an object, for example
+`{"first": "Required group heading", "second": "Unique opening body text", "reason": "Heading must remain with its introduction"}`;
+replace these strings with actual source text, or leave the array empty.
+Do not invent a requirement that an entire table and chart share a page
 when each is readable on adjacent pages. Headings and their opening prose are
 added automatically from the Markdown source. Captions and tables use the
 renderer’s grouping defaults and still need page review.

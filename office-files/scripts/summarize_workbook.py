@@ -494,6 +494,11 @@ def build_layout(spec, records, aggregates):
             definition = {"type": chart.get("type", "column"), "title": chart["title"], "data_sheet": layout["sheet"], "data": data, "categories": categories, "anchor": anchor, "labels": chart.get("labels", False)}
             if "number_format" in chart:
                 definition["number_format"] = chart["number_format"]
+            else:
+                formats = {metric_format(metric) for metric in summary_map[chart["summary"]]["metrics"]
+                           if metric["id"] in chart["metrics"]}
+                if len(formats) == 1:
+                    definition["number_format"] = formats.pop()
             sheet.setdefault("charts", []).append(definition)
             reviews.append(f"Chart {index + 1}: {layout['sheet']}!{data}; categories {categories}; excludes totals; dashboard slot {anchor}.")
             if index % 2 == 0 and index >= 2:

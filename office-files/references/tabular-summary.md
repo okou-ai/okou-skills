@@ -116,6 +116,10 @@ lower-level author for noncontiguous series/custom geometry. Categories and
 data ranges are computed from the selected summary, excluding its total.
 The dashboard title repeats on printed continuation pages. Charts do not
 create additional analysis or inferred narrative.
+When all plotted metrics share a format, the chart axis inherits it, including
+the default percentage format of ratios and changes. Explicit `number_format`
+overrides inheritance. Mixed formats retain the general decimal default; choose
+a meaningful common unit or separate charts instead of assuming a shared unit.
 Data labels default to false. Keep that default for line charts unless labels
 add necessary information; labels can collide with the lines in Calc previews.
 

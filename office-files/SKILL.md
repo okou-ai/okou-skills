@@ -22,6 +22,11 @@ supplies a template package, follow that package's entry point.
 Use the starter's working defaults before writing custom authoring code. Adapt
 content to the requested sections, decisions and evidence. Do not expand a short
 report into extra scenarios, appendices or financial models without a task need.
+Do not add quantitative forecasts, counterfactual decompositions, payback models
+or numerical operating thresholds unless the user asks for them. If an essential
+decision lacks evidence, state the missing input and how to validate it instead
+of inventing a diagnostic rule or expanding the analysis. A next-steps section
+can give concrete actions and owners without a speculative financial model.
 Let complete content paginate naturally unless the user specifies a page limit.
 For a time target, keep that scope and use the one-command setup/preparation
 routes below; never meet a deadline by dropping requested content or checks.
