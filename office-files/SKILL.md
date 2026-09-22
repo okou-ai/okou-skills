@@ -25,7 +25,7 @@ report into extra scenarios, appendices or financial models without a task need.
 Let complete content paginate naturally unless the user specifies a page limit.
 For a time target, keep that scope and use the one-command setup/preparation
 routes below; never meet a deadline by dropping requested content or checks.
-Generate simulated inputs once and describe their actual results.
+When simulated data is requested, generate it once and describe its actual results.
 
 Resolve quick-check findings while drafting. Once content is stable, verify the
 final candidate, review its page gallery, and run acceptance before delivery.
