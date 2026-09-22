@@ -1,6 +1,8 @@
 # Pandoc authoring
 
 Use Pandoc for simple, text-led documents or an existing publishing workflow.
+Read the [layout and rendering setup](document-layout.md#rendering-setup) before
+authoring.
 
 ## Install
 
@@ -14,7 +16,7 @@ Write semantic headings, paragraphs, lists, tables, captions, footnotes and
 images. Set `lang` in YAML, such as `zh-CN` or `en-US`, or pass `--lang` during
 preparation. Include title, author and date only when supplied or appropriate.
 
-Pass the `.md` file to `render_document.py` in [the main workflow](../SKILL.md).
+During verification, pass the `.md` file to `render_document.py`.
 Use `--format pdf|docx|both` to select delivery files. Use `--reference theme.docx`
 only to apply a style reference to new prose.
 
@@ -72,9 +74,19 @@ PANDOC_BIN="$(python3 -c 'import pypandoc; print(pypandoc.get_pandoc_path())')"
   --resource-path .:assets --output authored.docx
 ```
 
-Use only the options and files needed by the task. Pass the finished DOCX/PDF to
-[the main workflow](../SKILL.md) and declare its source, filters, references and
-assets with `--resource`. Check conversion fidelity in the final pages.
+Use only the options and files needed by the task. During verification, declare
+the source, filters, references and assets with `--resource`.
+
+## Verify and deliver
+
+Complete [page verification](document-layout.md#verification) for the Markdown
+source or the finished DOCX/PDF from an existing pipeline. For a matching
+Word/PDF pair, export the final DOCX to PDF. Check conversion fidelity in the
+final pages.
+
+Upload the requested files with `okou web upload-file`; attach the editable
+source alongside a final PDF when appropriate. Keep the source, filters, data,
+assets and QA files for revisions.
 
 Editorial theme attribution: `nexu-io/open-design` at
 `3fb620af423534643677c7c6fae76be088fa770a`, based on `tw93/kami` (MIT).

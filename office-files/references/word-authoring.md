@@ -1,5 +1,15 @@
 # Word authoring and editing
 
+## Start
+
+Follow a supplied template's instructions. Work on a copy of an existing file
+and preserve content and formatting outside the requested changes. When layout
+must be preserved, inspect the original pages before editing.
+
+Read the [rendering setup](document-layout.md#rendering-setup), then use the
+applicable method below. For new simple text-led documents or an existing
+publishing workflow, optionally use [Pandoc](pandoc-authoring.md).
+
 ## Create with `docx`
 
 Install in the task's authoring directory:
@@ -130,5 +140,12 @@ For RTL, set paragraph direction and run-level complex-script properties, then
 inspect mixed-script text, numbers and punctuation. Retain template fonts unless
 the task requires a change.
 
-For simple prose or an existing publishing workflow, see [Pandoc](pandoc-authoring.md).
-Follow the [shared inspection and delivery steps](../SKILL.md) for the finished DOCX.
+## Verify and deliver
+
+Run [document verification](document-layout.md#verification) on the finished
+DOCX. For matching Word/PDF deliverables, export the PDF from this DOCX and
+verify the pair together.
+
+Upload the requested files with `okou web upload-file`; include the editable
+DOCX alongside a final PDF. Keep authoring sources, data, assets and QA files
+for revisions.

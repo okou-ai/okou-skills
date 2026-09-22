@@ -1,5 +1,18 @@
 # PDF authoring and editing
 
+## Start
+
+Use this page to author or edit PDF directly. For matching Word/PDF deliverables,
+follow the [Word workflow](word-authoring.md) and export its finished DOCX to PDF.
+
+Follow a supplied template's instructions. Work on a copy of an existing file
+and preserve content and formatting outside the requested changes. When layout
+must be preserved, inspect the original pages before editing.
+
+Read the [rendering setup](document-layout.md#rendering-setup), then use the
+applicable method below. For new simple text-led documents or an existing
+publishing workflow, optionally use [Pandoc](pandoc-authoring.md).
+
 ## ReportLab
 
 Use Platypus for flowing paragraphs, tables and pagination. Use Canvas for
@@ -123,5 +136,9 @@ writer.write("filled.pdf")
   cropping and flattening do not ensure removal. Check text, images, annotations,
   attachments and metadata for remaining content.
 
-Follow the [shared page verification and delivery steps](../SKILL.md) on the
-final PDF.
+## Verify and deliver
+
+Run [document verification](document-layout.md#verification) on the finished PDF.
+
+Upload the PDF with `okou web upload-file` and include its editable source when
+appropriate. Keep authoring sources, data, assets and QA files for revisions.
