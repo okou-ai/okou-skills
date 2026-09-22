@@ -52,9 +52,9 @@ arbitrary expressions fail rather than being silently ignored.
 | Source column | `key`, `header`, `type`: `date`, `text` or `number`; optional `format` and `width` |
 | `summaries[]` | Unique `id`, `sheet`, `title`, `group_by`, `metrics`; optional `totals` (default true) and `total_label` (default `Total`) |
 | `group_by` | `column` and `kind`: `category` for a text column, or `month` for a date column; optional `header` |
-| Metric | Unique `id`, `label`, `op` and operands below; optional `format` |
+| Metric | Unique `id`, `label`, `op` and operands below; optional `format` and `width` |
 | Optional `dashboard` | `sheet`, `title`, and explicitly configured `kpis` and/or `charts` |
-| Optional `notes` | `sheet`, `title`, `rows`: pairs of literal strings, with the first row used as column headers |
+| Optional `notes` | `sheet`, `title`, `rows`: pairs of literal strings, with the first row used as column headers; optional `column_widths` for `A` and/or `B` |
 | KPI | `summary`, `metric`, `label`; refers to that summary's total; `change` is not a total KPI |
 | Chart | `summary`, `metrics` (array of ids), `title`; optional `type`: `column`, `bar`, `line`; `labels` boolean; `number_format` |
 
@@ -63,8 +63,24 @@ the actual CSV/JSON field names. Sheet names and labels can use other languages,
 spaces and internal apostrophes. Reusing the exact same summary `sheet` name
 stacks sections on that sheet. Source, dashboard and notes sheets must be distinct.
 There is no fixed number of summaries, sheets or printed pages.
+
+The builder freezes raw data at `A4` (title/header rows stay visible) and
+summaries at `B4` (also retaining the group-label column). Raw data uses a
+structured table with filter controls. Number formats come from the source
+columns and metrics; wrapped text, header styling, column widths and chart
+slots have working defaults. These defaults require no lower-level spec or
+script-source inspection. Use the custom route only for a requested feature
+outside this interface.
+
 Notes are supplied text only: the builder adds no definitions, conclusions or
 source claims on its own. Formula-like note text stays literal.
+
+Column widths are finite numbers greater than 0 and at most 255. Metrics
+default to 20; notes default to `{"A": 26, "B": 80}`. Stacked summaries share
+physical sheet columns: an explicit metric width applies to every section in
+that column, and conflicting explicit widths are rejected. Notes already wrap
+and get estimated row heights; adjust widths for actual readability problems
+and check the preview rather than requiring every note to fit on one line.
 
 | `op` | Operands | Calculation |
 | --- | --- | --- |
@@ -78,6 +94,8 @@ Derived metrics refer to **earlier** metrics, never source-column expressions.
 There is no expression parser. Count defaults to integer format; sums and
 differences to decimal; ratios and changes to percent. Use `money`, `integer`,
 `decimal`, `percent`, `date`, `text` or an Excel number-format string to override.
+Plan metric order with the desired chart series in mind: a chart's selected
+metrics must be adjacent and in that same order.
 
 Month summaries include every calendar month from the earliest to latest input
 date, including missing months with zero counts/sums. The first month's change,
@@ -91,7 +109,8 @@ Charts get stable two-column grid slots on the optional dashboard. Metric ids
 must be adjacent **and in summary-column order**; reorder metrics or use the
 lower-level author for noncontiguous series/custom geometry. Categories and
 data ranges are computed from the selected summary, excluding its total.
-Charts do not create additional analysis or inferred narrative.
+The dashboard title repeats on printed continuation pages. Charts do not
+create additional analysis or inferred narrative.
 
 ## Source and verification contract
 

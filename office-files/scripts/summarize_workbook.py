@@ -50,6 +50,11 @@ def unique(values, where):
         raise ValueError(f"{where} must be unique, ignoring case")
 
 
+def column_width(value, where):
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 < value <= 255:
+        raise ValueError(f"{where} must be a finite number in (0, 255]")
+
+
 def sheet_name(value):
     nonempty(value, "sheet name")
     if len(value) > 31 or re.search(r"[\\/*?:\[\]]", value) or value != value.strip() or value.startswith("'") or value.endswith("'"):
@@ -79,15 +84,14 @@ def validate_spec(spec):
             raise ValueError("Column type must be date, text or number")
         if "format" in column:
             nonempty(column["format"], "column.format")
-        width = column.get("width", 24 if column["type"] == "text" else 18)
-        if isinstance(width, bool) or not isinstance(width, (int, float)) or not math.isfinite(width) or not 0 < width <= 255:
-            raise ValueError("Column width must be a finite number in (0, 255]")
+        column_width(column.get("width", 24 if column["type"] == "text" else 18), "Column width")
     unique([c["key"] for c in columns], "Source column keys")
     unique([c["header"] for c in columns], "Source headers")
     kinds = {c["key"]: c["type"] for c in columns}
     summaries = spec["summaries"]
     if not isinstance(summaries, list) or not summaries:
         raise ValueError("summaries must explicitly configure at least one nonempty grouping")
+    shared_widths = {}
     for summary in summaries:
         fields(summary, {"id", "sheet", "title", "group_by", "metrics", "totals", "total_label"}, {"id", "sheet", "title", "group_by", "metrics"}, "summary")
         identifier(summary["id"], "summary.id")
@@ -103,18 +107,24 @@ def validate_spec(spec):
         if not isinstance(metrics, list) or not metrics or len(metrics) > 16383:
             raise ValueError("Each summary needs a nonempty metrics array within Excel's column limit")
         earlier = set()
-        for metric in metrics:
+        for index, metric in enumerate(metrics, 2):
             if not isinstance(metric, dict) or metric.get("op") not in OPS:
                 raise ValueError(f"Metric op must be one of: {', '.join(sorted(OPS))}; arbitrary expressions are unsupported")
             op = metric["op"]
             operands = {"count": set(), "sum": {"column"}, "difference": {"left", "right"}, "ratio": {"numerator", "denominator"}, "change": {"metric"}}[op]
-            fields(metric, {"id", "label", "op", "format"} | operands, {"id", "label", "op"} | operands, "metric")
+            fields(metric, {"id", "label", "op", "format", "width"} | operands, {"id", "label", "op"} | operands, "metric")
             identifier(metric["id"], "metric.id")
             if metric["id"].casefold() in {name.casefold() for name in earlier}:
                 raise ValueError(f"{summary['id']} metric ids must be unique, ignoring case")
             nonempty(metric["label"], "metric.label")
             if "format" in metric:
                 nonempty(metric["format"], "metric.format")
+            if "width" in metric:
+                column_width(metric["width"], f"Metric {summary['id']}.{metric['id']} width")
+                location = (summary["sheet"], get_column_letter(index))
+                if location in shared_widths and shared_widths[location] != metric["width"]:
+                    raise ValueError(f"Conflicting explicit widths for {location[0]}!{location[1]}: {shared_widths[location]} and {metric['width']}. Stacked summaries share physical columns; use one width for this column or place the summaries on separate sheets.")
+                shared_widths[location] = metric["width"]
             if op == "sum" and kinds.get(metric["column"]) != "number":
                 raise ValueError(f"sum metric {metric['id']} needs a declared number column")
             if op in {"difference", "ratio", "change"} and any(metric[key] not in earlier for key in operands):
@@ -164,13 +174,17 @@ def validate_spec(spec):
                 nonempty(chart["number_format"], "chart.number_format")
     notes = spec.get("notes")
     if notes is not None:
-        fields(notes, {"sheet", "title", "rows"}, {"sheet", "title", "rows"}, "notes")
+        fields(notes, {"sheet", "title", "rows", "column_widths"}, {"sheet", "title", "rows"}, "notes")
         names.append(sheet_name(notes["sheet"]))
         nonempty(notes["title"], "notes.title")
         if not isinstance(notes["rows"], list) or not notes["rows"] or any(not isinstance(row, list) or len(row) != 2 or any(not isinstance(value, str) for value in row) for row in notes["rows"]):
             raise ValueError("notes.rows must contain two-column arrays of literal strings; the first row is the header")
         for header in notes["rows"][0]:
             nonempty(header, "notes header")
+        widths = notes.get("column_widths", {})
+        fields(widths, {"A", "B"}, set(), "notes.column_widths")
+        for column, width in widths.items():
+            column_width(width, f"notes.column_widths.{column}")
     unique(names, "Source, summary and dashboard sheet names")
     return spec
 
@@ -415,7 +429,10 @@ def build_layout(spec, records, aggregates):
         for index, metric in enumerate(summary["metrics"], 2):
             letter = get_column_letter(index)
             metric_columns[metric["id"]] = letter
-            sheet["column_widths"][letter] = 20
+            if "width" in metric:
+                sheet["column_widths"][letter] = metric["width"]
+            else:
+                sheet["column_widths"].setdefault(letter, 20)
             put(sheet, f"{letter}{header}", metric["label"], style="header")
         previous = None
         for row, group in enumerate(groups, first):
@@ -457,7 +474,7 @@ def build_layout(spec, records, aggregates):
         sheet["column_widths"]["D"] = 20
         sheet["column_widths"]["F"] = 3
         sheet["merges"].append("A1:K1")
-        sheet["print"] = {"orientation": "landscape"}
+        sheet["print"] = {"orientation": "landscape", "title_rows": "1:1"}
         put(sheet, "A1", dashboard["title"], style="title")
         summary_map = {s["id"]: s for s in spec["summaries"]}
         for row, kpi in enumerate(dashboard.get("kpis", []), 3):
@@ -484,7 +501,7 @@ def build_layout(spec, records, aggregates):
     notes = spec.get("notes")
     if notes:
         sheet = new_sheet(notes["sheet"])
-        sheet["column_widths"] = {"A": 26, "B": 80}
+        sheet["column_widths"] = {"A": 26, "B": 80, **notes.get("column_widths", {})}
         sheet["merges"] = ["A1:B1"]
         sheet["print"] = {"orientation": "landscape", "title_rows": "1:3"}
         put(sheet, "A1", notes["title"], style="title")

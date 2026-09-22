@@ -24,6 +24,9 @@ Calc provides formula recalculation and print previews; Writer alone cannot
 load XLSX. Choose the final filename before QA. Keep raw input data separate
 from presentation. For simulated data, generate inputs once, inspect the
 aggregates, then write conclusions supported by those aggregates.
+Correct actual data errors, but do not repeatedly tune valid simulated inputs
+to obtain an unrequested growth pattern or narrative. An uneven trend is a
+valid result to describe.
 
 ## Author
 
@@ -129,7 +132,8 @@ python3 "$OFFICE_FILES_DIR/scripts/check_workbook.py" accept --qa generated/work
 ```
 
 Only `READY_TO_DELIVER` permits verified delivery. Upload the exact
-`candidate.path` returned by `accept`, then provide its link promptly. Changes
-to bound files invalidate acceptance. Keep the source, raw data and QA records
-for revisions. Any requested retrospective follows delivery using existing
-logs; it does not require regenerating the files.
+`candidate.path` returned by `accept`, then send the returned download URL in a
+short assistant message before preparing any retrospective. Changes to bound
+files invalidate acceptance. Keep the source, raw data and QA records for
+revisions. Any requested retrospective follows delivery using existing logs;
+it does not require regenerating the files.
