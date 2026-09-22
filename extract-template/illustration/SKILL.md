@@ -277,7 +277,7 @@ anything still open — a dial with one value, a complexity level never tested,
 an axis that departs from the reference.
 
 Register it as a built-in selectable style only when the user asks: the
-resource goes to `illustration-template/<slug>/` in `okou-ai/vm0-skills`, its
+resource goes to `illustration-template/<slug>/` in `okou-ai/okou-skills`, its
 entry to the Open Design registry in `okou-ai/okou` as `vm0:image-style:<slug>`
 with a selection description of 150 characters or less, and each pull request
 links the other.

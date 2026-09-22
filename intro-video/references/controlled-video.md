@@ -11,7 +11,7 @@ The lanes, validation and render steps below are the preservation path. A build 
 For a library-based build, use the mounted `video-composition` skill or the sibling `../../video-composition/SKILL.md` in this repository. A revision reuses the checkout recorded by the accepted project. If neither is available, fetch the official source into a new resource directory once:
 
 ```bash
-git clone --depth 1 --filter=blob:none --sparse https://github.com/okou-ai/vm0-skills.git <RESOURCE_DIR>
+git clone --depth 1 --filter=blob:none --sparse https://github.com/okou-ai/okou-skills.git <RESOURCE_DIR>
 git -C <RESOURCE_DIR> sparse-checkout set video-composition
 git -C <RESOURCE_DIR> rev-parse HEAD
 ```
