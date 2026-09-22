@@ -16,3 +16,8 @@ installation, authoring, verification and delivery steps.
 
 For multiple independent deliverables, follow each relevant page. If the user
 supplies a template package, follow that package's entry point.
+
+Complete the selected workflow's verification immediately before delivery.
+Word/PDF includes batch page galleries and explicit page review; Excel verifies
+recalculated results against independent expectations. Keep sources and check
+records for revisions.

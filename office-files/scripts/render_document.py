@@ -103,6 +103,33 @@ def language_of(ast, override):
     return "en-US"
 
 
+def native_language(text, declared=()):
+    """Prefer document metadata; script detection is explicitly only a fallback."""
+    for language in declared:
+        if language and language.strip():
+            return language.strip(), "document-metadata"
+    if not text.strip():
+        return "und", "undetermined"
+    return language_of({"blocks": [{"t": "Str", "c": text}]}, None), "script-fallback"
+
+
+def docx_language(path):
+    with zipfile.ZipFile(path) as archive:
+        document = ET.fromstring(archive.read("word/document.xml"))
+        text = "".join(element.text or "" for element in document.iter(W + "t"))
+        inferred, _ = native_language(text)
+        attribute = "eastAsia" if inferred.split("-")[0] in {"zh", "ja", "ko"} else (
+            "bidi" if inferred in {"ar", "he"} else "val")
+        roots = [document]
+        if "word/styles.xml" in archive.namelist():
+            roots.append(ET.fromstring(archive.read("word/styles.xml")))
+        values = [element.get(W + attribute) for root in roots for element in root.iter(W + "lang")]
+        if "docProps/core.xml" in archive.namelist():
+            core = ET.fromstring(archive.read("docProps/core.xml"))
+            values.extend(element.text for element in core.iter("{http://purl.org/dc/elements/1.1/}language"))
+        return native_language(text, values)
+
+
 def prose_text(block):
     if block.get("t") in ("Para", "Plain"):
         return inline_text(block["c"])
@@ -285,6 +312,7 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
         versions = {}
         resources = [{"path": str(path), "sha256": sha256(path)} for path in resource_paths]
         warnings = []
+        language_source = "override" if lang else None
         expectations = {"required_text": [], "same_page": []}
         source_hash = sha256(source)
         reference_hash = sha256(reference) if reference else None
@@ -295,12 +323,18 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
             with pymupdf.open(pdf_path) as document:
                 if not document.is_pdf or document.needs_pass or len(document) == 0:
                     raise ValueError("Expected a readable, unencrypted PDF with pages.")
+                if not lang:
+                    kind, declared = document.xref_get_key(document.pdf_catalog(), "Lang")
+                    text = "\n".join(page.get_text() for page in document)
+                    lang, language_source = native_language(text, [declared] if kind == "string" else [])
             versions["pymupdf"] = pymupdf.VersionBind
             theme = "source-preserved"
             artifacts = (pdf_path,)
         elif source.suffix.lower() == ".docx":
             shutil.copyfile(source, docx_path)
             theme = "source-preserved"
+            if not lang:
+                lang, language_source = docx_language(docx_path)
         else:
             # Native files do not need the Markdown author's dependencies.
             from document_style import build_reference, polish_document
@@ -314,6 +348,7 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
             resources.extend({"path": str(path), "sha256": sha256(path)}
                              for path in sorted(local_resources(ast, source.parent))
                              if str(path) not in existing)
+            language_source = language_source or ("document-metadata" if inline_text(ast.get("meta", {}).get("lang", {})).strip() else "script-fallback")
             lang = language_of(ast, lang)
             ast.setdefault("meta", {})["lang"] = {"t": "MetaString", "c": lang}
             if not reference:
@@ -359,7 +394,7 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
         manifest = {"status": "needs-inspection", "source": {"path": str(source), "sha256": source_hash},
                     "reference": {"path": str(reference), "sha256": reference_hash} if reference else None,
                     "resources": resources, "warnings": warnings,
-                    "theme": theme, "language": lang, "versions": versions, "outputs": outputs,
+                    "theme": theme, "language": lang, "language_source": language_source, "versions": versions, "outputs": outputs,
                     "deliver": list(outputs) if output_format == "both" else [output_format]}
         (stage / "render.json").write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -373,7 +408,7 @@ def main():
     parser.add_argument("--out", type=Path, required=True, help="Output directory, separate from input")
     parser.add_argument("--format", choices=("pdf", "docx", "both"),
                         help="Delivery files; defaults to pdf for PDF input, otherwise both. Word always gets a PDF preview.")
-    parser.add_argument("--lang", help="BCP 47 language; overrides Markdown lang metadata")
+    parser.add_argument("--lang", help="BCP 47 language; overrides source metadata and script fallback for all formats")
     parser.add_argument("--reference", type=Path, help="Style reference for NEW Markdown prose only")
     parser.add_argument("--resource", type=Path, action="append", default=[],
                         help="Bind an authoring script, data, template, filter or asset to verification; repeat for each file.")

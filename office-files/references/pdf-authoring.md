@@ -5,9 +5,10 @@
 Use this page to author or edit PDF directly. For matching Word/PDF deliverables,
 follow the [Word workflow](word-authoring.md) and export its finished DOCX to PDF.
 
-Follow a supplied template's instructions. Work on a copy of an existing file
-and preserve content and formatting outside the requested changes. When layout
-must be preserved, inspect the original pages before editing.
+Follow a supplied template's instructions. Keep an existing original unchanged:
+open it as the input and save edits to a distinct output path. Preserve content
+and formatting outside the requested changes. When layout must be preserved,
+inspect the original pages before editing.
 
 Read the [rendering setup](document-layout.md#rendering-setup), then use the
 applicable method below. For new simple text-led documents or an existing
@@ -55,11 +56,44 @@ document.build(story)
   headers across pages, allow row splitting where needed, and keep captions with
   figures. Avoid unbreakable containers taller than a page.
 - Register regular, bold and italic faces with their family mapping. This example
-  requires TrueType outlines; CFF-based fonts are not supported.
+  requires TrueType outlines; CFF-based fonts are not supported. A `.ttc` extension
+  identifies a collection, not its outline format: TrueType collections work with
+  `TTFont(..., subfontIndex=0)`, but CFF collections such as Noto Sans CJK do not.
 - For CJK, use the appropriate regional glyphs and configure CJK line breaking.
   For Arabic/Hebrew or mixed-direction text, verify shaping and bidirectional
   support in the installed engine; switch to a verified engine if necessary.
   Do not reverse Unicode strings manually.
+
+### Runnable Simplified Chinese example
+
+For this ReportLab route on Debian/Ubuntu, install an embeddable Chinese
+TrueType font and a separate bullet font:
+
+```bash
+sudo apt-get update -qq
+sudo apt-get install -y -qq fonts-wqy-zenhei fonts-dejavu-core
+python3 -m pip install --break-system-packages reportlab
+python3 "$OFFICE_FILES_DIR/scripts/author_pdf_cjk.py" generated/chinese.pdf
+```
+
+Read and adapt [the example source](../scripts/author_pdf_cjk.py) to the approved
+content. It embeds WenQuanYi Zen Hei face 0, sets `lang="zh-CN"` and
+`wordWrap="CJK"`, and demonstrates Chinese punctuation, Latin text, numerals,
+`·` and wrapped paragraphs. WenQuanYi Zen Hei lacks `•` (U+2022), so the example
+embeds DejaVu Sans for `bulletText="•"` with `bulletFontName="Symbols"`.
+For an inline bullet, use an explicit `<font name="Symbols">•</font>` run inside
+otherwise escaped paragraph text; do not use a font that lacks the glyph.
+On other systems, pass
+`--font /path/to/chinese.ttf --symbols-font /path/to/symbols.ttf`, using fonts
+whose glyph coverage and regional forms match the content. The example uses
+regular faces only; add actual faces before requesting bold or italic.
+
+Do not use `UnicodeCIDFont("STSong-Light")` as an automatic substitute for an
+embedded font. It relies on the viewer's CJK resources, has no registered bold
+or italic variants, and `·` or `•` can extract as text while rendering blank.
+After authoring, use the shared [page review](document-layout.md#page-review)
+to inspect every page, including punctuation and symbols at readable scale.
+Successful text extraction or character matching does not prove visible glyphs.
 
 ## Typst and HTML/CSS
 
@@ -102,6 +136,26 @@ low-confidence text against the page images.
 ```bash
 python3 -m pip install --break-system-packages pypdf pdfplumber
 ```
+
+For PyMuPDF, open the original and save the modified document under a new name:
+
+```python
+from pathlib import Path
+import pymupdf
+
+source = Path("original.pdf")
+output = Path("revised.pdf")
+if source.resolve() == output.resolve():
+    raise ValueError("The edited PDF must use a distinct output path")
+with pymupdf.open(source) as document:
+    # Apply the requested page, annotation or redaction edits here.
+    document.save(output, garbage=4, deflate=True)
+```
+
+Do not copy the input, open that copy and call `save()` on the same path:
+PyMuPDF rejects non-incremental in-place saves. For content removal, use real
+redaction and a full save to a new path as above; an incremental save can retain
+earlier versions of removed content. Reopen and verify the new file.
 
 For AcroForms, inspect `PdfReader("form.pdf").get_fields()` and use actual field
 names and types. Clone the document to retain its form structure. This example

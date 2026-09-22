@@ -68,10 +68,10 @@ def normalize(text):
 
 def read_expectations(path):
     if path is None:
-        return {"required_text": [], "same_page": []}
+        return {"required_text": [], "same_page": [], "not_applicable": {}}
     data = json.loads(Path(path).read_text(encoding="utf-8"))
-    if not isinstance(data, dict) or set(data) - {"required_text", "same_page"}:
-        raise ValueError("Expectations must contain only required_text and same_page.")
+    if not isinstance(data, dict) or set(data) - {"required_text", "same_page", "not_applicable"}:
+        raise ValueError("Expectations must contain only required_text, same_page and not_applicable.")
     required = data.get("required_text", [])
     pairs = data.get("same_page", [])
     if not isinstance(required, list) or any(not isinstance(t, str) or not normalize(t) for t in required):
@@ -83,7 +83,13 @@ def read_expectations(path):
             raise ValueError("Each same_page item needs first, second, and reason.")
         if any(not isinstance(pair[k], str) or not normalize(pair[k]) for k in pair):
             raise ValueError("same_page fields must be nonempty strings.")
-    return {"required_text": required, "same_page": pairs}
+    exemptions = data.get("not_applicable", {})
+    if (not isinstance(exemptions, dict) or set(exemptions) - {"required_text", "same_page"} or
+            any(not isinstance(reason, str) or not normalize(reason) for reason in exemptions.values())):
+        raise ValueError("not_applicable must give a nonempty reason for required_text or same_page.")
+    if any(data.get(key) for key in exemptions):
+        raise ValueError("An expectation cannot have both entries and a not_applicable reason.")
+    return {"required_text": required, "same_page": pairs, "not_applicable": exemptions}
 
 
 def add_finding(report, severity, code, message, page=None, evidence=None):
@@ -100,6 +106,10 @@ def add_finding(report, severity, code, message, page=None, evidence=None):
 
 
 def inspect_expectations(report, texts, expectations):
+    for key in ("required_text", "same_page"):
+        if not expectations[key] and not expectations["not_applicable"].get(key):
+            add_finding(report, "blocker", "empty_" + key,
+                        f"Add task-specific {key} expectations, or explain why they do not apply.")
     normalized_pages = [normalize(text) for text in texts]
 
     def occurrences(phrase):
@@ -326,7 +336,33 @@ def bind_render_manifest(report, path):
         add_finding(report, "blocker", "invalid_render_manifest", f"The render snapshot cannot be verified: {error}")
 
 
-def inspect(pdf, out, docx=None, expectations=None, render=None):
+def bind_docx_comparison(report, path):
+    """Require a successful comparison of the exact edited Word package."""
+    try:
+        from compare_docx import validate_binding
+
+        report["inputs"]["docx_comparison"] = fingerprint(path)
+        comparison = json.loads(Path(path).read_text(encoding="utf-8"))
+        validate_binding(comparison)
+        require("docx" in report["inputs"], "A Word comparison needs the paired --docx.")
+        bound = comparison["inputs"]
+        require(isinstance(bound, dict) and {"original", "edited"} <= set(bound),
+                "Word comparison must bind the original and edited documents.")
+        for name, item in bound.items():
+            if item is None:
+                continue
+            require(isinstance(item, dict) and isinstance(item.get("path"), str), "Invalid Word comparison input.")
+            current = fingerprint(item["path"])
+            require(current["sha256"] == item["sha256"],
+                    f"The comparison's {name} changed; compare and inspect again.")
+            report["inputs"]["comparison_" + name] = current
+        require(bound["edited"]["sha256"] == report["inputs"]["docx"]["sha256"],
+                "The compared Word document is not the inspected Word document.")
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        add_finding(report, "blocker", "invalid_docx_comparison", str(error))
+
+
+def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison=None):
     out = Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     (out / "acceptance.json").unlink(missing_ok=True)
@@ -339,9 +375,13 @@ def inspect(pdf, out, docx=None, expectations=None, render=None):
     if expectations:
         inputs["expectations"] = fingerprint(expectations)
     expected = read_expectations(expectations)
-    report = {"schema_version": 1, "created_at": datetime.now(timezone.utc).isoformat(), "inputs": inputs, "page_count": 0, "pages": [], "findings": [], "limitations": LIMITATIONS}
+    report = {"schema_version": 2, "created_at": datetime.now(timezone.utc).isoformat(), "inputs": inputs, "expectations": expected, "page_count": 0, "pages": [], "findings": [], "limitations": LIMITATIONS}
+    if not expectations:
+        add_finding(report, "blocker", "missing_expectations", "Supply --expectations with task-specific checks or explicit not-applicable reasons.")
     if render:
         bind_render_manifest(report, render)
+    if docx_comparison:
+        bind_docx_comparison(report, docx_comparison)
     if "docx" in inputs:
         try:
             validate_docx(inputs["docx"]["path"])
@@ -365,13 +405,17 @@ def inspect(pdf, out, docx=None, expectations=None, render=None):
             add_finding(report, "blocker", "input_changed_during_inspection", f"Input {name} changed while inspection was running; inspect again. {error}")
     write_json(out / "inspection.json", report)
     review = {
-        "schema_version": 1,
+        "schema_version": 2,
         "inspection_sha256": sha256(out / "inspection.json"),
         "instructions": "Open every PNG. Record observations for all five criteria on each page; use pass only after checking it. For pages without tables or figures, explicitly record that observation. Explain each warning. If you repair a file, run inspect again and review the new images.",
         "pages": [{"number": page["number"], "image_sha256": page["image"]["sha256"], "criteria": {name: {"status": "pending", "observations": ""} for name in CRITERIA}} for page in report["pages"]],
         "warning_acknowledgements": [{"finding_id": finding["id"], "observations": ""} for finding in report["findings"] if finding["severity"] == "warning"],
     }
     write_json(out / "review.json", review)
+    if report["pages"] and len(report["pages"]) == report["page_count"]:
+        from page_gallery import build_gallery
+
+        build_gallery(out)
     return report
 
 
@@ -387,9 +431,10 @@ def accept(out):
     inspection_path, review_path = out / "inspection.json", out / "review.json"
     report = json.loads(inspection_path.read_text(encoding="utf-8"))
     review = json.loads(review_path.read_text(encoding="utf-8"))
-    require(report["schema_version"] == review["schema_version"] == 1, "Unsupported inspection or review version.")
+    require(report["schema_version"] == review["schema_version"] == 2, "Inspect again with the current verifier; older reviews do not cover required expectations.")
     require(review["inspection_sha256"] == sha256(inspection_path), "The inspection changed after the review was created. Inspect and review again.")
     require("pdf" in report["inputs"], "The inspection has no bound PDF.")
+    require("expectations" in report["inputs"], "The inspection has no bound expectations.")
     for name, item in report["inputs"].items():
         require(sha256(item["path"]) == item["sha256"], f"The {name} changed after inspection. Inspect and review again.")
     blockers = [finding["code"] for finding in report["findings"] if finding["severity"] == "blocker"]
@@ -417,7 +462,7 @@ def accept(out):
     require(len(acknowledgements) == len(warnings) and {item["finding_id"] for item in acknowledgements} == warnings, "Acknowledge each warning exactly once.")
     require(all(isinstance(item["observations"], str) and item["observations"].strip() for item in acknowledgements), "Every warning needs an explanation based on the rendered pages.")
     acceptance = {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "READY_TO_DELIVER",
         "accepted_at": datetime.now(timezone.utc).isoformat(),
         "inputs": report["inputs"],
@@ -439,15 +484,16 @@ def main():
     inspection.add_argument("--docx", type=Path)
     inspection.add_argument("--expectations", type=Path)
     inspection.add_argument("--render", type=Path, help="Bind a completed render.json, its outputs and all declared inputs.")
+    inspection.add_argument("--docx-comparison", type=Path, help="Bind a passed original/edited Word preservation comparison (required for edits).")
     acceptance = commands.add_parser("accept", help="Check all current hashes and completed visual review.")
     acceptance.add_argument("out", type=Path)
     args = parser.parse_args()
     try:
         if args.command == "inspect":
-            report = inspect(args.pdf, args.out, args.docx, args.expectations, args.render)
+            report = inspect(args.pdf, args.out, args.docx, args.expectations, args.render, args.docx_comparison)
             blockers = sum(f["severity"] == "blocker" for f in report["findings"])
             warnings = sum(f["severity"] == "warning" for f in report["findings"])
-            print(f"Inspected {report['page_count']} pages: {blockers} blockers, {warnings} warnings. Open the page PNGs, then complete {args.out / 'review.json'}.")
+            print(f"Inspected {report['page_count']} pages: {blockers} blockers, {warnings} warnings. Browse {args.out / 'gallery/index.html'} and full page PNGs, then complete {args.out / 'review.json'}.")
             return 2 if blockers else 0
         accept(args.out)
         print("READY_TO_DELIVER — current files match the inspected pages and completed review.")

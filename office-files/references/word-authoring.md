@@ -104,9 +104,10 @@ values. Preserve the template's styles, fields, headers and dimensions.
    bookmarks, field instructions, whitespace and revision boundaries.
 3. Change only the necessary parts and preserve untouched parts byte-for-byte.
    Update relationships and content-type entries when adding or removing parts.
-4. Compare part inventories, hashes and the intended text delta. Validate
-   referenced IDs/targets and relevant OOXML schema constraints, then compare
-   the original and edited rendering.
+4. Run [the before/after comparison](#compare-before-and-after) with
+   `--strict-bytes`. It checks inventories, hashes, references and protected
+   features. Validate relevant OOXML schema constraints separately when needed,
+   then compare the original and edited rendering.
 
 This example replaces an already-edited XML part. Make and validate the XML
 change separately; the example only packages replacements of existing parts.
@@ -132,6 +133,74 @@ deletion elements, paragraph-mark deletions, comment anchors and their related
 parts. Do not silently accept revisions. Validate revision semantics as well as
 rendering; an accepted-view PDF cannot establish revision preservation.
 
+## Compare before and after
+
+Required for editing an existing DOCX, including template filling. Keep the
+original and edited files at separate paths. Run this standard-library script
+after saving the edit; `OFFICE_FILES_DIR` is set in the rendering setup:
+
+```bash
+python3 "$OFFICE_FILES_DIR/scripts/compare_docx.py" source.docx edited.docx \
+  --out generated/word-comparison.json
+```
+
+The report inventories ZIP parts and their hashes, resolves relationship IDs
+and targets, and compares headers, footers, images, hyperlinks, comments and
+anchors, revision elements/authors/IDs, fields, drawings and bookmarks. It also
+reports text and other XML changes. A missing referenced part or broken field
+boundary blocks comparison and cannot be waived.
+
+Expected edits initially produce `BLOCKED` too. Read the reported text delta
+and investigate each changed part or feature. Fix unintended changes. For each
+change required by the request, copy that finding's exact `code`, `part`,
+`scope`, `before_sha256` and `after_sha256` into a changes policy and add a
+specific reason. The two digests identify that finding's scope; copy them from
+the finding, not from the ZIP inventory. For example, an intended body-text
+edit uses this shape (replace the example hashes with the actual values):
+
+```json
+{
+  "schema_version": 1,
+  "changes": [
+    {
+      "code": "text_changed",
+      "part": "word/document.xml",
+      "scope": "text",
+      "before_sha256": "<finding's before_sha256>",
+      "after_sha256": "<finding's after_sha256>",
+      "reason": "Change the requested revenue figure from 1000 to 1200."
+    }
+  ]
+}
+```
+
+Approving the text delta does not approve a removed hyperlink, revision or
+field. Any intentional feature removal needs its own matching explanation.
+Do not copy every finding into the policy automatically or use an "all changes
+approved" reason. Wildcards, stale approvals and unmatched entries are rejected.
+The editing agent records these reasons as local review evidence against the
+user's already-authorized request; do not ask the user to approve each edit again.
+
+```bash
+python3 "$OFFICE_FILES_DIR/scripts/compare_docx.py" source.docx edited.docx \
+  --changes generated/word-changes.json --out generated/word-comparison.json
+```
+
+Continue only when the report says `PASS` (exit code 0). This checks semantic
+XML rather than requiring every library save to retain identical XML bytes:
+namespace/attribute serialization and equivalent relationship IDs may change,
+and removing an empty `.rels` part is informational. For focused OOXML edits,
+add `--strict-bytes` on both comparison runs; each changed existing part then
+also needs an exact byte-change approval, so untouched parts stay identical.
+
+Render the edited DOCX and supply
+`--docx-comparison generated/word-comparison.json` to the document `inspect`
+command below. Inspection binds the report, original, edited file and policy
+to their hashes. Keep these files available; any later change requires a new
+comparison and inspection. The compared edited DOCX must match the rendered
+DOCX exactly. The script does not replace page review or full OOXML schema
+validation, and a PDF alone cannot prove that comments or revisions survived.
+
 ## Font and language settings
 
 Check installed fonts and character coverage; setting a DOCX font name does not
@@ -143,8 +212,9 @@ the task requires a change.
 ## Verify and deliver
 
 Run [document verification](document-layout.md#verification) on the finished
-DOCX. For matching Word/PDF deliverables, export the PDF from this DOCX and
-verify the pair together.
+DOCX. For edits, include the passing comparison with `--docx-comparison` during
+inspection. For matching Word/PDF deliverables, export the PDF from this DOCX
+and verify the pair together.
 
 Upload the requested files with `okou web upload-file`; include the editable
 DOCX alongside a final PDF. Keep authoring sources, data, assets and QA files
