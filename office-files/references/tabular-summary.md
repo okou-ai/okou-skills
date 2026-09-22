@@ -12,6 +12,11 @@ columns, sheet names and requested summaries, and point it at actual source
 data. The accompanying [summary-data.csv](../assets/summary-data.csv) is a
 deterministic **simulated** service-booking example, not factual business data.
 Do not add sections, KPIs or charts the request does not need.
+Localize every visible label, including each summary's `total_label` (the
+default is English `Total`), notes headers and chart titles. For a currency,
+set e.g. `"theme": {"currency": "¥"}` and reuse `"format": "money"` /
+`"number_format": "money"`; ordinary currency formatting needs no manually
+escaped Excel format string.
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/summarize_workbook.py" \
@@ -111,6 +116,8 @@ lower-level author for noncontiguous series/custom geometry. Categories and
 data ranges are computed from the selected summary, excluding its total.
 The dashboard title repeats on printed continuation pages. Charts do not
 create additional analysis or inferred narrative.
+Data labels default to false. Keep that default for line charts unless labels
+add necessary information; labels can collide with the lines in Calc previews.
 
 ## Source and verification contract
 

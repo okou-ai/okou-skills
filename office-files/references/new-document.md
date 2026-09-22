@@ -78,6 +78,33 @@ when each is readable on adjacent pages. Headings and their opening prose are
 added automatically from the Markdown source. Captions and tables use the
 renderer’s grouping defaults and still need page review.
 
+### Check content in parallel
+
+Before the first preparation command, start a content check once the complete
+draft and calculation model are ready. If agent tools are available, delegate
+one bounded review to an independent reviewer using the same default model,
+without a model override. Give it fresh context containing the original user
+request, raw data, complete final draft and calculation model; exclude the
+author's own passing QA conclusions. Continue preparation and the required
+page-by-page visual review in parallel. Without agent tools, perform the same
+content check yourself and state that it was not independent.
+
+Check requirement coverage; recompute all key calculations and reconcile
+repeated targets and assumptions throughout the draft. Distinguish evidence
+from causal, efficiency or feasibility claims: a change in cost or effort alone
+does not establish its cause. Verify that each recommended action is sufficient
+to resolve the problem it claims to address, including any numerical shortfall.
+Return only specific errors with their locations and evidence, or `pass`;
+do not add analysis, sections or cosmetic changes to the report.
+
+Resolve actual errors before acceptance. Recheck changed conclusions and their
+dependent calculations when needed; do not repeat an unchanged passing content
+review. No additional schema or lengthy review record is needed. A time target
+never permits skipping this check or the five visual criteria below, or imposing
+a word or page limit.
+
+### Prepare and inspect pages
+
 Run generation, quick checks and page-preview preparation in one command:
 
 ```bash
@@ -106,7 +133,8 @@ observation covering the checks, including absent tables/figures when relevant.
 Explain every warning from the rendered pages. The compact record reduces
 duplicate prose; it does not skip criteria or approve pages automatically.
 Repair actual defects together where possible, then prepare and review the
-changed candidate. A passing candidate needs no additional layout experiments.
+changed candidate. Finish the content check above before `accept`. A passing
+candidate needs no additional layout experiments.
 
 ```bash
 python3 "$OFFICE_FILES_DIR/scripts/check_document.py" accept generated/report/output/qa
