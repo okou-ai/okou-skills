@@ -1,8 +1,8 @@
 # Pandoc authoring
 
-Use Pandoc for simple, text-led documents or an existing publishing workflow.
-Read the [layout and rendering setup](document-layout.md#rendering-setup) before
-authoring.
+Use the [runnable document starter](new-document.md) for new prose. Read the
+sections below only for optional editorial components or an existing Pandoc
+publishing workflow.
 
 ## Install
 
@@ -57,6 +57,16 @@ short labels, with interpretation in nearby prose:
 Use `# Chapter title {.chapter}` for a deliberate page transition. Keep callouts
 selective and avoid a repeated component under every heading. Use a normal
 table for records or detailed comparisons.
+
+Use `.chapter` on any heading level only when an explicit page transition serves
+the document. For flowing reports, omit it. Keep paragraphs together with
+`Keep with Next` when necessary; the generated grouping checks retain those
+paragraphs.
+
+In new house-theme documents, retain the renderer's content-based table widths.
+Use `--table-widths source` only for deliberately specified Pandoc proportions;
+pipe-table separator lengths can otherwise give wide numeric columns and narrow
+prose columns. Supplied reference styles and native files are preserved.
 
 The bundled theme uses warm paper, near-black text, an ink-blue accent, serif
 display text and sans body text. Match chart colours to it when using this theme;

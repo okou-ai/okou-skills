@@ -2,8 +2,9 @@
 
 ## Start
 
-Use this page to author or edit PDF directly. For matching Word/PDF deliverables,
-follow the [Word workflow](word-authoring.md) and export its finished DOCX to PDF.
+For new prose, use the [runnable document starter](new-document.md). Use this page
+to edit PDF directly or when the task calls for a native PDF engine. For an
+existing Word/PDF pair, edit Word and export its finished DOCX to PDF.
 
 Follow a supplied template's instructions. Keep an existing original unchanged:
 open it as the input and save edits to a distinct output path. Preserve content
@@ -11,8 +12,7 @@ and formatting outside the requested changes. When layout must be preserved,
 inspect the original pages before editing.
 
 Read the [rendering setup](document-layout.md#rendering-setup), then use the
-applicable method below. For new simple text-led documents or an existing
-publishing workflow, optionally use [Pandoc](pandoc-authoring.md).
+applicable method below.
 
 ## ReportLab
 

@@ -362,6 +362,32 @@ def bind_docx_comparison(report, path):
         add_finding(report, "blocker", "invalid_docx_comparison", str(error))
 
 
+def quick(pdf, expectations, docx=None, render=None, docx_comparison=None):
+    """Check text/relationships and input bindings without producing page images."""
+    inputs = {"pdf": fingerprint(pdf), "expectations": fingerprint(expectations)}
+    if docx:
+        inputs["docx"] = fingerprint(docx)
+    expected = read_expectations(expectations)
+    report = {"status": "QUICK_CHECK_ONLY", "inputs": inputs,
+              "expectations": expected, "page_count": 0, "findings": []}
+    if render:
+        bind_render_manifest(report, render)
+    if docx_comparison:
+        bind_docx_comparison(report, docx_comparison)
+    if "docx" in inputs:
+        validate_docx(inputs["docx"]["path"])
+    with pymupdf.open(pdf) as document:
+        require(document.is_pdf and not document.needs_pass and len(document) > 0,
+                "Expected a nonempty, unencrypted PDF.")
+        report["page_count"] = len(document)
+        inspect_expectations(report, [extracted_page_text(page) for page in document], expected)
+    for name, item in inputs.items():
+        require(sha256(item["path"]) == item["sha256"], f"Input {name} changed during the quick check.")
+    report["passed"] = not any(f["severity"] == "blocker" for f in report["findings"])
+    report["next"] = "Run inspect and review every final page before accept. This command does not approve delivery."
+    return report
+
+
 def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison=None):
     out = Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -478,6 +504,12 @@ def accept(out):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
+    preflight = commands.add_parser("quick", help="Check text and same-page expectations without rendering PNGs; not delivery acceptance.")
+    preflight.add_argument("pdf", type=Path)
+    preflight.add_argument("--expectations", type=Path, required=True)
+    preflight.add_argument("--docx", type=Path)
+    preflight.add_argument("--render", type=Path)
+    preflight.add_argument("--docx-comparison", type=Path)
     inspection = commands.add_parser("inspect", help="Render the actual PDF and create measurement/review files.")
     inspection.add_argument("pdf", type=Path)
     inspection.add_argument("--out", type=Path, required=True)
@@ -489,6 +521,10 @@ def main():
     acceptance.add_argument("out", type=Path)
     args = parser.parse_args()
     try:
+        if args.command == "quick":
+            report = quick(args.pdf, args.expectations, args.docx, args.render, args.docx_comparison)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 0 if report["passed"] else 2
         if args.command == "inspect":
             report = inspect(args.pdf, args.out, args.docx, args.expectations, args.render, args.docx_comparison)
             blockers = sum(f["severity"] == "blocker" for f in report["findings"])
@@ -498,7 +534,8 @@ def main():
         accept(args.out)
         print("READY_TO_DELIVER — current files match the inspected pages and completed review.")
         return 0
-    except (OSError, ValueError, KeyError, TypeError, AttributeError) as error:
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, RuntimeError,
+            zipfile.BadZipFile, ET.ParseError) as error:
         print(f"Document QA failed: {error}", file=sys.stderr)
         return 2
 

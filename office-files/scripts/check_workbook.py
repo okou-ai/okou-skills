@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Recalculate ordinary XLSX files and check independently supplied expectations.
 
-This is a local, artifact-bound check, not a proof of model correctness or visual
-review. No source workbook is overwritten. Run accept again before delivery.
+Quick checks do not recalculate or permit delivery. Verify checks fresh results;
+render_workbook.py prepares a candidate-bound visual review. No source workbook
+is overwritten. Run accept again before delivery.
 """
 
 import argparse
@@ -25,6 +26,7 @@ from openpyxl.utils.cell import range_boundaries
 
 
 NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+RISKY_PARTS = ("xl/externalLinks/", "xl/pivot", "xl/slicer", "xl/activeX/", "xl/embeddings/", "xl/queryTables/", "xl/ctrlProps/", "xl/webextensions/", "customXml/")
 LIMITATIONS = [
     "Expectations must be calculated independently from the declared raw data; "
     "the script cannot prove their independence or completeness.",
@@ -130,6 +132,9 @@ def read_expectations(path):
             raise ValueError("Each cell expectation needs sheet, cell, value; optional abs_tol/rel_tol.")
         if not isinstance(item["sheet"], str) or not item["sheet"] or not isinstance(item["cell"], str) or not re.fullmatch(r"[A-Z]+[1-9][0-9]*", item["cell"]):
             raise ValueError("Cell expectations need a sheet and a single uppercase A1 coordinate.")
+        column, row, _, _ = range_boundaries(item["cell"])
+        if column > 16384 or row > 1048576:
+            raise ValueError(f"Expected cell is outside Excel's grid: {item['cell']}")
         key = (item["sheet"], item["cell"])
         if key in seen:
             raise ValueError(f"Duplicate expected cell: {key}")
@@ -151,12 +156,62 @@ def read_expectations(path):
     return data
 
 
+def check_supported_package(path):
+    with zipfile.ZipFile(path) as package:
+        if any(name.startswith(RISKY_PARTS) or name in {"xl/vbaProject.bin", "xl/connections.xml"} for name in package.namelist()):
+            raise ValueError("Workbook has external links or advanced parts that need a native Excel preservation/recalculation workflow.")
+
+
+def check_expectation_targets(snapshot, expectations, data):
+    """Validate the intended checks without trusting any existing value cache."""
+    formula_count = len(snapshot["formulas"])
+    if formula_count and not data:
+        raise ValueError("Formula workbooks require --data bindings for the raw data used to derive expectations.")
+    if formula_count and not any(f"{item['sheet']}!{item['cell']}" in snapshot["formulas"] for item in expectations["cells"]):
+        raise ValueError("A formula workbook must independently check at least one formula result; cover every requested/affected key result.")
+    for item in expectations["cells"]:
+        if item["sheet"] not in snapshot["sheets"]:
+            raise ValueError(f"Expected sheet is absent: {item['sheet']}")
+    for table in expectations.get("tables", []):
+        key = f"{table['sheet']}!{table['name']}"
+        if snapshot["tables"].get(key) != table["ref"].replace("$", "").upper():
+            raise ValueError(f"Table range mismatch: {key}; expected {table['ref']}, found {snapshot['tables'].get(key)}")
+
+
+def quick(args):
+    source = Path(args.input).resolve(strict=True)
+    if source.suffix.lower() != ".xlsx":
+        raise ValueError("This checker supports ordinary .xlsx only; use a native workflow for other formats.")
+    bindings = [fingerprint(path) for path in [source, args.expectations, *args.data, *args.resource]]
+    check_supported_package(source)
+    expectations = read_expectations(args.expectations)
+    snapshot = workbook_snapshot(source)
+    check_expectation_targets(snapshot, expectations, args.data)
+    for binding in bindings:
+        if fingerprint(binding["path"]) != binding:
+            raise ValueError(f"An input changed during quick checks: {binding['path']}")
+    result = {
+        "status": "QUICK_CHECK_PASSED_NOT_VERIFIED", "delivery_allowed": False,
+        "input": bindings[0], "sheet_count": len(snapshot["sheets"]),
+        "formula_count": len(snapshot["formulas"]), "expected_cell_count": len(expectations["cells"]),
+        "checks": "Workbook structure, supported parts, error cells, references and expectation inputs.",
+        "next": "Run verify for fresh independent values, render_workbook.py for visual review, then accept.",
+        "limitations": "No recalculation, expected-value comparison or visual review was performed.",
+    }
+    if args.out:
+        output = Path(args.out).resolve()
+        if str(output) in {binding["path"] for binding in bindings}:
+            raise ValueError("The quick report must not overwrite an input or resource.")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        write_json(output, result)
+    print(json.dumps(result, ensure_ascii=False))
+    return 0
+
+
 def fresh_calculation_copy(source, target):
     """Drop old formula caches without round-tripping through openpyxl."""
+    check_supported_package(source)
     with zipfile.ZipFile(source) as original, zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as output:
-        risky = ("xl/externalLinks/", "xl/pivot", "xl/slicer", "xl/activeX/", "xl/embeddings/", "xl/queryTables/", "xl/ctrlProps/", "xl/webextensions/", "customXml/")
-        if any(name.startswith(risky) or name in {"xl/vbaProject.bin", "xl/connections.xml"} for name in original.namelist()):
-            raise ValueError("Workbook has external links or advanced parts that need a native Excel preservation/recalculation workflow.")
         for item in original.infolist():
             content = original.read(item.filename)
             if item.filename == "xl/workbook.xml":
@@ -241,6 +296,7 @@ def verify(args):
     report = {"status": "UNVERIFIED", "checked_at": datetime.now(timezone.utc).isoformat(), "limitations": LIMITATIONS, "bindings": [], "failures": []}
     try:
         report["bindings"] = [fingerprint(path) for path in [source, args.expectations, __file__, *args.data, *args.resource]]
+        check_supported_package(source)
         expectations = read_expectations(args.expectations)
         before = workbook_snapshot(source)
         report["structure"] = before
@@ -248,14 +304,7 @@ def verify(args):
         report["calculation_basis"] = expectations["calculation_basis"]
         formula_count = len(before["formulas"])
         report["formula_count"] = formula_count
-        if formula_count and not args.data:
-            raise ValueError("Formula workbooks require --data bindings for the raw data used to derive expectations.")
-        if formula_count and not any(f"{item['sheet']}!{item['cell']}" in before["formulas"] for item in expectations["cells"]):
-            raise ValueError("A formula workbook must independently check at least one formula result; cover every requested/affected key result.")
-        for table in expectations.get("tables", []):
-            key = f"{table['sheet']}!{table['name']}"
-            if before["tables"].get(key) != table["ref"].replace("$", "").upper():
-                raise ValueError(f"Table range mismatch: {key}; expected {table['ref']}, found {before['tables'].get(key)}")
+        check_expectation_targets(before, expectations, args.data)
         if formula_count:
             engine = shutil.which("soffice")
             if engine is None:
@@ -298,10 +347,8 @@ def verify(args):
     return 0 if report["status"] == "VERIFIED" else 1
 
 
-def accept(args):
-    qa = Path(args.qa).resolve(strict=True)
-    acceptance = qa / "acceptance.json"
-    acceptance.unlink(missing_ok=True)
+def load_verified_report(qa):
+    qa = Path(qa).resolve(strict=True)
     report_path = qa / "verification.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
     if report.get("status") != "VERIFIED" or not report.get("bindings") or not report.get("candidate"):
@@ -309,7 +356,62 @@ def accept(args):
     for binding in report["bindings"]:
         if fingerprint(binding["path"]) != binding:
             raise ValueError(f"The workbook, expectations, checker or declared data/resource changed after verification: {binding['path']}. Verify into a new directory.")
-    result = {"status": "READY_TO_DELIVER", "accepted_at": datetime.now(timezone.utc).isoformat(), "candidate": report["candidate"], "verification": fingerprint(report_path), "mode": report["mode"], "limitations": LIMITATIONS}
+    if fingerprint(report["candidate"]["path"]) != report["candidate"]:
+        raise ValueError("The candidate changed after verification. Verify into a new directory.")
+    return report
+
+
+def validate_preview(qa, report, *, require_review=True):
+    """Validate exact-candidate pages, without claiming native Excel rendering."""
+    qa = Path(qa).resolve(strict=True)
+    preview_dir = qa / "preview"
+    inspection_path, review_path = preview_dir / "inspection.json", preview_dir / "review.json"
+    if not inspection_path.is_file() or not review_path.is_file():
+        raise ValueError("Visual review is missing. Run render_workbook.py --qa QA, inspect its gallery and complete preview/review.json.")
+    preview = json.loads(inspection_path.read_text(encoding="utf-8"))
+    review = json.loads(review_path.read_text(encoding="utf-8"))
+    if preview.get("kind") != "office-workbook-preview" or preview.get("schema_version") != 1 or preview.get("status") != "needs-review":
+        raise ValueError("The workbook preview is incomplete or unsupported; render it again.")
+    expected_inputs = {
+        "candidate": report["candidate"], "verification": fingerprint(qa / "verification.json"),
+        "renderer": fingerprint(Path(__file__).with_name("render_workbook.py")),
+        "gallery_builder": fingerprint(Path(__file__).with_name("page_gallery.py")),
+        "pdf": fingerprint(preview_dir / "preview.pdf"),
+    }
+    if preview.get("inputs") != expected_inputs:
+        raise ValueError("The candidate, verification, renderer or preview PDF changed; prepare and review a current preview.")
+    if review.get("kind") != "office-workbook-review" or review.get("schema_version") != 1 or review.get("inspection_sha256") != fingerprint(inspection_path)["sha256"]:
+        raise ValueError("Visual review does not match the current workbook preview.")
+    pages = preview.get("pages", [])
+    if not pages or len(pages) != preview.get("page_count") or [page["number"] for page in pages] != list(range(1, len(pages) + 1)):
+        raise ValueError("Workbook preview must contain every rendered page exactly once.")
+    reviewed = review.get("pages", [])
+    if len(reviewed) != len(pages) or [page.get("number") for page in reviewed] != [page["number"] for page in pages]:
+        raise ValueError("Visual review must cover every preview page exactly once and in order.")
+    gallery_dir = preview_dir / "gallery"
+    gallery = json.loads((gallery_dir / "manifest.json").read_text(encoding="utf-8"))
+    if gallery.get("kind") != "office-page-gallery" or gallery.get("inspection_sha256") != fingerprint(inspection_path)["sha256"]:
+        raise ValueError("The gallery does not match the current workbook preview.")
+    for page, observed in zip(pages, reviewed):
+        name = f"page-{page['number']:03d}.png"
+        if page["image"]["path"] != name or fingerprint(preview_dir / name)["sha256"] != page["image"]["sha256"] or observed.get("image_sha256") != page["image"]["sha256"]:
+            raise ValueError(f"Preview page {page['number']} changed; render and review the current workbook.")
+        if fingerprint(gallery_dir / name)["sha256"] != page["image"]["sha256"]:
+            raise ValueError(f"Gallery page {page['number']} no longer matches the reviewed workbook preview.")
+        if require_review and (observed.get("status") != "pass" or not isinstance(observed.get("observations"), str) or not observed["observations"].strip()):
+            raise ValueError(f"Page {page['number']} needs a passed visual review with observations on legibility, clipping, number formats and any charts.")
+    return {"inspection": fingerprint(inspection_path), "review": fingerprint(review_path),
+            "pdf": expected_inputs["pdf"], "page_count": len(pages),
+            "limitations": preview.get("limitations", [])}
+
+
+def accept(args):
+    qa = Path(args.qa).resolve(strict=True)
+    acceptance = qa / "acceptance.json"
+    acceptance.unlink(missing_ok=True)
+    report = load_verified_report(qa)
+    visual = validate_preview(qa, report)
+    result = {"status": "READY_TO_DELIVER", "accepted_at": datetime.now(timezone.utc).isoformat(), "candidate": report["candidate"], "verification": fingerprint(qa / "verification.json"), "visual_review": visual, "mode": report["mode"], "limitations": LIMITATIONS + visual["limitations"]}
     write_json(acceptance, result)
     print(json.dumps(result, ensure_ascii=False))
     return 0
@@ -318,20 +420,24 @@ def accept(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    check = commands.add_parser("verify", help="Check fresh calculation and independent cell expectations.")
-    check.add_argument("--input", required=True)
-    check.add_argument("--expectations", required=True)
-    check.add_argument("--data", action="append", default=[], help="Raw data used for independent expected values; repeatable.")
-    check.add_argument("--resource", action="append", default=[], help="Author/expectation scripts and other dependencies; repeatable.")
-    check.add_argument("--out", required=True, help="New, nonexistent QA directory.")
-    check.set_defaults(func=verify)
+    for name, action, help_text in (
+        ("quick", quick, "Check structure and expectation inputs; no recalculation or delivery acceptance."),
+        ("verify", verify, "Check fresh calculation and independent cell expectations."),
+    ):
+        check = commands.add_parser(name, help=help_text)
+        check.add_argument("--input", required=True)
+        check.add_argument("--expectations", required=True)
+        check.add_argument("--data", action="append", default=[], help="Raw data used for independent expected values; repeatable.")
+        check.add_argument("--resource", action="append", default=[], help="Author/expectation scripts and other dependencies; repeatable.")
+        check.add_argument("--out", required=name == "verify", help="New, nonexistent QA directory." if name == "verify" else "Optional quick-report JSON file.")
+        check.set_defaults(func=action)
     acceptance = commands.add_parser("accept", help="Recheck all bindings immediately before delivery.")
     acceptance.add_argument("--qa", required=True)
     acceptance.set_defaults(func=accept)
     args = parser.parse_args()
     try:
         return args.func(args)
-    except (ValueError, OSError, KeyError, TypeError) as error:
+    except (ValueError, OSError, KeyError, TypeError, zipfile.BadZipFile, ET.XMLSyntaxError) as error:
         print(json.dumps({"status": "UNVERIFIED", "error": str(error)}, ensure_ascii=False), file=sys.stderr)
         return 1
 

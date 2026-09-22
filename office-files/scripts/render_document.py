@@ -56,7 +56,7 @@ def find_pandoc():
     binary = shutil.which("pandoc")
     if binary:
         return binary
-    raise RuntimeError("Install the skill's requirements.txt before rendering.")
+    raise RuntimeError("Install pypandoc_binary==1.17 before rendering Markdown.")
 
 
 def inline_text(value):
@@ -133,6 +133,8 @@ def docx_language(path):
 def prose_text(block):
     if block.get("t") in ("Para", "Plain"):
         return inline_text(block["c"])
+    if block.get("t") == "Div" and len(block["c"][1]) == 1:
+        return prose_text(block["c"][1][0])
     return ""
 
 
@@ -248,7 +250,8 @@ def export_pdf(docx_path, output_dir):
     return pdf_path, run([binary, "--version"]).strip()
 
 
-def render(source, output_dir, output_format=None, lang=None, reference=None, resources=()):
+def render(source, output_dir, output_format=None, lang=None, reference=None, resources=(),
+           style=None, table_widths="auto"):
     source, output_dir = Path(source).resolve(), Path(output_dir).resolve()
     native_pdf = source.suffix.lower() == ".pdf"
     if source.suffix.lower() not in (".md", ".markdown", ".docx", ".pdf"):
@@ -263,14 +266,19 @@ def render(source, output_dir, output_format=None, lang=None, reference=None, re
     reference = Path(reference).resolve() if reference else None
     if reference and (source.suffix.lower() not in (".md", ".markdown") or not reference.is_file()):
         raise ValueError("--reference requires a Markdown input and an existing reference DOCX.")
-    resource_paths = sorted({Path(path).resolve() for path in resources})
+    style = Path(style).resolve() if style else None
+    if style and (source.suffix.lower() not in (".md", ".markdown") or reference):
+        raise ValueError("--style applies only to new Markdown without --reference.")
+    if table_widths not in {"auto", "source"}:
+        raise ValueError("Table widths must be auto or source.")
+    resource_paths = sorted({Path(path).resolve() for path in resources} | ({style} if style else set()))
     for path in resource_paths:
         if not path.is_file():
             raise ValueError(f"Resource file does not exist: {path}")
     output_dir.mkdir(parents=True, exist_ok=True)
     extensions = (".pdf",) if native_pdf else (".docx", ".pdf")
     targets = [output_dir / (source.stem + ext) for ext in extensions]
-    targets += [output_dir / name for name in ("expectations.json", "render.json")]
+    targets += [output_dir / name for name in ("expectations.json", "expectations.seed.json", "render.json")]
     for target in targets:
         for original in (source, reference, *resource_paths):
             if original and (target.resolve() == original or
@@ -278,7 +286,8 @@ def render(source, output_dir, output_format=None, lang=None, reference=None, re
                 raise ValueError("Output would overwrite an input. Choose a separate output directory.")
     write_json(output_dir / "render.json", {"status": "rendering", "source": str(source)})
     try:
-        return render_candidate(source, output_dir, output_format, lang, reference, resource_paths)
+        return render_candidate(source, output_dir, output_format, lang, reference, resource_paths,
+                                style, table_widths)
     except Exception as error:
         write_json(output_dir / "render.json", {"status": "failed", "source": str(source),
                                                 "error": str(error)})
@@ -303,7 +312,8 @@ def local_resources(value, parent):
     return paths
 
 
-def render_candidate(source, output_dir, output_format, lang, reference, resource_paths=()):
+def render_candidate(source, output_dir, output_format, lang, reference, resource_paths=(),
+                     style_path=None, table_widths="auto"):
     # Everything is built in isolation. A failed export cannot reuse an old PDF.
     with tempfile.TemporaryDirectory(prefix=".document-", dir=output_dir) as staging:
         stage = Path(staging)
@@ -337,9 +347,10 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
                 lang, language_source = docx_language(docx_path)
         else:
             # Native files do not need the Markdown author's dependencies.
-            from document_style import build_reference, polish_document
+            from document_style import build_reference, load_style, polish_document
 
             pandoc = find_pandoc()
+            style = load_style(style_path) if style_path else None
             versions["pandoc"] = run([pandoc, "--version"]).splitlines()[0]
             ast = json.loads(run([pandoc, str(source), "-f", "markdown-smart", "-t", "json"]))
             validate_source(ast)
@@ -354,7 +365,7 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
             if not reference:
                 (stage / "style").mkdir()
                 active_reference = stage / "style" / "reference.docx"
-                build_reference(pandoc, active_reference, lang)
+                build_reference(pandoc, active_reference, lang, style=style)
             else:
                 active_reference = reference
             run([pandoc, "-f", "json", "-t", "docx", "--standalone",
@@ -371,7 +382,7 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
                 raise RuntimeError("Pandoc reported an export problem:\n" + "\n".join(
                     item.get("pretty", str(item)) for item in destructive))
             if not reference:
-                polish_document(docx_path, lang)
+                polish_document(docx_path, lang, automatic_table_widths=table_widths == "auto", style=style)
             theme = "reference-preserved" if reference else "default"
             expectations = source_expectations(ast)
         if source.suffix.lower() != ".pdf":
@@ -388,9 +399,11 @@ def render_candidate(source, output_dir, output_format, lang, reference, resourc
             # symlink/hardlink to another file.
             path.replace(destination)
             outputs[path.suffix[1:]] = {"path": str(destination), "sha256": sha256(destination)}
-        (stage / "expectations.json").write_text(
-            json.dumps(expectations, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        (stage / "expectations.json").replace(output_dir / "expectations.json")
+        write_json(output_dir / "expectations.seed.json", expectations)
+        # Task-specific checks belong to the author. Refresh the suggested
+        # source checks separately; never erase authored checks on rerender.
+        if not (output_dir / "expectations.json").exists():
+            write_json(output_dir / "expectations.json", expectations)
         manifest = {"status": "needs-inspection", "source": {"path": str(source), "sha256": source_hash},
                     "reference": {"path": str(reference), "sha256": reference_hash} if reference else None,
                     "resources": resources, "warnings": warnings,
@@ -410,11 +423,15 @@ def main():
                         help="Delivery files; defaults to pdf for PDF input, otherwise both. Word always gets a PDF preview.")
     parser.add_argument("--lang", help="BCP 47 language; overrides source metadata and script fallback for all formats")
     parser.add_argument("--reference", type=Path, help="Style reference for NEW Markdown prose only")
+    parser.add_argument("--style", type=Path, help="Style JSON for new Markdown without a supplied reference")
+    parser.add_argument("--table-widths", choices=("auto", "source"), default="auto",
+                        help="New house-theme Markdown: size columns by content, or retain Pandoc's source widths")
     parser.add_argument("--resource", type=Path, action="append", default=[],
                         help="Bind an authoring script, data, template, filter or asset to verification; repeat for each file.")
     args = parser.parse_args()
     try:
-        result = render(args.source, args.out, args.format, args.lang, args.reference, args.resource)
+        result = render(args.source, args.out, args.format, args.lang, args.reference, args.resource,
+                        args.style, args.table_widths)
     except (ValueError, RuntimeError, OSError, KeyError, ET.ParseError,
             subprocess.TimeoutExpired, zipfile.BadZipFile) as error:
         parser.exit(1, f"Render failed: {error}\n")

@@ -2,13 +2,15 @@
 
 ## Start
 
+For new prose, use the [runnable document starter](new-document.md). Use this
+page for editing, template filling, or native Word features the starter lacks.
+
 Follow a supplied template's instructions. Work on a copy of an existing file
 and preserve content and formatting outside the requested changes. When layout
 must be preserved, inspect the original pages before editing.
 
 Read the [rendering setup](document-layout.md#rendering-setup), then use the
-applicable method below. For new simple text-led documents or an existing
-publishing workflow, optionally use [Pandoc](pandoc-authoring.md).
+applicable method below. Keep an existing publishing workflow when appropriate.
 
 ## Create with `docx`
 
@@ -205,6 +207,9 @@ validation, and a PDF alone cannot prove that comments or revisions survived.
 
 Check installed fonts and character coverage; setting a DOCX font name does not
 embed the font. For CJK, use the appropriate regional font and document language.
+In OOXML, `w:lang/@w:val` controls Western text and `@w:eastAsia` controls CJK.
+For Chinese/English content, set them to `en-US` and `zh-CN` respectively. Inspect
+decimal numbers and Latin words for unwanted internal line breaks in the PDF.
 For RTL, set paragraph direction and run-level complex-script properties, then
 inspect mixed-script text, numbers and punctuation. Retain template fonts unless
 the task requires a change.

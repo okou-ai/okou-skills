@@ -2,7 +2,11 @@
 
 ## Rendering setup
 
-Set `OFFICE_FILES_DIR` to this skill's absolute directory in each shell invocation.
+Set `OFFICE_FILES_DIR` to this skill's absolute directory on a separate shell line:
+
+```bash
+export OFFICE_FILES_DIR=/absolute/path/to/office-files
+```
 Install the shared page inspector:
 
 ```bash
@@ -64,13 +68,18 @@ paragraphs; **native Word/PDF starts with empty lists that you must populate**:
 {
   "required_text": ["Terms remain unchanged"],
   "same_page": [
-    {"first": "The next table contains", "second": "Metric", "reason": "Keep the lead-in with the table header"}
+    {"first": "The next table contains", "second": "January operating revenue", "reason": "Keep the lead-in with the first body row"}
   ]
 }
 ```
 
-Check repeated text, exact page counts and other constraints not represented by
-this format directly against the rendered pages.
+Choose distinctive body text, not a repeated table header, for `same_page`.
+For an ambiguity warning, verify the intended occurrences visually or use more
+specific snippets; a warning alone does not require rewriting the document.
+Check user-requested page counts and other constraints directly against the pages.
+
+Rerendering preserves `expectations.json` and refreshes `expectations.seed.json`.
+Reconcile changed headings with the seed while retaining source-derived key checks.
 
 Each empty category blocks acceptance unless it has a concrete reason under
 `not_applicable`. For example, a single-page form with no heading/body groups may
@@ -78,6 +87,20 @@ use `"not_applicable": {"same_page": "One-page form without heading/body groups"
 For an image-only page, explain why text checks do not apply and verify the
 required content visually. Do not use a reason to skip applicable checks or
 derive expected wording/numbers solely from the candidate you are testing.
+
+### Check text before page images
+
+While drafting, run the image-free check to find missing text and split groups:
+
+```bash
+python3 "$OFFICE_FILES_DIR/scripts/check_document.py" quick \
+  generated/document/document.pdf --docx generated/document/document.docx \
+  --render generated/document/render.json \
+  --expectations generated/document/expectations.json
+```
+
+For edits, include the passed `--docx-comparison` as below. Quick checks never
+approve delivery. Resolve blockers, then inspect once the content is stable.
 
 ### Inspect the pages
 
@@ -129,9 +152,9 @@ observations for all five criteria and mark each `pass` only after checking it:
 
 If a page has no tables or figures, record that observation. Explain every
 warning using what is visible on the page. Repair blockers and visual defects
-in the source; change grouping, emphasis or page transitions to fix a flat
-composition. Regenerate and prepare the document, reapply request-specific
-expectations, then inspect again.
+in the source. After an actual change, regenerate, reconcile the preserved
+expectations and inspect the new candidate. Do not rerun a passing inspection
+solely to duplicate its evidence.
 
 When relevant, verify interactive features and accessibility separately. For
 Word, report material pagination differences between the verified LibreOffice
