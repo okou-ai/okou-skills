@@ -119,6 +119,15 @@ binds the original, edited file and change policy to acceptance.
 
 ### Page review
 
+New-prose preparation also requests a compact content check. In the existing
+`review.json`, complete `content.status`, retain its required `reviewer`, and
+write a specific `content.observations` note after checking the current content
+against the request and sources. Pending, failed or missing checks block
+acceptance. Custom/native `inspect` can opt in with `--content-review author`
+or `--content-review independent`; the latter records the requirement and does
+not launch a reviewer. These records bind a declared check to the current files,
+not proof of factual correctness or reviewer independence.
+
 Inspection writes every `page-NNN.png` plus `gallery/index.html` and numbered
 `gallery/overview-NNN.png` contact sheets. Open the gallery to scroll through all
 pages, click to enlarge, use arrow keys for adjacent pages, and toggle original

@@ -1,182 +1,116 @@
-# New Word/PDF report
+# New Word/PDF prose
 
-Use this starter for new prose without a supplied template. For native Word
-features or existing files, use [Word](word-authoring.md) or [PDF](pdf-authoring.md).
+Use this route for new prose. Follow a supplied template's entry point; use
+[Word](word-authoring.md) or [PDF](pdf-authoring.md) for existing files and native
+features. Word and PDF share one content source.
 
-## Prepare and write
+## Set up and write
 
-Set the skill path once per shell, with assignment on its own line. Run setup
-once; it checks pinned Python dependencies and the actual Writer module,
-installs only missing/mismatched requirements, and records setup time:
+Set the skill's absolute path in each shell using the variable. Run setup once;
+if background tools are available, draft while it installs and confirm success
+before preparation.
 
 ```bash
 export OFFICE_FILES_DIR=/absolute/path/to/office-files
 python3 "$OFFICE_FILES_DIR/scripts/setup_office.py" document \
   --out generated/setup-document.json
+mkdir -p generated/document
 ```
 
-Add `--charts` to this setup command when chart images are needed. Installation
-supports Debian/Ubuntu; other platforms receive concrete missing requirements.
+Write `generated/document/document.md` directly with the requested content.
+[The sample](../assets/document.md) demonstrates syntax, not required sections.
+Use semantic headings, lists and tables where useful, and declare the language:
 
-Copy the runnable source and optional style settings:
+```markdown
+---
+title: Service access
+lang: en-US
+---
 
-```bash
-mkdir -p generated/report
-cp "$OFFICE_FILES_DIR/assets/document.md" generated/report/report.md
-cp "$OFFICE_FILES_DIR/assets/document-style.json" generated/report/style.json
+# Request access
+
+Contact the service owner and state the access you need.
 ```
 
-Replace the sample with the requested content. Set the actual language in YAML,
-for example `lang: zh-CN`. Use ordinary Markdown headings, lists and tables.
-Keep calculations in a data/model file; label assumptions and fictional inputs.
-Use the requested sections and only the supporting analysis needed for their
-decisions. Do not add manual chapter breaks or a page cap to shorten execution.
-Compute the metrics needed to explain the supplied data. Forecasts, counterfactual
-scenarios, payback models and numeric operating thresholds belong only in tasks
-that request them; missing causal evidence calls for a stated uncertainty and a
-validation action. Keep toolchain names and local file paths in QA/chat, not in
-the business report, unless the user asks for implementation details.
+Use the purpose, reader, supplied information and required wording to organize
+the document. For an ordinary drafting task, write the complete draft without
+first producing a separate outline, data model or report configuration. Reuse a
+provided outline. Check coverage, names, dates, consistency and actionable steps
+against the request. Literal dates or numbers do not require a calculation model.
+Keep implementation details and QA notes out of the document.
 
-State a finding once where it supports a requested decision; do not repeatedly
-narrate the same table. Keep metric names and meanings identical to the model.
-An average is not a marginal contribution, an observed change is not its cause,
-and a required volume is not proof of achievable capacity. When the requested
-problem analysis cannot establish a cause from the supplied data, identify what
-to check next instead of inventing a diagnosis. Use assumptions only to complete
-an explicitly needed calculation; label both the assumption and its consequence.
-Preserve the source's accounting scope. If a source says only "cost", do not
-silently classify it as direct cost, gross profit, operating profit or net profit.
-Use a plain label such as "revenue less the listed costs", or state one explicit
-cost-scope assumption and apply it consistently in every table and conclusion.
-Do not claim a category is both included and excluded elsewhere in the report.
+Read only the additional instructions the content needs:
 
-Use installed fonts covering the content. Optional style keys are `body_font`,
-`heading_font`, `east_asia_font`, `body_size_pt`, `accent` (six hex digits),
-`page_size` (`A4` or `Letter`), and `margins_mm` with `top`, `right`, `bottom`,
-`left`. The defaults include table sizing and page numbers. Read
-[editorial components](pandoc-authoring.md#optional-editorial-components) only
-when needed; ordinary prose does not require custom CSS or layout experiments.
+- **Substantive analysis, conflicting sources or complex rule dependencies:**
+  [targeted content checks](content-checks.md). Calculations are only one possible
+  trigger; a policy can need deep checks without any arithmetic. Routine sourced
+  instructions and straightforward restatements stay on the default route.
+- **A requested or useful chart:** [document charts](document-charts.md).
+- **Custom appearance:** copy [style settings](../assets/document-style.json) and
+  pass `--style`; otherwise use the built-in defaults. Read [editorial
+  components](pandoc-authoring.md#optional-editorial-components) only when needed.
 
-### When a chart is needed
+## Prepare once the complete draft is ready
 
-Copy [the chart spec](../assets/chart.json) to `generated/report/chart.json` and
-fill its data. Use `type: "bar"` or `"line"`, `categories` or numeric `x`, and
-`series` entries with `name` and `values`. Set meaningful `x_label` and `y_label`;
-optional keys are `font` (installed family/path), `accent` or `palette`.
-The default image is 6 × 3.6 inches to fit the document. Override with
-`width_inches` and `height_inches` only when needed. Put the figure caption in
-Markdown; add an internal `title` only if it contributes distinct information.
-
-```bash
-python3 "$OFFICE_FILES_DIR/scripts/render_chart.py" \
-  --spec generated/report/chart.json --output generated/report/chart.png
-```
-
-Insert `![Caption](chart.png)` into Markdown and bind the chart spec with
-`--resource` below. Reuse this renderer before writing custom drawing code.
-
-## Prepare the candidate and review
-
-Before rendering, write `generated/report/expectations.json` from the request
-and raw data. Include the key wording and independently calculated results;
-text presence alone does not establish correct reasoning. For example:
+Write `generated/document/expectations.json` from the request and source, using
+actual required wording or key facts rather than copying checks from the
+finished draft. For the access example, if the request specified these terms:
 
 ```json
 {
-  "required_text": ["Decision summary", "40 completed tasks"],
+  "required_text": ["Service access", "service owner"],
   "same_page": [],
   "not_applicable": {}
 }
 ```
 
-Replace these example checks with actual requirements. Use `same_page` only
-for a necessary grouping, with distinctive body text rather than repeated table
-headers. Each item is an object, for example
-`{"first": "Required group heading", "second": "Unique opening body text", "reason": "Heading must remain with its introduction"}`;
-replace these strings with actual source text, or leave the array empty.
-Do not invent a requirement that an entire table and chart share a page
-when each is readable on adjacent pages. Headings and their opening prose are
-added automatically from the Markdown source. Captions and tables use the
-renderer’s grouping defaults and still need page review.
-
-### Check content in parallel
-
-Before the first preparation command, start a content check once the complete
-draft and calculation model are ready. If agent tools are available, delegate
-one bounded review to an independent reviewer using the same default model,
-without a model override. Give it fresh context containing the original user
-request, raw data, complete final draft and calculation model; exclude the
-author's own passing QA conclusions. Use a background/asynchronous task when
-supported so preparation and the overview inspection can continue. Collect
-content and visible layout fixes together before the full-page review of the
-final candidate; do not write a full acceptance record for a draft still under
-content review. Without agent tools, perform the same content check yourself
-and state that it was not independent.
-
-Check requirement coverage; recompute all key calculations and reconcile
-repeated targets and assumptions throughout the draft. Distinguish evidence
-from causal, efficiency or feasibility claims: a change in cost or effort alone
-does not establish its cause. Verify that each recommended action is sufficient
-to resolve the problem it claims to address, including any numerical shortfall.
-Check every quantitative explanation against the model's dependency structure:
-which inputs actually change the named result, and which do not? Do not let a
-correct number conceal a wrong explanation. Distinguish totals from averages,
-observed differences from marginal effects, and cash results from accounting
-results. For each asserted inability, sufficiency or capacity constraint, require
-the missing size, duration or operating evidence; try a simple counterexample
-under the stated assumptions. If the assertion does not follow, report it as an
-error rather than a stylistic preference. Remove unsupported certainty or narrow
-the conclusion to what the data establishes; adding "probably" is not evidence.
-Return only specific errors with their locations and evidence, or `pass`;
-do not add analysis, sections or cosmetic changes to the report.
-
-Resolve actual errors before acceptance. Recheck changed conclusions and their
-dependent calculations when needed; do not repeat an unchanged passing content
-review. No additional schema or lengthy review record is needed. A time target
-never permits skipping this check or the five visual criteria below, or imposing
-a word or page limit.
-
-### Prepare and inspect pages
-
-Run generation, quick checks and page-preview preparation in one command:
+Headings and their opening paragraphs are added automatically. For an additional
+required grouping, use `{"first":"Unique lead-in", "second":"Unique body text",
+"reason":"Why these belong together"}` in `same_page`. A document without any
+applicable groups needs a specific `not_applicable.same_page` reason. Do not
+require entire tables or chapters to fit on one page.
 
 ```bash
-python3 "$OFFICE_FILES_DIR/scripts/prepare_document.py" generated/report/report.md \
-  --out generated/report/output --expectations generated/report/expectations.json \
-  --style generated/report/style.json
+python3 "$OFFICE_FILES_DIR/scripts/prepare_document.py" generated/document/document.md \
+  --out generated/document/output --expectations generated/document/expectations.json
 ```
 
-Bind calculation scripts, input data and chart specs with repeated `--resource`
-arguments. Keep all authored inputs outside `--out`. Use `--reference template.docx`
-instead of `--style` when a supplied style reference governs the new document.
-For deliberate Pandoc column proportions, add `--table-widths source`; otherwise
-retain automatic widths, which reserve space for short labels and numbers.
+Add `--content-review independent` when the targeted content checks call for an
+independent reviewer. Default prose uses the author's content check. Bind actual
+input files, calculation scripts and chart specs with repeated `--resource`
+arguments. Keep authored inputs outside `--out`. Use `--reference template.docx`
+for a style reference, or `--style style.json` for custom settings. Use
+`--table-widths source` only for deliberately authored column proportions.
 
-The output contains editable `report.docx`, its exported `report.pdf`, timing in
-`prepare.json`, and `qa/`. Original expectations are preserved; the current
-Markdown checks are merged into `expectations.prepared.json`. Quick blockers
-stop page-preview preparation. Fix missing text or split required groups in the
-source and rerun. Repeated text is an ambiguity warning: verify the intended
-occurrences visually or use a distinctive check, without rewriting sound prose.
+Preparation creates editable DOCX, PDF, timing, quick checks and `qa/`. Fix
+reported blockers; an ambiguity warning calls for checking the intended text,
+not automatically rewriting it. Preserve independent checks across revisions.
 
-Open `qa/gallery/overview-*.png`, then **every full page** at readable size in
-small batches. In `qa/review.json`, check all five criteria on each page and set
-each status explicitly to `pass` or `fail`. Write one concise page-specific
-observation covering the checks, including absent tables/figures when relevant.
-Explain every warning from the rendered pages. The compact record reduces
-duplicate prose; it does not skip criteria or approve pages automatically.
-Repair actual defects together where possible, then prepare and review the
-changed candidate. Finish the content check above before `accept`. A passing
-candidate needs no additional layout experiments.
+## Review and deliver
+
+Complete the content check in the existing `qa/review.json` under `content`:
+set `status` to `pass` only after checking the complete draft against the request
+and sources, retain the required `reviewer`, and add one concise, specific
+`observations` note about what was checked. This records the check; it does not
+prove every statement. Independent review must actually be performed when
+required. Resolve findings before approval.
+
+Open `qa/gallery/overview-*.png`, then every full `page-NNN.png` at readable size
+in small batches. For every page, explicitly check all five criteria in
+`qa/review.json`: legibility, hierarchy, composition, pagination, and tables or
+figures. Add one page-specific observation and explain each warning. Collect
+content and layout fixes together, regenerate, and review the final candidate.
+Changed content requires a current content check; unchanged passing prose needs
+no stylistic rewrite. Keep natural pagination and all requested content.
 
 ```bash
-python3 "$OFFICE_FILES_DIR/scripts/check_document.py" accept generated/report/output/qa
-okou web upload-file -f generated/report/output/report.docx
+python3 "$OFFICE_FILES_DIR/scripts/check_document.py" accept generated/document/output/qa
+okou web upload-file -f generated/document/output/document.docx
 ```
 
-Upload only after `READY_TO_DELIVER`. For a final PDF, upload `report.pdf` and
-its editable DOCX source. Immediately send a short assistant message containing
-the returned download URL(s), before any retrospective. Keep source and QA files.
+Upload only after `READY_TO_DELIVER`. For final PDF, upload `document.pdf` and
+its editable DOCX source. Immediately send the returned download URL(s), then
+any requested retrospective. Keep sources and QA files for revisions.
 
-For custom pipelines, the separate `render_document.py`, `quick`, `inspect` and
-`accept` interfaces remain available in [document layout](document-layout.md).
+Use [separate rendering and inspection commands](document-layout.md#verification)
+only when the preparation command does not cover the task.

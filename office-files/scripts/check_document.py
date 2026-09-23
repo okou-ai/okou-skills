@@ -39,6 +39,9 @@ LIMITATIONS = [
     "reproducibility evidence, not authentication of the renderer.",
     "Acceptance is a local snapshot, not tamper-proof evidence or proof of image "
     "viewing. Rerun accept immediately before delivering these exact files.",
+    "When content review is required, acceptance checks its declared status and "
+    "observation against this exact inspection. It does not prove factual "
+    "correctness or that the reviewer was independent.",
 ]
 
 
@@ -389,8 +392,10 @@ def quick(pdf, expectations, docx=None, render=None, docx_comparison=None):
 
 
 def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison=None,
-            review_format="verbose"):
+            review_format="verbose", content_review=None):
     require(review_format in {"verbose", "compact"}, "Review format must be verbose or compact.")
+    require(content_review in {None, "author", "independent"},
+            "Content review must be author or independent when requested.")
     out = Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     (out / "acceptance.json").unlink(missing_ok=True)
@@ -404,6 +409,8 @@ def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison
         inputs["expectations"] = fingerprint(expectations)
     expected = read_expectations(expectations)
     report = {"schema_version": 2, "created_at": datetime.now(timezone.utc).isoformat(), "inputs": inputs, "expectations": expected, "page_count": 0, "pages": [], "findings": [], "limitations": LIMITATIONS}
+    if content_review:
+        report["content_review"] = content_review
     if not expectations:
         add_finding(report, "blocker", "missing_expectations", "Supply --expectations with task-specific checks or explicit not-applicable reasons.")
     if render:
@@ -443,6 +450,14 @@ def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison
                   for page in report["pages"]],
         "warning_acknowledgements": [{"finding_id": finding["id"], "observations": ""} for finding in report["findings"] if finding["severity"] == "warning"],
     }
+    if content_review:
+        review["content"] = {"status": "pending", "reviewer": content_review,
+                             "observations": ""}
+        review["instructions"] += (
+            " Complete the content check against the request and supplied material "
+            "using the required reviewer mode. Record a concrete observation about "
+            "coverage, consistency or corrected issues; a bare pass is insufficient. "
+            "Set content.status to pass only after checking the final content.")
     write_json(out / "review.json", review)
     if report["pages"] and len(report["pages"]) == report["page_count"]:
         from page_gallery import build_gallery
@@ -454,6 +469,30 @@ def inspect(pdf, out, docx=None, expectations=None, render=None, docx_comparison
 def require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def validate_content_review(report, review):
+    """Check a declared review bound by inspection_sha256, not its truthfulness."""
+    if "content_review" not in report:
+        return None  # Older/native inspections keep their opt-in behavior.
+    mode = report["content_review"]
+    require(mode in {"author", "independent"},
+            "The inspection has an invalid content review mode; inspect again.")
+    content = review.get("content")
+    require(isinstance(content, dict), "Complete the required content review.")
+    require(content.get("reviewer") == mode,
+            f"Content review must use the inspection's required {mode} reviewer mode.")
+    require(content.get("status") == "pass", "Content review is not passed.")
+    observations = content.get("observations")
+    # Reject empty/punctuation-only text and bare acknowledgements. Specificity
+    # and correctness still require the reviewer; this is not semantic scoring.
+    words = "".join(char for char in observations.casefold() if char.isalnum()) if isinstance(observations, str) else ""
+    require(bool(words) and words not in {
+        "pass", "passed", "ok", "okay", "done", "checked", "complete",
+        "completed", "good", "none", "na", "noissues", "allgood",
+        "通过", "已通过", "已检查", "检查通过", "完成", "已完成", "无问题",
+    }, "Content review needs a concrete observation, not a blank or bare acknowledgement.")
+    return content
 
 
 def accept(out):
@@ -471,6 +510,7 @@ def accept(out):
         require(sha256(item["path"]) == item["sha256"], f"The {name} changed after inspection. Inspect and review again.")
     blockers = [finding["code"] for finding in report["findings"] if finding["severity"] == "blocker"]
     require(not blockers, f"Unresolved machine blockers: {', '.join(blockers)}")
+    content = validate_content_review(report, review)
     pages = report["pages"]
     require(len(pages) == report["page_count"] > 0, "Inspection did not cover every page.")
     require([page["number"] for page in pages] == list(range(1, len(pages) + 1)), "Inspection page order is invalid.")
@@ -507,6 +547,9 @@ def accept(out):
         "page_image_sha256": image_hashes,
         "limitations": LIMITATIONS,
     }
+    if content is not None:
+        acceptance["content"] = content
+        acceptance["content_review"] = report["content_review"]
     write_json(out / "acceptance.json", acceptance)
     return acceptance
 
@@ -529,6 +572,8 @@ def main():
     inspection.add_argument("--docx-comparison", type=Path, help="Bind a passed original/edited Word preservation comparison (required for edits).")
     inspection.add_argument("--review-format", choices=("verbose", "compact"), default="verbose",
                             help="Compact: five explicit criterion statuses plus one concise observation per page; warnings remain separate.")
+    inspection.add_argument("--content-review", choices=("author", "independent"),
+                            help="Require an explicit content check in review.json; existing native/edit workflows remain opt-in.")
     acceptance = commands.add_parser("accept", help="Check all current hashes and completed visual review.")
     acceptance.add_argument("out", type=Path)
     args = parser.parse_args()
@@ -539,7 +584,7 @@ def main():
             return 0 if report["passed"] else 2
         if args.command == "inspect":
             report = inspect(args.pdf, args.out, args.docx, args.expectations, args.render, args.docx_comparison,
-                             args.review_format)
+                             args.review_format, args.content_review)
             blockers = sum(f["severity"] == "blocker" for f in report["findings"])
             warnings = sum(f["severity"] == "warning" for f in report["findings"])
             print(f"Inspected {report['page_count']} pages: {blockers} blockers, {warnings} warnings. Browse {args.out / 'gallery/index.html'} and full page PNGs, then complete {args.out / 'review.json'}.")

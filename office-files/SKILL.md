@@ -11,7 +11,7 @@ or implementing a feature outside the documented interface.
 
 | Requested task | Page |
 | --- | --- |
-| New prose report in Word, PDF, or both | [Runnable document starter](references/new-document.md) |
+| New prose in Word, PDF, or both | [Runnable document starter](references/new-document.md) |
 | Edit Word, fill a Word template, or use native Word features | [Word workflow](references/word-authoring.md) |
 | Edit PDF or author a PDF with a specified native engine | [PDF workflow](references/pdf-authoring.md) |
 | Create or edit Excel (`.xlsx`) | [Excel workflow](references/excel-authoring.md) |
@@ -19,18 +19,14 @@ or implementing a feature outside the documented interface.
 For multiple independent deliverables, follow each relevant page. If the user
 supplies a template package, follow that package's entry point.
 
-Use the starter's working defaults before writing custom authoring code. Adapt
-content to the requested sections, decisions and evidence. Do not expand a short
-report into extra scenarios, appendices or financial models without a task need.
-Do not add quantitative forecasts, counterfactual decompositions, payback models
-or numerical operating thresholds unless the user asks for them. If an essential
-decision lacks evidence, state the missing input and how to validate it instead
-of inventing a diagnostic rule or expanding the analysis. A next-steps section
-can give concrete actions and owners without a speculative financial model.
-Let complete content paginate naturally unless the user specifies a page limit.
-For a time target, keep that scope and use the one-command setup/preparation
-routes below; never meet a deadline by dropping requested content or checks.
-When simulated data is requested, generate it once and describe its actual results.
+Use the starter's working defaults before custom authoring code. Write for the
+requested purpose, reader and scope. Choose headings from the task; the file
+format does not require a report, calculations, charts or a separate planning
+document. Add tools and deeper checks only for work the content actually needs.
+Preserve supplied facts and distinguish assumptions from evidence. For a
+decision that lacks evidence, state what to verify next. Let complete content
+paginate naturally unless the user specifies a page limit. A time target never
+permits dropping requested content or applicable checks.
 
 Resolve quick-check findings while drafting. Once content is stable, verify the
 final candidate, review its page gallery, and run acceptance before delivery.

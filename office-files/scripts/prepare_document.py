@@ -30,7 +30,9 @@ def merge_expectations(authored, seed):
 
 def prepare(source, out, expectations, *, output_format="both", lang=None,
             reference=None, style=None, resources=(), table_widths="auto",
-            review_format="compact"):
+            review_format="compact", content_review="author"):
+    if content_review not in {"author", "independent"}:
+        raise ValueError("Content review must be author or independent for new Markdown.")
     source, out = Path(source).resolve(), Path(out).resolve()
     expected_path = Path(expectations).resolve(strict=True)
     if source.suffix.lower() not in {".md", ".markdown"}:
@@ -48,7 +50,8 @@ def prepare(source, out, expectations, *, output_format="both", lang=None,
     qa = out / "qa"
     (qa / "acceptance.json").unlink(missing_ok=True)
     record = {"status": "preparing", "started_at": datetime.now(timezone.utc).isoformat(),
-              "stage_seconds": {}, "visual_review": "pending", "acceptance": "not-run"}
+              "stage_seconds": {}, "visual_review": "pending", "acceptance": "not-run",
+              "content_review": content_review}
     summary_path = out / "prepare.json"
     started = perf_counter()
 
@@ -98,12 +101,13 @@ def prepare(source, out, expectations, *, output_format="both", lang=None,
             save()
             return record
         inspection = stage("inspect", lambda: check_document.inspect(
-            pdf, qa, docx, effective, render_path, review_format=review_format))
+            pdf, qa, docx, effective, render_path, review_format=review_format,
+            content_review=content_review))
         blockers = [item for item in inspection["findings"] if item["severity"] == "blocker"]
         record.update({"status": "blocked" if blockers else "needs-visual-review",
                        "findings": inspection["findings"], "review": str(qa / "review.json"),
                        "gallery": str(qa / "gallery" / "index.html"),
-                       "next": "Open every full page PNG, explicitly review all five criteria and every warning, then run check_document.py accept on the qa directory."})
+                       "next": "Complete the required content check in review.json. Open every full page PNG, explicitly review all five criteria and every warning, then run check_document.py accept on the qa directory."})
         save()
         return record
     except Exception as error:
@@ -124,17 +128,19 @@ def main():
     parser.add_argument("--resource", type=Path, action="append", default=[], help="Bind calculation scripts, data, chart specs or assets; repeat as needed")
     parser.add_argument("--table-widths", choices=("auto", "source"), default="auto")
     parser.add_argument("--review-format", choices=("verbose", "compact"), default="compact")
+    parser.add_argument("--content-review", choices=("author", "independent"), default="author",
+                        help="Require a compact author check by default; choose independent for complex content that needs a separate reviewer.")
     args = parser.parse_args()
     try:
         result = prepare(args.source, args.out, args.expectations, output_format=args.format,
                          lang=args.lang, reference=args.reference, style=args.style,
                          resources=args.resource, table_widths=args.table_widths,
-                         review_format=args.review_format)
+                         review_format=args.review_format, content_review=args.content_review)
     except Exception as error:
         print(f"Document preparation failed: {error}", file=sys.stderr)
         return 2
     summary = {key: result[key] for key in (
-        "status", "stage_seconds", "total_seconds", "page_count", "review", "gallery", "next") if key in result}
+        "status", "stage_seconds", "total_seconds", "page_count", "content_review", "review", "gallery", "next") if key in result}
     summary.update({"record": str(args.out.resolve() / "prepare.json"),
                     "blockers": [item["code"] for item in result.get("findings", []) if item["severity"] == "blocker"],
                     "warnings": sum(item["severity"] == "warning" for item in result.get("findings", []))})

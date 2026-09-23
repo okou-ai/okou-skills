@@ -1,27 +1,19 @@
 ---
-title: Project review
+title: Service access
 lang: en-US
 ---
 
-This starter uses fictional data. Replace its content and headings with the
-requested report, keeping assumptions distinct from observed facts.
+# Request access
 
-# Decision summary
+Contact the service owner with the access you need and the work it supports.
+Use the approved request channel so the owner can track the request.
 
-Completed tasks increased from 18 to 22 in the two example periods. Explain
-the decision this report supports and the evidence for the recommendation.
-Across both periods, there were 40 completed tasks.
+# After access is granted
 
-# Operating figures
+Check that you can reach the required service. Report missing access to the
+service owner rather than submitting another request for the same item.
 
-The following figures are fictional task counts.
+# Get help
 
-| Period | Planned | Completed | Explanation |
-| :--- | ---: | ---: | :--- |
-| Week 1 | 20 | 18 | First example period; replace with source data. |
-| Week 2 | 24 | 22 | Second example period; replace with source data. |
-
-# Recommended action
-
-State the next action, its owner and its decision criterion using the supplied
-facts. Add a chart only when it explains a relationship the table does not.
+Describe the step that failed and include the visible error message. Remove
+passwords and other sensitive information before sharing a screenshot.
