@@ -4,8 +4,9 @@ Use a chart when requested or when it explains a relationship needed by the
 document. Add `--charts` to `setup_office.py document` for chart dependencies.
 Reuse verified source/calculated values from the document's data.
 
-For a bar, line, scatter, pie/donut, histogram or waterfall, write a task-specific
-JSON specification using the [preset schema](chart-spec.md). The renderer shares
+For a bar, line, scatter, pie/donut, histogram or waterfall, use the
+[preset schema](chart-spec.md) when it covers the requested features. Write a
+task-specific specification. The renderer shares
 the same style and export helper as custom charts. Its default size is 6 × 3.6
 inches; set dimensions, colours or font only when the document needs them.
 
@@ -16,8 +17,10 @@ python3 "$OFFICE_FILES_DIR/scripts/render_chart.py" \
 
 ## Custom chart types
 
-Use Matplotlib directly when the relationship needs another chart type, such as
-a box plot or heatmap. Import the shared `chart_style` helper; do not copy its
+Use Matplotlib directly for another chart type, such as a box plot or heatmap,
+or features outside the preset schema, such as point annotations, extra axes or
+custom scales. Choose this route before rendering when those features are needed.
+Import the shared `chart_style` helper; do not copy its
 implementation or force data into an unrelated preset. Create any needed
 figures, axes, annotations and colour bars inside `chart_theme(...)`, then call
 `save_chart(fig, output, font=None)`. The helper applies a covering font to actual
