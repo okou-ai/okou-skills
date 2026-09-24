@@ -1,6 +1,6 @@
 ---
 name: gen
-description: Use Okou generation pipelines for images, video, talking-avatar videos, voice, presentations, websites, reports, and designs.
+description: Generate images, presentations, websites, reports, and designs with Okou, and discover connected providers for video, talking avatars, and voice.
 ---
 
 # Gen
@@ -13,16 +13,18 @@ okou generate -h
 
 `okou generate` is the source of truth. Always inspect the current command help when exact flags, models, styles, or providers matter.
 
+Okou no longer offers video or avatar templates, built-in video/voice/avatar generation, or the built-in JoggAI avatar and voice catalogs. Video model entries may remain in settings; they do not make these retired pipelines available. Use an authorized connector for new video, avatar, or speech requests. Never retry a retired built-in endpoint or substitute another built-in media command.
+
 ## Core Commands
 
 - `okou generate image` - billed image file generation; supports built-in models, image editing/reference inputs, image style registry selection, and connector guidance.
-- `okou generate video` - billed video file generation; supports built-in video models, first/last frames, reference media, audio controls, and connector guidance.
-- `okou generate avatar-video` - billed JoggAI talking-avatar video generation; supports built-in public avatar and voice discovery, script or audio input, and JoggAI connector guidance.
-- `okou generate voice` - billed speech audio generation; supports built-in voices and connector guidance.
+- `okou generate video` - list connected video providers and get connector skill guidance; no built-in execution or video templates.
+- `okou generate avatar-video` - discover video connectors for talking-avatar requests; avatar and voice discovery and generation follow the selected connector skill.
+- `okou generate voice` - discover audio connectors for speech requests; synthesis follows the selected connector skill.
 - `okou generate presentation` - returns an Open Design resource-selection packet for an HTML presentation that the agent authors and hosts.
 - `okou generate website` - returns website authoring instructions / an Open Design packet that the agent uses to build and host a static site.
 - `okou generate report`, `docs-design`, `poster`, `dashboard-design`, `mobile-app-design` - return Open Design resource-selection packets for static HTML artifacts.
-- `okou generate text`, `code`, `document`, `audio` - list connector-backed options and print connector skill-invocation guidance; these do not have built-in platform pipelines unless the CLI help says otherwise.
+- `okou generate text`, `code`, `document`, `music` - list connector-backed options and print connector skill-invocation guidance; these do not have built-in platform pipelines unless the CLI help says otherwise.
 
 Run `okou generate <type>` with no generation input to list available providers for that artifact type. Add `--all` when unavailable or not-yet-authorized connectors are relevant.
 
@@ -58,17 +60,17 @@ Run `okou generate <type>` with no generation input to list available providers 
 5. Build the prompt.
    - Preserve the user's core intent, constraints, audience, brand, source materials, aspect ratio, duration, size, format, and delivery target.
    - Add operational details only when they improve generation reliability: composition, visual hierarchy, must-include/must-avoid elements, target medium, and reference handling.
-   - For avatar video, discover public avatar and voice IDs through the CLI before generation. Never invent either ID, and use exactly one of script or audio URL input.
+   - For avatar video, discover supported avatar and voice IDs through the selected connector skill. Never invent IDs or substitute an identity or voice. Follow that provider's input contract.
    - For style-guided image generation, let the selected registry style drive stylistic details through the compilation packet.
    - For prompt text that is long or quote-sensitive, use a file and a safely quoted argument, or stdin when the selected prompt mode supports it.
 
 6. Execute and wait for completion.
-   - For `video`, follow **Video preview** below before submitting a video job, including template and connector routes.
-   - Run the selected `okou generate <type>` command.
+   - For connector-backed video, follow **Video preview** below before submitting a video job.
+   - For built-in artifact types, run the selected `okou generate <type>` command. For video, avatar, or voice, use `--provider <connector-name>` for guidance, then execute through that connector skill; the CLI does not accept generation input for these retired built-in types.
    - For commands that return an Open Design resource-selection packet, follow the packet: author the artifact, verify it locally if needed, and host static outputs with `okou host`.
    - For commands that return `/f/` file URLs, keep the URL and metadata for the user.
    - If generation fails because of missing credits, run `okou doctor credit`.
-   - If connector auth fails, run `okou doctor check-connector` using the environment name or URL from the provider guidance.
+   - If connector auth fails, run `okou connector check --help` and diagnose the failing URL or environment name from the provider guidance.
 
 7. Deliver the result.
    - Give the user the generated URL or hosted artifact URL.
@@ -81,7 +83,7 @@ Run `okou generate <type>` with no generation input to list available providers 
 2. Show the actual images through accessible links, briefly describe the intended motion, and ask the user to confirm. End the turn and wait; do not start a video job before confirmation. Revise the preview if requested.
 3. After confirmation, generate the video. Use the approved images as first/last frames or references when supported by the selected model; otherwise follow the approved visual direction in the prompt. Reuse existing confirmation for an unchanged preview.
 
-When using BytePlus/Seedance, choose one supported input mode: first/last frames (`--first-frame-image-url`, `--last-frame-image-url`) or reference media (`--image-url`, `--video-url`, `--audio-url`). Never combine these groups in one request. If the user's requirements need both modes, explain the tradeoff before choosing; do not silently drop supplied inputs. Correct conflicting inputs before retrying.
+Follow the selected connector's supported input modes for first/last frames and reference media. Do not reuse retired Okou generation flags for a provider API or silently drop supplied inputs. Correct conflicting inputs before retrying.
 
 Keep the preview message short: the images, a brief motion description, and one confirmation question.
 
@@ -112,14 +114,6 @@ List current providers:
 okou generate image
 okou generate video
 okou generate voice
-```
-
-Discover public JoggAI avatars and voices, then generate through the built-in pipeline:
-
-```bash
-okou generate avatar-video --provider built-in --list-avatars
-okou generate avatar-video --provider built-in --list-voices
-okou generate avatar-video --provider built-in --avatar-id "<avatar-id>" --voice-id "<voice-id>" --script "<script>"
 ```
 
 Get JoggAI connector skill guidance for BYOK operations:
