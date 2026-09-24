@@ -15,6 +15,7 @@ or implementing a feature outside the documented interface.
 | Edit Word, fill a Word template, or use native Word features | [Word workflow](references/word-authoring.md) |
 | Edit PDF or author a PDF with a specified native engine | [PDF workflow](references/pdf-authoring.md) |
 | Create or edit Excel (`.xlsx`) | [Excel workflow](references/excel-authoring.md) |
+| Charts for a document | [Chart presets and custom Matplotlib](references/document-charts.md) |
 
 For multiple independent deliverables, follow each relevant page. If the user
 supplies a template package, follow that package's entry point.
