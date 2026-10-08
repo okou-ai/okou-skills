@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "theme": {"accent": "245C7B", "stripe": "F1F5F8", "currency": "¥"},
+  "sheets": [
+    {
+      "name": "Data",
+      "columns": [
+        {"header": "Month", "width": 18, "type": "date", "format": "yyyy-mm"},
+        {"header": "Revenue", "width": 18, "format": "money"},
+        {"header": "Cost", "width": 18, "format": "money"},
+        {"header": "Profit", "width": 18, "format": "money", "formula": "=B2-C2"},
+        {"header": "Margin", "width": 16, "format": "percent", "formula": "=IF(B2=0,\"\",D2/B2)"}
+      ],
+      "rows": [
+        ["2026-01-01", 3000, 1800],
+        ["2026-02-01", 48, 32],
+        ["2026-03-01", 380, 260]
+      ],
+      "freeze": "B2",
+      "filter": "A1:E4",
+      "table": "MonthlyData",
+      "print": {"title_rows": "1:1"}
+    },
+    {
+      "name": "Summary",
+      "column_widths": {"A": 15, "B": 15, "C": 15, "D": 15, "E": 3, "F": 15, "G": 15, "H": 15, "I": 15},
+      "cells": {
+        "A1": {"value": "Operating summary · illustrative data", "style": "title"},
+        "A3": {"value": "Revenue", "style": "header"},
+        "B3": {"formula": "=SUM(Data!B2:B4)", "format": "money", "style": "total"},
+        "F3": {"value": "Profit", "style": "header"},
+        "G3": {"formula": "=SUM(Data!D2:D4)", "format": "money", "style": "total"},
+        "A5": {"value": "Margin", "style": "header"},
+        "B5": {"formula": "=IFERROR(G3/B3,0)", "format": "percent", "style": "total"},
+        "A23": {"value": "Illustrative input only. Revenue less cost defines profit; margin is total profit divided by total revenue. All formulas remain editable.", "style": "note"}
+      },
+      "merges": ["A1:I1", "A23:I23"],
+      "charts": [
+        {"type": "column", "title": "Monthly revenue and cost", "data_sheet": "Data", "data": "B1:C4", "categories": "A2:A4", "anchor": "A7:D21", "number_format": "integer", "labels": false},
+        {"type": "line", "title": "Monthly profit", "data_sheet": "Data", "data": "D1:D4", "categories": "A2:A4", "anchor": "F7:I21", "number_format": "integer", "labels": false}
+      ],
+      "freeze": "A3",
+      "print": {"orientation": "landscape"}
+    }
+  ]
+}

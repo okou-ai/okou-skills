@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "filename": "service-booking-summary.xlsx",
+  "theme": {"currency": "$"},
+  "source": {
+    "sheet": "Booking records",
+    "title": "Service bookings — simulated example data",
+    "columns": [
+      {"key": "date", "header": "Service date", "type": "date"},
+      {"key": "service", "header": "Service", "type": "text", "width": 26},
+      {"key": "booked", "header": "Booked amount", "type": "number", "format": "money"},
+      {"key": "cost", "header": "Resource cost", "type": "number", "format": "money"}
+    ]
+  },
+  "summaries": [
+    {
+      "id": "monthly",
+      "sheet": "Summary",
+      "title": "Bookings by month",
+      "group_by": {"column": "date", "kind": "month"},
+      "metrics": [
+        {"id": "count", "label": "Bookings", "op": "count"},
+        {"id": "booked", "label": "Booked amount", "op": "sum", "column": "booked", "format": "money"},
+        {"id": "cost", "label": "Resource cost", "op": "sum", "column": "cost", "format": "money"},
+        {"id": "net", "label": "Net amount", "op": "difference", "left": "booked", "right": "cost", "format": "money"},
+        {"id": "margin", "label": "Net / booked", "op": "ratio", "numerator": "net", "denominator": "booked"},
+        {"id": "change", "label": "Booked change", "op": "change", "metric": "booked"}
+      ]
+    },
+    {
+      "id": "services",
+      "sheet": "Summary",
+      "title": "Bookings by service",
+      "group_by": {"column": "service", "kind": "category"},
+      "metrics": [
+        {"id": "count", "label": "Bookings", "op": "count"},
+        {"id": "booked", "label": "Booked amount", "op": "sum", "column": "booked", "format": "money"},
+        {"id": "cost", "label": "Resource cost", "op": "sum", "column": "cost", "format": "money"},
+        {"id": "net", "label": "Net amount", "op": "difference", "left": "booked", "right": "cost", "format": "money"},
+        {"id": "margin", "label": "Net / booked", "op": "ratio", "numerator": "net", "denominator": "booked"}
+      ]
+    }
+  ],
+  "dashboard": {
+    "sheet": "Overview",
+    "title": "Service booking overview — simulated data",
+    "kpis": [
+      {"summary": "monthly", "metric": "booked", "label": "Total booked amount"},
+      {"summary": "monthly", "metric": "net", "label": "Total net amount"},
+      {"summary": "monthly", "metric": "margin", "label": "Overall net / booked"}
+    ],
+    "charts": [
+      {"summary": "monthly", "metrics": ["booked", "cost"], "type": "column", "title": "Monthly bookings and resource costs", "number_format": "money"},
+      {"summary": "services", "metrics": ["net"], "type": "bar", "title": "Net amount by service", "number_format": "money"}
+    ]
+  },
+  "notes": {
+    "sheet": "Definitions",
+    "title": "Definitions and source notes",
+    "rows": [
+      ["Field", "Definition"],
+      ["Source", "Simulated service-booking data supplied with this example; not actual business results."],
+      ["Net amount", "Booked amount minus resource cost. Negative values represent adjustments."],
+      ["Net / booked", "Net amount divided by booked amount. The total uses total operands; zero denominators are blank."],
+      ["Booked change", "Change relative to the preceding calendar month. First month and zero-denominator changes are blank."]
+    ]
+  }
+}
