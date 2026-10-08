@@ -8,13 +8,17 @@ In `layouts/source-index.json`, record the source filename, page count, and orig
 
 Prefer a source layout whose regions and capacity fit. If none fits, adapt an available compatible built-in layout or create a documented layout using the same design system. Do not force incompatible content into an existing composition.
 
-## Adapting built-in layouts
+## Generation-time built-in references
 
-Built-in layouts can supply missing structures such as metric grids, comparisons, timelines, and tables. Use them as structural references when source layouts do not cover the new content or its density.
+Built-in layouts can supply missing structures such as metric grids, comparisons, timelines, and tables. Keep them in the shared library, not in every extracted template package. The generated `SKILL.md` and `layouts/README.md` must include the absolute reference-index URL from [built-in-layouts.md](built-in-layouts.md) and these selection/adaptation rules; do not copy the catalogue or pre-adapt its layouts during extraction.
 
-- Map the borrowed layout's regions to the source's typography roles, colors, spacing, components, and chrome. Default to the corresponding source font sizes; do not import the built-in theme's font defaults or minimum sizes.
-- Package the adapted layout and required assets locally. Record its origin and intended capacity in `layouts/README.md`; keep it distinguishable from layouts observed in the source. Do not invent source-page mappings for it.
-- Use the same shared overflow fitter as source layouts. A built-in layout's original capacity is only a starting estimate: check it again with the custom template's fonts, sizes, language, and content.
+When generating a deck:
+
+1. Prefer a fitting source layout. Only if the source compositions do not cover the new content or density, use the shared index to choose compatible structures by slide purpose and content volume.
+2. Read only the selected fragment links, once per distinct layout in the run. Keep the catalogue and fragments at the same commit-pinned library revision; do not download the whole library or read unselected layouts, example decks, shared shells, or QA implementations. If a link is unavailable or unsuitable, use a source layout or create a documented custom composition instead of repeatedly retrying.
+3. Borrow region ordering, proportions, and arrangement, then map them to the custom template's typography roles, colors, spacing, components, and chrome. Do not paste unresolved built-in CSS classes or bring in its theme, decoration, shell, font defaults, minimum sizes, or runtime. Full-template authoring rules apply when that built-in template is selected, not when its fragment is only a structural reference for a custom template.
+4. Start at the corresponding source font sizes and use the custom shared overflow fitter. The built-in layout's capacity is only an estimate; measure again with the custom fonts, language, and real content before the first QA capture.
+5. Inline the adapted structure in the generated deck using the custom shared styles and shell. Record the chosen layout ID, commit-pinned source URL, and adaptations in that deck's generation notes, not `layouts/source-index.json`. Keep all required styles and assets in the delivered artifact; it must render without fetching reference HTML or CSS. Do not write the adapted layout back into the reusable template package.
 
 Reuse compatible structures instead of rebuilding common layouts for every deck. Built-in layouts supplement the source compositions; they do not replace the source design system.
 
@@ -40,7 +44,7 @@ Place background layers behind content without changing its flow or intercepting
 
 Include these rules in the generated package's `SKILL.md` and `layouts/README.md`:
 
-1. Select a fitting source layout first, then a source-observed background recipe suited to its role and content density.
+1. Select a fitting source layout first. If none fits, use the shared external layout links on demand and the adaptation rules above; do not require packaged built-in layouts. Then select a source-observed background recipe suited to the slide's role and content density.
 2. Respect the recipe's usable content area and documented color, placement, scale, crop, and repetition rules. Keep decoration out of body-copy regions unless the source supports it.
 3. Prefer compatible quiet backgrounds for dense content. If decoration conflicts, change the recipe before reconsidering the layout; do not displace a fitting source layout or shrink typography just to fit an ornament.
 4. Document inferred combinations and new layouts while preserving shared brand rules. Do not impose a fixed background count or mechanical color rotation.

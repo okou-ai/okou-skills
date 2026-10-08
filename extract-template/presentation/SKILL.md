@@ -28,7 +28,7 @@ Record in `design-system.md`:
 - Repeated components and chrome: cards, metrics, tables, quotes, image frames, logos, headers, footers, and page markers.
 - Background fields and content-independent decorations: reusable elements, source-observed combinations, and allowed adaptations.
 
-Read [references/layout-reuse.md](references/layout-reuse.md) for source inventory, compatible built-in layouts, and background composition. Read [references/typography-fit.md](references/typography-fit.md) for source-size extraction and automatic overflow fitting. Distinguish observed rules from inferred or fallback choices. An absent content type, such as images, is not a prohibition on future use.
+Read [references/layout-reuse.md](references/layout-reuse.md) for source inventory, generation-time built-in layout references, and background composition. [references/built-in-layouts.md](references/built-in-layouts.md) supplies the shared layout links; do not copy the built-in library into each custom package. Read [references/typography-fit.md](references/typography-fit.md) for source-size extraction and automatic overflow fitting. Distinguish observed rules from inferred or fallback choices. An absent content type, such as images, is not a prohibition on future use.
 
 ## 3. Build the editable package
 
@@ -37,7 +37,7 @@ Read [references/layout-reuse.md](references/layout-reuse.md) for source invento
   SKILL.md                 # usage and authoring instructions
   design-system.md         # brand rules, background elements/recipes, asset notes
   layouts/
-    README.md              # layout selection and assembly instructions
+    README.md              # source-first selection, external layout links, assembly
     source-index.json      # every source page mapped to a preserved layout
     source/<name>.html     # distinct source compositions
     _shell.html            # shared canvas, fonts, chrome, and navigation
@@ -46,7 +46,7 @@ Read [references/layout-reuse.md](references/layout-reuse.md) for source invento
   assets/                  # reusable logos, fonts, textures, and artwork
 ```
 
-Preserve every distinct source composition and prefer it when new content fits. Group equivalent structures, keeping background variants separate. When no source layout fits, adapt a compatible built-in layout if one is available, or add a documented layout in the same design system. Reuse its structure while applying the source typography, components, and brand rules; packaged layouts are references, not a whitelist.
+Preserve every distinct source composition and prefer it when new content fits. Group equivalent structures, keeping background variants separate. Package source layouts and the custom design system, not copies or pre-adaptations of the built-in library. When no source layout fits during deck generation, follow the shared layout links and adapt only the chosen structure to the source typography, components, and brand rules. Put the adapted content in that generated deck, not back into the reusable template package. If no reference is available or suitable, add a documented deck-specific layout in the same design system; packaged layouts are references, not a whitelist.
 
 Use a 16:9 canvas, shared CSS variables/components, and semantic regions for replaceable text, images, and data. Keep title and metric typography separate. Start each text region at its corresponding source size, converted with the layout's canvas scale. Only when rendered content overflows, automatically reduce the affected region's typography to the largest size that fits within its documented readability limit. Keep unaffected regions at their source sizes. Do not impose a universal font size or prohibit shrinking; change the layout or split content when bounded fitting cannot resolve the overflow. Prefer normal flow, Flexbox, or Grid; use absolute positioning for chrome, decoration, and intentional overlays.
 
@@ -54,7 +54,7 @@ Text, shapes, cards, tables, and ordinary charts must remain editable HTML/CSS/S
 
 Document assembly through the shared shell, with working package-relative asset paths. Wire the shared fitter into the shell so it runs after fonts and layout are ready and before the first QA capture or export; a written instruction to shrink text during QA is insufficient. Follow the readiness, reset, bounds, and reporting contract in `references/typography-fit.md`. Support all four navigation keys: `ArrowLeft`/`ArrowUp` go back; `ArrowRight`/`ArrowDown` go forward.
 
-The generated `SKILL.md` and `layouts/README.md` must direct authors to the design system and source index, explain source-first selection, built-in layout adaptation, and background composition, and identify the shared styles, fitter, and assembly steps. Include the source-size defaults, overflow-only shrinking, and unresolved-overflow handling in the generated instructions; do not depend on access to this extraction guide at generation time.
+The generated `SKILL.md` and `layouts/README.md` must direct authors to the design system and source index, include the absolute shared reference-index URL specified in `references/built-in-layouts.md`, explain source-first selection and on-demand layout adaptation, and identify background composition, shared styles, fitter, and assembly steps. Do not copy the reference catalogue, built-in fragments, shells, or themes into the package. Include the source-size defaults, overflow-only shrinking, and unresolved-overflow handling locally; generation must not require this extraction guide to use source layouts. External links are optional authoring references, never render-time dependencies.
 
 ## 4. Validate representative rebuilds
 
@@ -67,6 +67,8 @@ npx --yes --package="${CLI_PKG_URL}" okou presentation screenshot \
 ```
 
 Compare structure, typography, colors, component styling, decoration placement, and safe areas against the source. Fix shared rules where needed; verify navigation, language fallbacks, and asset loading. Rebuilt images are local validation evidence, not source-page images for publication.
+
+Check that the package instructions contain usable external layout links and that no built-in library was bundled. Exercise one suitable linked layout in a temporary validation deck when available, using the custom styles and fitter; keep that example outside the reusable package. Unavailable links must fall back to source layouts or a documented custom composition, not trigger repeated fetch attempts.
 
 Also validate the fitter with unchanged source content, longer replacement content, CJK/mixed-language text where supported, and content too dense to fit within the documented limit. Confirm that fitting content keeps its source size, actual overflow shrinks automatically before capture, unresolved overflow remains reported, and replacing long content with short content restores source sizes. Inspect affected pages visually for clipping, overlaps, and readability; overflow measurements alone are not visual QA.
 

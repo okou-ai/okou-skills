@@ -28,7 +28,7 @@ Include these rules and the fit-report location in the generated package's `SKIL
 
 ## Validate before publishing
 
-Use representative layouts and their actual fonts, including an adapted built-in layout when present:
+Use representative layouts and their actual fonts, including a generation-time built-in adaptation when present. Keep linked-layout validation examples outside the reusable template package:
 
 | Case | Required result |
 | --- | --- |
