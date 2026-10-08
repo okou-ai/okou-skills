@@ -1,0 +1,12 @@
+{
+  "contractVersion": "1.0.0",
+  "description": "Synthetic fixture, not a real PPT extraction. Six required tokens; optional fields are intentionally absent.",
+  "$tokens": {
+    "color.surface.canvas": {"$type": "color", "$value": "#f7f7f4", "$extensions": {"origin": {"kind": "inferred", "reason": "Synthetic fixture color, not source evidence."}}},
+    "color.on-surface.canvas.primary": {"$type": "color", "$value": "#20252a", "$extensions": {"origin": {"kind": "inferred", "reason": "Synthetic fixture color, not source evidence."}}},
+    "type.title.font-family": {"$type": "font-family", "$value": ["sans-serif"], "$extensions": {"origin": {"kind": "inferred", "reason": "Synthetic fixture font, not source evidence."}}},
+    "type.title.font-size": {"$type": "dimension", "$value": {"value": 56, "unit": "px"}, "$extensions": {"origin": {"kind": "inferred", "reason": "Synthetic fixture size, not source evidence."}}},
+    "type.body.font-family": {"$type": "font-family", "$value": ["sans-serif"], "$extensions": {"origin": {"kind": "inferred", "reason": "Synthetic fixture font, not source evidence."}}},
+    "type.body.font-size": {"$type": "dimension", "$value": {"value": 32, "unit": "px"}, "$extensions": {"origin": {"kind": "inferred", "reason": "Synthetic fixture size, not source evidence."}}}
+  }
+}

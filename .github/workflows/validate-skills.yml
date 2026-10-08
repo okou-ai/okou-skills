@@ -4,11 +4,15 @@ on:
   pull_request:
     paths:
       - "**/SKILL.md"
+      - "presentation-layouts/**"
+      - "extract-template/presentation/**"
   push:
     branches:
       - main
     paths:
       - "**/SKILL.md"
+      - "presentation-layouts/**"
+      - "extract-template/presentation/**"
 
 jobs:
   validate:
@@ -107,6 +111,12 @@ jobs:
 
           echo ""
           echo "All SKILL.md files are valid."
+
+      - name: Validate progressive presentation contract and neutral layouts
+        run: |
+          python3 -m unittest discover -s presentation-layouts/tests -p 'test_*.py' -v
+          node --check presentation-layouts/scripts/fit-text.js
+          node --check presentation-layouts/tests/browser-test.cjs
 
       - name: Ban _ACCESS_TOKEN naming
         run: |

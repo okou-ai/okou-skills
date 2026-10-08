@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/okou-ai/okou-skills/presentation-layouts/token-contract-v1",
+  "title": "Progressive presentation binding contract, pilot v1",
+  "type": "object",
+  "required": ["contractVersion", "$tokens"],
+  "properties": {
+    "contractVersion": {"const": "1.0.0"},
+    "description": {"type": "string"},
+    "$tokens": {
+      "allOf": [{"$ref": "#/$defs/token-map"}],
+      "required": ["color.surface.canvas", "color.on-surface.canvas.primary", "type.title.font-family", "type.title.font-size", "type.body.font-family", "type.body.font-size"]
+    },
+    "contexts": {
+      "type": "object",
+      "properties": {
+        "profiles": {"type": "object", "additionalProperties": {"$ref": "#/$defs/context"}},
+        "surfaces": {"type": "object", "additionalProperties": {"$ref": "#/$defs/context"}}
+      },
+      "additionalProperties": false
+    },
+    "unknown": {"type": "array", "items": {"type": "string"}},
+    "source": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "token-map": {
+      "type": "object",
+      "propertyNames": {"pattern": "^(ref|color|type|space|shape|stroke|chart|component)\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*)*$"},
+      "additionalProperties": {"$ref": "#/$defs/token"}
+    },
+    "context": {"type": "object", "required": ["$tokens"], "properties": {"$tokens": {"$ref": "#/$defs/token-map"}}, "additionalProperties": false},
+    "origin": {
+      "type": "object", "required": ["kind"],
+      "properties": {"kind": {"enum": ["extracted", "inferred", "user", "library"]}, "reason": {"type": "string", "minLength": 1}, "documentId": {"type": "string", "minLength": 1}, "location": {"type": "string", "minLength": 1}},
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "extracted"}}}, "then": {"required": ["documentId", "location"]}},
+        {"if": {"properties": {"kind": {"const": "inferred"}}}, "then": {"required": ["reason"]}}
+      ]
+    },
+    "token": {
+      "type": "object", "required": ["$type", "$value"],
+      "properties": {
+        "$type": {"enum": ["color", "color-list", "font-family", "dimension", "number", "string", "boolean"]},
+        "$value": {},
+        "$extensions": {"type": "object", "properties": {"origin": {"$ref": "#/$defs/origin"}}}
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {"properties": {"$value": {"type": "string", "pattern": "^\\{(?:ref|color|type|space|shape|stroke|chart|component)\\.[^{}]+\\}$"}}},
+        {
+          "required": ["$extensions"],
+          "properties": {"$extensions": {"required": ["origin"]}},
+          "allOf": [
+            {"if": {"properties": {"$type": {"const": "color"}}}, "then": {"properties": {"$value": {"type": "string", "pattern": "^#[0-9a-f]{6}(?:[0-9a-f]{2})?$"}}}},
+            {"if": {"properties": {"$type": {"const": "color-list"}}}, "then": {"properties": {"$value": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^(?:#[0-9a-f]{6}(?:[0-9a-f]{2})?|\\{(?:ref|color|chart)\\.[^{}]+\\})$"}}}}},
+            {"if": {"properties": {"$type": {"const": "font-family"}}}, "then": {"properties": {"$value": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}}},
+            {"if": {"properties": {"$type": {"const": "dimension"}}}, "then": {"properties": {"$value": {"type": "object", "required": ["value", "unit"], "properties": {"value": {"type": "number"}, "unit": {"const": "px"}}, "additionalProperties": false}}}},
+            {"if": {"properties": {"$type": {"const": "number"}}}, "then": {"properties": {"$value": {"type": "number"}}}},
+            {"if": {"properties": {"$type": {"const": "string"}}}, "then": {"properties": {"$value": {"enum": ["inherit", "canvas", "panel", "accent", "inverse"]}}}},
+            {"if": {"properties": {"$type": {"const": "boolean"}}}, "then": {"properties": {"$value": {"type": "boolean"}}}}
+          ]
+        }
+      ]
+    }
+  }
+}

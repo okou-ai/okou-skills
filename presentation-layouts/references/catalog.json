@@ -1,0 +1,12 @@
+{
+  "contractVersion": "1.0.0",
+  "geometry": "../styles/geometry.css",
+  "layouts": [
+    {"id": "kpi-grid", "file": "../layouts/kpi-grid.html", "regions": ["title", "metrics"], "roles": ["title", "metric-value", "metric-label", "caption"], "repeat": ["metrics"], "variants": {"columns": [2, 3, 4]}, "capacityHint": "2-8 concise metrics; measure real text, not an acceptance limit"},
+    {"id": "table", "file": "../layouts/table.html", "regions": ["title", "table"], "roles": ["title", "table-header", "table-cell", "caption"], "repeat": ["columns", "rows", "cells"], "capacityHint": "3-6 columns, 3-8 short rows; split dense content rather than reducing source defaults"},
+    {"id": "two-column", "file": "../layouts/two-column.html", "regions": ["title", "left", "right"], "roles": ["title", "heading", "body"], "capacityHint": "Two independent narratives; 1:1 columns, separate fit regions"},
+    {"id": "comparison", "file": "../layouts/comparison.html", "regions": ["title", "option-a", "option-b"], "roles": ["title", "heading", "body"], "capacityHint": "Two comparable options; cards are skin hooks, not mandatory filled panels"},
+    {"id": "process", "file": "../layouts/process.html", "regions": ["title", "steps"], "roles": ["title", "label", "body"], "capacityHint": "Four horizontal steps; materialize only relationships supported by the content"},
+    {"id": "image-text", "file": "../layouts/image-text.html", "regions": ["title", "description", "image"], "roles": ["title", "heading", "body", "caption"], "capacityHint": "One meaningful image and one short narrative; contain crop by default"}
+  ]
+}
