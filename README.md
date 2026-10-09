@@ -62,10 +62,11 @@ To add a new skill or improve an existing one:
 ## Business document reference index
 
 [business-skill-index](business-skill-index/SKILL.md) provides a
-[62-row Markdown reference table](business-skill-index/references/skill-index.md) across
-18 business scenarios. Agents match the task, read the selected pinned source,
-and fetch supporting templates only when needed. The repository keeps the index
-and selection prompt, not copies of the upstream skill collection.
+[domain and scenario directory](business-skill-index/references/skill-index.md)
+covering 62 skills across 18 scenarios. Agents open one scenario shortlist, then
+one skill's metadata file and its pinned source. Supporting templates are read
+only when needed. The repository keeps the index and selection prompt, not
+copies of the upstream skill collection.
 
 ```bash
 /plugin install business-skill-index@vm0-skills

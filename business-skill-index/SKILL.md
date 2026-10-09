@@ -1,42 +1,43 @@
 ---
 name: business-skill-index
-description: Find task-specific structures, templates, and quality checks for business documents, plans, reports, and analyses in a curated external skill index. Use when choosing a document's business content; skip format-only conversion, styling, and narrow edits with an established structure.
+description: Find task-specific structures, templates, and quality checks for business documents by domain and scenario, then read the relevant external skill. Skip format-only conversion, styling, and narrow edits with an established structure.
 ---
 
 # Business Skill Index
 
-Use [the reference table](references/skill-index.md) to find relevant upstream
-guidance, then read the selected source. The table contains 62 references across
-18 business scenarios, reviewed on 2026-10-09. It stores metadata and addresses,
-not copies of third-party skills, templates, or scripts.
+Find guidance through a small directory, a scenario shortlist, and one selected
+skill's metadata file. The collection covers 62 skills across 18 scenarios.
+It stores routing information and pinned addresses, not upstream skill bodies.
 
-## Choose a reference
+## Read only the relevant branch
 
 1. Identify the business task, audience, intended output, and available evidence.
    Honor a user-supplied template or required structure. Skip discovery when a
    narrow edit or conversion already has everything it needs.
-2. Search the table's business scenario, task, and output columns, using the task's
-   terms, English skill names, or relevant synonyms. Start with the best match;
-   add complementary references only when they cover a real gap in the task.
-3. Read the selected row's **Raw** link to obtain its pinned `SKILL.md`.
-   **Source** opens the same file on GitHub. Do not fetch every skill or clone
-   a repository to make this selection.
-4. Read a referenced template or supporting file only when needed. Resolve
-   relative paths against the directory of the Raw link, preserving its repository
-   and commit. The matching entry under **Templates and scope notes** lists known
-   template links.
-5. Apply the useful content structure, required inputs, and checks to the user's
-   material, then continue with the existing authoring and delivery workflow.
+2. Open the [domain and scenario directory](references/skill-index.md). It lists
+   scenario files, not all skills. Read only the best-matching scenario shortlist.
+3. Compare its tasks and outputs, then open the best-matching skill's linked
+   metadata file. This file contains its **Skill address**, license, scope notes,
+   and known template links. Add another reference only for an unmet task need.
+4. Follow **Raw** to read the pinned upstream `SKILL.md`; **Source** opens the
+   same file on GitHub. Fetch a supporting template or file only when needed,
+   resolving relative paths from the Raw link's directory at the same commit.
 
-Run this search from this skill's directory; it reads only the index:
+Skip directory levels already resolved. If a skill is named, find its metadata
+file directly. If the scenario is unclear, search only the shortlists and return
+matching filenames. For example, from this skill's directory:
 
 ```bash
-rg -n -i 'onboarding|new.hire' references/skill-index.md
+# A known skill: read the matching metadata file directly.
+rg --files references/skills -g '*onboarding.md'
+
+# An unclear scenario: find candidate shortlist files before reading them.
+rg -l -i 'onboarding|new.hire' references/scenarios
 ```
 
-Use the available HTTP/file-reading tool for the chosen address. Keep any
-fetched files in the task workspace, and reuse a reference already read
-at the same commit. Do not vendor the upstream collection into this skill repo.
+Do not concatenate all reference files, read every branch, or clone upstream
+repositories for ordinary discovery. Reuse local files and sources already read
+at the same commit. Keep fetched content in the task workspace.
 
 ## Apply the reference to the task
 
@@ -55,10 +56,6 @@ at the same commit. Do not vendor the upstream collection into this skill repo.
   indexed reference, or the user's existing material. Do not silently switch to
   the latest branch or claim to have applied a source you could not read.
 
-Examples: a new-hire guide matches `onboarding`; a budget variance report matches
-`financial-analyst`; a customer QBR matches `customer-success-manager`. A request
-to change a heading font or convert an existing document needs no index lookup.
-
 ## License and maintenance
 
 The **License** link describes the reviewed skill at its pinned commit, not every
@@ -67,8 +64,13 @@ Apache-2.0; they have been checked for licensing and content, not individually
 execution-tested. Preserve applicable copyright, license and NOTICE material
 when copying or adapting content; mark changes to Apache-licensed files.
 
-Maintain this Markdown index as the single source of truth. When adding or
-updating a row, check the source and its applicable license at the exact commit,
-update the entry's review date, and retain its specific scope notes. Do not add
+Keep each skill's source URLs, license, pinned commit, review date, scope notes,
+and template links in its one metadata file under `references/skills/`.
+Shortlists under `references/scenarios/` hold task-matching summaries and links
+to those files; the directory links to shortlists. Do not maintain a duplicate
+all-skills table or CSV.
+
+When updating an entry, check its source and applicable license at the exact
+commit, update the review date, and retain its scope notes. Do not include
 unlicensed, noncommercial, or separately restricted dependencies under a
 permissive parent entry. Store links and routing metadata, never upstream bodies.
