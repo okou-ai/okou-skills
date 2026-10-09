@@ -5,11 +5,11 @@ description: Borrow six public, theme-neutral presentation structures on demand,
 
 # Shared presentation structures · pilot v1
 
-This is a structure library, not a visual template, shell, full PPTX extractor, or universal design-token dictionary. It has no dependency on Template-artifact, a private repository, a theme font, or a brand stylesheet.
+This is a structure library, not a visual template, shell, full PPTX extractor, or universal design-token dictionary. It has no dependency on a private repository, a theme font, or a brand stylesheet.
 
 ## 1. Select only when needed
 
-Prefer a suitable source layout or validated extension already saved in the user template. During upload-time extraction, this six-structure pilot can supplement a larger authorised catalogue: read [references/catalog.md](references/catalog.md) and **only the chosen fragments**. Fetch the catalogue, fragments, geometry and tools from the same exact `okou-ai/okou-skills` commit. Do not download example decks, unselected fragments, or another theme's shell.
+Prefer a suitable source layout or validated extension already saved in the user template. During upload-time extraction, read this public six-structure pilot's [references/catalog.md](references/catalog.md) and **only the chosen fragments**. Use matching local resources or fetch the catalogue, fragments, geometry and tools from the same exact public `okou-ai/okou-skills` commit. No private catalogue or GitHub credentials are required. Do not download example decks, unselected fragments, or another theme's shell.
 
 Follow `extract-template/presentation` when building a reusable custom template: adapt selected structures to the source style during extraction, validate them, and save those adaptations plus provenance in the package's local extension index. Do not bundle the entire six-layout library, its catalogue, or synthetic skins. Later generation copies and edits saved layouts without fetching this library. For a one-off deck without an extraction stage, an adaptation may stay in that deck and its notes. If the public reference is unavailable, retain saved layouts or document the gap/composition; do not retry indefinitely.
 
