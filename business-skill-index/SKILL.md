@@ -16,21 +16,22 @@ not copies of third-party skills, templates, or scripts.
    Honor a user-supplied template or required structure. Skip discovery when a
    narrow edit or conversion already has everything it needs.
 2. Search the table's business scenario, task, and output columns, using the task's
-   terms, English skill names, or Chinese equivalents. Start with the best match;
+   terms, English skill names, or relevant synonyms. Start with the best match;
    add complementary references only when they cover a real gap in the task.
 3. Read the selected row's **Raw** link to obtain its pinned `SKILL.md`.
-   **原文** opens the same file on GitHub. Do not fetch every skill or clone
+   **Source** opens the same file on GitHub. Do not fetch every skill or clone
    a repository to make this selection.
 4. Read a referenced template or supporting file only when needed. Resolve
    relative paths against the directory of the Raw link, preserving its repository
-   and commit. The matching entry under **模板与适用说明** lists known template links.
+   and commit. The matching entry under **Templates and scope notes** lists known
+   template links.
 5. Apply the useful content structure, required inputs, and checks to the user's
    material, then continue with the existing authoring and delivery workflow.
 
 Run this search from this skill's directory; it reads only the index:
 
 ```bash
-rg -n -i 'onboarding|入职' references/skill-index.md
+rg -n -i 'onboarding|new.hire' references/skill-index.md
 ```
 
 Use the available HTTP/file-reading tool for the chosen address. Keep any
@@ -50,7 +51,7 @@ at the same commit. Do not vendor the upstream collection into this skill repo.
 - Interface dependencies are not grounds to reject an otherwise useful
   reference. Use available, authorized tools and supplied material; the index
   does not claim that upstream tool names or integrations are already installed.
-- If a pinned source is unavailable, try its **原文** link, another suitable
+- If a pinned source is unavailable, try its **Source** link, another suitable
   indexed reference, or the user's existing material. Do not silently switch to
   the latest branch or claim to have applied a source you could not read.
 
@@ -60,7 +61,7 @@ to change a heading font or convert an existing document needs no index lookup.
 
 ## License and maintenance
 
-The **许可** link describes the reviewed skill at its pinned commit, not every
+The **License** link describes the reviewed skill at its pinned commit, not every
 external service, dataset, model, or dependency it mentions. Entries use MIT or
 Apache-2.0; they have been checked for licensing and content, not individually
 execution-tested. Preserve applicable copyright, license and NOTICE material

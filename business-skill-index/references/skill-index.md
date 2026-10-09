@@ -1,90 +1,90 @@
-# 业务场景 Skill 索引
+# Business Skill Index
 
-共 **62 项 Skill、18 类业务场景**。按业务场景排列；只保存用途和地址，不复制第三方 Skill 正文。
+**62 skills across 18 business scenarios**, grouped by scenario. This index stores use cases and addresses without copying third-party skill content.
 
-- **原文**：在 GitHub 查看 Skill；**Raw**：供 AI 直接读取。
-- 所有来源地址固定到已核对的提交；许可为 MIT 或 Apache-2.0，使用时仍需履行对应义务。
-- 模板链接、适用边界与每项核对日期在下方“模板与适用说明”中，按需展开。许可与内容已核对，尚未逐项运行验收。
+- **Source** opens the skill on GitHub; **Raw** provides its content for an AI to read directly.
+- All source addresses are pinned to reviewed commits. Entries use MIT or Apache-2.0 licenses; their obligations still apply.
+- Expand the entries under **Templates and scope notes** for template links, scope limits, and review dates. Licensing and content have been checked; individual skills have not been execution-tested.
 
-## 索引大表
+## Skill table
 
-| 业务场景 | Skill | 适用任务与产出 | 参考地址 | 许可 |
+| Business scenario | Skill | Tasks and outputs | Skill address | License |
 | --- | --- | --- | --- | --- |
-| 办公协作与会议 | **会议准备与议程**<br>`notion-meeting-intelligence` | 从已有资料准备会议，选择适合 1:1、决策会或复盘的议程。<br>产出：会议议程、会前材料、决策讨论模板 | [原文](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/SKILL.md) · [Raw](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/SKILL.md) | [MIT](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/LICENSE.txt) |
-| 办公协作与会议 | **会议议程与行动项**<br>`meetings` | 判断是否需要开会、安排限时议程，或把会议笔记整理为行动项。<br>产出：会议必要性判断、限时议程、带负责人和截止日期的行动清单 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/productivity/meetings/skills/meetings/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/productivity/meetings/skills/meetings/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 办公协作与会议 | **内部变更沟通**<br>`internal-comms` | 为组织变更、政策调整或新工具上线准备内部沟通材料。<br>产出：工具上线或组织变更的预告、公告、FAQ 与后续沟通计划 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/internal-comms/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/internal-comms/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 招聘、入职与绩效 | **新人入职与培训**<br>`onboarding` | 为新员工或特定岗位制定分阶段入职计划。<br>产出：入职前清单、首周计划、阶段目标、岗位权限清单 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/onboarding/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/onboarding/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 招聘、入职与绩效 | **结构化面试**<br>`interview-prep` | 设计结构化面试、能力问题与候选人评分卡。<br>产出：面试提纲、能力题库、候选人评分卡 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/interview-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/interview-prep/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 招聘、入职与绩效 | **绩效评估**<br>`performance-review` | 根据工作证据撰写员工自评、经理评语或绩效材料。<br>产出：员工自评、经理评语、绩效校准材料 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/performance-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/performance-review/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 招聘、入职与绩效 | **录用方案与 Offer**<br>`draft-offer` | 整理录用条件、薪酬构成，拟定 Offer 草稿。<br>产出：录用信草稿、薪酬构成、谈判准备材料 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/draft-offer/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/draft-offer/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 招聘、入职与绩效 | **人力资源分析**<br>`people-report` | 分析人员编制、流失、招聘或组织健康情况。<br>产出：人员编制、离职趋势、组织健康报告 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/people-report/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/people-report/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 制度、SOP 与运营流程 | **业务流程与 SOP**<br>`process-doc` | 把业务流程整理成含职责、步骤及例外处理的 SOP。<br>产出：流程说明、职责矩阵、步骤及例外处理 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/process-doc/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/process-doc/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 制度、SOP 与运营流程 | **操作手册**<br>`runbook` | 为重复操作编写可执行步骤、故障处理和检查清单。<br>产出：操作步骤、故障处理、升级路径和恢复检查清单 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/runbook/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/runbook/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 制度、SOP 与运营流程 | **知识库与制度维护**<br>`knowledge-ops` | 创建或维护 SOP、操作手册，并检查知识库内容。<br>产出：SOP、运行手册、知识库维护规范 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/knowledge-ops/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/knowledge-ops/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 制度、SOP 与运营流程 | **运营风险评估**<br>`risk-assessment` | 识别运营风险，评估概率、影响和缓解行动。<br>产出：风险登记表、概率与影响评估、缓解措施 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/risk-assessment/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/risk-assessment/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 项目管理与交付 | **项目规划与治理**<br>`senior-pm` | 制定项目章程、职责分工、资源与风险计划。<br>产出：项目规划、状态评估、风险与依赖分析 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/project-management/skills/senior-pm/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/project-management/skills/senior-pm/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 项目管理与交付 | **项目进度报告**<br>`status-report` | 把项目或团队进展汇总为周报、状态报告。<br>产出：项目周报、里程碑、阻塞项和下一步 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/status-report/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/status-report/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 项目管理与交付 | **系统与流程变更申请**<br>`change-request` | 说明系统或流程变更的影响、实施和回退方案。<br>产出：变更说明、影响评估、实施及回退计划、审批材料 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/change-request/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/change-request/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 产品规划与用户研究 | **产品需求文档**<br>`write-spec` | 把业务问题和用户场景写成含验收标准的 PRD。<br>产出：PRD、需求说明、用户场景、验收标准 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/write-spec/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/write-spec/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/LICENSE) |
-| 产品规划与用户研究 | **产品路线图**<br>`roadmap-update` | 制定或更新产品路线图、优先级和版本计划。<br>产出：版本计划、优先级、依赖与路线图说明 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/roadmap-update/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/roadmap-update/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/LICENSE) |
-| 产品规划与用户研究 | **用户研究总结**<br>`synthesize-research` | 从访谈、反馈与支持记录中归纳需求主题和证据。<br>产出：访谈与反馈归纳、问题主题、产品建议 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/synthesize-research/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/synthesize-research/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/LICENSE) |
-| 产品规划与用户研究 | **用户研究设计**<br>`user-research` | 设计访谈、问卷、可用性测试及用户研究计划。<br>产出：研究计划、访谈提纲、问卷与可用性测试方案 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/design/skills/user-research/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/design/skills/user-research/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
-| 市场营销与品牌 | **营销活动策划**<br>`campaign-plan` | 围绕业务目标、受众和预算制定营销活动方案。<br>产出：活动 Brief、渠道计划、预算安排与评估指标 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/campaign-plan/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/campaign-plan/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
-| 市场营销与品牌 | **品牌表达检查**<br>`brand-review` | 对照品牌规范检查现有文案、语气和表达一致性。<br>产出：品牌语气核对、内容一致性检查、修改建议 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/brand-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/brand-review/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
-| 市场营销与品牌 | **内容创作**<br>`content-creation` | 起草文章、社交文案、营销邮件、落地页或客户案例。<br>产出：文章、社交文案、邮件、落地页和案例内容 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/content-creation/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/content-creation/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
-| 市场营销与品牌 | **营销效果复盘**<br>`performance-report` | 复盘营销渠道指标和活动结果，给出优化建议。<br>产出：渠道效果报告、指标变化、优化建议 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/performance-report/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/performance-report/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
-| 销售与商务方案 | **商业提案与工作范围**<br>`contract-and-proposal-writer` | 拟定客户提案、报价说明、SOW 或合同草稿。<br>产出：商业提案、报价、SOW 和合同草稿 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/contract-and-proposal-writer/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/contract-and-proposal-writer/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 销售与商务方案 | **客户会议准备**<br>`call-prep` | 结合客户背景与已有互动准备销售会谈。<br>产出：客户背景、会议目标、提问清单和沟通要点 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/call-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/call-prep/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/LICENSE) |
-| 销售与商务方案 | **重点客户经营计划**<br>`account-plan` | 创建或更新重点客户的目标、关系、机会与行动计划。<br>产出：账户计划、关系图、机会与推进路径 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/account-plan/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/account-plan/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/LICENSE) |
-| 销售与商务方案 | **招投标与 RFP 响应**<br>`rfp-responder` | 解析 RFP / RFI / RFQ 要求并组织招投标响应。<br>产出：响应矩阵、资料缺口、应答计划和提交清单 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/rfp-responder/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/rfp-responder/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 客户成功与支持 | **客户成功计划与 QBR**<br>`customer-success-manager` | 制定客户成功计划、季度业务回顾或续约风险分析。<br>产出：客户上线清单、成功计划、季度业务回顾、续约分析 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/customer-success-manager/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/customer-success-manager/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 客户成功与支持 | **客户帮助文档**<br>`kb-article` | 把解决记录或产品知识改写成客户可用的帮助文章。<br>产出：FAQ、知识库文章、已知问题和解决步骤 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/kb-article/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/kb-article/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/LICENSE) |
-| 客户成功与支持 | **客户问题升级**<br>`customer-escalation` | 将客户问题、业务影响和已做排查整理成升级材料。<br>产出：问题背景、影响范围、已采取措施、升级说明 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/customer-escalation/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/customer-escalation/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/LICENSE) |
-| 经营管理与战略 | **董事会与管理层汇报**<br>`board-deck-builder` | 组织董事会或投资人汇报的内容、指标与决策议题。<br>产出：董事会材料结构、经营指标、决策议题 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/board-deck-builder/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/board-deck-builder/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 经营管理与战略 | **经营战略分析**<br>`ceo-advisor` | 分析经营战略、资源取舍和管理层沟通问题。<br>产出：战略判断、经营分析、利益相关方沟通材料 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/ceo-advisor/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/ceo-advisor/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 经营管理与战略 | **目标对齐与战略检查**<br>`strategic-alignment` | 检查公司战略与团队目标之间的冲突或断层。<br>产出：战略一致性诊断、目标冲突和调整建议 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/strategic-alignment/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/strategic-alignment/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 定价与收入管理 | **定价与产品套餐策略**<br>`pricing-strategist` | 选择定价模式、研究付费意愿或设计产品套餐。<br>产出：定价模式选择、付费意愿分析、套餐设计与定价建议 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/pricing-strategist/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/pricing-strategist/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 定价与收入管理 | **收入运营分析**<br>`revenue-operations` | 分析销售管线、预测准确性和 GTM 经营指标。<br>产出：销售管线复盘、收入预测、GTM 指标报告 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/revenue-operations/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/revenue-operations/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 定价与收入管理 | **商业预测**<br>`commercial-forecaster` | 用商机、历史转化与客户群数据预测收入及 ARR。<br>产出：预测输入表、情景分析、收入预测说明 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/commercial-forecaster/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/commercial-forecaster/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 采购与供应商管理 | **供应商评估**<br>`vendor-management` | 评估供应商绩效、SLA、续约和第三方风险。<br>产出：供应商台账、SLA 检查、绩效与续约评估 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/vendor-management/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/vendor-management/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 采购与供应商管理 | **采购支出分析**<br>`procurement-optimizer` | 分析采购支出、采购周期和供应商整合机会。<br>产出：支出归类、采购集中度、节约机会与行动计划 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/procurement-optimizer/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/procurement-optimizer/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 企业财务与预算 | **预算与财务分析**<br>`financial-analyst` | 进行预算差异、财务比率、预测或估值分析。<br>产出：预算差异报告、财务比率、现金流及滚动预测 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/financial-analyst/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/financial-analyst/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 企业财务与预算 | **经营财务报表**<br>`financial-statements` | 依据实际财务数据组织财务报表和期间差异说明。<br>产出：损益表、资产负债表、现金流及期间对比 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/financial-statements/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/financial-statements/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/LICENSE) |
-| 企业财务与预算 | **账户对账**<br>`reconciliation` | 核对总账、子账、银行或内部往来，并解释差异。<br>产出：对账表、未达项、差异分类与处理说明 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/reconciliation/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/reconciliation/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/LICENSE) |
-| 企业财务与预算 | **月结管理**<br>`close-management` | 安排月结任务、时间表、依赖和责任人。<br>产出：月结日历、任务依赖、负责人和进度清单 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/close-management/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/close-management/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/LICENSE) |
-| 法务与合规管理 | **合同审阅准备**<br>`review-contract` | 对照公司条款底线审阅合同，提出偏离点与修改草稿。<br>产出：条款风险清单、偏离点、修改建议草稿 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/review-contract/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/review-contract/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/LICENSE) |
-| 法务与合规管理 | **保密协议初筛**<br>`triage-nda` | 快速筛查 NDA 条款，确定标准处理或升级审阅。<br>产出：NDA 分类、问题条款和升级建议 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/triage-nda/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/triage-nda/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/LICENSE) |
-| 法务与合规管理 | **合规问题检查**<br>`compliance-check` | 梳理业务方案涉及的适用规则、要求和合规问题。<br>产出：合规问题分析、核查事项和处理建议 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/compliance-check/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/compliance-check/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/LICENSE) |
-| 法务与合规管理 | **合规准备度评估**<br>`compliance-readiness` | 梳理多框架合规的证据、缺口及整改准备。<br>产出：合规证据清单、差距分析和整改路线图 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/compliance-readiness/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/compliance-readiness/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 商业调研与数据分析 | **市场与行业研究**<br>`market-research-reports` | 研究市场规模、竞争格局，形成有来源的市场报告。<br>产出：市场定义、竞争格局、市场规模情景与研究报告 | [原文](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
-| 商业调研与数据分析 | **研究简报与对比报告**<br>`notion-research-documentation` | 综合已有研究资料，选择简报、摘要、对比或完整报告结构。<br>产出：快速简报、研究摘要、对比分析、完整研究报告 | [原文](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/SKILL.md) · [Raw](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/SKILL.md) | [MIT](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/LICENSE.txt) |
-| 商业调研与数据分析 | **经营数据分析**<br>`analyze` | 用实际数据回答经营问题，进行分组、趋势或异常分析。<br>产出：指标分析、分组对比、异常解释和管理报告 | [原文](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/data/skills/analyze/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/data/skills/analyze/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/data/LICENSE) |
-| 投融资、估值与尽调 | **投资尽调清单**<br>`dd-checklist` | 启动或跟踪投资尽调，组织资料请求与红旗事项。<br>产出：按行业和交易类型组织的尽调资料清单 | [原文](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/dd-checklist/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/dd-checklist/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
-| 投融资、估值与尽调 | **投委会决策材料**<br>`ic-memo` | 综合尽调发现、投资逻辑和交易条件，撰写投委会备忘录。<br>产出：投资建议、尽调发现、财务分析、交易风险 | [原文](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/ic-memo/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/ic-memo/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
-| 投融资、估值与尽调 | **投资回报与敏感性分析**<br>`returns-analysis` | 评估交易的 IRR、MOIC、情景和敏感性。<br>产出：IRR、MOIC、交易情景和双变量敏感性表，以及投委会回报摘要 | [原文](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/returns-analysis/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/returns-analysis/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
-| 投融资、估值与尽调 | **填充现有财务三表模板**<br>`3-statement-model` | 填充已有财务三表模板，建立预测公式和勾稽关系。<br>产出：在已有 Excel 模板内填充三表、预测公式与勾稽检查 | [原文](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/3-statement-model/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/3-statement-model/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
-| 证券研究与基金运营 | **财报点评**<br>`earnings-analysis` | 对已覆盖公司撰写财报点评，比较实际业绩与预期。<br>产出：实际与预期对比、经营驱动因素和业绩解读 | [原文](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/earnings-analysis/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/earnings-analysis/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
-| 证券研究与基金运营 | **行业投资概览**<br>`sector-overview` | 梳理行业结构、竞争格局、估值和投资讨论材料。<br>产出：行业结构、竞争格局、趋势和投资讨论材料 | [原文](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/sector-overview/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/sector-overview/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
-| 证券研究与基金运营 | **余额滚动核对**<br>`roll-forward` | 以总账证据核对期初余额、期间变动和期末余额。<br>产出：期初余额、期间变动、冲销与期末勾稽表 | [原文](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/fund-admin/skills/roll-forward/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/fund-admin/skills/roll-forward/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
-| 科研写作与课题申请 | **科研报告与论文写作**<br>`scientific-writing` | 根据研究结果和来源撰写论文或科研报告草稿。<br>产出：论文与研究报告草稿、证据记录和一致性检查 | [原文](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-writing/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-writing/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
-| 科研写作与课题申请 | **文献综述**<br>`literature-review` | 组织文献检索、筛选、引用核对和综述。<br>产出：文献检索记录、筛选结果、证据综合与综述 | [原文](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/literature-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/literature-review/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
-| 科研写作与课题申请 | **课题与科研经费申请**<br>`research-grants` | 按资助项目要求组织研究目标、申请材料和预算说明。<br>产出：申请结构、研究目标、预算说明及要求核对表 | [原文](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/research-grants/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/research-grants/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
-| 科研写作与课题申请 | **研究稿件评审**<br>`peer-review` | 对获准处理的研究稿件整理方法与证据评审意见。<br>产出：稿件评审草稿、方法问题和证据核对意见 | [原文](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/peer-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/peer-review/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
-| 信息安全与行业质量体系 | **信息安全体系审计准备**<br>`iso27001-audit-prep` | 准备信息安全体系审计证据，梳理控制缺口。<br>产出：ISO 27001 证据准备、缺口清单和整改安排 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso27001-audit-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso27001-audit-prep/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
-| 信息安全与行业质量体系 | **医疗器械质量体系准备**<br>`iso13485-audit-prep` | 准备医疗器械质量体系的设计、CAPA 和审计证据。<br>产出：ISO 13485 审计证据、流程缺口和整改准备材料 | [原文](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso13485-audit-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso13485-audit-prep/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Workplace collaboration and meetings | **Meeting preparation and agendas**<br>`notion-meeting-intelligence` | Prepare meetings from existing context and choose an agenda for a 1:1, decision meeting, or retrospective.<br>Outputs: Meeting agendas, pre-reads, decision discussion templates | [Source](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/SKILL.md) · [Raw](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/SKILL.md) | [MIT](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/LICENSE.txt) |
+| Workplace collaboration and meetings | **Meeting agendas and action items**<br>`meetings` | Decide whether a meeting is needed, plan a timed agenda, or turn meeting notes into action items.<br>Outputs: Meeting necessity assessment, timed agendas, action lists with owners and due dates | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/productivity/meetings/skills/meetings/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/productivity/meetings/skills/meetings/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Workplace collaboration and meetings | **Internal change communications**<br>`internal-comms` | Prepare internal communications for organizational changes, policy updates, or new tool launches.<br>Outputs: Advance notices, announcements, FAQs, and follow-up communication plans | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/internal-comms/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/internal-comms/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Hiring, onboarding and performance | **New-hire onboarding and training**<br>`onboarding` | Create a phased onboarding plan for a new employee or a specific role.<br>Outputs: Pre-start checklists, first-week plans, milestones, role-specific access checklists | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/onboarding/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/onboarding/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Hiring, onboarding and performance | **Structured interviews**<br>`interview-prep` | Design structured interviews, competency questions, and candidate scorecards.<br>Outputs: Interview guides, competency question banks, candidate scorecards | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/interview-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/interview-prep/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Hiring, onboarding and performance | **Performance reviews**<br>`performance-review` | Use work evidence to draft employee self-assessments, manager evaluations, or review materials.<br>Outputs: Employee self-assessments, manager evaluations, performance calibration materials | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/performance-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/performance-review/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Hiring, onboarding and performance | **Job offers and compensation**<br>`draft-offer` | Organize employment terms and compensation components, then draft an offer.<br>Outputs: Offer letter drafts, compensation breakdowns, negotiation preparation | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/draft-offer/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/draft-offer/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Hiring, onboarding and performance | **People analytics**<br>`people-report` | Analyze headcount, attrition, hiring, or organizational health.<br>Outputs: Headcount reports, attrition trends, organizational health reports | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/people-report/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/human-resources/skills/people-report/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Policies, SOPs and operations | **Business processes and SOPs**<br>`process-doc` | Document a business process as an SOP with responsibilities, steps, and exception handling.<br>Outputs: Process documentation, responsibility matrices, steps and exception handling | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/process-doc/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/process-doc/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Policies, SOPs and operations | **Operational runbooks**<br>`runbook` | Write actionable steps, troubleshooting procedures, and checklists for repeatable operations.<br>Outputs: Operating procedures, troubleshooting, escalation paths, recovery checklists | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/runbook/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/runbook/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Policies, SOPs and operations | **Knowledge base and policy maintenance**<br>`knowledge-ops` | Create or maintain SOPs and runbooks, and check knowledge base content.<br>Outputs: SOPs, runbooks, knowledge base maintenance standards | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/knowledge-ops/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/knowledge-ops/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Policies, SOPs and operations | **Operational risk assessments**<br>`risk-assessment` | Identify operational risks and assess their likelihood, impact, and mitigation actions.<br>Outputs: Risk registers, likelihood and impact assessments, mitigation measures | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/risk-assessment/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/risk-assessment/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Project management and delivery | **Project planning and governance**<br>`senior-pm` | Define a project charter, responsibilities, resource allocation, and risk plans.<br>Outputs: Project plans, status assessments, risk and dependency analysis | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/project-management/skills/senior-pm/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/project-management/skills/senior-pm/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Project management and delivery | **Project status reports**<br>`status-report` | Summarize project or team progress in a weekly update or status report.<br>Outputs: Weekly project reports, milestones, blockers, next steps | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/status-report/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/status-report/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Project management and delivery | **System and process change requests**<br>`change-request` | Explain the impact, implementation, and rollback plan for a system or process change.<br>Outputs: Change descriptions, impact assessments, implementation and rollback plans, approval materials | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/change-request/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/operations/skills/change-request/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Product planning and user research | **Product requirements documents**<br>`write-spec` | Turn a business problem and user scenarios into a PRD with acceptance criteria.<br>Outputs: PRDs, requirements, user scenarios, acceptance criteria | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/write-spec/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/write-spec/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/LICENSE) |
+| Product planning and user research | **Product roadmaps**<br>`roadmap-update` | Create or update a product roadmap, priorities, and release plans.<br>Outputs: Release plans, priorities, dependencies, roadmap narratives | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/roadmap-update/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/roadmap-update/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/LICENSE) |
+| Product planning and user research | **User research synthesis**<br>`synthesize-research` | Identify user needs and supporting evidence across interviews, feedback, and support records.<br>Outputs: Interview and feedback summaries, recurring themes, product recommendations | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/synthesize-research/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/skills/synthesize-research/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/product-management/LICENSE) |
+| Product planning and user research | **User research design**<br>`user-research` | Plan interviews, surveys, usability tests, and user research studies.<br>Outputs: Research plans, interview guides, surveys, usability test plans | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/design/skills/user-research/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/design/skills/user-research/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/LICENSE) |
+| Marketing and brand | **Marketing campaign planning**<br>`campaign-plan` | Plan a marketing campaign around business goals, audiences, and budget.<br>Outputs: Campaign briefs, channel plans, budget allocation, success metrics | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/campaign-plan/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/campaign-plan/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
+| Marketing and brand | **Brand consistency reviews**<br>`brand-review` | Check existing copy, tone, and messaging against brand guidelines.<br>Outputs: Brand voice checks, content consistency reviews, revision recommendations | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/brand-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/brand-review/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
+| Marketing and brand | **Content creation**<br>`content-creation` | Draft articles, social posts, marketing emails, landing pages, or customer case studies.<br>Outputs: Articles, social copy, emails, landing pages, case study content | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/content-creation/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/content-creation/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
+| Marketing and brand | **Marketing performance reviews**<br>`performance-report` | Review channel metrics and campaign results, then recommend improvements.<br>Outputs: Channel performance reports, metric changes, optimization recommendations | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/performance-report/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/skills/performance-report/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/marketing/LICENSE) |
+| Sales and proposals | **Business proposals and scopes of work**<br>`contract-and-proposal-writer` | Draft client proposals, pricing explanations, SOWs, or contracts.<br>Outputs: Business proposals, pricing, SOWs, contract drafts | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/contract-and-proposal-writer/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/contract-and-proposal-writer/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Sales and proposals | **Customer meeting preparation**<br>`call-prep` | Prepare for sales conversations using account context and prior interactions.<br>Outputs: Account background, meeting goals, question lists, talking points | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/call-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/call-prep/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/LICENSE) |
+| Sales and proposals | **Strategic account plans**<br>`account-plan` | Create or update goals, relationships, opportunities, and actions for a key account.<br>Outputs: Account plans, stakeholder maps, opportunities, action plans | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/account-plan/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/skills/account-plan/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/sales/LICENSE) |
+| Sales and proposals | **RFP and tender responses**<br>`rfp-responder` | Analyze RFP, RFI, or RFQ requirements and organize a response.<br>Outputs: Response matrices, information gaps, response plans, submission checklists | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/rfp-responder/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/rfp-responder/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Customer success and support | **Customer success plans and QBRs**<br>`customer-success-manager` | Create a customer success plan, quarterly business review, or renewal risk analysis.<br>Outputs: Customer onboarding checklists, success plans, quarterly business reviews, renewal analysis | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/customer-success-manager/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/customer-success-manager/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Customer success and support | **Customer help articles**<br>`kb-article` | Turn resolution records or product knowledge into customer-facing help articles.<br>Outputs: FAQs, knowledge base articles, known issues, resolution steps | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/kb-article/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/kb-article/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/LICENSE) |
+| Customer success and support | **Customer issue escalations**<br>`customer-escalation` | Summarize a customer issue, business impact, and completed investigation for escalation.<br>Outputs: Issue background, affected scope, actions taken, escalation briefs | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/customer-escalation/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/skills/customer-escalation/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/customer-support/LICENSE) |
+| Executive management and strategy | **Board and executive reporting**<br>`board-deck-builder` | Organize content, metrics, and decision topics for board or investor reporting.<br>Outputs: Board material outlines, business metrics, decision topics | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/board-deck-builder/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/board-deck-builder/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Executive management and strategy | **Business strategy analysis**<br>`ceo-advisor` | Analyze business strategy, resource tradeoffs, and executive communication needs.<br>Outputs: Strategic assessments, business analysis, stakeholder communications | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/ceo-advisor/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/ceo-advisor/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Executive management and strategy | **Goal alignment and strategy reviews**<br>`strategic-alignment` | Identify conflicts or gaps between company strategy and team goals.<br>Outputs: Strategic alignment assessments, goal conflicts, adjustment recommendations | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/strategic-alignment/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/strategic-alignment/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Pricing and revenue management | **Pricing and product packaging**<br>`pricing-strategist` | Choose pricing models, research willingness to pay, or design product packages.<br>Outputs: Pricing model selection, willingness-to-pay analysis, package design, pricing recommendations | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/pricing-strategist/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/pricing-strategist/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Pricing and revenue management | **Revenue operations analysis**<br>`revenue-operations` | Analyze the sales pipeline, forecast accuracy, and go-to-market metrics.<br>Outputs: Pipeline reviews, revenue forecasts, go-to-market metric reports | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/revenue-operations/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/revenue-operations/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Pricing and revenue management | **Commercial forecasting**<br>`commercial-forecaster` | Forecast revenue and ARR using opportunities, historical conversions, and customer cohorts.<br>Outputs: Forecast input sheets, scenario analysis, revenue forecast narratives | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/commercial-forecaster/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/commercial-forecaster/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Procurement and vendor management | **Vendor assessments**<br>`vendor-management` | Assess vendor performance, SLAs, renewals, and third-party risks.<br>Outputs: Vendor registers, SLA checks, performance and renewal assessments | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/vendor-management/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/vendor-management/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Procurement and vendor management | **Procurement spend analysis**<br>`procurement-optimizer` | Analyze procurement spend, purchasing cycles, and vendor consolidation opportunities.<br>Outputs: Spend categories, procurement concentration, savings opportunities, action plans | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/procurement-optimizer/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/procurement-optimizer/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Corporate finance and budgeting | **Budgeting and financial analysis**<br>`financial-analyst` | Analyze budget variances, financial ratios, forecasts, or valuations.<br>Outputs: Budget variance reports, financial ratios, cash flow and rolling forecasts | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/financial-analyst/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/financial-analyst/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Corporate finance and budgeting | **Financial statements**<br>`financial-statements` | Prepare financial statements and period variance explanations from actual financial data.<br>Outputs: Income statements, balance sheets, cash flow statements, period comparisons | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/financial-statements/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/financial-statements/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/LICENSE) |
+| Corporate finance and budgeting | **Account reconciliations**<br>`reconciliation` | Reconcile general ledgers, subledgers, bank accounts, or intercompany balances and explain differences.<br>Outputs: Reconciliation schedules, outstanding items, difference classifications, resolution notes | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/reconciliation/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/reconciliation/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/LICENSE) |
+| Corporate finance and budgeting | **Month-end close management**<br>`close-management` | Plan month-end close tasks, schedules, dependencies, and owners.<br>Outputs: Close calendars, task dependencies, owners, status checklists | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/close-management/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/skills/close-management/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/finance/LICENSE) |
+| Legal and compliance | **Contract review preparation**<br>`review-contract` | Review contracts against the company's contract playbook and draft proposed changes.<br>Outputs: Clause risk lists, deviations, draft revisions | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/review-contract/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/review-contract/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/LICENSE) |
+| Legal and compliance | **NDA screening**<br>`triage-nda` | Screen NDA terms and determine whether standard handling or further review is appropriate.<br>Outputs: NDA classifications, problematic clauses, escalation recommendations | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/triage-nda/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/triage-nda/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/LICENSE) |
+| Legal and compliance | **Compliance checks**<br>`compliance-check` | Identify applicable rules, requirements, and compliance questions for a business proposal.<br>Outputs: Compliance analysis, verification items, recommendations | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/compliance-check/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/skills/compliance-check/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/legal/LICENSE) |
+| Legal and compliance | **Compliance readiness assessments**<br>`compliance-readiness` | Organize evidence, gaps, and remediation for multiple compliance frameworks.<br>Outputs: Compliance evidence lists, gap analysis, remediation roadmaps | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/compliance-readiness/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/compliance-readiness/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Business research and data analysis | **Market and industry research**<br>`market-research-reports` | Research market size and the competitive landscape to produce a sourced market report.<br>Outputs: Market definitions, competitive landscapes, market size scenarios, research reports | [Source](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
+| Business research and data analysis | **Research briefs and comparison reports**<br>`notion-research-documentation` | Synthesize existing research into a brief, summary, comparison, or full report.<br>Outputs: Quick briefs, research summaries, comparative analyses, full research reports | [Source](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/SKILL.md) · [Raw](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/SKILL.md) | [MIT](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/LICENSE.txt) |
+| Business research and data analysis | **Business data analysis**<br>`analyze` | Use actual data to answer business questions through group comparisons, trend analysis, or anomaly analysis.<br>Outputs: Metric analysis, group comparisons, anomaly explanations, management reports | [Source](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/data/skills/analyze/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/knowledge-work-plugins/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/data/skills/analyze/SKILL.md) | [Apache-2.0](https://github.com/anthropics/knowledge-work-plugins/blob/ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1/data/LICENSE) |
+| Investment, valuation and due diligence | **Investment due diligence checklists**<br>`dd-checklist` | Start or track investment due diligence, organizing information requests and red flags.<br>Outputs: Due diligence information requests organized by industry and deal type | [Source](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/dd-checklist/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/dd-checklist/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
+| Investment, valuation and due diligence | **Investment committee materials**<br>`ic-memo` | Combine due diligence findings, investment rationale, and deal terms in an investment committee memo.<br>Outputs: Investment recommendations, due diligence findings, financial analysis, deal risks | [Source](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/ic-memo/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/ic-memo/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
+| Investment, valuation and due diligence | **Investment returns and sensitivity analysis**<br>`returns-analysis` | Assess a deal's IRR, MOIC, scenarios, and sensitivities.<br>Outputs: IRR, MOIC, deal scenarios, two-variable sensitivity tables, investment committee return summaries | [Source](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/returns-analysis/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/private-equity/skills/returns-analysis/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
+| Investment, valuation and due diligence | **Populate an existing three-statement model**<br>`3-statement-model` | Populate an existing financial model template with forecast formulas and linked statements.<br>Outputs: Three statements populated in an existing Excel template, forecast formulas, reconciliation checks | [Source](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/3-statement-model/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/3-statement-model/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
+| Equity research and fund operations | **Earnings analysis**<br>`earnings-analysis` | Write an earnings update for a covered company, comparing actual results with expectations.<br>Outputs: Actual-versus-expected comparisons, business drivers, earnings commentary | [Source](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/earnings-analysis/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/earnings-analysis/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
+| Equity research and fund operations | **Sector investment overviews**<br>`sector-overview` | Summarize industry structure, competition, valuations, and investment considerations.<br>Outputs: Industry structure, competitive landscapes, trends, investment discussion materials | [Source](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/sector-overview/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/sector-overview/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
+| Equity research and fund operations | **Balance roll-forward reconciliations**<br>`roll-forward` | Use general ledger evidence to reconcile opening balances, period movements, and closing balances.<br>Outputs: Opening balances, period movements, reversals, closing balance reconciliation schedules | [Source](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/fund-admin/skills/roll-forward/SKILL.md) · [Raw](https://raw.githubusercontent.com/anthropics/financial-services/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/fund-admin/skills/roll-forward/SKILL.md) | [Apache-2.0](https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/LICENSE) |
+| Scientific writing and grant applications | **Scientific reports and manuscripts**<br>`scientific-writing` | Draft a manuscript or scientific report from research findings and sources.<br>Outputs: Manuscript and research report drafts, evidence records, consistency checks | [Source](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-writing/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-writing/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
+| Scientific writing and grant applications | **Literature reviews**<br>`literature-review` | Organize literature searches, screening, citation checks, and synthesis.<br>Outputs: Literature search records, screening results, evidence synthesis, review manuscripts | [Source](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/literature-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/literature-review/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
+| Scientific writing and grant applications | **Research grant applications**<br>`research-grants` | Organize research aims, application materials, and budget justifications to meet funder requirements.<br>Outputs: Application outlines, research aims, budget justifications, requirements checklists | [Source](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/research-grants/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/research-grants/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
+| Scientific writing and grant applications | **Research manuscript reviews**<br>`peer-review` | Review methods and evidence in a research manuscript you are authorized to process.<br>Outputs: Draft manuscript reviews, methodological concerns, evidence review comments | [Source](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/peer-review/SKILL.md) · [Raw](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/peer-review/SKILL.md) | [MIT](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/LICENSE.md) |
+| Information security and quality systems | **Information security audit preparation**<br>`iso27001-audit-prep` | Prepare information security management system audit evidence and identify control gaps.<br>Outputs: ISO 27001 audit evidence, gap lists, remediation plans | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso27001-audit-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso27001-audit-prep/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
+| Information security and quality systems | **Medical device quality system preparation**<br>`iso13485-audit-prep` | Prepare design, CAPA, and audit evidence for a medical device quality management system.<br>Outputs: ISO 13485 audit evidence, process gaps, remediation preparation materials | [Source](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso13485-audit-prep/SKILL.md) · [Raw](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/compliance-os/skills/iso13485-audit-prep/SKILL.md) | [MIT](https://github.com/alirezarezvani/claude-skills/blob/19392f7a08264ed00486a251f5b2098321771f94/LICENSE) |
 
-## 模板与适用说明
+## Templates and scope notes
 
-按大表相同顺序排列。只有确实需要该 Skill 的模板或边界信息时，才读取对应条目。
+Entries follow the same order as the table. Read an entry only when you need that skill's templates or scope information.
 
 <details>
-<summary>会议准备与议程 · <code>notion-meeting-intelligence</code></summary>
+<summary>Meeting preparation and agendas · <code>notion-meeting-intelligence</code></summary>
 
-索引 ID：`oa-notion-meeting-intelligence` · 核对日期：2026-10-09 · 固定提交：`49f948faa9258a0c61caceaf225e179651397431`
+Index ID: `oa-notion-meeting-intelligence` · Reviewed: 2026-10-09 · Pinned commit: `49f948faa9258a0c61caceaf225e179651397431`
 
-原流程从 Notion 获取上下文；有 1:1、决策会、复盘等独立模板。
+The original workflow retrieves context from Notion and includes separate templates for 1:1s, decision meetings, retrospectives, and other meeting types.
 
-**模板文件**
+**Template files**
 
 - [reference/brainstorming-template.md](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/reference/brainstorming-template.md)
 - [reference/decision-meeting-template.md](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-meeting-intelligence/reference/decision-meeting-template.md)
@@ -96,116 +96,116 @@
 </details>
 
 <details>
-<summary>会议议程与行动项 · <code>meetings</code></summary>
+<summary>Meeting agendas and action items · <code>meetings</code></summary>
 
-索引 ID：`ar-meetings` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-meetings` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-附 3 个本地 Python 脚本：会议成本、议程和行动项提取；行动项脚本按明确文本模式提取，复杂笔记仍需模型理解。
+Includes three local Python scripts for meeting costs, agendas, and action item extraction. The action item script uses explicit text patterns; complex notes still require model interpretation.
 
-**模板文件**
+**Template files**
 
 - [assets/meeting_gate_worksheet.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/productivity/meetings/skills/meetings/assets/meeting_gate_worksheet.md)
 
 </details>
 
 <details>
-<summary>内部变更沟通 · <code>internal-comms</code></summary>
+<summary>Internal change communications · <code>internal-comms</code></summary>
 
-索引 ID：`ar-internal-comms` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-internal-comms` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-针对组织变更和新工具推广，附沟通简报模板、公告生成与触达日历脚本。
+Covers organizational changes and new tool adoption, with a communications brief template and scripts for announcements and communication calendars.
 
-**模板文件**
+**Template files**
 
 - [assets/comms_brief_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/internal-comms/assets/comms_brief_template.md)
 
 </details>
 
 <details>
-<summary>新人入职与培训 · <code>onboarding</code></summary>
+<summary>New-hire onboarding and training · <code>onboarding</code></summary>
 
-索引 ID：`kw-onboarding` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-onboarding` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-可直接提取入职阶段、负责人、检查项和阶段目标；公司制度及岗位差异由实际资料填充。
+Reuse its onboarding phases, owners, checklists, and milestones; fill in company policies and role-specific requirements from actual source material.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>结构化面试 · <code>interview-prep</code></summary>
-
-索引 ID：`kw-interview-prep` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>绩效评估 · <code>performance-review</code></summary>
+<summary>Structured interviews · <code>interview-prep</code></summary>
 
-索引 ID：`kw-performance-review` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-interview-prep` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>录用方案与 Offer · <code>draft-offer</code></summary>
-
-索引 ID：`kw-draft-offer` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-生成录用草稿和薪酬摘要；条款须使用公司认可版本及适用地区规则。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>人力资源分析 · <code>people-report</code></summary>
+<summary>Performance reviews · <code>performance-review</code></summary>
 
-索引 ID：`kw-people-report` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-performance-review` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>业务流程与 SOP · <code>process-doc</code></summary>
-
-索引 ID：`kw-process-doc` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>操作手册 · <code>runbook</code></summary>
+<summary>Job offers and compensation · <code>draft-offer</code></summary>
 
-索引 ID：`kw-runbook` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-draft-offer` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Produces offer drafts and compensation summaries. Use company-approved terms and the rules applicable to the location.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>知识库与制度维护 · <code>knowledge-ops</code></summary>
+<summary>People analytics · <code>people-report</code></summary>
 
-索引 ID：`ar-knowledge-ops` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `kw-people-report` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-自带 SOP、操作手册模板及生成、校验脚本，资源较完整。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-**模板文件**
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Business processes and SOPs · <code>process-doc</code></summary>
+
+Index ID: `kw-process-doc` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Operational runbooks · <code>runbook</code></summary>
+
+Index ID: `kw-runbook` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Knowledge base and policy maintenance · <code>knowledge-ops</code></summary>
+
+Index ID: `ar-knowledge-ops` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
+
+Includes SOP and runbook templates, plus generation and validation scripts.
+
+**Template files**
 
 - [assets/runbook_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/knowledge-ops/assets/runbook_template.md)
 - [assets/sop_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/knowledge-ops/assets/sop_template.md)
@@ -213,24 +213,24 @@
 </details>
 
 <details>
-<summary>运营风险评估 · <code>risk-assessment</code></summary>
+<summary>Operational risk assessments · <code>risk-assessment</code></summary>
 
-索引 ID：`kw-risk-assessment` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-risk-assessment` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>项目规划与治理 · <code>senior-pm</code></summary>
+<summary>Project planning and governance · <code>senior-pm</code></summary>
 
-索引 ID：`ar-senior-pm` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-senior-pm` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-自带项目章程、职责矩阵和管理层报告模板；还有风险、资源和项目健康分析脚本。
+Includes project charter, responsibility matrix, and executive reporting templates, plus scripts for risk, resource, and project health analysis.
 
-**模板文件**
+**Template files**
 
 - [assets/executive_report_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/project-management/skills/senior-pm/assets/executive_report_template.md)
 - [assets/project_charter_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/project-management/skills/senior-pm/assets/project_charter_template.md)
@@ -239,169 +239,169 @@
 </details>
 
 <details>
-<summary>项目进度报告 · <code>status-report</code></summary>
+<summary>Project status reports · <code>status-report</code></summary>
 
-索引 ID：`kw-status-report` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-status-report` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>系统与流程变更申请 · <code>change-request</code></summary>
-
-索引 ID：`kw-change-request` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>产品需求文档 · <code>write-spec</code></summary>
+<summary>System and process change requests · <code>change-request</code></summary>
 
-索引 ID：`kw-write-spec` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-change-request` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-内含完整 PRD 结构与验收标准写法；可结合问题追踪和反馈接口获取背景。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>产品路线图 · <code>roadmap-update</code></summary>
-
-索引 ID：`kw-roadmap-update` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>用户研究总结 · <code>synthesize-research</code></summary>
+<summary>Product requirements documents · <code>write-spec</code></summary>
 
-索引 ID：`kw-synthesize-research` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-write-spec` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-以实际访谈、反馈与支持记录归纳主题，适合接在用户研究或客服数据之后。
+Includes a complete PRD structure and guidance for writing acceptance criteria. Issue tracking and feedback integrations can supply context.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>用户研究设计 · <code>user-research</code></summary>
-
-索引 ID：`kw-user-research` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>营销活动策划 · <code>campaign-plan</code></summary>
+<summary>Product roadmaps · <code>roadmap-update</code></summary>
 
-索引 ID：`kw-campaign-plan` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-roadmap-update` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>品牌表达检查 · <code>brand-review</code></summary>
-
-索引 ID：`kw-brand-review` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-以实际品牌规范为优先依据；未配置规范时只做通用表达检查。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>内容创作 · <code>content-creation</code></summary>
+<summary>User research synthesis · <code>synthesize-research</code></summary>
 
-索引 ID：`kw-content-creation` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-synthesize-research` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Synthesizes themes from actual interviews, feedback, and support records; suited to working with user research or customer support data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>营销效果复盘 · <code>performance-report</code></summary>
-
-索引 ID：`kw-performance-report` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>商业提案与工作范围 · <code>contract-and-proposal-writer</code></summary>
+<summary>User research design · <code>user-research</code></summary>
 
-索引 ID：`ar-contract-and-proposal-writer` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `kw-user-research` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-模板嵌在 SKILL.md 内；含商业提案、SOW、合同等结构，原版输出 Markdown 并给出 DOCX 转换指引。法律条款以适用地区和公司条款为准。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>客户会议准备 · <code>call-prep</code></summary>
-
-索引 ID：`kw-call-prep` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-原流程可汇总 CRM、邮件、日历、会议记录，也支持用户提供的资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>重点客户经营计划 · <code>account-plan</code></summary>
+<summary>Marketing campaign planning · <code>campaign-plan</code></summary>
 
-索引 ID：`kw-account-plan` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-campaign-plan` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-原流程支持生成计划文档并将要点同步 CRM；也有文件输入及文本输出路径。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>招投标与 RFP 响应 · <code>rfp-responder</code></summary>
+<summary>Brand consistency reviews · <code>brand-review</code></summary>
 
-索引 ID：`ar-rfp-responder` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `kw-brand-review` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-有 RFP 接收模板、要求解析与响应草稿脚本；能力陈述应绑定实际证据。
+Prioritize the actual brand guidelines. When none are configured, limit the review to general messaging quality.
 
-**模板文件**
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Content creation · <code>content-creation</code></summary>
+
+Index ID: `kw-content-creation` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Marketing performance reviews · <code>performance-report</code></summary>
+
+Index ID: `kw-performance-report` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Business proposals and scopes of work · <code>contract-and-proposal-writer</code></summary>
+
+Index ID: `ar-contract-and-proposal-writer` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
+
+Templates are embedded in SKILL.md and cover business proposals, SOWs, and contracts. The original workflow outputs Markdown and provides DOCX conversion guidance. Use legal terms appropriate to the jurisdiction and company.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Customer meeting preparation · <code>call-prep</code></summary>
+
+Index ID: `kw-call-prep` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+
+The original workflow can combine CRM records, emails, calendars, and meeting notes, and also supports user-supplied material.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Strategic account plans · <code>account-plan</code></summary>
+
+Index ID: `kw-account-plan` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+
+The original workflow can generate a plan document and sync key points to a CRM. File input and text output are also supported.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>RFP and tender responses · <code>rfp-responder</code></summary>
+
+Index ID: `ar-rfp-responder` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
+
+Includes an RFP intake template and scripts for requirements parsing and response drafts. Tie capability claims to actual evidence.
+
+**Template files**
 
 - [assets/rfp_intake_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/rfp-responder/assets/rfp_intake_template.md)
 
 </details>
 
 <details>
-<summary>客户成功计划与 QBR · <code>customer-success-manager</code></summary>
+<summary>Customer success plans and QBRs · <code>customer-success-manager</code></summary>
 
-索引 ID：`ar-customer-success-manager` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-customer-success-manager` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-自带客户上线、成功计划、QBR 和管理层业务回顾模板，以及健康度与流失分析脚本。
+Includes customer onboarding, success plan, QBR, and executive business review templates, plus health and churn analysis scripts.
 
-**模板文件**
+**Template files**
 
 - [assets/executive_business_review_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/customer-success-manager/assets/executive_business_review_template.md)
 - [assets/onboarding_checklist_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/customer-success-manager/assets/onboarding_checklist_template.md)
@@ -411,83 +411,83 @@
 </details>
 
 <details>
-<summary>客户帮助文档 · <code>kb-article</code></summary>
+<summary>Customer help articles · <code>kb-article</code></summary>
 
-索引 ID：`kw-kb-article` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-kb-article` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>客户问题升级 · <code>customer-escalation</code></summary>
-
-索引 ID：`kw-customer-escalation` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>董事会与管理层汇报 · <code>board-deck-builder</code></summary>
+<summary>Customer issue escalations · <code>customer-escalation</code></summary>
 
-索引 ID：`ar-board-deck-builder` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `kw-customer-escalation` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供董事会内容结构与 Markdown 模板；不包含现成的 PPTX 视觉版式模板。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-**模板文件**
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Board and executive reporting · <code>board-deck-builder</code></summary>
+
+Index ID: `ar-board-deck-builder` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
+
+Provides a board content structure and Markdown templates. It does not include ready-made PPTX visual layout templates.
+
+**Template files**
 
 - [templates/board-deck-template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/c-level-advisor/skills/board-deck-builder/templates/board-deck-template.md)
 
 </details>
 
 <details>
-<summary>经营战略分析 · <code>ceo-advisor</code></summary>
+<summary>Business strategy analysis · <code>ceo-advisor</code></summary>
 
-索引 ID：`ar-ceo-advisor` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-ceo-advisor` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-适合战略分析和管理层沟通；包含战略与财务情景分析工具，需由实际经营数据支撑。
+Supports strategy analysis and executive communication. Includes strategic and financial scenario analysis tools that require actual business data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>目标对齐与战略检查 · <code>strategic-alignment</code></summary>
-
-索引 ID：`ar-strategic-alignment` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
-
-侧重战略到目标的映射、冲突和组织协作问题，不是单纯的 OKR 表格生成器。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>定价与产品套餐策略 · <code>pricing-strategist</code></summary>
+<summary>Goal alignment and strategy reviews · <code>strategic-alignment</code></summary>
 
-索引 ID：`ar-pricing-strategist` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-strategic-alignment` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-自带定价简报模板和模式选择、付费意愿、套餐设计脚本；需要真实客户及价值信息。
+Focuses on mapping strategy to goals, identifying conflicts, and addressing organizational coordination issues; its scope extends beyond generating OKR tables.
 
-**模板文件**
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Pricing and product packaging · <code>pricing-strategist</code></summary>
+
+Index ID: `ar-pricing-strategist` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
+
+Includes a pricing brief template and scripts for model selection, willingness to pay, and package design. Requires actual customer and value information.
+
+**Template files**
 
 - [assets/pricing_brief_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/pricing-strategist/assets/pricing_brief_template.md)
 
 </details>
 
 <details>
-<summary>收入运营分析 · <code>revenue-operations</code></summary>
+<summary>Revenue operations analysis · <code>revenue-operations</code></summary>
 
-索引 ID：`ar-revenue-operations` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-revenue-operations` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-自带管线复盘、预测报告和 GTM 看板模板，适合连接 CRM 与收入数据。
+Includes pipeline review, forecast report, and go-to-market dashboard templates; suited to CRM and revenue data.
 
-**模板文件**
+**Template files**
 
 - [assets/forecast_report_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/revenue-operations/assets/forecast_report_template.md)
 - [assets/gtm_dashboard_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-growth/skills/revenue-operations/assets/gtm_dashboard_template.md)
@@ -496,52 +496,52 @@
 </details>
 
 <details>
-<summary>商业预测 · <code>commercial-forecaster</code></summary>
+<summary>Commercial forecasting · <code>commercial-forecaster</code></summary>
 
-索引 ID：`ar-commercial-forecaster` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-commercial-forecaster` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-以商机、客户群和历史转化为输入；有预订额、ARR 和漏斗置信分析脚本。
+Uses opportunities, customer cohorts, and historical conversions as inputs. Includes scripts for bookings, ARR, and funnel confidence analysis.
 
-**模板文件**
+**Template files**
 
 - [assets/forecast_intake_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/commercial/skills/commercial-forecaster/assets/forecast_intake_template.md)
 
 </details>
 
 <details>
-<summary>供应商评估 · <code>vendor-management</code></summary>
+<summary>Vendor assessments · <code>vendor-management</code></summary>
 
-索引 ID：`ar-vendor-management` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-vendor-management` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-有供应商台账模板及评分、SLA、风险脚本；评分权重需适配采购政策。
+Includes a vendor register template and scoring, SLA, and risk scripts. Adjust scoring weights to the procurement policy.
 
-**模板文件**
+**Template files**
 
 - [assets/vendor_catalog_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/vendor-management/assets/vendor_catalog_template.md)
 
 </details>
 
 <details>
-<summary>采购支出分析 · <code>procurement-optimizer</code></summary>
+<summary>Procurement spend analysis · <code>procurement-optimizer</code></summary>
 
-索引 ID：`ar-procurement-optimizer` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-procurement-optimizer` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-有支出接收模板及支出归类、采购周期和供应商整合脚本。
+Includes a spend intake template and scripts for spend categorization, purchasing cycles, and vendor consolidation.
 
-**模板文件**
+**Template files**
 
 - [assets/spend_intake_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/business-operations/skills/procurement-optimizer/assets/spend_intake_template.md)
 
 </details>
 
 <details>
-<summary>预算与财务分析 · <code>financial-analyst</code></summary>
+<summary>Budgeting and financial analysis · <code>financial-analyst</code></summary>
 
-索引 ID：`ar-financial-analyst` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-financial-analyst` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-有预算差异、预测、DCF 报告模板及配套计算脚本，财务报告资源较完整。
+Includes budget variance, forecast, and DCF report templates with supporting calculation scripts.
 
-**模板文件**
+**Template files**
 
 - [assets/dcf_analysis_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/financial-analyst/assets/dcf_analysis_template.md)
 - [assets/forecast_report_template.md](https://raw.githubusercontent.com/alirezarezvani/claude-skills/19392f7a08264ed00486a251f5b2098321771f94/finance/skills/financial-analyst/assets/forecast_report_template.md)
@@ -550,90 +550,90 @@
 </details>
 
 <details>
-<summary>经营财务报表 · <code>financial-statements</code></summary>
+<summary>Financial statements · <code>financial-statements</code></summary>
 
-索引 ID：`kw-financial-statements` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-financial-statements` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-按实际财务数据组织三张报表和差异说明；会计准则与披露口径需按适用地区配置。
+Organizes the three financial statements and variance explanations from actual financial data. Apply the accounting standards and disclosure requirements of the relevant jurisdiction.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>账户对账 · <code>reconciliation</code></summary>
-
-索引 ID：`kw-reconciliation` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>月结管理 · <code>close-management</code></summary>
+<summary>Account reconciliations · <code>reconciliation</code></summary>
 
-索引 ID：`kw-close-management` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-reconciliation` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>合同审阅准备 · <code>review-contract</code></summary>
-
-索引 ID：`kw-review-contract` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-优先使用组织自己的条款手册，输出条款偏离及修改建议草稿。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>保密协议初筛 · <code>triage-nda</code></summary>
+<summary>Month-end close management · <code>close-management</code></summary>
 
-索引 ID：`kw-triage-nda` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-close-management` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>合规问题检查 · <code>compliance-check</code></summary>
-
-索引 ID：`kw-compliance-check` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
-
-覆盖合规要求与风险的整理；需要适用地区、业务范围与最新规则。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>合规准备度评估 · <code>compliance-readiness</code></summary>
+<summary>Contract review preparation · <code>review-contract</code></summary>
 
-索引 ID：`ar-compliance-readiness` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `kw-review-contract` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-通过六组问题组织多框架合规准备，原流程还引用同仓库审计工具；输出是准备度与整改材料。
+Use the organization's own contract playbook as the primary reference; identify clause deviations and draft proposed revisions.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>市场与行业研究 · <code>market-research-reports</code></summary>
+<summary>NDA screening · <code>triage-nda</code></summary>
 
-索引 ID：`kd-market-research-reports` · 核对日期：2026-10-09 · 固定提交：`92ace75ac21efe19a620434e0ca4e356081fe807`
+Index ID: `kw-triage-nda` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-有来源与论断台账、竞争矩阵、市场规模及敏感性工具，以及可选 LaTeX 报告模板。
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
 
-**模板文件**
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Compliance checks · <code>compliance-check</code></summary>
+
+Index ID: `kw-compliance-check` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+
+Organizes compliance requirements and risks. Requires the applicable jurisdiction, business scope, and current rules.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Compliance readiness assessments · <code>compliance-readiness</code></summary>
+
+Index ID: `ar-compliance-readiness` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
+
+Uses six groups of questions to organize readiness across multiple compliance frameworks. The original workflow also references audit tools in the same repository. Outputs readiness assessments and remediation materials.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Market and industry research · <code>market-research-reports</code></summary>
+
+Index ID: `kd-market-research-reports` · Reviewed: 2026-10-09 · Pinned commit: `92ace75ac21efe19a620434e0ca4e356081fe807`
+
+Includes source and claim ledgers, competitive matrices, market sizing and sensitivity tools, and optional LaTeX report templates.
+
+**Template files**
 
 - [assets/claims_ledger_template.csv](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/assets/claims_ledger_template.csv)
 - [assets/competitor_feature_matrix_template.csv](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/assets/competitor_feature_matrix_template.csv)
@@ -647,13 +647,13 @@
 </details>
 
 <details>
-<summary>研究简报与对比报告 · <code>notion-research-documentation</code></summary>
+<summary>Research briefs and comparison reports · <code>notion-research-documentation</code></summary>
 
-索引 ID：`oa-notion-research-documentation` · 核对日期：2026-10-09 · 固定提交：`49f948faa9258a0c61caceaf225e179651397431`
+Index ID: `oa-notion-research-documentation` · Reviewed: 2026-10-09 · Pinned commit: `49f948faa9258a0c61caceaf225e179651397431`
 
-自带快速简报、研究摘要、对比分析、完整报告四类模板；原流程读取并写入 Notion。
+Includes four template types: quick briefs, research summaries, comparative analyses, and full reports. The original workflow reads from and writes to Notion.
 
-**模板文件**
+**Template files**
 
 - [reference/comparison-template.md](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/reference/comparison-template.md)
 - [reference/comprehensive-report-template.md](https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/notion-research-documentation/reference/comprehensive-report-template.md)
@@ -663,101 +663,101 @@
 </details>
 
 <details>
-<summary>经营数据分析 · <code>analyze</code></summary>
+<summary>Business data analysis · <code>analyze</code></summary>
 
-索引 ID：`kw-analyze` · 核对日期：2026-10-09 · 固定提交：`ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
+Index ID: `kw-analyze` · Reviewed: 2026-10-09 · Pinned commit: `ae1513ea94dcb74a7f1505ddcf3b0ec3fab327f1`
 
-支持从数据仓库或用户提供的数据回答业务问题；先核对口径和分析结果，再呈现结论。
+Answers business questions using a data warehouse or user-supplied data. Verify metric definitions and analytical results before presenting conclusions.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>投资尽调清单 · <code>dd-checklist</code></summary>
-
-索引 ID：`fs-dd-checklist` · 核对日期：2026-10-09 · 固定提交：`574ed3624aebd0418c7e96cd101262f30210ab26`
-
-按行业和交易类型拆分工作流、资料请求、进度和红旗问题。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>投委会决策材料 · <code>ic-memo</code></summary>
+<summary>Investment due diligence checklists · <code>dd-checklist</code></summary>
 
-索引 ID：`fs-ic-memo` · 核对日期：2026-10-09 · 固定提交：`574ed3624aebd0418c7e96cd101262f30210ab26`
+Index ID: `fs-dd-checklist` · Reviewed: 2026-10-09 · Pinned commit: `574ed3624aebd0418c7e96cd101262f30210ab26`
 
-包含投资逻辑、财务、尽调、风险和退出等章节；适合连接数据室与财务资料。
+Organizes workstreams, information requests, progress, and red flags by industry and deal type.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>投资回报与敏感性分析 · <code>returns-analysis</code></summary>
-
-索引 ID：`fs-returns-analysis` · 核对日期：2026-10-09 · 固定提交：`574ed3624aebd0418c7e96cd101262f30210ab26`
-
-含交易输入、回报公式、敏感性矩阵、情景表和投委会摘要结构；需要实际交易假设及表格计算工具。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>填充现有财务三表模板 · <code>3-statement-model</code></summary>
+<summary>Investment committee materials · <code>ic-memo</code></summary>
 
-索引 ID：`fs-3-statement-model` · 核对日期：2026-10-09 · 固定提交：`574ed3624aebd0418c7e96cd101262f30210ab26`
+Index ID: `fs-ic-memo` · Reviewed: 2026-10-09 · Pinned commit: `574ed3624aebd0418c7e96cd101262f30210ab26`
 
-必须已有模型模板；原版设多个逐阶段确认点，要求公式重算及三表勾稽校验。
+Includes sections for investment rationale, financials, due diligence, risks, and exit considerations; suited to data room and financial source material.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>财报点评 · <code>earnings-analysis</code></summary>
-
-索引 ID：`fs-earnings-analysis` · 核对日期：2026-10-09 · 固定提交：`574ed3624aebd0418c7e96cd101262f30210ab26`
-
-原版建议 8–12 页；可复用其分析结构，篇幅按实际任务设置，不将该页数变成所有报告的硬限制。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>行业投资概览 · <code>sector-overview</code></summary>
+<summary>Investment returns and sensitivity analysis · <code>returns-analysis</code></summary>
 
-索引 ID：`fs-sector-overview` · 核对日期：2026-10-09 · 固定提交：`574ed3624aebd0418c7e96cd101262f30210ab26`
+Index ID: `fs-returns-analysis` · Reviewed: 2026-10-09 · Pinned commit: `574ed3624aebd0418c7e96cd101262f30210ab26`
 
-提供该业务场景的流程、内容结构与检查要点，可结合现有接口获取实际资料。
+Includes deal inputs, return formulas, sensitivity matrices, scenario tables, and an investment committee summary structure. Requires actual deal assumptions and spreadsheet calculation tools.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
-
-</details>
-
-<details>
-<summary>余额滚动核对 · <code>roll-forward</code></summary>
-
-索引 ID：`fs-roll-forward` · 核对日期：2026-10-09 · 固定提交：`574ed3624aebd0418c7e96cd101262f30210ab26`
-
-原流程使用 internal-gl MCP 查询总账并逐行引用；重点是核对期初到期末勾稽。
-
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>科研报告与论文写作 · <code>scientific-writing</code></summary>
+<summary>Populate an existing three-statement model · <code>3-statement-model</code></summary>
 
-索引 ID：`kd-scientific-writing` · 核对日期：2026-10-09 · 固定提交：`92ace75ac21efe19a620434e0ca4e356081fe807`
+Index ID: `fs-3-statement-model` · Reviewed: 2026-10-09 · Pinned commit: `574ed3624aebd0418c7e96cd101262f30210ab26`
 
-自带稿件骨架、证据和来源清单及离线校验工具，核心指引不要求外部 API。
+Requires an existing model template. The original workflow has several stage-by-stage confirmation points and requires formula recalculation and reconciliation across the three statements.
 
-**模板文件**
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Earnings analysis · <code>earnings-analysis</code></summary>
+
+Index ID: `fs-earnings-analysis` · Reviewed: 2026-10-09 · Pinned commit: `574ed3624aebd0418c7e96cd101262f30210ab26`
+
+The original recommends 8-12 pages. Reuse its analytical structure and set length for the actual task; this recommendation is not a universal report page limit.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Sector investment overviews · <code>sector-overview</code></summary>
+
+Index ID: `fs-sector-overview` · Reviewed: 2026-10-09 · Pinned commit: `574ed3624aebd0418c7e96cd101262f30210ab26`
+
+Provides a workflow, content structure, and checks for this business scenario; existing integrations can supply the relevant data.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Balance roll-forward reconciliations · <code>roll-forward</code></summary>
+
+Index ID: `fs-roll-forward` · Reviewed: 2026-10-09 · Pinned commit: `574ed3624aebd0418c7e96cd101262f30210ab26`
+
+The original workflow queries the general ledger through internal-gl MCP and cites evidence line by line. Focuses on reconciling opening balances through to closing balances.
+
+No separate template files; use the structure and workflow in the skill source.
+
+</details>
+
+<details>
+<summary>Scientific reports and manuscripts · <code>scientific-writing</code></summary>
+
+Index ID: `kd-scientific-writing` · Reviewed: 2026-10-09 · Pinned commit: `92ace75ac21efe19a620434e0ca4e356081fe807`
+
+Includes manuscript outlines, evidence and source lists, and offline validation tools. The core guidance does not require an external API.
+
+**Template files**
 
 - [assets/authorship_template.json](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-writing/assets/authorship_template.json)
 - [assets/claim_evidence_template.csv](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-writing/assets/claim_evidence_template.csv)
@@ -770,26 +770,26 @@
 </details>
 
 <details>
-<summary>文献综述 · <code>literature-review</code></summary>
+<summary>Literature reviews · <code>literature-review</code></summary>
 
-索引 ID：`kd-literature-review` · 核对日期：2026-10-09 · 固定提交：`92ace75ac21efe19a620434e0ca4e356081fe807`
+Index ID: `kd-literature-review` · Reviewed: 2026-10-09 · Pinned commit: `92ace75ac21efe19a620434e0ca4e356081fe807`
 
-有综述模板、检索与引用核验脚本；联网检索、可选 AI 插图及 PDF 导出各有工具依赖。
+Includes review templates, search scripts, and citation verification scripts. Online search, optional AI illustrations, and PDF export each have tool dependencies.
 
-**模板文件**
+**Template files**
 
 - [assets/review_template.md](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/literature-review/assets/review_template.md)
 
 </details>
 
 <details>
-<summary>课题与科研经费申请 · <code>research-grants</code></summary>
+<summary>Research grant applications · <code>research-grants</code></summary>
 
-索引 ID：`kd-research-grants` · 核对日期：2026-10-09 · 固定提交：`92ace75ac21efe19a620434e0ca4e356081fe807`
+Index ID: `kd-research-grants` · Reviewed: 2026-10-09 · Pinned commit: `92ace75ac21efe19a620434e0ca4e356081fe807`
 
-有研究目标、项目摘要和预算说明模板；针对实际资助机构最新申请指南调整。
+Includes specific aims, project summary, and budget justification templates. Adapt them to the relevant funder's current application guidelines.
 
-**模板文件**
+**Template files**
 
 - [assets/budget_justification_template.md](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/research-grants/assets/budget_justification_template.md)
 - [assets/nih_specific_aims_template.md](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/research-grants/assets/nih_specific_aims_template.md)
@@ -798,13 +798,13 @@
 </details>
 
 <details>
-<summary>研究稿件评审 · <code>peer-review</code></summary>
+<summary>Research manuscript reviews · <code>peer-review</code></summary>
 
-索引 ID：`kd-peer-review` · 核对日期：2026-10-09 · 固定提交：`92ace75ac21efe19a620434e0ca4e356081fe807`
+Index ID: `kd-peer-review` · Reviewed: 2026-10-09 · Pinned commit: `92ace75ac21efe19a620434e0ca4e356081fe807`
 
-自带评审骨架、证据矩阵和校验工具；按稿件保密与期刊 AI 使用政策处理，意见由评审人确认。
+Includes review outlines, evidence matrices, and validation tools. Follow manuscript confidentiality requirements and journal policies on AI use; the reviewer confirms the comments.
 
-**模板文件**
+**Template files**
 
 - [assets/citation_references_template.csv](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/peer-review/assets/citation_references_template.csv)
 - [assets/claim_evidence_matrix_template.csv](https://raw.githubusercontent.com/K-Dense-AI/scientific-agent-skills/92ace75ac21efe19a620434e0ca4e356081fe807/skills/peer-review/assets/claim_evidence_matrix_template.csv)
@@ -817,23 +817,23 @@
 </details>
 
 <details>
-<summary>信息安全体系审计准备 · <code>iso27001-audit-prep</code></summary>
+<summary>Information security audit preparation · <code>iso27001-audit-prep</code></summary>
 
-索引 ID：`ar-iso27001-audit-prep` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-iso27001-audit-prep` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-提供审计准备的六组问题和结果结构，引用同仓库工具；用于证据与缺口准备，不构成认证。
+Provides six groups of audit preparation questions and a results structure, with references to tools in the same repository. Supports evidence and gap preparation; it does not constitute certification.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
 
 <details>
-<summary>医疗器械质量体系准备 · <code>iso13485-audit-prep</code></summary>
+<summary>Medical device quality system preparation · <code>iso13485-audit-prep</code></summary>
 
-索引 ID：`ar-iso13485-audit-prep` · 核对日期：2026-10-09 · 固定提交：`19392f7a08264ed00486a251f5b2098321771f94`
+Index ID: `ar-iso13485-audit-prep` · Reviewed: 2026-10-09 · Pinned commit: `19392f7a08264ed00486a251f5b2098321771f94`
 
-针对医疗器械设计控制、CAPA 和上市后证据；引用同仓库质量工具，条款须匹配最新标准与目标市场。
+Covers medical device design controls, CAPA, and post-market evidence, with references to quality tools in the same repository. Match requirements to current standards and the target market.
 
-无独立模板文件；参考 Skill 原文内的结构与流程。
+No separate template files; use the structure and workflow in the skill source.
 
 </details>
