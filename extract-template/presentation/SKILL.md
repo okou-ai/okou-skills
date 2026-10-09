@@ -10,6 +10,11 @@ original file unchanged. Upload analysis saves source style and source layouts;
 **generation** selectively adapts local reference layouts when originals do not fit.
 No private repository, external layout catalogue or GitHub credential is required.
 
+Write all authoring/generation prompts and guidance in English, including the
+user package's SKILL.md, READMEs, design-system instructions and references.
+Preserve original quoted content, font-family names and the user's requested
+presentation language; English guidance does not mean translating the source deck.
+
 ## 1. Inspect every source page
 
 Render PPT/PPTX/PDF in order:
