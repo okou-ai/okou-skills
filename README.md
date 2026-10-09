@@ -62,7 +62,7 @@ To add a new skill or improve an existing one:
 ## Business document reference index
 
 [business-skill-index](business-skill-index/SKILL.md) provides a
-[62-row reference table](business-skill-index/references/skill-index.csv) across
+[62-row Markdown reference table](business-skill-index/references/skill-index.md) across
 18 business scenarios. Agents match the task, read the selected pinned source,
 and fetch supporting templates only when needed. The repository keeps the index
 and selection prompt, not copies of the upstream skill collection.

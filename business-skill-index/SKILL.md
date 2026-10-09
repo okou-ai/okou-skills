@@ -5,7 +5,7 @@ description: Find task-specific structures, templates, and quality checks for bu
 
 # Business Skill Index
 
-Use [the reference table](references/skill-index.csv) to find relevant upstream
+Use [the reference table](references/skill-index.md) to find relevant upstream
 guidance, then read the selected source. The table contains 62 references across
 18 business scenarios, reviewed on 2026-10-09. It stores metadata and addresses,
 not copies of third-party skills, templates, or scripts.
@@ -15,27 +15,26 @@ not copies of third-party skills, templates, or scripts.
 1. Identify the business task, audience, intended output, and available evidence.
    Honor a user-supplied template or required structure. Skip discovery when a
    narrow edit or conversion already has everything it needs.
-2. Search the table's `scenario`, `use_when`, and `outputs`, using the task's
+2. Search the table's business scenario, task, and output columns, using the task's
    terms, English skill names, or Chinese equivalents. Start with the best match;
    add complementary references only when they cover a real gap in the task.
-3. Read the selected row's `raw_url` to obtain its pinned `SKILL.md`.
-   `source_url` opens the same file on GitHub. Do not fetch every skill or clone
+3. Read the selected row's **Raw** link to obtain its pinned `SKILL.md`.
+   **原文** opens the same file on GitHub. Do not fetch every skill or clone
    a repository to make this selection.
 4. Read a referenced template or supporting file only when needed. Resolve
-   relative paths against the directory of `raw_url`, preserving its repository
-   and commit. `template_raw_urls` lists known templates separated by ` | `.
+   relative paths against the directory of the Raw link, preserving its repository
+   and commit. The matching entry under **模板与适用说明** lists known template links.
 5. Apply the useful content structure, required inputs, and checks to the user's
    material, then continue with the existing authoring and delivery workflow.
 
 Run this search from this skill's directory; it reads only the index:
 
 ```bash
-rg -n -i 'onboarding|入职' references/skill-index.csv
+rg -n -i 'onboarding|入职' references/skill-index.md
 ```
 
-Use the available HTTP/file-reading tool for the chosen address. If parsing the
-table programmatically, use a CSV reader rather than splitting rows on commas.
-Keep any fetched files in the task workspace, and reuse a reference already read
+Use the available HTTP/file-reading tool for the chosen address. Keep any
+fetched files in the task workspace, and reuse a reference already read
 at the same commit. Do not vendor the upstream collection into this skill repo.
 
 ## Apply the reference to the task
@@ -51,7 +50,7 @@ at the same commit. Do not vendor the upstream collection into this skill repo.
 - Interface dependencies are not grounds to reject an otherwise useful
   reference. Use available, authorized tools and supplied material; the index
   does not claim that upstream tool names or integrations are already installed.
-- If a pinned source is unavailable, try its `source_url`, another suitable
+- If a pinned source is unavailable, try its **原文** link, another suitable
   indexed reference, or the user's existing material. Do not silently switch to
   the latest branch or claim to have applied a source you could not read.
 
@@ -61,14 +60,14 @@ to change a heading font or convert an existing document needs no index lookup.
 
 ## License and maintenance
 
-`license` and `license_url` describe the reviewed skill at `commit`, not every
+The **许可** link describes the reviewed skill at its pinned commit, not every
 external service, dataset, model, or dependency it mentions. Entries use MIT or
 Apache-2.0; they have been checked for licensing and content, not individually
 execution-tested. Preserve applicable copyright, license and NOTICE material
 when copying or adapting content; mark changes to Apache-licensed files.
 
-Maintain this CSV as the single source of truth. When adding or updating a row,
-check the source and its applicable license at the exact commit, update
-`reviewed_at`, and retain the specific `scope_note`. Do not add unlicensed,
-noncommercial, or separately restricted dependencies under a permissive parent
-entry. Store links and routing metadata, never upstream skill bodies.
+Maintain this Markdown index as the single source of truth. When adding or
+updating a row, check the source and its applicable license at the exact commit,
+update the entry's review date, and retain its specific scope notes. Do not add
+unlicensed, noncommercial, or separately restricted dependencies under a
+permissive parent entry. Store links and routing metadata, never upstream bodies.
