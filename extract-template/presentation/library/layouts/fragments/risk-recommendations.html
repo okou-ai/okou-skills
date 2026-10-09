@@ -1,0 +1,20 @@
+<section class="builtin-layout" data-layout="risk-recommendations">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-stack">
+      <article class="bl-pair" data-repeat="risks">
+        <div class="bl-stack">
+          <div data-text-role="heading">{{risk-title}}</div>
+          <div data-text-role="body">{{risk-evidence}}</div>
+        </div>
+        <div class="bl-stack">
+          <div data-text-role="heading">{{response-title}}</div>
+          <div data-text-role="body">{{response-action}}</div>
+          <div data-text-role="caption">{{response-owner}}</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

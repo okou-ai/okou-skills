@@ -4,9 +4,11 @@
 
 Inspect every source page. Preserve distinct content regions, proportions, and hierarchy; equivalent structures may share a layout with separate background variants.
 
-In `layouts/source-index.json`, record the source filename, page count, and original aspect ratio. Each layout entry needs an ID, file path, source pages, purpose, content regions, and approximate capacity. Cover every input page and note material adaptations to 16:9. Capacities guide selection; actual fit depends on content, language, and font.
+In `layouts/source-index.json`, use `sourceFilename`, positive `pageCount`, original `sourceAspectRatio` and a `layouts` array. Each entry records `id`, `file` (relative to `layouts/`, under `source/`), `sourcePages` (one-based integers), `purpose`, `regions` and `capacity`. IDs are unique; cover every input page and note material adaptations to 16:9. Capacities guide selection; actual fit depends on content, language and font. Run the packaged `tools/verify-package.mjs` before publication.
 
-Prefer a source layout whose regions and capacity fit. If none fits, create a documented layout using the same design system. Do not force incompatible content into an existing composition.
+During generation, prefer a source layout whose regions and capacity fit. If none fits, choose from the packaged local `library/references/catalog.json`, copy only selected fragments into the working deck, and adapt them to the user's design system. Only when neither source nor local references fits should a documented source-styled composition be created. Do not force incompatible content into an existing composition.
+
+Keep the source upload and library originals immutable. Upload analysis preserves source compositions and copies the neutral library; it does not pre-style the full library. Library adaptations belong to the generated working deck, not the original-source inventory.
 
 ## Background elements and recipes
 
@@ -32,7 +34,7 @@ Include these rules in the generated package's `SKILL.md` and `layouts/README.md
 
 1. Select a fitting source layout first, then a source-observed background recipe suited to its role and content density.
 2. Respect the recipe's usable content area and documented color, placement, scale, crop, and repetition rules. Keep decoration out of body-copy regions unless the source supports it.
-3. Prefer compatible quiet backgrounds for dense content. If decoration conflicts, change the recipe before reconsidering the layout; do not displace a fitting source layout or shrink typography just to fit an ornament.
+3. Prefer compatible quiet backgrounds for dense content. If decoration conflicts, change the recipe before reconsidering the layout. Do not shrink type merely to accommodate an ornament. Real content overflow uses the shared local fitter with the fixed 10px minimum; source sizes are initial styles, not runtime lower bounds.
 4. Document inferred combinations and new layouts while preserving shared brand rules. Do not impose a fixed background count or mechanical color rotation.
 
-Check representative observed and adapted recipes on compatible layouts. Switching a compatible background should preserve content geometry and typography; verify actual text contrast rather than relying on low texture opacity.
+Check representative observed recipes during extraction and newly adapted recipes during generation. Switching compatible backgrounds should preserve content geometry and typography; verify actual text contrast rather than relying on low texture opacity. Follow `qa.md` for automatic gates and a separate source-style comparison.

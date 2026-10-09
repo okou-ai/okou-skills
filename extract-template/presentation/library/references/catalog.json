@@ -1,0 +1,1496 @@
+{
+  "formatVersion": 1,
+  "geometry": "../styles/geometry.css",
+  "layouts": [
+    {
+      "id": "cover",
+      "file": "../layouts/fragments/cover.html",
+      "category": "framing",
+      "purpose": "Opening title and audience context",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "eyebrow",
+        "presenter",
+        "subtitle",
+        "title"
+      ],
+      "capacityHint": "One title, one subtitle, short attribution"
+    },
+    {
+      "id": "toc",
+      "file": "../layouts/fragments/toc.html",
+      "category": "framing",
+      "purpose": "Agenda and reading order",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "items"
+      ],
+      "slots": [
+        "item-body",
+        "item-heading",
+        "item-number",
+        "title"
+      ],
+      "capacityHint": "3-6 concise sections; preserve order"
+    },
+    {
+      "id": "section-divider",
+      "file": "../layouts/fragments/section-divider.html",
+      "category": "framing",
+      "purpose": "Section transition",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "section-number",
+        "section-summary",
+        "title"
+      ],
+      "capacityHint": "One section number and a short summary"
+    },
+    {
+      "id": "close",
+      "file": "../layouts/fragments/close.html",
+      "category": "framing",
+      "purpose": "Conclusion and next action",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "conclusion",
+        "contact",
+        "next-action",
+        "title"
+      ],
+      "capacityHint": "One conclusion and one explicit next action"
+    },
+    {
+      "id": "statement",
+      "file": "../layouts/fragments/statement.html",
+      "category": "narrative",
+      "purpose": "One central argument",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "claim",
+        "source-note",
+        "support",
+        "title"
+      ],
+      "capacityHint": "One claim with concise support"
+    },
+    {
+      "id": "executive-summary",
+      "file": "../layouts/fragments/executive-summary.html",
+      "category": "narrative",
+      "purpose": "Decision summary with evidence and action",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [
+        "items"
+      ],
+      "slots": [
+        "decision",
+        "item-body",
+        "item-heading",
+        "takeaway",
+        "title"
+      ],
+      "capacityHint": "One decision and 2-4 supporting findings"
+    },
+    {
+      "id": "two-column",
+      "file": "../layouts/fragments/two-column.html",
+      "category": "narrative",
+      "purpose": "Two independent narratives",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "left-body",
+        "left-heading",
+        "right-body",
+        "right-heading",
+        "title"
+      ],
+      "capacityHint": "Two independent medium-length prose blocks"
+    },
+    {
+      "id": "three-column",
+      "file": "../layouts/fragments/three-column.html",
+      "category": "narrative",
+      "purpose": "Three parallel narratives",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "column-1-body",
+        "column-1-heading",
+        "column-2-body",
+        "column-2-heading",
+        "column-3-body",
+        "column-3-heading",
+        "title"
+      ],
+      "capacityHint": "Three concise peer readings"
+    },
+    {
+      "id": "longform",
+      "file": "../layouts/fragments/longform.html",
+      "category": "narrative",
+      "purpose": "Structured prose with a supporting aside",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "aside-body",
+        "aside-heading",
+        "introduction",
+        "paragraph-1",
+        "paragraph-2",
+        "title"
+      ],
+      "capacityHint": "Several short paragraphs and one supporting aside"
+    },
+    {
+      "id": "bullets",
+      "file": "../layouts/fragments/bullets.html",
+      "category": "narrative",
+      "purpose": "Unordered findings",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [
+        "items"
+      ],
+      "slots": [
+        "item-body",
+        "item-heading",
+        "title"
+      ],
+      "capacityHint": "3-5 concise points; no invented ordering"
+    },
+    {
+      "id": "numbered-list",
+      "file": "../layouts/fragments/numbered-list.html",
+      "category": "narrative",
+      "purpose": "Ranked or explicitly ordered findings",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "items"
+      ],
+      "slots": [
+        "item-body",
+        "item-heading",
+        "item-number",
+        "title"
+      ],
+      "capacityHint": "3-5 ordered points; retain supplied order"
+    },
+    {
+      "id": "todo-checklist",
+      "file": "../layouts/fragments/todo-checklist.html",
+      "category": "narrative",
+      "purpose": "Action, owner and completion state",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "actions"
+      ],
+      "slots": [
+        "action-note",
+        "action-owner",
+        "action-state",
+        "action-title",
+        "title"
+      ],
+      "capacityHint": "3-5 actions with explicit states and owners"
+    },
+    {
+      "id": "comparison",
+      "file": "../layouts/fragments/comparison.html",
+      "category": "comparison",
+      "purpose": "Evidence compared under the same criteria",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "evidence-a",
+        "evidence-b",
+        "option-a",
+        "option-b",
+        "title"
+      ],
+      "capacityHint": "Two comparable options; consistent criteria"
+    },
+    {
+      "id": "pros-cons",
+      "file": "../layouts/fragments/pros-cons.html",
+      "category": "comparison",
+      "purpose": "Benefits and limitations of one choice",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [
+        "benefits",
+        "limitations"
+      ],
+      "slots": [
+        "benefit-heading",
+        "item-body",
+        "item-heading",
+        "limitation-heading",
+        "title"
+      ],
+      "capacityHint": "Two balanced groups, not different options"
+    },
+    {
+      "id": "versus",
+      "file": "../layouts/fragments/versus.html",
+      "category": "comparison",
+      "purpose": "Two opposing headline measures",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "left-evidence",
+        "left-label",
+        "left-value",
+        "right-evidence",
+        "right-label",
+        "right-value",
+        "title"
+      ],
+      "capacityHint": "Two headline values with units and comparable bases"
+    },
+    {
+      "id": "stat-highlight",
+      "file": "../layouts/fragments/stat-highlight.html",
+      "category": "metrics",
+      "purpose": "One primary metric and its meaning",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "context",
+        "interpretation",
+        "metric-label",
+        "metric-value",
+        "source-note",
+        "title"
+      ],
+      "capacityHint": "One large value and a concise interpretation"
+    },
+    {
+      "id": "kpi-grid",
+      "file": "../layouts/fragments/kpi-grid.html",
+      "category": "metrics",
+      "purpose": "A small set of peer indicators",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [
+        "metrics"
+      ],
+      "slots": [
+        "metric-label",
+        "metric-note",
+        "metric-value",
+        "title"
+      ],
+      "capacityHint": "2-4 concise indicators per row; more needs adaptation"
+    },
+    {
+      "id": "dashboard",
+      "file": "../layouts/fragments/dashboard.html",
+      "category": "metrics",
+      "purpose": "Indicators combined with diagnosis",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [
+        "metrics"
+      ],
+      "slots": [
+        "action",
+        "diagnosis",
+        "metric-label",
+        "metric-note",
+        "metric-value",
+        "recommendation",
+        "signal",
+        "title"
+      ],
+      "capacityHint": "A short KPI row and two concise diagnostic blocks"
+    },
+    {
+      "id": "scorecard",
+      "file": "../layouts/fragments/scorecard.html",
+      "category": "metrics",
+      "purpose": "Criteria, scores and status",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "table-cell",
+        "table-header",
+        "title"
+      ],
+      "repeatSlots": [
+        "cells",
+        "headers",
+        "rows"
+      ],
+      "slots": [
+        "cell",
+        "header",
+        "score-note",
+        "title"
+      ],
+      "capacityHint": "Several scored criteria; state units and thresholds"
+    },
+    {
+      "id": "period-comparison",
+      "file": "../layouts/fragments/period-comparison.html",
+      "category": "metrics",
+      "purpose": "Two periods with a stated change basis",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "heading",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "change",
+        "comparison-note",
+        "current-period",
+        "current-value",
+        "previous-period",
+        "previous-value",
+        "title"
+      ],
+      "capacityHint": "Two periods and one comparable change"
+    },
+    {
+      "id": "actual-vs-target",
+      "file": "../layouts/fragments/actual-vs-target.html",
+      "category": "metrics",
+      "purpose": "Actual value against an explicit target",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "heading",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "actual-label",
+        "actual-value",
+        "target-label",
+        "target-value",
+        "title",
+        "variance",
+        "variance-note"
+      ],
+      "capacityHint": "Actual, target and variance with matching units"
+    },
+    {
+      "id": "metric-deep-dive",
+      "file": "../layouts/fragments/metric-deep-dive.html",
+      "category": "metrics",
+      "purpose": "Metric, trend and named drivers",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [
+        "drivers"
+      ],
+      "slots": [
+        "item-body",
+        "item-heading",
+        "metric-label",
+        "metric-value",
+        "title",
+        "trend"
+      ],
+      "capacityHint": "One indicator and 2-3 explanatory drivers"
+    },
+    {
+      "id": "table",
+      "file": "../layouts/fragments/table.html",
+      "category": "records",
+      "purpose": "Records under consistent headers",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "table-cell",
+        "table-header",
+        "title"
+      ],
+      "repeatSlots": [
+        "cells",
+        "headers",
+        "rows"
+      ],
+      "slots": [
+        "cell",
+        "header",
+        "source-note",
+        "title"
+      ],
+      "capacityHint": "Start with 3-6 columns and short rows; measure real content"
+    },
+    {
+      "id": "detail-summary",
+      "file": "../layouts/fragments/detail-summary.html",
+      "category": "records",
+      "purpose": "Detailed records alongside a short conclusion",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "metric-value",
+        "table-cell",
+        "table-header",
+        "title"
+      ],
+      "repeatSlots": [
+        "cells",
+        "headers",
+        "rows"
+      ],
+      "slots": [
+        "cell",
+        "header",
+        "summary-body",
+        "summary-heading",
+        "summary-value",
+        "title"
+      ],
+      "capacityHint": "A compact table and one supporting conclusion"
+    },
+    {
+      "id": "case-study",
+      "file": "../layouts/fragments/case-study.html",
+      "category": "narrative",
+      "purpose": "Situation, intervention and outcome",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "case-note",
+        "challenge",
+        "intervention",
+        "outcome",
+        "situation",
+        "title"
+      ],
+      "capacityHint": "One case, retaining evidence and causal qualifications"
+    },
+    {
+      "id": "big-quote",
+      "file": "../layouts/fragments/big-quote.html",
+      "category": "narrative",
+      "purpose": "One attributed quotation",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "attribution",
+        "quotation",
+        "quote-context",
+        "title"
+      ],
+      "capacityHint": "One short quotation and its attribution"
+    },
+    {
+      "id": "quote-cards",
+      "file": "../layouts/fragments/quote-cards.html",
+      "category": "narrative",
+      "purpose": "Several attributed perspectives",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "quotes"
+      ],
+      "slots": [
+        "attribution",
+        "quotation",
+        "quote-context",
+        "title"
+      ],
+      "capacityHint": "2-3 short quotes; no invented endorsements"
+    },
+    {
+      "id": "process-steps",
+      "file": "../layouts/fragments/process-steps.html",
+      "category": "time-process",
+      "purpose": "An ordered method with meaningful connections",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "steps"
+      ],
+      "slots": [
+        "process-note",
+        "step-description",
+        "step-number",
+        "step-title",
+        "title"
+      ],
+      "capacityHint": "3-4 ordered stages; keep their relationship explicit"
+    },
+    {
+      "id": "timeline",
+      "file": "../layouts/fragments/timeline.html",
+      "category": "time-process",
+      "purpose": "Dated events in chronological order",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "events"
+      ],
+      "slots": [
+        "event-date",
+        "event-description",
+        "event-title",
+        "title"
+      ],
+      "capacityHint": "3-5 dated events; retain actual dates and order"
+    },
+    {
+      "id": "roadmap",
+      "file": "../layouts/fragments/roadmap.html",
+      "category": "time-process",
+      "purpose": "Future horizons with deliverables",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "horizons"
+      ],
+      "slots": [
+        "deliverable",
+        "horizon",
+        "roadmap-note",
+        "title"
+      ],
+      "capacityHint": "Three distinct horizons; label commitments vs proposals"
+    },
+    {
+      "id": "gantt",
+      "file": "../layouts/fragments/gantt.html",
+      "category": "time-process",
+      "purpose": "Task intervals on one time scale",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "intervals"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "interval-height",
+        "interval-width",
+        "interval-x",
+        "interval-y",
+        "task-label",
+        "task-label-x",
+        "task-label-y",
+        "title"
+      ],
+      "capacityHint": "A few tasks with explicit start/end dates and shared scale"
+    },
+    {
+      "id": "flow-diagram",
+      "file": "../layouts/fragments/flow-diagram.html",
+      "category": "diagrams",
+      "purpose": "Directed branches and transitions",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "edges",
+        "nodes"
+      ],
+      "slots": [
+        "diagram-description",
+        "diagram-note",
+        "edge-path",
+        "node-height",
+        "node-label",
+        "node-label-x",
+        "node-label-y",
+        "node-width",
+        "node-x",
+        "node-y",
+        "title"
+      ],
+      "capacityHint": "3-6 nodes; draw only supported transitions"
+    },
+    {
+      "id": "arch-diagram",
+      "file": "../layouts/fragments/arch-diagram.html",
+      "category": "diagrams",
+      "purpose": "Systems, boundaries and interfaces",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "edges",
+        "nodes"
+      ],
+      "slots": [
+        "diagram-description",
+        "diagram-note",
+        "edge-path",
+        "node-height",
+        "node-label",
+        "node-label-x",
+        "node-label-y",
+        "node-width",
+        "node-x",
+        "node-y",
+        "title"
+      ],
+      "capacityHint": "A few components and explicit interfaces, not implied causality"
+    },
+    {
+      "id": "mindmap",
+      "file": "../layouts/fragments/mindmap.html",
+      "category": "diagrams",
+      "purpose": "One topic and its subordinate branches",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "edges",
+        "nodes"
+      ],
+      "slots": [
+        "diagram-description",
+        "diagram-note",
+        "edge-path",
+        "node-height",
+        "node-label",
+        "node-label-x",
+        "node-label-y",
+        "node-width",
+        "node-x",
+        "node-y",
+        "title"
+      ],
+      "capacityHint": "One root and a few labelled branches"
+    },
+    {
+      "id": "image-left",
+      "file": "../layouts/fragments/image-left.html",
+      "category": "images",
+      "purpose": "Image evidence beside a narrative",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "image-alt",
+        "image-body",
+        "image-heading",
+        "image-note",
+        "image-src",
+        "title"
+      ],
+      "capacityHint": "One meaningful image with concise supporting prose"
+    },
+    {
+      "id": "image-right",
+      "file": "../layouts/fragments/image-right.html",
+      "category": "images",
+      "purpose": "Narrative leading to image evidence",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "image-alt",
+        "image-body",
+        "image-heading",
+        "image-note",
+        "image-src",
+        "title"
+      ],
+      "capacityHint": "A narrative first, then one meaningful image"
+    },
+    {
+      "id": "image-hero",
+      "file": "../layouts/fragments/image-hero.html",
+      "category": "images",
+      "purpose": "One dominant evidence image",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "title"
+      ],
+      "repeatSlots": [],
+      "slots": [
+        "image-alt",
+        "image-note",
+        "image-src",
+        "title"
+      ],
+      "capacityHint": "One supplied image; do not invent decorative media"
+    },
+    {
+      "id": "image-grid",
+      "file": "../layouts/fragments/image-grid.html",
+      "category": "images",
+      "purpose": "A repeated visual series",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "title"
+      ],
+      "repeatSlots": [
+        "images"
+      ],
+      "slots": [
+        "image-alt",
+        "image-caption",
+        "image-src",
+        "title"
+      ],
+      "capacityHint": "3-6 related supplied images with captions"
+    },
+    {
+      "id": "team",
+      "file": "../layouts/fragments/team.html",
+      "category": "commercial",
+      "purpose": "Named people, roles and responsibilities",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "people"
+      ],
+      "slots": [
+        "person-name",
+        "person-responsibility",
+        "person-role",
+        "title"
+      ],
+      "capacityHint": "A few named people; no fabricated profiles"
+    },
+    {
+      "id": "pricing",
+      "file": "../layouts/fragments/pricing.html",
+      "category": "commercial",
+      "purpose": "Comparable plans and their economics",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "label",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [
+        "plans"
+      ],
+      "slots": [
+        "plan-features",
+        "plan-name",
+        "plan-price",
+        "plan-qualification",
+        "plan-unit",
+        "title"
+      ],
+      "capacityHint": "2-3 plans with prices, units and qualifications"
+    },
+    {
+      "id": "chart-bar",
+      "file": "../layouts/fragments/chart-bar.html",
+      "category": "charts",
+      "purpose": "Magnitude on one quantitative baseline",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "mark-height",
+        "mark-label",
+        "mark-width",
+        "mark-x",
+        "mark-y",
+        "series",
+        "title"
+      ],
+      "capacityHint": "A short set of categories with a shared scale"
+    },
+    {
+      "id": "chart-line",
+      "file": "../layouts/fragments/chart-line.html",
+      "category": "charts",
+      "purpose": "Values over time",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "line-path",
+        "mark-label",
+        "point-radius",
+        "point-x",
+        "point-y",
+        "series",
+        "title"
+      ],
+      "capacityHint": "A few dated observations; preserve gaps and units"
+    },
+    {
+      "id": "chart-pie",
+      "file": "../layouts/fragments/chart-pie.html",
+      "category": "charts",
+      "purpose": "A non-negative whole partition",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "mark-label",
+        "series",
+        "slice-path",
+        "title"
+      ],
+      "capacityHint": "A few parts whose sum and denominator are explicit"
+    },
+    {
+      "id": "chart-radar",
+      "file": "../layouts/fragments/chart-radar.html",
+      "category": "charts",
+      "purpose": "Several comparable dimensions",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "mark-label",
+        "radar-axis-points",
+        "radar-value-points",
+        "series",
+        "title"
+      ],
+      "capacityHint": "Comparable dimensions with stated normalization"
+    },
+    {
+      "id": "stacked-bar",
+      "file": "../layouts/fragments/stacked-bar.html",
+      "category": "charts",
+      "purpose": "Contribution within comparable totals",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "mark-height",
+        "mark-label",
+        "mark-width",
+        "mark-x",
+        "mark-y",
+        "series",
+        "title"
+      ],
+      "capacityHint": "A few categories and labelled series; preserve segment sums"
+    },
+    {
+      "id": "waterfall",
+      "file": "../layouts/fragments/waterfall.html",
+      "category": "charts",
+      "purpose": "Signed contributions bridging two totals",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "mark-height",
+        "mark-label",
+        "mark-width",
+        "mark-x",
+        "mark-y",
+        "series",
+        "title"
+      ],
+      "capacityHint": "Starting total, signed contributions and ending total"
+    },
+    {
+      "id": "funnel",
+      "file": "../layouts/fragments/funnel.html",
+      "category": "charts",
+      "purpose": "Sequential volumes with stated denominators",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "funnel-path",
+        "label-x",
+        "label-y",
+        "mark-label",
+        "title"
+      ],
+      "capacityHint": "3-5 actual stages; volumes and conversion are distinct"
+    },
+    {
+      "id": "heatmap",
+      "file": "../layouts/fragments/heatmap.html",
+      "category": "charts",
+      "purpose": "A matrix of numeric intensity",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "table-cell",
+        "table-header",
+        "title"
+      ],
+      "repeatSlots": [
+        "cells",
+        "headers",
+        "rows"
+      ],
+      "slots": [
+        "cell",
+        "cell-intensity",
+        "header",
+        "heatmap-note",
+        "title"
+      ],
+      "capacityHint": "A compact matrix; bind a source-compatible quantitative color scale"
+    },
+    {
+      "id": "scatter-plot",
+      "file": "../layouts/fragments/scatter-plot.html",
+      "category": "charts",
+      "purpose": "Two quantitative dimensions",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "mark-label",
+        "point-radius",
+        "point-x",
+        "point-y",
+        "title"
+      ],
+      "capacityHint": "A few observations with units and comparable axes"
+    },
+    {
+      "id": "bubble-chart",
+      "file": "../layouts/fragments/bubble-chart.html",
+      "category": "charts",
+      "purpose": "Two coordinates and a third size dimension",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "marks"
+      ],
+      "slots": [
+        "bubble-radius",
+        "chart-description",
+        "chart-note",
+        "label-x",
+        "label-y",
+        "mark-label",
+        "point-x",
+        "point-y",
+        "title"
+      ],
+      "capacityHint": "Use area, not radius, for a stated non-negative third quantity"
+    },
+    {
+      "id": "forecast-scenarios",
+      "file": "../layouts/fragments/forecast-scenarios.html",
+      "category": "analysis",
+      "purpose": "Explicit conditional future cases",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "metric-value",
+        "title"
+      ],
+      "repeatSlots": [
+        "scenarios"
+      ],
+      "slots": [
+        "scenario-assumption",
+        "scenario-name",
+        "scenario-note",
+        "scenario-value",
+        "title"
+      ],
+      "capacityHint": "A few scenarios; never present them as observed results"
+    },
+    {
+      "id": "risk-recommendations",
+      "file": "../layouts/fragments/risk-recommendations.html",
+      "category": "analysis",
+      "purpose": "A signal paired with an accountable response",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "body",
+        "caption",
+        "heading",
+        "title"
+      ],
+      "repeatSlots": [
+        "risks"
+      ],
+      "slots": [
+        "response-action",
+        "response-owner",
+        "response-title",
+        "risk-evidence",
+        "risk-title",
+        "title"
+      ],
+      "capacityHint": "2-3 supported risks with owners and next steps"
+    },
+    {
+      "id": "methods-definitions",
+      "file": "../layouts/fragments/methods-definitions.html",
+      "category": "analysis",
+      "purpose": "Definitions and calculation boundaries",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "table-cell",
+        "table-header",
+        "title"
+      ],
+      "repeatSlots": [
+        "cells",
+        "headers",
+        "rows"
+      ],
+      "slots": [
+        "cell",
+        "header",
+        "method-note",
+        "title"
+      ],
+      "capacityHint": "A few definitions/formulas, units and exclusions"
+    },
+    {
+      "id": "appendix-index",
+      "file": "../layouts/fragments/appendix-index.html",
+      "category": "framing",
+      "purpose": "References and supporting material",
+      "regions": [
+        "title",
+        "body"
+      ],
+      "roles": [
+        "caption",
+        "heading",
+        "label",
+        "title"
+      ],
+      "repeatSlots": [
+        "references"
+      ],
+      "slots": [
+        "reference-location",
+        "reference-number",
+        "reference-title",
+        "title"
+      ],
+      "capacityHint": "A few real references; preserve original identifiers"
+    }
+  ]
+}

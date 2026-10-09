@@ -1,84 +1,135 @@
 ---
 name: presentation-extract-template
-description: Extract and publish a reusable HTML presentation template from PPTX, PPT, PDF, image decks, or page screenshots. Preserve the source's typography, layouts, backgrounds, decoration, and brand framing as editable structures and reusable assets.
+description: Extract and publish an editable HTML presentation template from PPTX, PPT, PDF or slide images. Preserve source style and original compositions, bundle a local neutral layout library, and validate with automatic 10px-bounded text fitting and source-configured rendered QA.
 ---
 
 # Extract a presentation template
 
-Turn the reference into a platform-compliant HTML template for new content. The source defines its visual language; the output remains HTML regardless of input format.
+The uploaded source defines style; the reusable output remains HTML. Preserve the
+original file unchanged. Upload analysis saves source style and source layouts;
+**generation** selectively adapts local reference layouts when originals do not fit.
+No private repository, external layout catalogue or GitHub credential is required.
 
-## 1. Inspect the source
+## 1. Inspect every source page
 
-Preserve the original and inspect every page in order, noting canvas ratio, page count, content types, page roles, and recurring structures. For PPT, PPTX, or PDF, run from this guide's directory:
+Render PPT/PPTX/PDF in order:
 
 ```bash
-node scripts/render-pages.mjs \
-  --input <deck.ppt|deck.pptx|deck.pdf> \
-  --out <source-pages-dir>
+okou presentation screenshot --input <source.ppt|source.pptx|source.pdf> --out <source-pages-dir>
 ```
 
-This writes ordered source images (`page-001.png`, `page-002.png`, …). Determine design rules from the rendered pages, not file structure alone.
+Record filename, original canvas ratio, page count, page roles and recurring
+structures. Corroborate rendered typography with authoring-file metadata; keep
+aspect adaptation and source-to-HTML units explicit. Label unavailable evidence
+and visual estimates as inferred. Never package reconstructed images as originals.
 
-## 2. Extract the design system
+## 2. Extract the source design system
 
 Record in `design-system.md`:
 
-- Typography: display/body fonts, size hierarchy, weights, line heights, spacing, and CJK fallbacks.
-- Color and geometry: foreground/background roles, accents, chart colors, margins, content-safe areas, borders, radii, and image crops.
-- Repeated components and chrome: cards, metrics, tables, quotes, image frames, logos, headers, footers, and page markers.
-- Background fields and content-independent decorations: reusable elements, source-observed combinations, and allowed adaptations.
+- Source fonts, effective initial sizes, weights, leading, tracking, mixed runs and
+  approved CJK fallbacks. Read [typography-fit.md](references/typography-fit.md):
+  the runtime minimum is always **10px**, never the source's minimum font size.
+- Foreground/background pairs, chart colours, source content-safe areas, spacing,
+  borders, radii, crop rules and source-observed component variants.
+- Source-required chrome and reusable background fields/decorations with compatible
+  recipes. Read [layout-reuse.md](references/layout-reuse.md).
 
-Read [references/layout-reuse.md](references/layout-reuse.md) for the source inventory and background composition rules. Distinguish observed rules from inferred or fallback choices. An absent content type, such as images, is not a prohibition on future use.
+Keep observed values separate from inferred adaptations and runtime policy. Missing
+images or another content type is not a prohibition on adding it during generation.
 
-## 3. Build the editable package
+## 3. Build a self-contained, editable package
 
 ```text
 <template-slug>/
-  SKILL.md                 # usage and authoring instructions
-  design-system.md         # brand rules, background elements/recipes, asset notes
+  SKILL.md                  # source-first generation and final QA instructions
+  design-system.md          # source rules, profiles and provenance
   layouts/
-    README.md              # layout selection and assembly instructions
-    source-index.json      # every source page mapped to a preserved layout
-    source/<name>.html     # distinct source compositions
-    _shell.html            # shared canvas, fonts, chrome, and navigation
-  styles/template.css      # shared layout, brand, and component styles
-  assets/                  # reusable logos, fonts, textures, and artwork
+    README.md
+    source-index.json       # original pages/compositions only
+    source/<name>.html
+    _shell.html             # canvas, fonts, source chrome, four-arrow navigation
+  styles/template.css
+  assets/                   # only reusable source assets in use
+  library/                  # untouched local neutral catalogue and 54 fragments
+  scripts/                  # common measurements and 10px text fitter
+  tools/                    # source QA config, package verifier and final audit
+  references/               # portable QA, fitting and reuse instructions
 ```
 
-Preserve every distinct source composition and prefer it when new content fits. Group equivalent structures, keeping background variants separate. When no source layout fits, add a documented layout in the same design system; packaged layouts are references, not a whitelist.
+Cover every source page in the source index and preserve every distinct source
+composition. Consolidate equivalent structures with separate background/profile
+variants. Do not adapt all library fragments during upload or include them in the
+source index as original compositions.
 
-Use a 16:9 canvas, shared CSS variables/components, and semantic regions for replaceable text, images, and data. Keep title and metric typography separate. Preserve hierarchy and spacing through content selection or splitting rather than page-specific font shrinking. Prefer normal flow, Flexbox, or Grid; use absolute positioning for chrome, decoration, and intentional overlays.
+Use `.deck > .slide` with one `.stage` per slide and a `.fit` content root. Preserve
+source geometry on the 16:9 target, and use disjoint `data-fit-region` areas for
+independent title/body fitting. Prefer normal flow, Flexbox or Grid; source chrome,
+decoration and intentional overlays may use absolute geometry. Text, shapes,
+tables and ordinary charts stay editable HTML/CSS/SVG, not full-page screenshots.
 
-Text, shapes, cards, tables, and ordinary charts must remain editable HTML/CSS/SVG. Retain isolated reusable artwork; never substitute a full-page screenshot for an editable layout or package old text/data as decoration.
-
-Document assembly through the shared shell, with working package-relative asset paths. Support all four navigation keys: `ArrowLeft`/`ArrowUp` go back; `ArrowRight`/`ArrowDown` go forward.
-
-The generated `SKILL.md` and `layouts/README.md` must direct authors to the design system and source index, explain source-first selection and background composition, and identify the shared styles and assembly steps.
-
-## 4. Validate representative rebuilds
-
-Rebuild representative source pages and background combinations, including documented adaptations. Confirm that the source inventory covers every page. Render the assembled examples:
+Write `tools/qa-config.json` from the actual source: safe areas per layout/profile,
+required chrome counts and approved fallbacks. Then run from this guide's directory:
 
 ```bash
-npx --yes --package="${CLI_PKG_URL}" okou presentation screenshot \
-  --input <rebuilt-deck.html> \
-  --out <validation-dir>
+node scripts/install-qa.mjs --package <template-slug>
 ```
 
-Compare structure, typography, colors, component styling, decoration placement, and safe areas against the source. Fix shared rules where needed; verify navigation, language fallbacks, and asset loading. Rebuilt images are local validation evidence, not source-page images for publication.
+The installer copies the local library and QA, and inlines the shared runtime once.
+It does not import another template's fonts, palette, motifs or picture crop policy.
+Use working package-relative asset paths and preserve all four navigation keys.
 
-## 5. Publish
+The generated `SKILL.md` and `layouts/README.md` must direct later authors to:
 
-Publish the source file, ordered original page images, and complete template package together:
+1. Read source design rules and `layouts/source-index.json`; copy a fitting source
+   composition first without modifying the stored package or original upload.
+2. Otherwise read `library/references/catalog.json`, then only selected local
+   fragments. Copy them into the working deck and selectively adapt source fonts,
+   initial sizes, palette, components, backgrounds, spacing, images and chrome.
+   Read `library/README.md`; the library is reference geometry, not a competing skin.
+3. Fill real content/data, expand needed repeated groups, and keep text-fitting hooks.
+   Do not refetch a catalogue or recreate source analysis for each generation.
+4. Automatically fit only overflowing regions, never below 10px. Still-unfit content
+   needs a different composition or splitting, not hiding/cropping or canvas scaling.
+5. Run final QA with the planned page count, compare new adaptations to source style,
+   and capture/export the exact measured working copy. Read [qa.md](references/qa.md).
+
+## 4. Validate representative source rebuilds
+
+Rebuild representative distinct compositions, profiles and background recipes.
+Check the source index covers every original page. Run the packaged final commands:
 
 ```bash
-npx --yes --package="${CLI_PKG_URL}" okou presentation-template publish \
-  --title "<user-visible template name>" \
-  --source <deck.pptx|normalized-source.pdf> \
-  --pages <source-pages-dir> \
+node <template-slug>/tools/verify-package.mjs --package <template-slug> --source-pages <source-pages-dir>
+node <template-slug>/tools/qa.mjs --final <rebuilt.html> \
+  --expected-pages <representative-count> --report <qa-report.json> \
+  --prepared <rebuilt.ready.html>
+okou presentation screenshot --input <rebuilt.ready.html> --out <validation-dir>
+```
+
+The prepared file must be a separate working copy beside the assembled HTML.
+Compare structure, type, source colour pairs, component styling, decoration,
+image crops and safe areas with original page images. A mechanical green status
+is not a source-fidelity pass. Keep temporary fixtures/review images outside the
+package and outside `source-pages-dir`. Fix shared rules rather than page-by-page
+ad hoc CSS. Fonts, images, clipping, the 10px floor, page count and live four-key
+navigation must pass; unknown image/gradient contrast needs recorded visual review.
+
+If PPTX is delivered, use `okou presentation convert --verify` on the prepared HTML
+and render that actual PPTX for roundtrip review. Text coverage alone does not prove
+font, crop or layout fidelity; SVG may rasterise. This is not a native PPTX editor.
+
+## 5. Publish only after both validations pass
+
+```bash
+okou presentation-template publish --title "<template name>" \
+  --source <source.pptx|normalized-source.pdf> --pages <source-pages-dir> \
   --package <template-slug>
 ```
 
-`--source` accepts PPTX or PDF. Convert legacy PPT to PPTX; for images/screenshots, create a PDF preserving page order and retain input provenance. `--pages` must contain only original source screenshots in filename order, never reconstructed validation images.
-
-Completion requires the editable package, source layout coverage, reusable background elements with composition guidance, successful validation, and a successful publication command. Report publication failures explicitly; do not claim delivery before it succeeds.
+Publish the original source, ordered original page images and complete package
+including local library/runtime/QA together. Convert legacy PPT to PPTX; normalise
+image decks to an ordered PDF with provenance. Never publish reconstruction images
+as originals. Completion requires source coverage, source-style review, passing QA,
+and a successful publication command. A repository PR is not production registry
+publication; report publication or entrypoint-sync blockers without claiming rollout.

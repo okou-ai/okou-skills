@@ -1,0 +1,28 @@
+<section class="builtin-layout" data-layout="detail-summary">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-grid bl-columns-2">
+      <div class="bl-table">
+        <table>
+          <thead>
+            <tr>
+              <th data-repeat="headers" data-text-role="table-header">{{header}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-repeat="rows">
+              <td data-repeat="cells" data-text-role="table-cell">{{cell}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="bl-stack">
+        <div data-text-role="metric-value">{{summary-value}}</div>
+        <div data-text-role="heading">{{summary-heading}}</div>
+        <div data-text-role="body">{{summary-body}}</div>
+      </div>
+    </div>
+  </div>
+</section>

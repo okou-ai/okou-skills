@@ -1,0 +1,23 @@
+/* Structure only. Bind all type, paint and component skin to the user's source. */
+.builtin-layout { display:flex; flex-direction:column; gap:var(--layout-gap,1em); height:100%; min-width:0; min-height:0; }
+.builtin-layout * { box-sizing:border-box; }
+.builtin-layout [data-text-role] { margin:0; }
+.bl-header { flex:none; min-width:0; }
+.bl-body { flex:1; min-height:0; min-width:0; display:flex; flex-direction:column; gap:var(--layout-gap,1em); }
+.bl-stack { display:flex; flex-direction:column; gap:var(--layout-gap,1em); min-width:0; min-height:0; }
+.bl-grid { display:grid; gap:var(--layout-gap,1em); min-width:0; min-height:0; }
+.bl-columns-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.bl-columns-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.bl-columns-4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.bl-item { display:flex; flex-direction:column; gap:var(--layout-gap,1em); min-width:0; }
+.bl-action { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:var(--layout-gap,1em); }
+.bl-action > :last-child { grid-column:2/-1; }
+.bl-timeline-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,3fr); gap:var(--layout-gap,1em); }
+.bl-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--layout-gap,1em); }
+.bl-table { min-width:0; }
+.bl-table table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.bl-table th,.bl-table td { text-align:start; vertical-align:top; overflow-wrap:anywhere; }
+.bl-plot { flex:1; min-width:0; min-height:0; display:flex; }
+.bl-plot svg { display:block; width:100%; height:100%; min-height:0; }
+.bl-media { flex:1; min-width:0; min-height:0; margin:0; display:flex; flex-direction:column; }
+.bl-media img { display:block; width:100%; height:100%; min-height:0; object-fit:var(--layout-image-fit,contain); }

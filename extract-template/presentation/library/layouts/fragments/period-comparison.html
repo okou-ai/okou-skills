@@ -1,0 +1,21 @@
+<section class="builtin-layout" data-layout="period-comparison">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-stack">
+      <div class="bl-grid bl-columns-2">
+        <div class="bl-stack">
+          <div data-text-role="metric-value">{{previous-value}}</div>
+          <div data-text-role="label">{{previous-period}}</div>
+        </div>
+        <div class="bl-stack">
+          <div data-text-role="metric-value">{{current-value}}</div>
+          <div data-text-role="label">{{current-period}}</div>
+        </div>
+      </div>
+      <div data-text-role="heading">{{change}}</div>
+      <div data-text-role="caption">{{comparison-note}}</div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+<section class="builtin-layout" data-layout="chart-pie">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-plot">
+      <svg viewBox="0 0 600 300" role="img" aria-label="{{chart-description}}" data-chart-kind="pie">
+        <path data-component="chart-axis" d="M32 16V280H580" fill="none" stroke="currentColor" />
+        <g data-repeat="marks" data-series="{{series}}">
+          <path d="{{slice-path}}" fill="currentColor" />
+          <text x="{{label-x}}" y="{{label-y}}" data-text-role="label" fill="currentColor">{{mark-label}}</text>
+        </g>
+      </svg>
+    </div>
+    <div data-text-role="caption">{{chart-note}}</div>
+  </div>
+</section>

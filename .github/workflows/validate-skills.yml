@@ -4,11 +4,15 @@ on:
   pull_request:
     paths:
       - "**/SKILL.md"
+      - "extract-template/**"
+      - ".github/workflows/validate-skills.yml"
   push:
     branches:
       - main
     paths:
       - "**/SKILL.md"
+      - "extract-template/**"
+      - ".github/workflows/validate-skills.yml"
 
 jobs:
   validate:
@@ -122,3 +126,36 @@ jobs:
           fi
 
           echo "No _ACCESS_TOKEN references found. ✓"
+
+  presentation-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Structural, packaging and inventory regression tests
+        run: python3 -m unittest discover -s extract-template/presentation/tests -p 'test_*.py' -v
+      - name: JavaScript syntax
+        run: |
+          find extract-template/presentation/scripts extract-template/presentation/tools extract-template/presentation/tests \
+            -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \) -exec node --check {} \;
+      - name: Install pinned browser test toolchain
+        run: |
+          npm install --prefix "$RUNNER_TEMP/presentation-qa" playwright@1.64.0
+          "$RUNNER_TEMP/presentation-qa/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Build all-layout controlled style probes
+        run: python3 extract-template/presentation/tests/build-fixtures.py "$RUNNER_TEMP/presentation-fixtures"
+      - name: Rendered fitting, QA and 216-layout regression tests
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/presentation-qa/node_modules/playwright
+          FIXTURE_DIR: ${{ runner.temp }}/presentation-fixtures
+          BROWSER_REPORT: ${{ runner.temp }}/presentation-browser-report.json
+        run: node extract-template/presentation/tests/browser-test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: presentation-browser-report
+          path: ${{ runner.temp }}/presentation-browser-report.json
+          if-no-files-found: ignore

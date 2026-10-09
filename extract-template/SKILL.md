@@ -52,3 +52,9 @@ Four rules override the table:
 `cd` into the branch directory; every path inside a branch guide is relative to
 it. Both document guides start with
 [`document-reuse.md`](document-reuse.md) to choose the reuse scope and package.
+
+For decks, `presentation/SKILL.md` is the complete local extraction path. Preserve
+source style/layouts at upload; adapt only selected packaged neutral references at
+generation. Install its shared fitter and source-configured QA, enforce the fixed
+10px logical font minimum, and validate before publication. No private layout
+catalogue or separate resource pull belongs in that extraction/generation path.
