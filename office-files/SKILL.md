@@ -40,6 +40,15 @@ data   →  you build rows in Python  →  openpyxl  →  .xlsx
 
 Styling never comes from the source you author — it comes from a `.docx` passed to pandoc, or from openpyxl. Never author a spreadsheet as a Markdown table, and never hand-build docx XML.
 
+## Choose the business content
+
+For a new business document or analysis that needs a task-specific structure,
+use `business-skill-index` when available to find and read a relevant external
+reference before drafting. Honor the user's template and supplied material;
+skip this lookup for conversion, styling, or narrow edits to an established
+document. Borrow useful content structure and checks while keeping this skill's
+file-generation workflow. The index is optional; its absence does not block work.
+
 ## Start from the user's file
 
 ```bash

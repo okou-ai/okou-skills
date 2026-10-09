@@ -59,6 +59,18 @@ To add a new skill or improve an existing one:
 3. Include a `SKILL.md` file with tested usage examples.
 4. Submit a pull request.
 
+## Business document reference index
+
+[business-skill-index](business-skill-index/SKILL.md) provides a
+[62-row reference table](business-skill-index/references/skill-index.csv) across
+18 business scenarios. Agents match the task, read the selected pinned source,
+and fetch supporting templates only when needed. The repository keeps the index
+and selection prompt, not copies of the upstream skill collection.
+
+```bash
+/plugin install business-skill-index@vm0-skills
+```
+
 ## Resources
 
 - [Agent Skills Specification](https://agentskills.io/specification)
