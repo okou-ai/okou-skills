@@ -3,6 +3,9 @@
 Choose the best match. Each link opens one metadata file with the
 pinned Skill address, license, scope notes, and templates.
 
+Onboarding here means onboarding a customer. For a new employee, including a
+customer success hire, start with [hiring and onboarding](hiring-and-performance.md).
+
 | Skill | Tasks and outputs |
 | --- | --- |
 | [Customer success plans and QBRs](../skills/ar-customer-success-manager.md)<br>`customer-success-manager` | Create a customer success plan, quarterly business review, or renewal risk analysis.<br>Outputs: Customer onboarding checklists, success plans, quarterly business reviews, renewal analysis |

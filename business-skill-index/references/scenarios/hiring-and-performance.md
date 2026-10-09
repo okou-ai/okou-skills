@@ -3,6 +3,9 @@
 Choose the best match. Each link opens one metadata file with the
 pinned Skill address, license, scope notes, and templates.
 
+Use this scenario for employee onboarding, including role-specific new-hire
+plans. Customer onboarding belongs to [customer success](customer-success.md).
+
 | Skill | Tasks and outputs |
 | --- | --- |
 | [New-hire onboarding and training](../skills/kw-onboarding.md)<br>`onboarding` | Create a phased onboarding plan for a new employee or a specific role.<br>Outputs: Pre-start checklists, first-week plans, milestones, role-specific access checklists |

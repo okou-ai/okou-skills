@@ -43,11 +43,11 @@ Styling never comes from the source you author — it comes from a `.docx` passe
 ## Choose the business content
 
 For a new business document or analysis that needs a task-specific structure,
-use `business-skill-index` when available: follow its domain and scenario routing
-to read a relevant external reference before drafting. Honor the user's template
-and supplied material; skip this lookup for conversion, styling, or narrow edits
-to an established document. Borrow useful content structure and checks while
-keeping this skill's file-generation workflow. The index is optional; its absence
+use `business-skill-index` when available: route by the requested work product,
+read the selected source and matching template, and follow its application and
+final-content checks. Honor the user's template and supplied material; skip this
+lookup for conversion, styling, or narrow edits to an established document.
+Keep this skill's file-generation workflow. The index is optional; its absence
 does not block work.
 
 ## Start from the user's file

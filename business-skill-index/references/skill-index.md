@@ -1,6 +1,7 @@
 # Business skill directory
 
-Choose a domain and open the matching scenario shortlist. Each shortlist
+Choose the domain of the requested work product or business event, using the
+person's role as context. Then open the matching scenario shortlist. Each shortlist
 links to individual metadata files; only the selected file contains its
 pinned Skill address, license, scope notes, and template links.
 
