@@ -17,6 +17,7 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -112,11 +113,35 @@ jobs:
           echo ""
           echo "All SKILL.md files are valid."
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Validate progressive presentation contract and neutral layouts
         run: |
           python3 -m unittest discover -s presentation-layouts/tests -p 'test_*.py' -v
           node --check presentation-layouts/scripts/fit-text.js
           node --check presentation-layouts/tests/browser-test.cjs
+
+      - name: Run presentation browser regressions
+        run: |
+          set -euo pipefail
+          qa="$RUNNER_TEMP/presentation-layouts-qa"
+          npm install --prefix "$qa" --no-save --package-lock=false playwright-core@1.64.0
+          export NODE_PATH="$qa/node_modules"
+          export PLAYWRIGHT_BROWSERS_PATH="$qa/browsers"
+          node "$qa/node_modules/playwright-core/cli.js" install --with-deps chromium
+          export CHROMIUM_PATH="$(node -e 'console.log(require("playwright-core").chromium.executablePath())')"
+          python3 presentation-layouts/scripts/build_preview.py --out "$qa/preview"
+          node presentation-layouts/tests/browser-test.cjs \
+            --input "$qa/preview/deck.html" --out "$qa/browser-report.json"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: presentation-layout-browser-report
+          path: ${{ runner.temp }}/presentation-layouts-qa/browser-report.json
+          if-no-files-found: ignore
 
       - name: Ban _ACCESS_TOKEN naming
         run: |

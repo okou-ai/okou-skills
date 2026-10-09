@@ -34,24 +34,40 @@
   }
   function reveal(region, root) {
     const changed = [];
-    for (let element = region; element && element !== document.body; element = element.parentElement) {
-      if (getComputedStyle(element).display === "none" || element.hidden) {
-        changed.push([element, ["display", "position", "left"].map(name => [name, element.style.getPropertyValue(name), element.style.getPropertyPriority(name)]), element.hidden]);
-        element.hidden = false;
-        element.style.setProperty("display", "block", "important");
-        element.style.setProperty("position", "absolute", "important");
-        element.style.setProperty("left", "-100000px", "important");
-      }
-      if (element === root && element.getBoundingClientRect().width > 0) break;
-    }
-    return () => {
-      for (const [element, style, hidden] of changed.reverse()) {
+    const restoreHidden = () => {
+      for (const [element, style, hidden] of [...changed].reverse()) {
         for (const [name, value, priority] of style) {
           if (value) element.style.setProperty(name, value, priority); else element.style.removeProperty(name);
         }
-        element.hidden = hidden;
+        if (hidden === null) element.removeAttribute("hidden"); else element.setAttribute("hidden", hidden);
       }
     };
+    try {
+      for (let element = region; element && element !== document.body; element = element.parentElement) {
+        if (getComputedStyle(element).display === "none" || element.hasAttribute("hidden")) {
+          changed.push([element, ["display", "position", "left", "visibility", "pointer-events"].map(name => [name, element.style.getPropertyValue(name), element.style.getPropertyPriority(name)]), element.getAttribute("hidden")]);
+          element.removeAttribute("hidden");
+          if (getComputedStyle(element).display === "none") element.style.removeProperty("display");
+          // Attribute/inline hiding can expose the authored flex/grid display.
+          // A stylesheet hiding rule needs an explicit hint, never a block guess.
+          if (getComputedStyle(element).display === "none") {
+            const display = element.dataset.fitDisplay;
+            if (!display || !CSS.supports("display", display) || ["none", "contents"].includes(display)) throw new Error("Hidden element needs a valid data-fit-display");
+            element.style.setProperty("display", display, "important");
+            if (["none", "contents"].includes(getComputedStyle(element).display)) throw new Error("Hidden element needs a valid data-fit-display");
+          }
+          element.style.setProperty("position", "absolute", "important");
+          element.style.setProperty("left", "-100000px", "important");
+          element.style.setProperty("visibility", "hidden", "important");
+          element.style.setProperty("pointer-events", "none", "important");
+        }
+        if (element === root && element.getBoundingClientRect().width > 0) break;
+      }
+      return restoreHidden;
+    } catch (error) {
+      restoreHidden();
+      throw error;
+    }
   }
   function bounds(region) {
     const rectangles = [region, region.closest(".okp-main"), region.closest(".okp-layout")].filter(Boolean).map(element => element.getBoundingClientRect());
@@ -95,6 +111,9 @@
     }
   }
   async function ready(root, timeoutMs) {
+    // Hidden-page fonts must participate in layout before reading fonts.ready.
+    root.getBoundingClientRect();
+    await bounded(frame(), timeoutMs, "Layout readiness timeout");
     await bounded(document.fonts.ready, timeoutMs, "Font readiness timeout");
     await Promise.all([...root.querySelectorAll("img")].map(image => {
       if (image.complete) {
@@ -106,7 +125,7 @@
         image.addEventListener("error", () => reject(new Error("Image load failed")), {once: true});
       }), timeoutMs, "Image readiness timeout");
     }));
-    await frame();
+    await bounded(frame(), timeoutMs, "Layout readiness timeout");
   }
   async function execute(root, policy) {
     const started = performance.now();
@@ -116,12 +135,21 @@
     const tolerance = policy.tolerancePx ?? 0.5;
     const timeoutMs = policy.timeoutMs ?? 5000;
     if (!Number.isInteger(iterations) || iterations < 1 || iterations > 16 || !Number.isFinite(tolerance) || tolerance < 0 || !Number.isFinite(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000) throw new Error("Invalid bounded fitting policy");
-    // Restore every region before measuring; earlier fits cannot taint later baselines.
-    for (const region of regions) for (const element of fontElements(region)) restore(element);
-    try { await ready(root, timeoutMs); }
-    catch (error) {
-      return {regions: regions.map(region => ({regionId: region.dataset.fitRegion, status: "unmeasurable", reason: error.message})), elapsedMs: performance.now() - started};
+    const restoreHidden = [];
+    try {
+      // Prepare all hidden pages first, so readiness includes their font loads.
+      for (const region of regions) restoreHidden.push(reveal(region, root));
+      // Restore every region before measuring; earlier fits cannot taint baselines.
+      for (const region of regions) for (const element of fontElements(region)) restore(element);
+      await ready(root, timeoutMs);
+      return {regions: fitRegions(root, regions, policy, iterations, tolerance), elapsedMs: performance.now() - started};
+    } catch (error) {
+      return {regions: regions.map(region => ({slideId: region.closest("[data-slide]")?.dataset.slide, regionId: region.dataset.fitRegion, status: "unmeasurable", reason: error.message})), elapsedMs: performance.now() - started};
+    } finally {
+      for (const restore of restoreHidden.reverse()) restore();
     }
+  }
+  function fitRegions(root, regions, policy, iterations, tolerance) {
     const results = [];
     const byRegion = new Map();
     for (const region of regions) {
@@ -186,7 +214,7 @@
         }
       } finally { hideAgain(); }
     }
-    return {regions: results, elapsedMs: performance.now() - started};
+    return results;
   }
   const api = {
     fit(root, policy = {}) {

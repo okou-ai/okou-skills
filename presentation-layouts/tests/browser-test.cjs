@@ -11,6 +11,119 @@ const fitter = fs.readFileSync(path.resolve(__dirname, '../scripts/fit-text.js')
 const checks = [];
 const check = (name, test) => { test(); checks.push({name, passed:true}); };
 
+// Original one-glyph WOFF fixture: a 600/1000-em advance, not a source font.
+const wideFont = Buffer.from('d09GRgABAAAAAALAAAoAAAAAA4wAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAABZAAAAC4AAABgRUlEXWNtYXAAAAGcAAAAKQAAADQADAC8Z2x5ZgAAAdAAAAAkAAAANDhdOFtoZWFkAAAA9AAAADYAAAA2YW5DnGhoZWEAAAEsAAAAHwAAACQFegHEaG10eAAAAZQAAAAGAAAABgKKADJsb2NhAAAByAAAAAYAAAAGABoADW1heHAAAAFMAAAAFgAAACAABAAGbmFtZQAAAfQAAAC7AAABYv5dimVwb3N0AAACsAAAAA8AAAAmAFAAAAABAAAAAQAA2bf/jV8PPPUAAwPoAAAAAAAAAAAAAAAAAAAAAAAyAAACJgK8AAAAAwACAAAAAAAAeJxjYGRgYFb4b8HAwBTBYMRgxKTGABRBAYwAPTECRAB4nGNgZGBgYGJgYQDRIBYaAAABEgALAAB4nGNgZopgnMDAysDCQBgwInPsgQBIZTJkMiv8t2BgYFZgOIGmXoGBAQDKvwUsAAACWAAyADIAAHicY2BgYGJgYGAGYhEgyQimWRgUgDQLEIL4mf//Q8j/M8B8BgBV3wbFAAAAAAAADQAaAAB4nGNgZDBiYGBSY9rDwMzAYKwoqGjE+OUfD5DLgFMGAMbUCSN4nH2NwQqCUBBFjylFQRFUm1ZvES2Ct3DZPwSCBK6DLEJBMdNdX9H39G2NOgW1aGAeZ+47zAAj7jg05TBu36Z6DGTq2GXKXNljwUq5z4yt/DreUJIlO+UeE07KLoZS2WPDQ7nPmmeQ5GYfX0sTXY5xGJ9v6aHIktyWktlaMlv5X45RScImayKrEQEJuVzbE3OVm4aIC0eZQukzN1IOFGStZ8XoPEutnqXC/7PH/GzqzLcXfbZ8WS9H2j0XAHicY2BiwA9A8j4AAMYAUQA=', 'base64');
+const hiddenMarkup = (display, concealment, hint = true) => `<!doctype html><style>
+  body{margin:0}.slide{display:${display};width:800px;height:400px;font:32px sans-serif;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .slide[hidden],.slide.inactive{display:none}.region{flex:1;min-width:0;height:120px}.region span{white-space:nowrap}
+  </style><main id="deck"><section class="slide okp-layout${concealment === 'class' ? ' inactive' : ''}" data-slide="hidden-${display}"
+  ${concealment === 'attribute' ? 'hidden="until-found"' : ''} ${concealment === 'class' && hint ? `data-fit-display="${display}"` : ''}
+  style="${concealment === 'inline' ? 'display:none!important;' : ''}position:relative;left:12px;visibility:visible;pointer-events:auto">
+  ${['left','right'].map(id => `<div class="region" data-fit-region="${id}"><span data-text-role="body">${'M'.repeat(26)}</span></div>`).join('')}
+  </section></main><script>${fitter}</script>`;
+
+async function hiddenSlideChecks(browser) {
+  const page = await browser.newPage({viewport:{width:1600,height:900}});
+  try {
+    for (const display of ['flex','grid']) for (const concealment of ['attribute','inline','class']) {
+      await page.setContent(hiddenMarkup(display,concealment));
+      const data = await page.evaluate(async () => {
+        const slide = document.querySelector('.slide');
+        const snapshot = () => ({hidden:slide.getAttribute('hidden'), style:[...slide.style].sort().map(name => [name,slide.style.getPropertyValue(name),slide.style.getPropertyPriority(name)])});
+        const before = snapshot();
+        const policy = {roleBounds:{body:{minScale:0.5}}};
+        const hidden = await OkpFit.fit(document.querySelector('#deck'),policy);
+        const after = snapshot();
+        slide.removeAttribute('hidden');slide.style.removeProperty('display');slide.classList.remove('inactive');
+        const widths = [...document.querySelectorAll('.region')].map(region => {
+          const range = document.createRange();range.selectNodeContents(region.querySelector('span'));
+          return {available:region.clientWidth,content:range.getBoundingClientRect().width};
+        });
+        const visible = await OkpFit.fit(document.querySelector('#deck'),policy);
+        return {before,after,hidden,visible,widths};
+      });
+      check(`hidden ${display} retains visible geometry and state (${concealment})`, () => {
+        assert.deepEqual(data.after,data.before);
+        for (let i=0;i<data.hidden.regions.length;i++) {
+          assert.equal(data.hidden.regions[i].status,'fitted');
+          assert.deepEqual(data.hidden.regions[i].baselineSizesPx,[32]);
+          assert(Math.abs(data.hidden.regions[i].scale-data.visible.regions[i].scale)<0.001);
+          assert(data.widths[i].content<=data.widths[i].available+0.5);
+        }
+      });
+    }
+    await page.setContent(hiddenMarkup('grid','class',false));
+    let report = await page.evaluate(() => OkpFit.fit(document.querySelector('#deck'),{roleBounds:{body:{minScale:0.5}}}));
+    check('unknown stylesheet-hidden display is not guessed',()=>assert(report.regions.every(r=>r.status==='unmeasurable'&&r.reason.includes('data-fit-display'))));
+    assert(await page.locator('.slide').evaluate(e=>getComputedStyle(e).display==='none'));
+    await page.setContent(hiddenMarkup('flex','attribute').replace('</section>', '<img src="data:image/png;base64,aW52YWxpZA=="></section>'));
+    report = await page.evaluate(() => OkpFit.fit(document.querySelector('#deck')));
+    check('hidden state restored after image readiness failure',()=>assert(report.regions.every(r=>r.status==='unmeasurable'&&r.reason==='Image load failed')));
+    assert.equal(await page.locator('.slide').getAttribute('hidden'),'until-found');
+    await page.setContent(hiddenMarkup('flex','attribute'));
+    report = await page.evaluate(async () => {
+      const original = window.requestAnimationFrame;window.requestAnimationFrame=()=>0;
+      try { return await OkpFit.fit(document.querySelector('#deck'),{timeoutMs:50}); }
+      finally { window.requestAnimationFrame=original; }
+    });
+    check('layout wait is bounded and restores hidden state',()=>assert(report.regions.every(r=>r.status==='unmeasurable'&&r.reason==='Layout readiness timeout')));
+    assert.equal(await page.locator('.slide').getAttribute('hidden'),'until-found');
+  } finally { await page.close(); }
+
+  for (const timeout of [false,true]) {
+    const fontPage = await browser.newPage({viewport:{width:1600,height:900}});
+    let releaseFont;
+    const gate = new Promise(resolve=>{releaseFont=resolve});
+    let pendingFit;
+    try {
+      await fontPage.route('https://fit-regression.invalid/**',async route => {
+        if (route.request().url().endsWith('/wide.woff')) {
+          await gate;
+          await route.fulfill({status:200,contentType:'font/woff',body:wideFont});
+        } else {
+          await route.fulfill({status:200,contentType:'text/html',body:`<!doctype html><style>
+            @font-face{font-family:TestWide;src:url('/wide.woff')}body{margin:0}.slide{width:400px;height:200px}.slide[hidden]{display:none}
+            .region{width:300px;height:100px;font:32px TestWide,sans-serif;white-space:nowrap}
+            </style><main id="deck"><section class="slide okp-layout" data-slide="font" hidden><div class="region" data-fit-region="body"><span data-text-role="body">${'i'.repeat(30)}</span></div></section></main><script>${fitter}</script>`});
+        }
+      });
+      await fontPage.goto('https://fit-regression.invalid/');
+      pendingFit = fontPage.evaluate(async timeout => {
+        window.fitDone=false;
+        const report = await OkpFit.fit(document.querySelector('#deck'),{timeoutMs:timeout?500:3000,roleBounds:{body:{minScale:0.5}}});
+        window.fitDone=true;return report;
+      },timeout);
+      pendingFit.catch(()=>undefined);
+      if (timeout) {
+        const report = await pendingFit;
+        check('hidden font timeout is unmeasurable, not a fallback-font pass',()=>assert(report.regions.every(r=>r.status==='unmeasurable'&&r.reason==='Font readiness timeout')));
+        assert(await fontPage.locator('.slide').evaluate(e=>e.hidden));
+      } else {
+        await fontPage.waitForFunction(()=>document.fonts.status==='loading');
+        await fontPage.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));
+        const fitDone = await fontPage.evaluate(()=>window.fitDone);
+        check('fitting promise waits for fonts first used by hidden pages',()=>assert.equal(fitDone,false));
+        releaseFont();
+        const report = await pendingFit;
+        const state = await fontPage.evaluate(() => {
+          const slide=document.querySelector('.slide');const hidden=slide.hidden;slide.hidden=false;
+          const region=document.querySelector('.region');const range=document.createRange();range.selectNodeContents(region.querySelector('span'));
+          return {hidden,loaded:document.fonts.check('32px TestWide'),available:region.clientWidth,content:range.getBoundingClientRect().width};
+        });
+        check('hidden text is fitted using loaded webfont metrics',()=>{
+          assert.equal(report.regions[0].status,'fitted');assert.deepEqual(report.regions[0].baselineSizesPx,[32]);
+          assert(report.regions[0].scale>=0.5&&report.regions[0].scale<0.53);
+          assert(state.hidden&&state.loaded);assert(state.content<=state.available+0.5);
+        });
+      }
+    } finally {
+      releaseFont();
+      if (pendingFit) await pendingFit.catch(()=>undefined);
+      await fontPage.close();
+    }
+  }
+}
+
 (async () => {
   const browser = await chromium.launch({executablePath:process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless:true, args:['--no-sandbox']});
   try {
@@ -81,6 +194,7 @@ const check = (name, test) => { test(); checks.push({name, passed:true}); };
     await page.setContent(markup.replace('</div><script>', '<img src="data:image/png;base64,aW52YWxpZA=="></div><script>'));
     report = await run();
     check('broken image readiness not a pass',()=>assert(report.regions.every(r=>r.status==='unmeasurable')));
+    await hiddenSlideChecks(browser);
     const result = {timestamp:new Date().toISOString(),chromium:browser.version(),fixturePages:12,fixtureRegions:fixtures.reduce((n,r)=>n+r.regions.length,0),checks,fixtureReports:fixtures,limitations:['Synthetic acceptance, not a real extracted template','No production first-pass rate or speed comparison','No source font availability guarantee']};
     fs.mkdirSync(path.dirname(path.resolve(values.out)),{recursive:true});
     fs.writeFileSync(values.out,JSON.stringify(result,null,2)+'\n');
