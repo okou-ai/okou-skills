@@ -1,44 +1,33 @@
-# Local neutral presentation layouts
+# 本地中性演示文稿布局
 
-This package contains **54 editable reference fragments**, not 54 pre-styled slides.
-It is bundled with extraction and copied unmodified into each reusable user package.
-No private repository, catalogue download, GitHub credentials, branded shell,
-stock photo, font, colour system or decoration resource is required.
+本资源包包含 **54 个可编辑的参考片段**，不是 54 页已经设定好样式的幻灯片。它随模板提取功能打包，并原样复制到每个可复用的用户模板包中。无需依赖私有仓库、下载布局目录、GitHub 凭据，或其他模板的品牌外壳、图库照片、字体、配色和装饰资源。
 
-Read `references/catalog.json` first, then only the selected `layouts/fragments/*.html`
-files and `styles/geometry.css`. Paths in the catalogue are relative to the catalogue.
-The catalogue describes purpose, content slots, repeated groups and approximate
-capacity; these are selection hints, not a fixed slide count or a guarantee of fit.
+先看 [布局目录表格](references/catalog.md)，再只读取选中的 `layouts/fragments/*.html`。具体占位符和重复块直接看 HTML，不需要另一套 JSON 元数据。目录中的路径相对于目录文件本身；用途和容量仅供选版参考，不代表固定页数，也不保证实际内容一定能放下。
 
-## Generation-time adaptation
+## `geometry.css` 如何与用户上传的 PPT 配合
 
-1. Prefer a fitting preserved source layout from the user's `layouts/source-index.json`.
-2. Otherwise choose a local fragment by its communicative purpose. Copy it into the
-   working deck's `.stage > .fit`; do not edit the source upload or library originals.
-3. Apply the user's design system and a matching source profile: fonts, initial sizes,
-   weights, leading, foreground/background pairs, component skin, spacing, crop,
-   chart colours, chrome and decoration. SVG CSS pixels are viewBox units: convert
-   source label sizes through `PresentationMetrics.fontFactor(element)` so their
-   effective logical size matches the source, rather than blindly reusing HTML px.
-   Keep unfamiliar roles explicitly inferred
-   or alias them to a documented source role. Do not introduce another template skin.
-4. Expand only the required `data-repeat` prototypes and replace every `{{slot}}`.
-   These markers are authoring hints, not a required template compiler. Use real
-   supplied text, image assets and data. Never keep example claims or fill a slot
-   with an invented fact. Numeric SVG geometry must be derived from the real data;
-   chart units, baselines, segment sums and bubble areas must remain correct.
-5. Preserve the disjoint title/body `data-fit-region` hooks. Run the packaged
-   fitter and final QA. Every visible editable text run has a **10px logical-canvas
-   minimum**, including SVG labels. Change composition or split if it still cannot fit.
-6. Compare newly adapted compositions with the user's source/style references.
-   A green mechanical QA result is not a source-fidelity audit.
+**它不会解析 PPT，也不会自动把用户的设计转换成 CSS，更不应套到保留下来的原始布局上。** 原始布局继续使用提取出的用户样式。这个文件只提供补充布局的 Flex/Grid、列结构、图表和图片容器等排版参考，不负责用户的字体、配色和组件外观。
 
-Only selected fragments are styled during generation. Upload analysis does not
-pre-adapt the complete library. Shared geometry is a reference: `--layout-gap` and
-`--layout-image-fit` must be adapted to observed source spacing and crop. The
-contain fallback prevents distortion, but does not override a source `cover` recipe.
-Do not copy temporary fixture skins, QA data or screenshots into a user package.
+实际适配在生成时完成：
 
-HTML/CSS/SVG remain editable in the HTML template. SVG can become a picture during
-PPTX conversion; this package does not claim a native PowerPoint chart renderer.
-Keep labels in HTML when native PPTX text editing is required and validate export.
+1. 先读取用户模板中的 `design-system.md`、`styles/template.css`、原始布局和参考页，找到实际使用的标题、正文、卡片、表格、图片等样式。
+2. 原始布局能表达内容时，直接复用原始布局和用户样式，不引入 `geometry.css`。
+3. 只有需要补充布局时，才复制选中的 HTML，以及 `geometry.css` 中该布局需要的规则到**工作稿**。不要把整套规则全局套到原始布局。
+4. 给选中的标题、正文等节点复用用户已有的样式类或 CSS 声明；必要时修改标签以匹配原样式，例如原模板用 `h1` 定义标题，就不要指望新增的 `div` 自动获得同样的样式。源模板没有对应组件时，只根据已记录的源样式推断，并注明推断。
+5. 按源模板实测结果调整间距、列宽比例、图片裁切、组件边框和圆角等。`--layout-gap` 用用户的间距；`--layout-image-fit` 用用户实际采用的 `cover`、`contain` 等裁切方式。文件里的等宽列、`1em` 和 `contain` 都是参考起点，不是用户样式，也不是必须保留的约束。
+6. 字体、初始字号、字重、行距、前景色与背景色组合、图表颜色、固定页面元素和装饰，均以用户 PPT 为准。保留用户的页面外壳和源样式，不引入另一个模板的外观。
+
+所有几何选择器都限定在 `.builtin-layout` 内，并通过 `:where()` 保持零优先级，避免影响原始布局，也避免压过用户已有的样式类。但选择器隔离不等于已经完成风格适配，仍需按以上步骤实际修改选中的布局。
+
+## 生成时适配
+
+1. 优先使用用户 `layouts/source-index.json` 中保留下来的、适合当前内容的原始布局。
+2. 如果没有合适的原始布局，就按表达目的从目录表格选择一个本地参考片段，复制到工作稿的 `.stage > .fit` 中。不要修改原始上传文件、存储的用户模板或布局库原件。
+3. 按上一节给选中的布局应用用户设计系统及匹配的源样式配置。SVG 中的 CSS 像素按 `viewBox` 坐标单位解释，应通过 `PresentationMetrics.fontFactor(element)` 转换标签字号，使实际逻辑字号与源模板一致，而不是直接照搬 HTML 的 px 数值。
+4. 只展开需要的 `data-repeat` 原型，并替换所有 `{{slot}}`。这些标记是编写提示，不要求使用模板编译器。使用实际提供的文字、图片和数据，不保留示例结论，也不编造事实填充占位符。表达数值的 SVG 几何必须根据真实数据生成，图表单位、基线、各分段之和及气泡面积必须正确。
+5. 保留标题和正文相互独立的 `data-fit-region` 标记，运行包内的自动文字适配工具及最终 QA。所有可见、可编辑的文本，包括 SVG 标签，都必须满足**逻辑画布上的 10px 最小字号**。如果仍然放不下，就调整布局或拆页，不能隐藏或裁掉文字。
+6. 将新适配的布局与用户原始文件及样式参考比较。机械性 QA 通过，不代表已经完成源样式保真审查。
+
+只在生成时为选中的片段适配样式。上传分析阶段保存用户样式和原始布局，不提前适配整个参考库。
+
+HTML 模板中的 HTML、CSS 和 SVG 仍然可编辑。但在转换为 PPTX 时，SVG 可能变成图片；本资源包不宣称具备原生 PowerPoint 图表渲染能力。如果需要在 PPTX 中原生编辑文字标签，应将标签保留为 HTML 文本，并验证导出结果。

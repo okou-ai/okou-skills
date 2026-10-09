@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Copy QA into a user package and inline the common runtime exactly once. */
-import {copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, writeFileSync} from "node:fs";
+import {copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync} from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +20,8 @@ for (const name of ["dom-metrics.js", "fit-text.js", "navigation.js"]) copyFileS
 for (const name of ["audit.js", "qa.mjs", "run.sh", "verify-package.mjs"]) copyFileSync(path.join(here, "../tools", name), path.join(target, "tools", name));
 writeFileSync(path.join(target, "tools/qa-config.json"), JSON.stringify(config, null, 2) + "\n");
 cpSync(path.join(here, "../library"), path.join(target, "library"), {recursive: true});
+// Remove the previously shipped machine catalogue when refreshing the library.
+rmSync(path.join(target, "library/references/catalog.json"), {force: true});
 mkdirSync(path.join(target, "references"), {recursive: true});
 for (const name of ["qa.md", "typography-fit.md", "layout-reuse.md"]) copyFileSync(path.join(here, "../references", name), path.join(target, "references", name));
 const runtime = ["dom-metrics.js", "fit-text.js", "navigation.js"].map(name => readFileSync(path.join(here, name), "utf8")).join("\n");

@@ -94,6 +94,7 @@ not proof that the template is a native PPTX in-place editing engine.
   fitting, final QA and source-style review of newly adapted compositions. Capture
   and export only the measured working copy. Never modify the stored source package.
 
-The repository CI must run structural/library tests and real-browser controls,
-including 9.99/10px boundaries, SVG/zoom, long CJK/Latin text, clipping, font/media
-errors, zero pages, all four keys, reruns/reloads and every local fragment.
+The portable package retains its runtime QA and 10px fitter. Repository CI checks
+skill metadata and JavaScript syntax; it does not certify rendered layout quality.
+Run the packaged final QA on actual reconstructions/generated decks and compare
+representative page images with the user's source before delivery.

@@ -7,7 +7,7 @@ for (let i = 0; i < args.length; i += 2) options[args[i]?.replace(/^--/, "")] = 
 if (!options.package) { console.error("Usage: node tools/verify-package.mjs --package <dir> [--source-pages <dir>]"); process.exit(2); }
 const root = path.resolve(options.package);
 const errors = [];
-for (const file of ["SKILL.md", "design-system.md", "layouts/_shell.html", "layouts/README.md", "styles/template.css", "scripts/dom-metrics.js", "scripts/fit-text.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "library/references/catalog.json"]) {
+for (const file of ["SKILL.md", "design-system.md", "layouts/_shell.html", "layouts/README.md", "styles/template.css", "scripts/dom-metrics.js", "scripts/fit-text.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "library/references/catalog.md"]) {
   if (!existsSync(path.join(root, file))) errors.push(`Missing ${file}`);
 }
 try {
@@ -29,10 +29,14 @@ try {
     }
   }
   if (covered.size !== index.pageCount) errors.push(`Covered ${covered.size} of ${index.pageCount} original pages`);
-  const catalogue = JSON.parse(readFileSync(path.join(root, "library/references/catalog.json"), "utf8"));
-  if (!Array.isArray(catalogue.layouts) || catalogue.layouts.length < 40) errors.push("The local neutral library must contain 40+ references");
-  for (const entry of catalogue.layouts || []) {
-    if (!existsSync(path.resolve(root, "library/references", entry.file))) errors.push(`Missing local reference ${entry.id}`);
+  const table = readFileSync(path.join(root, "library/references/catalog.md"), "utf8");
+  const links = [...table.matchAll(/\[([a-z0-9-]+)\]\(\.\.\/layouts\/fragments\/([a-z0-9-]+\.html)\)/g)];
+  const files = readdirSync(path.join(root, "library/layouts/fragments")).filter(name => name.endsWith(".html"));
+  if (links.length < 40 || files.length < 40) errors.push("The local neutral library must contain 40+ references");
+  const listed = new Set(links.map(match => match[2]));
+  if (listed.size !== links.length || files.length !== listed.size || files.some(file => !listed.has(file))) errors.push("The layout table must list every local fragment exactly once");
+  for (const [, id, file] of links) {
+    if (file !== `${id}.html` || !existsSync(path.join(root, "library/layouts/fragments", file))) errors.push(`Missing or invalid local reference ${id}`);
   }
   if (options["source-pages"]) {
     const pages = readdirSync(options["source-pages"]).filter(name => /^page-\d{3}\.png$/.test(name)).sort();

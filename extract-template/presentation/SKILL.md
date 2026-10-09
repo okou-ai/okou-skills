@@ -51,7 +51,7 @@ images or another content type is not a prohibition on adding it during generati
     _shell.html             # canvas, fonts, source chrome, four-arrow navigation
   styles/template.css
   assets/                   # only reusable source assets in use
-  library/                  # untouched local neutral catalogue and 54 fragments
+  library/                  # local Markdown layout table and 54 neutral fragments
   scripts/                  # common measurements and 10px text fitter
   tools/                    # source QA config, package verifier and final audit
   references/               # portable QA, fitting and reuse instructions
@@ -83,10 +83,13 @@ The generated `SKILL.md` and `layouts/README.md` must direct later authors to:
 
 1. Read source design rules and `layouts/source-index.json`; copy a fitting source
    composition first without modifying the stored package or original upload.
-2. Otherwise read `library/references/catalog.json`, then only selected local
-   fragments. Copy them into the working deck and selectively adapt source fonts,
-   initial sizes, palette, components, backgrounds, spacing, images and chrome.
-   Read `library/README.md`; the library is reference geometry, not a competing skin.
+2. Otherwise choose from the Markdown table `library/references/catalog.md`, then
+   read only selected HTML fragments and their needed geometry rules. Copy them
+   into the working deck; reuse the user's existing CSS classes/declarations for
+   fonts, initial sizes, palette, components, backgrounds, spacing, crop and chrome.
+   Adapt column ratios and gaps to observed source geometry, rather than treating
+   equal columns, 1em or contain as user defaults. Do not attach geometry.css to
+   preserved source layouts or the stored source shell. Read `library/README.md`.
 3. Fill real content/data, expand needed repeated groups, and keep text-fitting hooks.
    Do not refetch a catalogue or recreate source analysis for each generation.
 4. Automatically fit only overflowing regions, never below 10px. Still-unfit content
