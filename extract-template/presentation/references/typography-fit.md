@@ -28,7 +28,7 @@ Include these rules and the fit-report location in the generated package's `SKIL
 
 ## Validate before publishing
 
-Use representative layouts and their actual fonts, including a generation-time built-in adaptation when present. Keep linked-layout validation examples outside the reusable template package:
+Use representative source layouts and every extension adapted during extraction, with their actual source fonts. Save validated reusable extension files in the template package; keep temporary fixture decks and validation images outside it:
 
 | Case | Required result |
 | --- | --- |

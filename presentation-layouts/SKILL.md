@@ -9,9 +9,9 @@ This is a structure library, not a visual template, shell, full PPTX extractor, 
 
 ## 1. Select only when needed
 
-Prefer a suitable layout already preserved in the user template. If none fits the purpose or density, read [references/catalog.md](references/catalog.md) and **only the chosen fragments**. Fetch the catalogue, fragments, geometry and tools from the same exact `okou-ai/okou-skills` commit. Do not download example decks, unselected fragments, or another theme's shell.
+Prefer a suitable source layout or validated extension already saved in the user template. During upload-time extraction, this six-structure pilot can supplement a larger authorised catalogue: read [references/catalog.md](references/catalog.md) and **only the chosen fragments**. Fetch the catalogue, fragments, geometry and tools from the same exact `okou-ai/okou-skills` commit. Do not download example decks, unselected fragments, or another theme's shell.
 
-A custom template package keeps its own source layouts, assets, design system, bindings, shell and fitter. It references the public catalogue; it does not contain copies of this catalogue, six-layout library, or pre-themed adaptations. An adapted layout belongs to the new generated deck and its generation notes. If the public reference is unavailable, retain the source layout or document a deck-specific composition; do not retry indefinitely.
+Follow `extract-template/presentation` when building a reusable custom template: adapt selected structures to the source style during extraction, validate them, and save those adaptations plus provenance in the package's local extension index. Do not bundle the entire six-layout library, its catalogue, or synthetic skins. Later generation copies and edits saved layouts without fetching this library. For a one-off deck without an extraction stage, an adaptation may stay in that deck and its notes. If the public reference is unavailable, retain saved layouts or document the gap/composition; do not retry indefinitely.
 
 ## 2. Bind reliable values, not a complete dictionary
 

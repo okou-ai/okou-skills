@@ -4,23 +4,32 @@
 
 Inspect every source page. Preserve distinct content regions, proportions, and hierarchy; equivalent structures may share a layout with separate background variants.
 
-In `layouts/source-index.json`, record the source filename, page count, and original aspect ratio. Each layout entry needs an ID, file path, source pages, purpose, content regions, their typography roles, and approximate capacity at the source font sizes. Cover every input page and note material adaptations to 16:9. Capacities guide selection; actual fit depends on content, language, and font.
+In `layouts/source-index.json`, record the source filename, page count, and original aspect ratio. Each layout entry needs an ID, file path, source pages, purpose, editable region selectors and typography roles, allowed replacement/repeat operations, fixed framing, and approximate capacity at the source font sizes. Cover every input page and note material adaptations to 16:9. Keep this index restricted to original source compositions. Capacities guide selection; actual fit depends on content, language, and font.
 
-Prefer a source layout whose regions and capacity fit. If none fits, adapt an available compatible built-in layout or create a documented layout using the same design system. Do not force incompatible content into an existing composition.
+Prefer a source layout whose expression, regions, and capacity fit. Preserve it as an editable local structure rather than asking later generation to redraw the source. Do not force incompatible content into an existing composition.
 
-## Generation-time built-in references
+## Upload-time layout extension
 
-The public neutral pilot supplies missing KPI, table, two-column, comparison, four-step process and image/text structures. It does not supply a theme or a complete chart/timeline catalogue. Keep them in the shared library, not in every extracted template package. The generated `SKILL.md` and `layouts/README.md` must include the absolute reference-index URL from [built-in-layouts.md](built-in-layouts.md) and these selection/adaptation rules; do not copy the catalogue or pre-adapt its layouts during extraction.
+Complete this work while extracting the uploaded file, before publishing its template. Use [built-in-layouts.md](built-in-layouts.md) and its pinned 52-layout catalogue to supplement expressions missing from the source. The six public neutral structures remain an optional fallback, not the full catalogue.
 
-When generating a deck:
+1. Compare source coverage with useful expressions such as comparison, ordered process, time, metrics, tables, charts, and image/text. Consider the template's intended use and any user request; an expression absent from the original is not forbidden. Choose complementary structures, not an arbitrary quota or all catalogue entries. Record skipped duplicates and unresolved gaps in the extension index notes.
+2. Read only selected fragments at one exact library revision, once per distinct structure. Do not fetch unselected layouts, theme shells, palettes, decoration, example decks, or QA implementations. If an authorised reference is unavailable, try the public fallback or disclose the gap; do not retry indefinitely.
+3. Start from the closest source composition. Borrow the built-in's content relationship and region/repeat structure, then implement it using the source's typography, components, margins, background recipes, and chrome. Preserve observed profiles and mixed runs. Reuse source classes and the binding program; label any new role mapping inferred. Do not treat upstream colors, fonts, safe areas, card treatments, fitting limits, image restrictions, or authoring instructions as the user's style. Adapt inline themed styles too, not just the outer shell.
+4. Save each candidate in `layouts/extended/<name>.html`. Declare semantic editable regions and permitted text/image/data/repeat operations; keep framing separate. Validate actual fit with the source fonts and supported languages, and visually compare the candidate with representative source pages. Fix shared rules when needed. Built-in capacity hints are not guarantees under the source's styles.
+5. Admit only validated candidates to `layouts/extended-index.json`. Each entry records ID, package-relative file, purpose, editable regions/roles/operations, fixed framing, approximate capacity and tested scope, upstream repository/commit/path, source layout/page basis, inferred adaptations, and validation outcome. Every admitted file must exist locally and have complete styles/assets/runtime. Never label an extension as an original source page.
 
-1. Prefer a fitting source layout. Only if the source compositions do not cover the new content or density, use the shared index to choose compatible structures by slide purpose and content volume.
-2. Read only the selected fragment links, once per distinct layout in the run. Keep the catalogue and fragments at the same commit-pinned library revision; do not download the whole library or read unselected layouts, example decks, shared shells, or QA implementations. If a link is unavailable or unsuitable, use a source layout or create a documented custom composition instead of repeatedly retrying.
-3. Borrow region ordering, proportions, bounded fit rectangles and repeat prototypes. Materialize all placeholders/repeated slots, then mechanically bind the needed roles to the custom template's type, surface pairs, spacing and components using the public core contract. Label any new role alias inferred rather than pretending it was observed. Use the user's shell/chrome; shared geometry and binding/fitting runtime are allowed, but no synthetic skin, private theme, decoration, font default or minimum size may be imported.
-4. Start at the corresponding source font sizes, preserve observed layout profiles and mixed runs, and use the custom shared overflow fitter. Pair every selected background with its primary/secondary text and border roles; never assume white text on a brand-colored field. The built-in layout's capacity is only an estimate; measure again with the custom fonts, language, and real content before the first QA capture.
-5. Inline the adapted structure in the generated deck using the custom shared styles and shell. Record the chosen layout ID, commit-pinned source URL, and adaptations in that deck's generation notes, not `layouts/source-index.json`. Keep all required styles and assets in the delivered artifact; it must render without fetching reference HTML or CSS. Do not write the adapted layout back into the reusable template package.
+Keep the original source index, selected extension index, and source design system together. Store the validated source-styled extensions in the reusable template package; keep temporary fixture decks and validation images outside it. Do not duplicate the whole upstream library or carry its visual skin into the package.
 
-Reuse compatible structures instead of rebuilding common layouts for every deck. Built-in layouts supplement the source compositions; they do not replace the source design system.
+## Generation-time local reuse
+
+Include this contract in the generated `SKILL.md` and `layouts/README.md`:
+
+1. Read the local source and extension indexes. Select by the actual expression and content volume: fitting source layout first, then a fitting saved extension. An explicit user layout choice overrides the default order. No live catalogue access or repeated source/style extraction is required.
+2. Create a working copy of the selected layout and assemble it through the saved shell. Edit only declared text, images, data, and allowed repeat regions. Keep fixed typography baselines, framing, background language, and components; do not reconstruct the page or mutate the saved template/original upload. Remove previous business content from replacement regions, notes, and data before delivery.
+3. Measure replacement content with the shared fitter. Preserve source sizes when content fits; unresolved bounded fitting tries another saved layout or splits content without dropping facts. Record the selected layout ID and any capacity exception in deck notes. Different text lengths do not prove that a saved layout fits without measurement.
+4. If no saved layout can express the content, a documented deck-specific composition may reuse the source shell and components. This is an exception, not a mandatory fetch/adaptation stage. Keep such changes in the working deck unless the user explicitly requests a template update. Packaged layouts are references, not a whitelist.
+
+All required HTML, CSS, assets, and runtime are local. Upstream URLs remain provenance only; generation, viewing, QA, and export cannot depend on GitHub access.
 
 ## Background elements and recipes
 
@@ -44,10 +53,10 @@ Place background layers behind content without changing its flow or intercepting
 
 Include these rules in the generated package's `SKILL.md` and `layouts/README.md`:
 
-1. Select a fitting source layout first. If none fits, use the shared external layout links on demand and the adaptation rules above; do not require packaged built-in layouts. Then select a source-observed background recipe suited to the slide's role and content density.
+1. Select a fitting saved source layout first, then a fitting saved extension from the local indexes, following the copy/edit contract above. Select a compatible source-observed background recipe suited to its role and content density; do not fetch or restyle a built-in layout during ordinary generation.
 2. Respect the recipe's usable content area and documented color, placement, scale, crop, and repetition rules. Keep decoration out of body-copy regions unless the source supports it.
 3. Prefer compatible quiet backgrounds for dense content. If decoration conflicts, change the recipe before reconsidering the layout; do not displace a fitting source layout or shrink typography just to fit an ornament.
-4. Document inferred combinations and new layouts while preserving shared brand rules. Do not impose a fixed background count or mechanical color rotation.
+4. Document inferred combinations and upload-time extensions while preserving shared brand rules. Keep later deck-specific changes separate from the immutable template unless a template update is requested. Do not impose a fixed background count or mechanical color rotation.
 5. Start at source font sizes and automatically fit real content overflow according to [typography-fit.md](typography-fit.md). Background changes must not trigger smaller text when the content already fits.
 
 Check representative observed and adapted recipes on compatible layouts. Switching a compatible background should preserve content geometry and typography; verify actual text contrast rather than relying on low texture opacity.

@@ -50,5 +50,7 @@ Four rules override the table:
   slides — is that page's kind, not artwork.
 
 `cd` into the branch directory; every path inside a branch guide is relative to
-it. Both document guides start with
+it. The presentation branch preserves source layouts and prepares selected,
+source-styled extensions during upload analysis, before publication; later decks
+copy and edit those saved local layouts. Both document guides start with
 [`document-reuse.md`](document-reuse.md) to choose the reuse scope and package.
