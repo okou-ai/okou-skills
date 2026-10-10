@@ -5,18 +5,28 @@ description: Create or edit Word documents, Excel spreadsheets, and PDFs, includ
 
 # Office files
 
-Prefer native authoring, shared styling, concise guidance, and final-file checks.
-Choose suitable libraries, such as `docx`/`python-docx` for Word or ReportLab/Typst
-for PDF. Markdown conversion is optional; DOCX-to-PDF serves Word layout checks
-or a requested matching export.
+## Generate
 
-- For new business work needing task-specific guidance, consult
-  `business-skill-index` when available.
-- For new English reports without a supplied design, apply [style.md](style.md).
-  Adapt typography for other languages; preserve existing designs during narrow edits.
-- Keep paired Word/PDF content and styling consistent.
-- Keep Word text and tables editable and spreadsheet calculations recalculable.
-- Check final content, numbers, and every rendered page or relevant worksheet.
-  For Word, inspect pages rendered from the actual DOCX; identify unverified checks.
-- Deliver the requested files. Include editable Word with final PDFs unless
-  the user requests otherwise.
+Prefer native authoring: create each format directly with a suitable library.
+For example:
+
+- Word: create editable paragraphs and tables with `docx`/`python-docx`.
+- PDF: lay out pages and write the PDF with ReportLab/Typst.
+- Excel: write cells and recalculable formulas with `openpyxl`.
+
+Markdown conversion is optional. Use DOCX-to-PDF for Word layout checks
+or a requested matching export. For new business content needing task-specific
+guidance, consult `business-skill-index` when available.
+
+## Style
+
+For new English reports without a supplied design, apply [style.md](style.md).
+Adapt typography for other languages; preserve existing designs during narrow edits.
+Keep paired Word/PDF content and styling consistent.
+
+## Check and deliver
+
+Check final content, numbers, and every rendered page or relevant worksheet.
+For Word, inspect pages rendered from the actual DOCX; identify unverified checks.
+Deliver the requested files. Include editable Word with final PDFs unless
+the user requests otherwise.
