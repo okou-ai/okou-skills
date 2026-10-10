@@ -1,0 +1,9 @@
+{
+  "minFontSizePx": 10,
+  "expectedPages": null,
+  "safeArea": null,
+  "layoutSafeAreas": {},
+  "requiredChrome": [],
+  "allowedFontFallbacks": [],
+  "minContrastRatio": 3
+}

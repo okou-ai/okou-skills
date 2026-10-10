@@ -4,11 +4,15 @@ on:
   pull_request:
     paths:
       - "**/SKILL.md"
+      - "extract-template/**"
+      - ".github/workflows/validate-skills.yml"
   push:
     branches:
       - main
     paths:
       - "**/SKILL.md"
+      - "extract-template/**"
+      - ".github/workflows/validate-skills.yml"
 
 jobs:
   validate:
@@ -122,3 +126,20 @@ jobs:
           fi
 
           echo "No _ACCESS_TOKEN references found. ✓"
+
+  presentation-syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: JavaScript syntax
+        run: |
+          set -euo pipefail
+          find extract-template/presentation/scripts extract-template/presentation/tools \
+            -type f \( -name '*.js' -o -name '*.mjs' \) -print0 |
+            while IFS= read -r -d '' file; do
+              node --check "$file"
+            done

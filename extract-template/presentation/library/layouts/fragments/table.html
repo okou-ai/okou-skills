@@ -1,0 +1,22 @@
+<section class="builtin-layout" data-layout="table">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-table">
+      <table>
+        <thead>
+          <tr>
+            <th data-repeat="headers" data-text-role="table-header">{{header}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-repeat="rows">
+            <td data-repeat="cells" data-text-role="table-cell">{{cell}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div data-text-role="caption">{{source-note}}</div>
+  </div>
+</section>
