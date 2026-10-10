@@ -1,6 +1,6 @@
 ---
 name: presentation-extract-template
-description: Extract and publish an editable HTML presentation template from PPTX, PPT, PDF or slide images. Preserve source style and original compositions, bundle a local neutral layout library, and validate with automatic 10px-bounded text fitting and source-configured rendered QA.
+description: Extract and save an editable HTML presentation template from PPTX, PPT, PDF or slide images. Preserve source style and compositions, bundle local layouts and future-generation QA, and use lightweight package checks during extraction.
 ---
 
 # Extract a presentation template
@@ -9,6 +9,11 @@ The uploaded source defines style; the reusable output remains HTML. Preserve th
 original file unchanged. Upload analysis saves source style and source layouts;
 **generation** selectively adapts local reference layouts when originals do not fit.
 No private repository, external layout catalogue or GitHub credential is required.
+
+This guide separates extraction from later deck generation. Extraction saves the
+source, style, layouts, assets, index and authoring guidance. Its five-step authoring
+workflow is written into the package for future PPT creation; do not run that workflow
+or build a finished sample deck as part of extraction.
 
 Write all authoring/generation prompts and guidance in English, including the
 user package's SKILL.md, READMEs, design-system instructions and references.
@@ -27,6 +32,8 @@ Record filename, original canvas ratio, page count, page roles and recurring
 structures. Corroborate rendered typography with authoring-file metadata; keep
 aspect adaptation and source-to-HTML units explicit. Label unavailable evidence
 and visual estimates as inferred. Never package reconstructed images as originals.
+Render the source once for extraction and the ordered source-page archive; do not
+rebuild a full deck or compare every rebuilt page during this step.
 
 ## 2. Extract the source design system
 
@@ -58,7 +65,7 @@ images or another content type is not a prohibition on adding it during generati
   assets/                   # only reusable source assets in use
   library/                  # local Markdown layout table and 54 neutral fragments
   scripts/                  # common measurements and 10px text fitter
-  tools/                    # source QA config, package verifier and final audit
+  tools/                    # package verifier plus QA for later generated decks
   references/               # portable QA, fitting and reuse instructions
 ```
 
@@ -113,32 +120,35 @@ The generated `layouts/README.md` should be a short path map linking to `SKILL.m
 briefly distinguish the original-page archive from the working output. Avoid repeating
 the entire workflow there.
 
-## 4. Validate representative source rebuilds
+The five authoring steps above are future-generation instructions inside the package.
+They are not extraction steps. Do not create an outline, rewrite source content, assemble
+a finished deck, or run final-deck QA/page-by-page review during extraction. If a user
+separately requests a sample rebuild, keep it to the requested sample; do not infer a
+full-deck scope or an all-pages comparison.
 
-Rebuild representative distinct compositions, profiles and background recipes.
-Check the source index covers every original page. Run the packaged final commands:
+## 4. Verify the extracted package
+
+Run the lightweight package check after creating the source index, local assets and
+package. It verifies required files, source-page coverage, local library links, source
+page capture count and package-local resource paths. It does not render or QA a newly
+authored deck:
 
 ```bash
-node <template-slug>/tools/verify-package.mjs --package <template-slug> --source-pages <source-pages-dir>
-node <template-slug>/tools/qa.mjs --final <rebuilt.html> \
-  --expected-pages <representative-count> --report <qa-report.json> \
-  --prepared <rebuilt.ready.html>
-okou presentation screenshot --input <rebuilt.ready.html> --out <validation-dir>
+node <template-slug>/tools/verify-package.mjs \
+  --package <template-slug> --source-pages <source-pages-dir>
 ```
 
-The prepared file must be a separate working copy beside the assembled HTML.
-Compare structure, type, source colour pairs, component styling, decoration,
-image crops and safe areas with original page images. A mechanical green status
-is not a source-fidelity pass. Keep temporary fixtures/review images outside the
-package and outside `source-pages-dir`. Fix shared rules rather than page-by-page
-ad hoc CSS. Fonts, images, clipping, the 10px floor, page count and live four-key
-navigation must pass; unknown image/gradient contrast needs recorded visual review.
+Do not run `<template-slug>/tools/qa.mjs` on the source shell during extraction. That
+final QA is for a deck created later by following the package's five-step workflow.
+Only when source-to-HTML reconstruction creates a specific fidelity risk, compare one
+or two unchanged representative compositions against their original page images. Do
+not rebuild the entire presentation or compare every page by default. Keep any small
+smoke-check output outside the reusable package.
 
-If PPTX is delivered, use `okou presentation convert --verify` on the prepared HTML
-and render that actual PPTX for roundtrip review. Text coverage alone does not prove
-font, crop or layout fidelity; SVG may rasterise. This is not a native PPTX editor.
+## 5. Save and verify the Custom Template
 
-## 5. Publish only after both validations pass
+After the package check passes, save the original source, ordered source-page images
+and complete package together:
 
 ```bash
 okou presentation-template publish --title "<template name>" \
@@ -146,9 +156,10 @@ okou presentation-template publish --title "<template name>" \
   --package <template-slug>
 ```
 
-Publish the original source, ordered original page images and complete package
-including local library/runtime/QA together. Convert legacy PPT to PPTX; normalise
-image decks to an ordered PDF with provenance. Never publish reconstruction images
-as originals. Completion requires source coverage, source-style review, passing QA,
-and a successful publication command. A repository PR is not production registry
-publication; report publication or entrypoint-sync blockers without claiming rollout.
+Confirm the command exits successfully and record its save confirmation; if it
+returns a template reference, retain it. If the command fails, report the template was
+not saved.
+This save step does not require generating a presentation, running final-deck QA,
+merging the repository PR or claiming a production deployment. Convert legacy PPT to
+PPTX and normalize image decks to an ordered PDF with provenance only as needed for
+the source upload. Never publish reconstruction images as original source pages.

@@ -4,7 +4,7 @@
 
 Inspect every source page. Preserve distinct content regions, proportions, and hierarchy; equivalent structures may share a layout with separate background variants.
 
-In `layouts/source-index.json`, use `sourceFilename`, positive `pageCount`, original `sourceAspectRatio` and a `layouts` array. Each entry records `id`, `file` (relative to `layouts/`, under `source/`), `sourcePages` (one-based integers), `purpose`, `regions` and `capacity`. IDs are unique; cover every input page and note material adaptations to 16:9. Capacities guide selection; actual fit depends on content, language and font. Run the packaged `tools/verify-package.mjs` before publication.
+In `layouts/source-index.json`, use `sourceFilename`, positive `pageCount`, original `sourceAspectRatio` and a `layouts` array. Each entry records `id`, `file` (relative to `layouts/`, under `source/`), `sourcePages` (one-based integers), `purpose`, `regions` and `capacity`. IDs are unique; cover every input page and note material adaptations to 16:9. Capacities guide selection; actual fit depends on content, language and font. Run the packaged `tools/verify-package.mjs` before saving the Custom Template.
 
 During generation, prefer a source layout whose regions and capacity fit. If none fits, choose from the local Markdown table `library/references/catalog.md`, copy only selected fragments and their needed geometry rules into the working deck, and reuse the user's CSS classes/declarations. Adapt spacing, column ratios and image crop from observed source styles; do not apply geometry.css to preserved source layouts. Only when neither source nor local references fits should a documented source-styled composition be created. Do not force incompatible content into an existing composition.
 
@@ -29,6 +29,10 @@ Keep field and decoration styles separately reusable in `styles/template.css`, f
 Place background layers behind content without changing its flow or intercepting clicks. Keep logos/footers in shared chrome and meaningful imagery in content regions. Pair each background with compatible text, component, chart, and logo colors.
 
 ## Authoring guidance
+
+The five-step authoring path below is for later deck generation from the saved
+Custom Template. It does not add outline creation, content rewriting, deck QA or
+page-by-page review to the extraction stage.
 
 `SKILL.md` should give a concise five-step authoring path, without breaking the work
 into excessive substeps or adding standalone PPTX-export/delivery sections:
@@ -57,4 +61,10 @@ Include these source-specific rules as part of those actions:
 - Prefer compatible quiet backgrounds for dense content. If decoration conflicts, change the recipe before reconsidering the layout. Do not shrink type merely to accommodate an ornament. Real content overflow uses the shared local fitter with the fixed 10px minimum; source sizes are initial styles, not runtime lower bounds.
 - Document inferred combinations and new layouts while preserving shared brand rules. Do not impose a fixed background count or mechanical color rotation.
 
-Check representative observed recipes during extraction and newly adapted recipes during generation. Switching compatible backgrounds should preserve content geometry and typography; verify actual text contrast rather than relying on low texture opacity. Follow `qa.md` for automatic gates and a separate source-style comparison.
+During extraction, document observed combinations from source evidence. If a
+source-to-HTML reconstruction creates a specific fidelity risk, compare only one or
+two unchanged source compositions; do not build a full sample deck or run generated-
+deck QA by default. During later generation, validate selected adapted recipes.
+Switching compatible backgrounds should preserve content geometry and typography;
+verify actual text contrast rather than relying on low texture opacity. Follow `qa.md`
+for generated-deck automatic gates and separate source-style review.

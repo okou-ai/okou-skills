@@ -55,6 +55,9 @@ it. Both document guides start with
 
 For decks, `presentation/SKILL.md` is the complete local extraction path. Preserve
 source style/layouts at upload; adapt only selected packaged neutral references at
-generation. Install its shared fitter and source-configured QA, enforce the fixed
-10px logical font minimum, and validate before publication. No private layout
-catalogue or separate resource pull belongs in that extraction/generation path.
+generation. Bundle its shared fitter and source-configured QA for later generated
+decks. During extraction, run only package-completeness and local-resource checks,
+optionally compare one or two unchanged source compositions when reconstruction risk
+warrants it, then save and verify the Custom Template. Do not build a sample deck or
+run generated-deck QA/page-by-page review as part of extraction. No private layout
+catalogue or separate resource pull belongs in that path.

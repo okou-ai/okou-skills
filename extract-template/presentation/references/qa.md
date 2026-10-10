@@ -1,4 +1,9 @@
-# Presentation QA and delivery readiness
+# QA for decks generated after extraction
+
+This guide is for a presentation assembled later from the saved Custom Template.
+It is not an extraction acceptance checklist: do not run `tools/qa.mjs` on the
+source archive or build a sample deck merely to save the template. Extraction uses
+`tools/verify-package.mjs` for package completeness and local resource paths.
 
 Copy the supplied implementation with `node scripts/install-qa.mjs --package <dir>`;
 do not ask the authoring model to recreate the fitter or audit. The installer
@@ -37,7 +42,7 @@ when a stylesheet conceals the display mode. Preserve source-compatible backgrou
 image crops, frames and absolute overlays: no foreign palette, universal 6% margin,
 forced contain mode or blanket decoration-hiding policy is imported.
 
-## One final mechanical command
+## Generated-deck final QA command
 
 ```bash
 node <dir>/tools/qa.mjs --final <assembled.html> \
@@ -45,10 +50,11 @@ node <dir>/tools/qa.mjs --final <assembled.html> \
   --prepared <assembled.ready.html>
 ```
 
-`--expected-pages` comes from the generation plan or representative rebuild plan,
-not from recounting the output. Zero pages, indirect/unreachable slides, count
-mismatches, <10px effective text, clipped or unsafe text, collapsed nonzero chart
-marks, unresolved/unmeasurable fitting, required chrome mistakes, broken images,
+`--expected-pages` comes from the later deck-generation plan, not from recounting
+the output. Do not use this command as an extraction gate. Zero pages,
+indirect/unreachable slides, count mismatches, <10px effective text, clipped or unsafe
+text, collapsed nonzero chart marks, unresolved/unmeasurable fitting, required chrome
+mistakes, broken images,
 failed used webfonts and broken four-direction navigation are blocking. Background
 images and fonts settle before measuring; `fonts.ready` alone is not font success.
 Known solid-background contrast below 3:1 is blocking, including same-colour text.
@@ -65,36 +71,46 @@ record `deckSha256`, reviewed `pages`, existing `sourceReferences` and nonempty
 any HTML change invalidates it. Freeze local assets throughout review and delivery.
 This is evidence of a performed review, not permission to bypass a hard failure.
 
-## Capture and export the measured state
+## Capture or convert a later generated deck only when requested
 
-`--prepared` writes a **separate** capture-only HTML copy beside the local input,
+`--prepared` writes a **separate** capture-only HTML copy beside the generated deck,
 only after QA passes. It contains measured styles, immutable baseline declarations
-and an explicit capture marker; automatic refitting is disabled in this copy.
-The source and interactive authored deck remain unchanged. Keeping it beside the
-input preserves package-relative assets. Use this exact copy for deliverable capture:
+and an explicit capture marker; automatic refitting is disabled in this copy. The
+source package and interactive authored deck remain unchanged. Keeping it beside the
+input preserves package-relative assets.
+
+For a requested page-image review or HTML capture:
 
 ```bash
 okou presentation screenshot --input <assembled.ready.html> --out <validation-dir>
-okou presentation convert --input <assembled.ready.html> --verify --out <deck.pptx>
 ```
 
-Render the actual PPTX with `okou presentation screenshot` when PPTX is delivered.
+Only when a later task explicitly requests a PPTX, convert the prepared HTML and
+render the actual PPTX for roundtrip review:
+
+```bash
+okou presentation convert --input <assembled.ready.html> --verify --out <deck.pptx>
+okou presentation screenshot --input <deck.pptx> --out <pptx-pages>
+```
+
 Check page count, font/crop/reflow/geometry and any rasterised SVG labels against the
 HTML images. Conversion `--verify` checks text coverage, not layout, minimum size
 or fidelity. Preserve units: 10px means logical HTML canvas pixels, not 10pt; native
 point sizes depend on slide-to-canvas mapping. Unsupported conversion is a blocker,
 not proof that the template is a native PPTX in-place editing engine.
 
-## Two validation stages
+## Keep extraction and generation separate
 
-- Extraction: check every source page is inventoried, rebuild representative distinct
-  compositions/profiles/backgrounds, run final QA, then compare to original page
-  images. Keep source-page images separate from reconstruction evidence.
-- Generation: source-first selection, selected local-layout adaptation, automatic
-  fitting, final QA and source-style review of newly adapted compositions. Capture
-  and export only the measured working copy. Never modify the stored source package.
+- **Extraction:** run `tools/verify-package.mjs` to check required package files,
+  source-index coverage, ordered source-page capture count, local library links and
+  package-local asset paths. If source-to-HTML reconstruction creates a specific
+  fidelity risk, compare one or two unchanged representative pages. Do not build a
+  full sample deck, run final-deck QA or compare every reconstructed page by default.
+  Save the Custom Template only after the package check succeeds.
+- **Generation:** follow the five-step authoring path in the package. Run this final
+  QA on the assembled output deck, then perform the separately requested page-by-page
+  source-style review. Never modify the stored source package.
 
-The portable package retains its runtime QA and 10px fitter. Repository CI checks
-skill metadata and JavaScript syntax; it does not certify rendered layout quality.
-Run the packaged final QA on actual reconstructions/generated decks and compare
-representative page images with the user's source before delivery.
+The portable package retains its runtime QA and 10px fitter for future generation.
+Repository CI checks skill metadata and JavaScript syntax; it does not certify rendered
+layout quality. Run packaged final QA on generated decks only, not during extraction.
