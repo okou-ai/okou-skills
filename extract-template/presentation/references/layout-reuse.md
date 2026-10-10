@@ -30,22 +30,25 @@ Place background layers behind content without changing its flow or intercepting
 
 ## Authoring guidance
 
-`SKILL.md` must be a runnable, numbered authoring procedure, not only a set of style principles. `layouts/README.md` is its short path map and quick start. For every step, state which files to read, what to do, what artifact/checkpoint results, and what to do if the gate fails. Cover this sequence:
+`SKILL.md` should give a concise five-step authoring path, without breaking the work
+into excessive substeps or adding standalone PPTX-export/delivery sections:
 
-1. Confirm audience, objective, requested language, page count/range and output format; verify the package and read `design-system.md`, `layouts/README.md`, `layouts/source-index.json`, source-specific QA findings and `references/qa.md`.
-2. Create a slide-by-slide content outline with evidence and one takeaway per page; do not invent missing facts.
-3. Map planned pages to source-index IDs/pages, regions and capacity. Prefer original source compositions; explain available language-specific variants. Use the neutral table only when no source composition fits.
-4. Create an isolated working copy, distinguish it from the archived shell/source fragments, assemble only planned pages and preserve package-relative assets. Never edit the original upload or stored package.
-5. Replace all sample content; reuse actual source classes, typography, background recipes, geometry, crops and chrome. Adapt only the working copy and mark inferences.
-6. Run the bundled fitter with disjoint regions and the fixed 10px logical-canvas floor; recompose or split unresolved content.
-7. Run `tools/qa.mjs` with the planned page count and distinct report/prepared paths. Fix all hard blockers before continuing.
-8. Render and compare the prepared HTML with source evidence. If PPTX is requested, convert that exact copy, render the actual PPTX and review the roundtrip. Follow the requested format; if none is stated, deliver both a hosted HTML deck and a PPTX. Explain how to create a minimal host directory with `index.html` plus only required styles/assets, preserving relative paths; never publish the archived source package as the finished deck. Deliver the requested files with a concise QA summary.
+1. Determine the outline: purpose, audience, requested language, page count/range,
+   and each page's main point and supporting content.
+2. Choose suitable layouts: prefer fitting source-index compositions; use a selected
+   neutral fragment only when the original layouts do not fit.
+3. Replace content and adapt styling, or rewrite: work on a copy, preserve supported
+   facts and source styling, and choose another layout/rewrite when the composition
+   cannot express the outline. Retain editable content and the fixed 10px floor.
+4. Run QA on the planned deck; fix blockers and rerun.
+5. Render and review every page against the outline and source style; fix problems,
+   then rerun QA and review.
 
-The generated runbook must show executable commands using paths that exist in that
-package: copy to a fresh working directory, verify the package, run QA with its
-planned page count/report/prepared outputs, render the prepared HTML, optionally
-convert and render PPTX, and host the minimal HTML site. State success statuses and
-what to fix/retry on failure. Explain placeholders; do not name absent tools/configs.
+Keep setup short: point to `design-system.md`, `layouts/README.md`,
+`layouts/source-index.json` and the QA guide. Include only the exact QA and page-render
+commands needed to follow the steps. Place source-specific caveats beside layout
+selection. `layouts/README.md` should be a short path map linking back to `SKILL.md`.
+Do not add separate PPTX conversion, hosting or file-delivery steps.
 
 Include these source-specific rules as part of those actions:
 
