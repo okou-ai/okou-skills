@@ -144,6 +144,15 @@
       ]
     },
     {
+      "name": "business-skill-index",
+      "description": "Find business document structures, templates, and checks through a curated index, then read only the relevant pinned upstream sources.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./business-skill-index"
+      ]
+    },
+    {
       "name": "user-research",
       "description": "User research toolkit — customer intelligence gathering with confidence scoring, and research synthesis for personas, themes, and opportunity prioritization.",
       "source": "./",
