@@ -84,23 +84,69 @@ The installer copies the local library and QA, and inlines the shared runtime on
 It does not import another template's fonts, palette, motifs or picture crop policy.
 Use working package-relative asset paths and preserve all four navigation keys.
 
-The generated `SKILL.md` and `layouts/README.md` must direct later authors to:
+The generated `SKILL.md` is the executable authoring runbook, not a short style
+summary. It must give a numbered, end-to-end sequence that a new author can follow
+without guessing. For every stage, name the input files, the action, the output or
+checkpoint, and what to do when the check fails. Include these stages in this order:
 
-1. Read source design rules and `layouts/source-index.json`; copy a fitting source
-   composition first without modifying the stored package or original upload.
-2. Otherwise choose from the Markdown table `library/references/catalog.md`, then
-   read only selected HTML fragments and their needed geometry rules. Copy them
-   into the working deck; reuse the user's existing CSS classes/declarations for
-   fonts, initial sizes, palette, components, backgrounds, spacing, crop and chrome.
-   Adapt column ratios and gaps to observed source geometry, rather than treating
-   equal columns, 1em or contain as user defaults. Do not attach geometry.css to
-   preserved source layouts or the stored source shell. Read `library/README.md`.
-3. Fill real content/data, expand needed repeated groups, and keep text-fitting hooks.
-   Do not refetch a catalogue or recreate source analysis for each generation.
-4. Automatically fit only overflowing regions, never below 10px. Still-unfit content
-   needs a different composition or splitting, not hiding/cropping or canvas scaling.
-5. Run final QA with the planned page count, compare new adaptations to source style,
-   and capture/export the exact measured working copy. Read [qa.md](references/qa.md).
+1. **Preflight:** confirm the requested audience, goal, language, page-count/range
+   and delivery format; preserve the user's requested language. Run
+   `node tools/verify-package.mjs --package <template-dir>`. Read `design-system.md`,
+   `layouts/README.md`, `layouts/source-index.json`, source-specific QA findings,
+   and `references/qa.md` before building.
+2. **Plan content:** make a page-by-page outline with one takeaway, its supporting
+   user-provided evidence/data, and a proposed source layout for each slide. Resolve
+   missing material facts or flag them; do not invent claims or create slides solely
+   to fill an arbitrary count.
+3. **Map layouts:** match each planned page to the source index's `id`, source page,
+   regions and capacity. Prefer an original composition. Explain how to use any
+   language-specific derivatives when present. Treat capacities as guidance, not
+   guarantees; route unsupported relationships to a selected neutral fragment.
+4. **Create a working deck:** explicitly distinguish the archived `layouts/_shell.html`
+   and `layouts/source/` from the new deliverable. Copy the package to a separate
+   working directory (or preserve the equivalent relative asset tree), then assemble
+   only planned pages there. Never edit the stored package, source fragments, original
+   upload or library files. Preserve CSS, fonts, assets, runtime and navigation.
+5. **Populate and adapt:** specify how to copy the mapped HTML fragments, replace all
+   sample content, retain editable HTML/CSS/SVG and source classes, keep source chrome
+   and image crops, and modify only the working copy. If no source composition fits,
+   select from `library/references/catalog.md`; inspect only selected fragments and
+   copy only their needed geometry rules. Reuse source CSS classes/declarations and
+   measured spacing, column ratios and crop. Do not apply `geometry.css` globally or
+   to preserved source layouts. Record inferred adaptations.
+6. **Fit text:** retain disjoint title/body `data-fit-region` hooks and run the bundled
+   fitter. Enforce the fixed 10px logical-canvas floor. If content still does not fit,
+   change composition or split the page; never hide/crop text or scale the canvas.
+7. **Run mechanical QA:** give the exact `tools/qa.mjs` command with the planned page
+   count and separate report/prepared output paths. Fix every hard failure and rerun;
+   state which statuses permit visual review versus delivery. QA must examine the
+   completed deck, not only the archived source shell.
+8. **Review, export and deliver:** render the exact prepared HTML, compare all output
+   pages with source evidence, and separately review typography, colour pairs,
+   components, chrome, safe areas, crops, assets and navigation. If PPTX is requested,
+   convert that prepared HTML with `okou presentation convert --verify`, render the
+   actual PPTX and inspect the roundtrip; text coverage alone is not visual QA. Follow
+   the delivery format requested by the user; if none is specified, deliver both a
+   hosted HTML deck and a PPTX. Explain how to create a minimal host directory with
+   `index.html` and only the required styles/assets while preserving relative paths;
+   never publish the archived source shell/package as the finished deck. Give the
+   requested deliverables and a short QA/result summary.
+
+The generated runbook must include executable examples with the package's actual
+paths: copy to a fresh working directory; verify the package; run final QA with
+`--expected-pages`, `--report` and `--prepared`; render the prepared HTML; optionally
+convert and render PPTX; and host a minimal HTML site. Show how the hosted `index.html`,
+HTML deck, stylesheet and required assets are arranged so relative URLs still resolve.
+For each command, state its expected success result and the fix/retry path when it fails.
+Do not leave angle-bracket placeholders unexplained or refer to tools/config files that
+the package does not contain.
+
+The generated `layouts/README.md` must be a quick start that links to this runbook,
+explains the package paths and distinguishes the original-page archive from the
+working output. Both documents must list source-specific known exceptions and tell
+the author to fix them in the working copy, not silently copy them unchanged. Avoid
+vague directions such as “preserve the style” unless the package names the source
+files/classes/rules to inspect.
 
 ## 4. Validate representative source rebuilds
 
