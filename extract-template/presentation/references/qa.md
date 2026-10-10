@@ -97,6 +97,21 @@ record `deckSha256`, reviewed `pages`, existing `sourceReferences` and nonempty
 any HTML change invalidates it. Freeze local assets throughout review and delivery.
 This is evidence of a performed review, not permission to bypass a hard failure.
 
+## Interaction checks already included
+
+The final QA command uses the same real browser session for layout and interaction
+checks. On decks with multiple slides, it dispatches `KeyboardEvent`s for Home/End,
+all four arrow keys and up to two consecutive steps per direction, checking the
+active-page marker and target-page visibility. These are browser-based handler
+checks; they do not certify trusted keyboard input or focus behavior.
+
+Treat passing checks as complete for the unchanged deck. Do not replay the covered
+keys manually, build a mock DOM or start a separate Playwright suite to repeat them.
+After changes, rerun packaged QA. Investigate reported failures; add targeted checks
+only for applicable behavior outside this coverage or an explicit user request.
+Displayed page-number synchronization, notes toggles and custom button clicks are
+not covered. Source-style page review and requested PPTX validation remain separate.
+
 ## Capture or convert a later generated deck only when requested
 
 `--prepared` writes a **separate** capture-only HTML copy beside the generated deck,

@@ -45,6 +45,8 @@ into excessive substeps or adding standalone PPTX-export/delivery sections:
    facts and source styling, and choose another layout/rewrite when the composition
    cannot express the outline. Retain editable content and the fixed 10px floor.
 4. Run QA on the planned deck; fix blockers and rerun.
+   Do not repeat passing interaction checks on an unchanged deck; use the
+   [packaged QA scope](qa.md#interaction-checks-already-included).
 5. Render and review every page against the outline and source style; fix problems,
    then rerun QA and review.
 

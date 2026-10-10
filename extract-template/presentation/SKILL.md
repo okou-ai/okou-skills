@@ -77,6 +77,10 @@ Write these **five steps for future generation** into the package's `SKILL.md`:
 3. **Replace/adapt or rewrite:** work on a copy, use supported facts and source styling,
    and change layouts or rewrite pages as needed. Retain editable content and the 10px floor.
 4. **Run QA:** use the planned page count; fix blockers and rerun.
+   Packaged QA already checks Home/End, all four arrow keys, consecutive navigation
+   and target-page visibility in its browser session. Do not repeat passing checks
+   on an unchanged deck manually or with a separate test harness; follow the
+   [interaction scope](references/qa.md#interaction-checks-already-included).
 5. **Review every page:** render the QA-prepared HTML, check against the outline and
    source style, fix problems, then rerun QA and review affected pages.
 
