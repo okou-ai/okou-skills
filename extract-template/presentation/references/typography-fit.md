@@ -32,8 +32,9 @@ The supplied `dom-metrics.js` and `fit-text.js` expose `PresentationFit.fit()` a
    stopping at a fixed 80%. Font sizes, leading and tracking move together;
    source families, weights, assets, palette and the whole canvas do not change.
 6. Rechecks neighbours after fitting. At the 10px limit, still-unfit content is
-   `unresolved`: change composition or split. Never hide/crop text or replace it
-   with an image to clear the report.
+   `unresolved`: inspect the text box, glyph bounds, computed line height and ancestor
+   clipping before changing copy. Fix geometry first; shorten, recompose or split only
+   when measurements show a genuine content-capacity limit. Keep text visible and editable.
 
 Use disjoint `data-fit-region` areas with meaningful `data-text-role` labels.
 Source-layout clones and selectively adapted local fragments use the same runtime.

@@ -68,10 +68,13 @@ marked data geometry; missing marks or unfilled values block QA. Use
 
 ## Generated-deck final QA command
 
+Assemble directly in the final web directory and resolve asset paths before the
+first QA. Create a separate QA directory for reports, receipts and rendered captures.
+
 ```bash
-node <dir>/tools/qa.mjs --final <assembled.html> \
-  --expected-pages <planned-count> --report <qa-report.json> \
-  --prepared <assembled.ready.html>
+node <template-dir>/tools/qa.mjs --final <web-dir>/index.html \
+  --expected-pages <planned-count> --report <qa-dir>/report.json \
+  --prepared <web-dir>/index.ready.html
 ```
 
 `--expected-pages` comes from the later deck-generation plan, not from recounting
@@ -84,10 +87,12 @@ images and fonts settle before measuring; `fonts.ready` alone is not font succes
 Known solid-background contrast below 3:1 is blocking, including same-colour text.
 
 The JSON is primary; errors identify page, element and reason. `READY_TO_PUBLISH`
-and zero `hardGateFailures` are required. Fix failures together and rerun only after
-changing input. No need to render every passing page: visually review QA-flagged pages
-and substantially changed layouts for content and source style. A full visual pass
-is needed only when requested; style advisories remain separate from mechanical blockers.
+and zero `hardGateFailures` are required. Diagnose the reported geometry before
+editing copy. For unresolved fitting at 10px, inspect text boxes, glyph bounds, line
+height and clipping; shorten text only when measurements show a genuine capacity
+limit. Fix failures together and rerun on the same HTML after changes. No need to
+rebase paths and repeat QA on a second web copy, or render passing pages for another
+visual check. Review only QA-designated pages unless a full pass is requested.
 
 Text on imagery, gradients, painted pseudo-elements or overlapping background
 layers yields `NEEDS_VISUAL_REVIEW`, not an automatic pass. Ancestor background
@@ -96,7 +101,8 @@ Compare the relevant page images with the source. A `--review <json>` receipt ca
 record `deckSha256`, reviewed `pages`, existing `sourceReferences` and nonempty
 `notes`. It must match the exact HTML bytes and cover all requested review pages;
 any HTML change invalidates it. Freeze local assets throughout review and delivery.
-This is evidence of a performed review, not permission to bypass a hard failure.
+After review, rerun the same final QA command with `--review <qa-dir>/review.json`.
+The receipt records actual review; all hard failures still need resolution.
 
 ## Interaction checks already included
 
@@ -122,18 +128,24 @@ requests visual review; the prepared copy is available only after it passes.
 Retain the original page numbers in any review receipt.
 
 ```bash
-okou presentation screenshot --input <assembled.html> \
-  --slides '<selectors-for-review-pages>' --out <validation-dir>
+okou presentation screenshot --input <web-dir>/index.html \
+  --slides '<selectors-for-review-pages>' --out <qa-dir>/review-pages
 ```
 
 Use the prepared HTML and omit `--slides` when a full set of page images is requested.
+
+Before conversion, move `index.ready.html` to a separate conversion directory and
+copy its relative asset tree there unchanged. Clean the web directory to retain
+only the final interactive HTML and its runtime assets. Reports, receipts, captures,
+PPTX files and conversion inputs stay outside it. The final web HTML and assets
+remain byte-identical to the passing QA input, so cleanup needs no second layout QA.
 
 Only when a later task explicitly requests a PPTX, convert the prepared HTML and
 render the actual PPTX for roundtrip review:
 
 ```bash
-okou presentation convert --input <assembled.ready.html> --verify --out <deck.pptx>
-okou presentation screenshot --input <deck.pptx> --out <pptx-pages>
+okou presentation convert --input <conversion-dir>/index.ready.html --verify --out <output-dir>/deck.pptx
+okou presentation screenshot --input <output-dir>/deck.pptx --out <qa-dir>/pptx-pages
 ```
 
 Check page count, font/crop/reflow/geometry and any rasterised SVG labels against the
@@ -141,6 +153,9 @@ HTML images. Conversion `--verify` checks text coverage, not layout, minimum siz
 or fidelity. Preserve units: 10px means logical HTML canvas pixels, not 10pt; native
 point sizes depend on slide-to-canvas mapping. Unsupported conversion is a blocker,
 not proof that the template is a native PPTX in-place editing engine.
+
+After the required checks pass, publish the clean web directory once and upload the
+final requested file once. Reuse these delivery links in the response.
 
 ## Keep extraction and generation separate
 
@@ -152,7 +167,7 @@ not proof that the template is a native PPTX in-place editing engine.
   full sample deck, run final-deck QA or compare every reconstructed page by default.
   Save the Custom Template only after the package check succeeds.
 - **Generation:** follow the five-step authoring path in the package. Run final QA on
-  the assembled deck, review flagged or substantially changed pages, and rerun after
+  the final web HTML, review QA-designated pages, and rerun with the receipt or after
   fixes. Keep the stored source package unchanged.
 
 The portable package retains its runtime QA and 10px fitter for future generation.

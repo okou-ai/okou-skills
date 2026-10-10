@@ -41,19 +41,20 @@ into excessive substeps or adding standalone PPTX-export/delivery sections:
    and each page's main point and supporting content.
 2. Choose suitable layouts: prefer fitting source-index compositions; use a selected
    neutral fragment only when the original layouts do not fit.
-3. Replace content and adapt styling, or rewrite: work on a copy, preserve supported
-   facts and source styling, and choose another layout/rewrite when the composition
-   cannot express the outline. Retain editable content and the fixed 10px floor.
-4. Run QA on the planned deck; fix blockers and rerun. No need to repeat passing
+3. Assemble a copy in the final web directory with final asset paths. Preserve supported
+   facts, source styling, editable content and the fixed 10px floor.
+4. Run QA on the planned deck; diagnose geometry before changing copy, then fix and rerun
+   on the same HTML. No need to repeat passing
    [interaction checks](qa.md#interaction-checks-already-included) on an unchanged deck.
-5. Review QA-flagged pages and substantially changed layouts against the outline and
-   source style; fix issues and rerun QA. No need for a full visual pass unless requested.
+5. Review only QA-designated pages unless a full pass is requested. Record the receipt
+   and rerun final QA; follow [output staging](qa.md#targeted-review-and-requested-output)
+   to clean the web directory before conversion and deliver the final outputs once.
 
 Keep setup short: point to `design-system.md`, `layouts/README.md`,
 `layouts/source-index.json` and the QA guide. Include only the exact QA and page-render
 commands needed to follow the steps. Place source-specific caveats beside layout
 selection. `layouts/README.md` should be a short path map linking back to `SKILL.md`.
-Do not add separate PPTX conversion, hosting or file-delivery steps.
+Keep output handling within the five steps.
 
 Include these source-specific rules as part of those actions:
 

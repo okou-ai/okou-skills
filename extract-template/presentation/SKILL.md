@@ -74,18 +74,21 @@ Write these **five steps for future generation** into the package's `SKILL.md`:
 1. **Outline:** establish purpose, audience, language, page count and each page's message.
 2. **Choose layouts:** prefer `layouts/source-index.json`; use `library/references/catalog.md`
    when source layouts do not fit. Note source-specific and language caveats here.
-3. **Replace/adapt or rewrite:** work on a copy, use supported facts and source styling,
-   and change layouts or rewrite pages as needed. Retain editable content and the 10px floor.
-4. **Run QA:** use the planned page count; fix blockers and rerun.
+3. **Replace/adapt or rewrite:** assemble a copy in the final web directory with final
+   asset paths, supported facts and source styling. Keep content editable and the 10px floor.
+4. **Run QA:** use the planned page count; diagnose geometry before changing copy.
+   At unresolved 10px fitting, inspect text boxes, glyph bounds and line height first.
+   Fix the cause and rerun on the same final HTML.
    No need to repeat passing [interaction checks](references/qa.md#interaction-checks-already-included)
    on an unchanged deck.
-5. **Review as needed:** inspect QA-flagged pages and substantially changed layouts
-   against the outline and source style; fix issues and rerun QA. No need to render
-   every passing page unless the user requests a full visual review.
+5. **Review as needed:** inspect only QA-designated pages unless a full review is requested;
+   record the review receipt and rerun final QA. Keep captures outside the web directory.
+   For requested delivery, clean that directory before conversion; finish PPTX checks,
+   then publish and upload the final outputs once. See the QA guide for capture staging.
 
 Link the design system, source index and QA guide; include exact QA and screenshot
 commands from [qa.md](references/qa.md). Keep `layouts/README.md` a short path map
-linking back to `SKILL.md`. No need for export, hosting or delivery steps.
+linking back to `SKILL.md`. Keep output handling within these five steps.
 
 ## 4. Check the package
 
