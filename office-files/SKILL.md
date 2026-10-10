@@ -20,13 +20,13 @@ guidance, consult `business-skill-index` when available.
 
 ## Style
 
-For new English reports without a supplied design, apply [style.md](style.md).
-Adapt typography for other languages; preserve existing designs during narrow edits.
-Keep paired Word/PDF content and styling consistent.
+For new Word/PDF documents without a supplied design, read and apply
+[style.md](style.md), including its language adaptations. Preserve existing
+designs during narrow edits. Keep paired Word/PDF content and styling consistent.
 
 ## Check and deliver
 
-Check final content, numbers, and every rendered page or relevant worksheet.
+Check content, numbers, and style compliance on every rendered page or relevant worksheet.
 For Word, inspect pages rendered from the actual DOCX; identify unverified checks.
 Deliver the requested files. Include editable Word with final PDFs unless
 the user requests otherwise.
