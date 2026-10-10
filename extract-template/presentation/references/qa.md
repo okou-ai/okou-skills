@@ -33,6 +33,9 @@ A required chrome rule names `role`, optional `min`/`max`, and optional `layouts
 Mark only source-required items with `data-chrome="<role>"`; absence in the source
 is not a reason to invent a footer, motif or page marker. Fallback font families
 must be explicitly approved in design notes before listing them here.
+List replacement families (for example `Arial`), not the name of a failed primary
+font. When a used webfont fails, the first available family in that text's CSS
+font stack must be an approved fallback; approving a later, unused family is insufficient.
 
 Use `.deck > .slide` with exactly one `.stage` per slide and a `.fit` content root.
 Add disjoint `data-fit-region` hooks to independently replaceable title/body areas;
@@ -41,6 +44,27 @@ bitmap or CSS pseudo-element. Hidden pages need their authored `data-fit-display
 when a stylesheet conceals the display mode. Preserve source-compatible backgrounds,
 image crops, frames and absolute overlays: no foreign palette, universal 6% margin,
 forced contain mode or blanket decoration-hiding policy is imported.
+
+The shared runtime owns keyboard navigation. Remove competing keyboard handlers;
+wire source next/previous buttons to `PresentationNavigation.next()`/`previous()`
+or use `go(index)` with a zero-based index. These return a promise and wait for any
+active text fit before changing pages. Startup scripts should first await
+`PresentationNavigationReady`. Scrolling decks may run horizontally,
+vertically or in document flow. Decks with hidden slides automatically use paged
+mode; `data-navigation-mode="paged"` on `.deck` can select it explicitly. Give
+each CSS-hidden `.slide` its authored `data-fit-display`, such as `flex` or `grid`.
+The runtime switches visibility and preserves that display mode. It recognizes
+`active`/`is-active`; name a different source class with
+`data-navigation-active-class="selected"` on `.deck`.
+
+Mark actual quantitative SVG/HTML shapes with `data-plot-mark="bar"` or `"area"`
+and a finite `data-value` taken from the source data. Nonzero values, including
+negative bars, need nonzero width and height; genuine zero values may have zero
+geometry. Use `data-plot-mark="point"` for visible observation markers and `"line"`
+for data-series paths (a horizontal/vertical line may have one zero extent).
+Axes and decorative guides are not data marks. Every `svg[data-chart-kind]` needs
+marked data geometry; missing marks or unfilled values block QA. Use
+`data-overlap-ok` only for labels intentionally drawn over a mark, as in pie labels.
 
 ## Generated-deck final QA command
 
@@ -64,7 +88,9 @@ and zero `hardGateFailures` are required. Fix failures together and rerun only a
 changing input. Do not repeatedly render passing pages or count style advisories as
 mechanical blockers. Brand/source fidelity is a separate representative comparison.
 
-Text on imagery or gradients yields `NEEDS_VISUAL_REVIEW`, not an automatic pass.
+Text on imagery, gradients, painted pseudo-elements or overlapping background
+layers yields `NEEDS_VISUAL_REVIEW`, not an automatic pass. Ancestor background
+colours cannot establish contrast when another layer may be behind the text.
 Compare the relevant page images with the source. A `--review <json>` receipt can
 record `deckSha256`, reviewed `pages`, existing `sourceReferences` and nonempty
 `notes`. It must match the exact HTML bytes and cover all requested review pages;
@@ -103,7 +129,8 @@ not proof that the template is a native PPTX in-place editing engine.
 
 - **Extraction:** run `tools/verify-package.mjs` to check required package files,
   source-index coverage, ordered source-page capture count, local library links and
-  package-local asset paths. If source-to-HTML reconstruction creates a specific
+  package-local asset paths, including every `srcset` candidate and resources in
+  linked/imported CSS and SVG files. If source-to-HTML reconstruction creates a specific
   fidelity risk, compare one or two unchanged representative pages. Do not build a
   full sample deck, run final-deck QA or compare every reconstructed page by default.
   Save the Custom Template only after the package check succeeds.

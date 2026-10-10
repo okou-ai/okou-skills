@@ -137,5 +137,9 @@ jobs:
           node-version: 22
       - name: JavaScript syntax
         run: |
+          set -euo pipefail
           find extract-template/presentation/scripts extract-template/presentation/tools \
-            -type f \( -name '*.js' -o -name '*.mjs' \) -exec node --check {} \;
+            -type f \( -name '*.js' -o -name '*.mjs' \) -print0 |
+            while IFS= read -r -d '' file; do
+              node --check "$file"
+            done

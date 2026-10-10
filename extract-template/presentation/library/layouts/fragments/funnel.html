@@ -7,8 +7,8 @@
       <svg viewBox="0 0 600 300" role="img" aria-label="{{chart-description}}" data-chart-kind="funnel">
         <path data-component="chart-axis" d="M32 16V280H580" fill="none" stroke="currentColor" />
         <g data-repeat="marks">
-          <path d="{{funnel-path}}" fill="currentColor" />
-          <text x="{{label-x}}" y="{{label-y}}" data-text-role="label" fill="currentColor">{{mark-label}}</text>
+          <path d="{{funnel-path}}" fill="currentColor" data-plot-mark="area" data-value="{{stage-value}}" />
+          <text x="{{label-x}}" y="{{label-y}}" data-text-role="label" data-overlap-ok fill="currentColor">{{mark-label}}</text>
         </g>
       </svg>
     </div>

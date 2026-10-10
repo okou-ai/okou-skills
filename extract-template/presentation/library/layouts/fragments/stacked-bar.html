@@ -7,7 +7,7 @@
       <svg viewBox="0 0 600 300" role="img" aria-label="{{chart-description}}" data-chart-kind="stacked-bar">
         <path data-component="chart-axis" d="M32 16V280H580" fill="none" stroke="currentColor" />
         <g data-repeat="marks" data-series="{{series}}">
-          <rect x="{{mark-x}}" y="{{mark-y}}" width="{{mark-width}}" height="{{mark-height}}" fill="currentColor" />
+          <rect x="{{mark-x}}" y="{{mark-y}}" width="{{mark-width}}" height="{{mark-height}}" fill="currentColor" data-plot-mark="bar" data-value="{{mark-value}}" />
           <text x="{{label-x}}" y="{{label-y}}" data-text-role="label" fill="currentColor">{{mark-label}}</text>
         </g>
       </svg>

@@ -101,7 +101,7 @@ with their source captures. Keep these check outputs outside the package.
 After the package check passes:
 
 ```bash
-okou presentation-template publish --title "<template name>" \
+okou user-template publish --kind presentation --title "<template name>" \
   --source <source.pptx|normalized-source.pdf> --pages <source-pages-dir> \
   --package <template-slug>
 ```

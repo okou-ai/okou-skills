@@ -14,6 +14,7 @@
     if (!reviews.has(key)) { reviews.add(key); report.reviewRequired.push({code, page, message}); }
   };
   if (!M) { fail("missingRuntime", 0, null, "Load the packaged dom-metrics.js"); return JSON.stringify(report); }
+  await window.PresentationNavigationReady;
   if (config.minFontSizePx !== undefined && config.minFontSizePx !== 10) fail("invalidConfig", 0, null, "The minimum font size is fixed at 10px");
   if (config.minContrastRatio !== undefined && (!Number.isFinite(config.minContrastRatio) || config.minContrastRatio < 3 || config.minContrastRatio > 21)) fail("invalidConfig", 0, null, "minContrastRatio must be within 3..21");
   const decks = [...document.querySelectorAll(".deck")];
@@ -44,7 +45,31 @@
   };
   const composite = (top, bottom) => [0, 1, 2].map(i => top[i] * top[3] + bottom[i] * (1 - top[3])).concat(1);
   const luminance = rgba => rgba.slice(0, 3).map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4).reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0);
+  const hasPaint = style => style.backgroundImage !== "none" || color(style.backgroundColor)[3] > 0 || style.boxShadow !== "none" ||
+    ["Top", "Right", "Bottom", "Left"].some(side => parseFloat(style[`border${side}Width`]) > 0 && color(style[`border${side}Color`])[3] > 0);
+  const paintedPseudo = node => ["::before", "::after"].some(pseudo => {
+    const style = getComputedStyle(node, pseudo);
+    return !["none", "normal"].includes(style.content) && style.display !== "none" && Number(style.opacity) > 0 && hasPaint(style);
+  });
+  const paintedLayers = new Map();
+  const layeredGround = element => {
+    const scope = element.closest(".slide") || element.closest(".stage");
+    if (!scope) return true;
+    if (!paintedLayers.has(scope)) paintedLayers.set(scope, [scope, ...scope.querySelectorAll("*")].filter(M.visible).map(node => ({
+      node, pseudo: paintedPseudo(node),
+      paint: hasPaint(getComputedStyle(node)) || node.matches("img,svg,canvas,video,iframe,object"),
+    })));
+    const boxes = M.textRects(element);
+    return paintedLayers.get(scope).some(({node, pseudo, paint}) => {
+      // Pseudo-element geometry and sibling stacking cannot be inferred from an
+      // ancestor's background. Do not certify contrast against the wrong layer.
+      if (pseudo) return true;
+      if (!paint || node.contains(element) || element.contains(node)) return false;
+      return boxes.some(box => overlap(box, node.getBoundingClientRect()));
+    });
+  };
   const ground = element => {
+    if (layeredGround(element)) return null;
     const layers = [];
     if (element instanceof SVGElement && element.ownerSVGElement) {
       const probe = M.textRects(element)[0];
@@ -100,7 +125,7 @@
       if (M.textOverflow(element, limit)) fail("textOverflow", page, element, "Text crosses its safe area or is clipped by an ancestor");
       const background = ground(element);
       if (!background) {
-        review("unknownTextGround", page, "Text over image/gradient needs source-style visual review");
+        review("unknownTextGround", page, "Text over imagery, gradients or overlapping paint layers needs source-style visual review");
       } else {
         const style = getComputedStyle(element);
         if (element instanceof SVGElement && (/url\(/.test(style.fill) || (style.fill === "none" && style.stroke !== "none"))) {
@@ -124,9 +149,24 @@
     for (const cell of stage.querySelectorAll("[data-photocell],[data-media-required]")) {
       if (!cell.querySelector("img") && !cell.matches("img") && !M.backgroundUrls(cell).length) fail("emptyMedia", page, cell, "Remove unsupported media instead of retaining a placeholder");
     }
+    for (const chart of stage.querySelectorAll("svg[data-chart-kind]")) {
+      if (!chart.querySelector("[data-plot-mark]")) fail("unmarkedChart", page, chart, "Mark quantitative SVG geometry with data-plot-mark so final QA can measure it");
+    }
     for (const element of stage.querySelectorAll("*")) {
       const height = /(?:^|;)\s*height\s*:\s*([\d.]+)%/i.exec(element.getAttribute("style") || "");
-      if ((height && Number(height[1]) > 0) || (element.hasAttribute("data-plot-mark") && Number(element.dataset.value) > 0)) {
+      if (element.hasAttribute("data-plot-mark")) {
+        const kind = element.dataset.plotMark || "bar", raw = element.dataset.value;
+        const quantity = kind === "bar" || kind === "area";
+        if (!["bar", "area", "point", "line"].includes(kind) ||
+          (quantity && (!raw?.trim() || !Number.isFinite(Number(raw)))) ||
+          (element instanceof SVGElement && !(element instanceof SVGGeometryElement))) {
+          fail("invalidChartMark", page, element, "Use a bar/area with finite data-value, or a point/line, on the actual mark geometry");
+        } else if (!quantity || Number(raw) !== 0) {
+          const box = element.getBoundingClientRect();
+          const nonzero = kind === "line" ? Math.max(box.width, box.height) >= 1 : box.width >= 1 && box.height >= 1;
+          if (!M.visible(element) || !nonzero) fail("collapsedChart", page, element, "A required chart mark has zero or hidden rendered geometry");
+        }
+      } else if (height && Number(height[1]) > 0) {
         if (M.visible(element) && element.getBoundingClientRect().height < 1) fail("collapsedChart", page, element, "A nonzero chart value has zero rendered height");
       }
       for (const pseudo of ["::before", "::after"]) {
@@ -148,7 +188,8 @@
       if (bodyLeaves.some(body => M.textRects(body).map(ink).some(a => overlap(a, chrome.getBoundingClientRect())))) fail("chromeOverlap", page, chrome, "Body text overlaps reserved chrome");
     }
     for (const mark of stage.querySelectorAll("[data-plot-mark]")) {
-      if (mark.closest("[data-overlap-ok]")) continue;
+      // A line's bounding box is mostly unpainted space, not an occluding block.
+      if (mark.dataset.plotMark === "line" || mark.closest("[data-overlap-ok]")) continue;
       if (contents.filter(element => !mark.contains(element) && !element.closest("[data-overlap-ok]")).some(element => M.textRects(element).map(ink).some(box => overlap(box, mark.getBoundingClientRect())))) fail("plotTextOverlap", page, mark, "A plot mark overlaps unrelated text");
     }
     if (stage.querySelector('[data-fit-state="unresolved"],[data-fit-state="unmeasurable"],[data-overflow]')) fail("unresolvedFit", page, stage, "Unresolved fit flag remains");
@@ -163,19 +204,32 @@
     const shown = index => {
       if (index < 0 || !M.visible(slides[index])) return false;
       const box = slides[index].getBoundingClientRect(), viewport = decks[0].getBoundingClientRect();
-      return Math.min(box.bottom, viewport.bottom) - Math.max(box.top, viewport.top) > 10;
+      return Math.min(box.bottom, viewport.bottom, innerHeight) - Math.max(box.top, viewport.top, 0) > 10 &&
+        Math.min(box.right, viewport.right, innerWidth) - Math.max(box.left, viewport.left, 0) > 10;
     };
-    const press = async key => { document.dispatchEvent(new KeyboardEvent("keydown", {key, code: key, bubbles: true, cancelable: true})); await M.frame(); await M.frame(); };
+    const press = async key => {
+      document.dispatchEvent(new KeyboardEvent("keydown", {key, code: key, bubbles: true, cancelable: true}));
+      // Include the navigation scroll debounce; two paint frames can precede it.
+      await new Promise(resolve => setTimeout(resolve, 150)); await M.frame(); await M.frame();
+    };
     const original = marked();
     await press("Home");
-    if (marked() !== 0) fail("keyboardNavigation", 0, null, "Home must activate the first page");
+    if (marked() !== 0 || !shown(0)) fail("keyboardNavigation", 0, null, "Home must show the first page");
     for (const key of ["ArrowRight", "ArrowDown"]) {
-      await press("Home"); await press(key);
-      if (marked() !== 1 || !shown(1)) fail("keyboardNavigation", 0, null, `${key} must advance one page`);
+      await press("Home");
+      for (let index = 1; index <= Math.min(2, slides.length - 1); index++) {
+        await press(key);
+        if (marked() !== index || !shown(index)) fail("keyboardNavigation", 0, null, `${key} must show page ${index + 1} on consecutive presses`);
+      }
     }
     for (const key of ["ArrowLeft", "ArrowUp"]) {
-      await press("End"); await press(key);
-      if (marked() !== slides.length - 2 || !shown(slides.length - 2)) fail("keyboardNavigation", 0, null, `${key} must go back one page`);
+      await press("End");
+      if (marked() !== slides.length - 1 || !shown(slides.length - 1)) fail("keyboardNavigation", 0, null, "End must show the last page");
+      for (let step = 1; step <= Math.min(2, slides.length - 1); step++) {
+        const index = slides.length - 1 - step;
+        await press(key);
+        if (marked() !== index || !shown(index)) fail("keyboardNavigation", 0, null, `${key} must show page ${index + 1} on consecutive presses`);
+      }
     }
     await press("Home");
     if (original > 0) for (let i = 0; i < original; i++) await press("ArrowRight");

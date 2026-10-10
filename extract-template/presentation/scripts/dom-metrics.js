@@ -137,10 +137,44 @@
   });
   const familyNames = value => value.split(",").map(name => name.trim().replace(/^['"]|['"]$/g, "").toLowerCase());
   function fontErrors(root, allowedFallbacks = []) {
-    const used = new Set(leaves(root).flatMap(element => familyNames(getComputedStyle(element).fontFamily)));
-    const allowed = new Set(allowedFallbacks.map(name => name.toLowerCase()));
-    return [...document.fonts].filter(face => face.status === "error" && used.has(familyNames(face.family)[0]) && !allowed.has(familyNames(face.family)[0]))
-      .map(face => `Font failed: ${face.family}`);
+    const failed = new Set([...document.fonts].filter(face => face.status === "error").map(face => familyNames(face.family)[0]));
+    if (!failed.size) return [];
+    const allowed = new Set(allowedFallbacks.flatMap(familyNames));
+    const generic = new Set(["serif", "sans-serif", "monospace", "system-ui", "cursive", "fantasy", "emoji", "math", "fangsong", "ui-serif", "ui-sans-serif", "ui-monospace", "ui-rounded"]);
+    const errors = new Set(), available = new Map();
+    for (const element of leaves(root)) {
+      const style = getComputedStyle(element), families = familyNames(style.fontFamily);
+      if (!families.some(family => failed.has(family))) continue;
+      const sample = ownText(element).map(node => node.textContent).join("");
+      const font = family => `${style.fontStyle} ${style.fontWeight} 16px ${generic.has(family) ? family : JSON.stringify(family)}`;
+      const usable = family => {
+        const key = `${font(family)}|${sample}`;
+        if (available.has(key)) return available.get(key);
+        let found = document.fonts.check(font(family), sample);
+        if (found && !generic.has(family)) {
+          // check() alone says true for nonexistent local families. An available
+          // family must change metrics against at least one generic baseline.
+          found = ["monospace", "serif", "sans-serif"].some(base => {
+            const probe = "BESbswy0123456789mW" + sample;
+            textCanvas.font = font(base); const width = textCanvas.measureText(probe).width;
+            textCanvas.font = `${font(family)}, ${base}`;
+            return Math.abs(textCanvas.measureText(probe).width - width) > 0.01;
+          });
+        }
+        available.set(key, found);
+        return found;
+      };
+      const failures = [];
+      for (const family of families) {
+        if (usable(family)) {
+          if (failures.length && !allowed.has(family)) errors.add(`Font failed: ${failures.join(", ")}; available fallback ${family} is not approved`);
+          break;
+        }
+        if (failed.has(family)) failures.push(family);
+        if (family === families.at(-1) && failures.length) errors.add(`Font failed: ${failures.join(", ")}; no available approved fallback`);
+      }
+    }
+    return [...errors];
   }
   async function assetsReady(root, allowedFallbacks = []) {
     root.getBoundingClientRect();

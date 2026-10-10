@@ -7,7 +7,7 @@
       <svg viewBox="0 0 600 300" role="img" aria-label="{{chart-description}}" data-chart-kind="gantt">
         <path data-component="chart-axis" d="M32 16V280H580" fill="none" stroke="currentColor" />
         <g data-repeat="intervals">
-          <rect x="{{interval-x}}" y="{{interval-y}}" width="{{interval-width}}" height="{{interval-height}}" fill="currentColor" />
+          <rect x="{{interval-x}}" y="{{interval-y}}" width="{{interval-width}}" height="{{interval-height}}" fill="currentColor" data-plot-mark="bar" data-value="{{interval-duration}}" />
           <text x="{{task-label-x}}" y="{{task-label-y}}" data-text-role="label" fill="currentColor">{{task-label}}</text>
         </g>
       </svg>
