@@ -32,7 +32,7 @@ Place background layers behind content without changing its flow or intercepting
 
 The five-step authoring path below is for later deck generation from the saved
 Custom Template. It does not add outline creation, content rewriting, deck QA or
-page-by-page review to the extraction stage.
+visual review of generated pages to the extraction stage.
 
 `SKILL.md` should give a concise five-step authoring path, without breaking the work
 into excessive substeps or adding standalone PPTX-export/delivery sections:
@@ -46,8 +46,8 @@ into excessive substeps or adding standalone PPTX-export/delivery sections:
    cannot express the outline. Retain editable content and the fixed 10px floor.
 4. Run QA on the planned deck; fix blockers and rerun. No need to repeat passing
    [interaction checks](qa.md#interaction-checks-already-included) on an unchanged deck.
-5. Render and review every page against the outline and source style; fix problems,
-   then rerun QA and review.
+5. Review QA-flagged pages and substantially changed layouts against the outline and
+   source style; fix issues and rerun QA. No need for a full visual pass unless requested.
 
 Keep setup short: point to `design-system.md`, `layouts/README.md`,
 `layouts/source-index.json` and the QA guide. Include only the exact QA and page-render

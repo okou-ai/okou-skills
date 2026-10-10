@@ -85,8 +85,9 @@ Known solid-background contrast below 3:1 is blocking, including same-colour tex
 
 The JSON is primary; errors identify page, element and reason. `READY_TO_PUBLISH`
 and zero `hardGateFailures` are required. Fix failures together and rerun only after
-changing input. Do not repeatedly render passing pages or count style advisories as
-mechanical blockers. Brand/source fidelity is a separate representative comparison.
+changing input. No need to render every passing page: visually review QA-flagged pages
+and substantially changed layouts for content and source style. A full visual pass
+is needed only when requested; style advisories remain separate from mechanical blockers.
 
 Text on imagery, gradients, painted pseudo-elements or overlapping background
 layers yields `NEEDS_VISUAL_REVIEW`, not an automatic pass. Ancestor background
@@ -108,7 +109,7 @@ targeted checks for failures, uncovered behavior or an explicit user request.
 Page-number synchronization, notes, custom buttons and native keyboard/focus behavior
 remain outside this check. Keep source-style review and requested PPTX validation.
 
-## Capture or convert a later generated deck only when requested
+## Targeted review and requested output
 
 `--prepared` writes a **separate** capture-only HTML copy beside the generated deck,
 only after QA passes. It contains measured styles, immutable baseline declarations
@@ -116,11 +117,16 @@ and an explicit capture marker; automatic refitting is disabled in this copy. Th
 source package and interactive authored deck remain unchanged. Keeping it beside the
 input preserves package-relative assets.
 
-For a requested page-image review or HTML capture:
+For targeted review, select the relevant slides. Use the authored HTML while QA
+requests visual review; the prepared copy is available only after it passes.
+Retain the original page numbers in any review receipt.
 
 ```bash
-okou presentation screenshot --input <assembled.ready.html> --out <validation-dir>
+okou presentation screenshot --input <assembled.html> \
+  --slides '<selectors-for-review-pages>' --out <validation-dir>
 ```
+
+Use the prepared HTML and omit `--slides` when a full set of page images is requested.
 
 Only when a later task explicitly requests a PPTX, convert the prepared HTML and
 render the actual PPTX for roundtrip review:
@@ -145,9 +151,9 @@ not proof that the template is a native PPTX in-place editing engine.
   fidelity risk, compare one or two unchanged representative pages. Do not build a
   full sample deck, run final-deck QA or compare every reconstructed page by default.
   Save the Custom Template only after the package check succeeds.
-- **Generation:** follow the five-step authoring path in the package. Run this final
-  QA on the assembled output deck, then perform the separately requested page-by-page
-  source-style review. Never modify the stored source package.
+- **Generation:** follow the five-step authoring path in the package. Run final QA on
+  the assembled deck, review flagged or substantially changed pages, and rerun after
+  fixes. Keep the stored source package unchanged.
 
 The portable package retains its runtime QA and 10px fitter for future generation.
 Repository CI checks skill metadata and JavaScript syntax; it does not certify rendered

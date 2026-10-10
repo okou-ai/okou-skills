@@ -6,7 +6,7 @@ description: Extract source style and editable HTML layouts from PPTX, PPT, PDF 
 # Extract a presentation template
 
 Preserve the original source and save its style, layouts and assets as a reusable
-HTML package. **Extraction uses package checks; deck QA and page-by-page review are
+HTML package. **Extraction uses package checks; deck QA and targeted visual review are
 for later generation.** Rebuild samples only when requested, within that scope.
 Write package instructions in English; preserve source content and the requested
 presentation language.
@@ -79,12 +79,13 @@ Write these **five steps for future generation** into the package's `SKILL.md`:
 4. **Run QA:** use the planned page count; fix blockers and rerun.
    No need to repeat passing [interaction checks](references/qa.md#interaction-checks-already-included)
    on an unchanged deck.
-5. **Review every page:** render the QA-prepared HTML, check against the outline and
-   source style, fix problems, then rerun QA and review affected pages.
+5. **Review as needed:** inspect QA-flagged pages and substantially changed layouts
+   against the outline and source style; fix issues and rerun QA. No need to render
+   every passing page unless the user requests a full visual review.
 
 Link the design system, source index and QA guide; include exact QA and screenshot
 commands from [qa.md](references/qa.md). Keep `layouts/README.md` a short path map
-linking back to `SKILL.md`. Do not add export, hosting or delivery steps.
+linking back to `SKILL.md`. No need for export, hosting or delivery steps.
 
 ## 4. Check the package
 
