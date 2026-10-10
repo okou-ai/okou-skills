@@ -99,18 +99,14 @@ This is evidence of a performed review, not permission to bypass a hard failure.
 
 ## Interaction checks already included
 
-The final QA command uses the same real browser session for layout and interaction
-checks. On decks with multiple slides, it dispatches `KeyboardEvent`s for Home/End,
-all four arrow keys and up to two consecutive steps per direction, checking the
-active-page marker and target-page visibility. These are browser-based handler
-checks; they do not certify trusted keyboard input or focus behavior.
+Final QA reuses its browser session to check Home/End, all four arrow keys and up to
+two consecutive moves per direction on multi-slide decks. Scripted key events check
+the active-page marker and target-page visibility.
 
-Treat passing checks as complete for the unchanged deck. Do not replay the covered
-keys manually, build a mock DOM or start a separate Playwright suite to repeat them.
-After changes, rerun packaged QA. Investigate reported failures; add targeted checks
-only for applicable behavior outside this coverage or an explicit user request.
-Displayed page-number synchronization, notes toggles and custom button clicks are
-not covered. Source-style page review and requested PPTX validation remain separate.
+No need to repeat passing checks on an unchanged deck. Rerun QA after edits; use
+targeted checks for failures, uncovered behavior or an explicit user request.
+Page-number synchronization, notes, custom buttons and native keyboard/focus behavior
+remain outside this check. Keep source-style review and requested PPTX validation.
 
 ## Capture or convert a later generated deck only when requested
 
