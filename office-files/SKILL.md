@@ -11,7 +11,7 @@ User requirements and supplied templates take priority. Start narrow edits from 
 
 Prefer native authoring: create files directly with tools that support the target format and language.
 
-Use the reusable tools in [references/native-authoring.md](references/native-authoring.md) for environment setup, ordinary paired reports, and cached checks. They add no report outline or palette. Prefer the preinstalled `/opt/office/bin/python`; `scripts/office_env.py` selects an available interpreter and fills missing dependencies on older hosts.
+Use the reusable tools in [references/native-authoring.md](references/native-authoring.md) for on-demand setup, ordinary paired reports, and cached checks. They add no report outline or palette. [scripts/office_env.py](scripts/office_env.py) reuses available dependencies and installs only those missing for the current task.
 
 - **Word**: for a new document, open [assets/blank.docx](assets/blank.docx) with `python-docx.Document(...)` and save a new file. Use its named styles: `Title`, `Heading 1`–`Heading 3`, `Normal`, `List Bullet`, `List Number`, `Table Text`, `Table Header`, `Table Title`, `Figure`, `Caption`, and `Source`. Keep paragraphs and tables editable.
 - **PDF**: copy [assets/blank.typ](assets/blank.typ), append content, and compile with `typst compile report.typ report.pdf` or Python's `typst.compile('report.typ', output='report.pdf')`. Use `#doc-title[...]`, headings, tables, and figure captions to inherit typography. Other native engines may use the same baseline. Markdown conversion is optional; DOCX-to-PDF serves Word layout checks or a requested matching export.

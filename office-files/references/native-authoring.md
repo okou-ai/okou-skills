@@ -10,9 +10,7 @@ From your working directory, replace `<skill-dir>` with this skill's absolute di
 python3 <skill-dir>/scripts/office_env.py --formats docx pdf --charts --install-missing
 ```
 
-Select only the formats needed; omit `--charts` without charts. Use the returned `python` path for subsequent commands, without shell activation. The helper prefers a working `/opt/office/bin/python`, reuses installed libraries, or creates `.office-cache/venv` on older hosts. It installs missing Writer components before one real DOCX probe. Failed probes are cached until the renderer changes. Font mappings are reported, not silently accepted as language coverage. On hosts without apt/sudo, use an available compatible renderer or report Word rendering as unverified.
-
-New Okou images can preinstall the packages and fonts at image-build time. The helper also supports old images and other hosts; a PR alone is not evidence that a runtime has the new image.
+Select only the formats needed; omit `--charts` without charts. Use the returned `python` path for subsequent commands, without shell activation. The [setup helper](../scripts/office_env.py) reuses the current Python or `.office-cache/venv`; with `--install-missing`, it creates or updates that local environment only when required libraries are missing. System Python is unchanged. For DOCX checks, it installs missing Writer components before one real import probe. Failed probes are cached until the renderer changes. Font mappings are reported, not silently accepted as language coverage. On hosts without apt/sudo, use an available compatible renderer or report Word rendering as unverified.
 
 ## Write shared content once
 

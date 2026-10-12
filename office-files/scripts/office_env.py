@@ -127,11 +127,7 @@ def main():
             for p in PACKAGES[kind]
         )
     )
-    candidates = [
-        Path("/opt/office/bin/python"),
-        Path(sys.executable),
-        args.cache / "venv/bin/python",
-    ]
+    candidates = [Path(sys.executable), args.cache / "venv/bin/python"]
     available = [(p, versions(p, packages)) for p in candidates if p.exists()]
     python, found = max(
         available, key=lambda item: sum(v is not None for v in item[1].values())
