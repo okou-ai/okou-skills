@@ -1,0 +1,16 @@
+<section class="builtin-layout" data-layout="pricing">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-grid bl-columns-3">
+      <article class="bl-stack" data-repeat="plans">
+        <div data-text-role="heading">{{plan-name}}</div>
+        <div data-text-role="metric-value">{{plan-price}}</div>
+        <div data-text-role="label">{{plan-unit}}</div>
+        <div data-text-role="body">{{plan-features}}</div>
+        <div data-text-role="caption">{{plan-qualification}}</div>
+      </article>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,21 @@
+<section class="builtin-layout" data-layout="actual-vs-target">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-stack">
+      <div class="bl-grid bl-columns-2">
+        <div class="bl-stack">
+          <div data-text-role="metric-value">{{actual-value}}</div>
+          <div data-text-role="label">{{actual-label}}</div>
+        </div>
+        <div class="bl-stack">
+          <div data-text-role="metric-value">{{target-value}}</div>
+          <div data-text-role="label">{{target-label}}</div>
+        </div>
+      </div>
+      <div data-text-role="heading">{{variance}}</div>
+      <div data-text-role="caption">{{variance-note}}</div>
+    </div>
+  </div>
+</section>

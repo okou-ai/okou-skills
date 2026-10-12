@@ -4,11 +4,15 @@ on:
   pull_request:
     paths:
       - "**/SKILL.md"
+      - "extract-template/**"
+      - ".github/workflows/validate-skills.yml"
   push:
     branches:
       - main
     paths:
       - "**/SKILL.md"
+      - "extract-template/**"
+      - ".github/workflows/validate-skills.yml"
 
 jobs:
   validate:
@@ -122,3 +126,46 @@ jobs:
           fi
 
           echo "No _ACCESS_TOKEN references found. ✓"
+
+  presentation-syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: JavaScript syntax
+        run: |
+          set -euo pipefail
+          find extract-template/presentation/scripts extract-template/presentation/tools extract-template/presentation/tests \
+            -type f \( -name '*.js' -o -name '*.mjs' \) -print0 |
+            while IFS= read -r -d '' file; do
+              node --check "$file"
+            done
+      - name: Presentation package contract
+        run: node --test extract-template/presentation/tests/verify-package.test.mjs
+      - name: HTML source inventory
+        run: python3 extract-template/presentation/tests/inventory-html.test.py
+      - name: Source preview and upload outputs
+        run: |
+          python3 -m pip install --quiet Pillow pypdf
+          python3 extract-template/presentation/tests/source-derivatives.test.py
+
+  presentation-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: extract-template/presentation/tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: extract-template/presentation/tests/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Rendered fitter and QA regressions
+        run: npm test

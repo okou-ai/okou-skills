@@ -1,84 +1,156 @@
 ---
 name: presentation-extract-template
-description: Extract and publish a reusable HTML presentation template from PPTX, PPT, PDF, image decks, or page screenshots. Preserve the source's typography, layouts, backgrounds, decoration, and brand framing as editable structures and reusable assets.
+description: Extract source style and editable HTML layouts from HTML decks (files, directories or URLs), PPTX, PPT, PDF or slide images, then save a reusable Custom Template.
 ---
 
 # Extract a presentation template
 
-Turn the reference into a platform-compliant HTML template for new content. The source defines its visual language; the output remains HTML regardless of input format.
+Preserve the original source and save its style, layouts and assets as a reusable
+HTML package. **Extraction uses package checks; deck QA and targeted visual review are
+for later generation.** Rebuild samples only when requested, within that scope.
+Write package instructions in English; preserve source content and the requested
+presentation language.
+
+| Files in this guide | Stage | Included in the saved template |
+| --- | --- | --- |
+| This `SKILL.md`, `references/extract/` | Extract and record the source | No |
+| `references/generate/` | Generate, check and deliver new decks | Yes, at the same paths |
+| `scripts/inventory-html.py`, `scripts/source-derivatives.py`, `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
+
+The installer copies the generation guides and runtime by an explicit file list.
+The package's own `SKILL.md` is its generation entrypoint.
 
 ## 1. Inspect the source
 
-Preserve the original and inspect every page in order, noting canvas ratio, page count, content types, page roles, and recurring structures. For PPT, PPTX, or PDF, run from this guide's directory:
+For HTML, batch-inventory the existing DOM with [html-source.md](references/extract/html-source.md)
+and reuse its editable fragments and CSS. For PPTX, read its structure/style metadata;
+for PDF/images, infer from the rendered pages. Keep the original as evidence.
+Source parsing and the independent page capture can run together.
+
+Use a new `<work-dir>` beside the template package. All commands below use fixed
+subdirectories: `source-pages/` for original pages, `previews/` for contact sheets
+and review images, and `upload/` for the upload PDF.
+
+Reuse existing ordered captures or supplied slide images at
+`<work-dir>/source-pages/page-001.png`, etc. Otherwise, render once:
 
 ```bash
-node scripts/render-pages.mjs \
-  --input <deck.ppt|deck.pptx|deck.pdf> \
-  --out <source-pages-dir>
+okou presentation screenshot --input <source.ppt|source.pptx|source.pdf|source.html|html-dir|url> --out <work-dir>/source-pages
 ```
 
-This writes ordered source images (`page-001.png`, `page-002.png`, …). Determine design rules from the rendered pages, not file structure alone.
+Review every page through contact sheets; open individual captures only for details
+that are unclear at that size. The helper installs Pillow if needed and writes previews
+to their own directory. For HTML/images, create the upload PDF in the same pass:
 
-## 2. Extract the design system
+```bash
+python3 scripts/source-derivatives.py --work-dir <work-dir> --contact-sheet --pdf
+```
 
-Record in `design-system.md`:
+For PPT/PPTX/PDF, omit `--pdf`: the original already supplies the upload source.
+For HTML, use `--slides "<slide-selector>"` when the source uses a different slide
+selector from `.deck > .slide`; use `--slides none` for one page per HTML file.
+Read computed CSS once per distinct style, including inherited styles and SVG.
+Record the original entry file or URL in `design-system.md`.
 
-- Typography: display/body fonts, size hierarchy, weights, line heights, spacing, and CJK fallbacks.
-- Color and geometry: foreground/background roles, accents, chart colors, margins, content-safe areas, borders, radii, and image crops.
-- Repeated components and chrome: cards, metrics, tables, quotes, image frames, logos, headers, footers, and page markers.
-- Background fields and content-independent decorations: reusable elements, source-observed combinations, and allowed adaptations.
+Record the filename, aspect ratio, page count, page roles and
+recurring structures. Check typography against source metadata and label visual
+estimates as inferred. Archive original-source captures, never reconstruction images.
 
-Read [references/layout-reuse.md](references/layout-reuse.md) for the source inventory and background composition rules. Distinguish observed rules from inferred or fallback choices. An absent content type, such as images, is not a prohibition on future use.
+## 2. Record the design system
+
+In `design-system.md`, record typography, foreground/background colours, spacing,
+safe areas, borders, image crops, required chrome and reusable backgrounds/decorations.
+Distinguish source observations from inferred adaptations, including unit conversion
+and aspect-ratio mapping to 16:9.
+
+Use [typography.md](references/extract/typography.md) for source font mapping and
+[layout-inventory.md](references/extract/layout-inventory.md) for source coverage
+and reusable background recipes.
 
 ## 3. Build the editable package
 
 ```text
 <template-slug>/
-  SKILL.md                 # usage and authoring instructions
-  design-system.md         # brand rules, background elements/recipes, asset notes
-  layouts/
-    README.md              # layout selection and assembly instructions
-    source-index.json      # every source page mapped to a preserved layout
-    source/<name>.html     # distinct source compositions
-    _shell.html            # shared canvas, fonts, chrome, and navigation
-  styles/template.css      # shared layout, brand, and component styles
-  assets/                  # reusable logos, fonts, textures, and artwork
+  SKILL.md
+  design-system.md
+  layouts/README.md
+  layouts/source-index.json
+  layouts/source/<name>.html
+  layouts/_shell.html
+  styles/template.css
+  assets/
+  library/                  # supplied neutral layouts and Markdown catalogue
+  scripts/                  # supplied fitter and navigation
+  tools/                    # source configuration and generation QA
+  references/generate/      # generation-only guidance
 ```
 
-Preserve every distinct source composition and prefer it when new content fits. Group equivalent structures, keeping background variants separate. When no source layout fits, add a documented layout in the same design system; packaged layouts are references, not a whitelist.
+Create the source index and fragments in one batch; preserve every distinct composition
+and background variant. Equivalent structures may share a layout with explicit source-page
+coverage. Keep text, shapes, tables and ordinary charts editable in HTML/CSS/SVG.
+Use package-relative assets and `.deck > .slide > .stage`, with a `.fit` root per
+slide. Extra `data-fit-region` hooks are only for genuinely constrained subareas;
+ordinary flow text needs no extra measurement boundary. All content shares one scale.
 
-Use a 16:9 canvas, shared CSS variables/components, and semantic regions for replaceable text, images, and data. Keep title and metric typography separate. Preserve hierarchy and spacing through content selection or splitting rather than page-specific font shrinking. Prefer normal flow, Flexbox, or Grid; use absolute positioning for chrome, decoration, and intentional overlays.
+`layouts/_shell.html` is the shared HTML document with one `.deck` insertion point.
+The installer supplies a pure-black viewer surround with centered, proportional
+canvas scaling. Keep source dimensions, backgrounds and styling on `.stage` and
+inside it; no separate viewport or resize script is needed.
+Its `.deck` can be empty or retain source examples; no need to assemble every source
+page in it. Complete source-page coverage belongs in `source-index.json`. Source fragments
+use paths relative to `layouts/`, where they are inserted into the shell.
 
-Text, shapes, cards, tables, and ordinary charts must remain editable HTML/CSS/SVG. Retain isolated reusable artwork; never substitute a full-page screenshot for an editable layout or package old text/data as decoration.
-
-Document assembly through the shared shell, with working package-relative asset paths. Support all four navigation keys: `ArrowLeft`/`ArrowUp` go back; `ArrowRight`/`ArrowDown` go forward.
-
-The generated `SKILL.md` and `layouts/README.md` must direct authors to the design system and source index, explain source-first selection and background composition, and identify the shared styles and assembly steps.
-
-## 4. Validate representative rebuilds
-
-Rebuild representative source pages and background combinations, including documented adaptations. Confirm that the source inventory covers every page. Render the assembled examples:
+Write `tools/qa-config.json` with source-derived safe areas, required chrome and
+approved font fallbacks; follow [qa-config.md](references/extract/qa-config.md).
+Use the [runtime hooks](references/generate/runtime-contract.md) when creating
+the source HTML, so later generation can reuse it directly.
+Then run from this guide's directory:
 
 ```bash
-npx --yes --package="${CLI_PKG_URL}" okou presentation screenshot \
-  --input <rebuilt-deck.html> \
-  --out <validation-dir>
+node scripts/install-qa.mjs --package <template-slug>
 ```
 
-Compare structure, typography, colors, component styling, decoration placement, and safe areas against the source. Fix shared rules where needed; verify navigation, language fallbacks, and asset loading. Rebuilt images are local validation evidence, not source-page images for publication.
+The installer supplies the library, tools, references and shared runtime, including
+the viewport frame and four-arrow navigation. Keep neutral library layouts separate
+from the source index; adapt only selected layouts during later generation.
 
-## 5. Publish
+Write the package's `SKILL.md` with its template identity, source/language caveats,
+links to `design-system.md` and `layouts/source-index.json`, and a Markdown link to
+`references/generate/workflow.md`. That supplied [workflow](references/generate/workflow.md)
+contains the generation steps and routes to the other guides; no need to duplicate
+them. Keep `layouts/README.md` a short path map linking back to the package's `SKILL.md`.
+When refreshing an older package, update its entrypoint links to `references/generate/`.
 
-Publish the source file, ordered original page images, and complete template package together:
+## 4. Check the package
+
+From this guide's directory, run the package verifier. It checks slide/stage/fit
+structure, generation links, source coverage/configuration, library resources and
+capture inventory, and rejects extraction files mixed into the saved package:
 
 ```bash
-npx --yes --package="${CLI_PKG_URL}" okou presentation-template publish \
-  --title "<user-visible template name>" \
-  --source <deck.pptx|normalized-source.pdf> \
-  --pages <source-pages-dir> \
+node tools/verify-package.mjs \
+  --package <template-slug> --source-pages <work-dir>/source-pages
+```
+
+No generation QA, interaction pass or runtime test-suite run is needed during extraction.
+Only for a specific reconstruction risk, compare one or two unchanged compositions
+with their source captures, using `--out <work-dir>/previews/reconstruction` for
+any check screenshots.
+
+## 5. Save the Custom Template
+
+After the package check passes, prepare the upload source.
+
+Use the original `.ppt`, `.pptx` or `.pdf` as `--source`. For HTML/images, reuse
+`<work-dir>/upload/source.pdf` from step 1. Record this conversion in `design-system.md`;
+the package retains editable layouts and assets. No reconstructed export is needed.
+
+```bash
+okou user-template publish --kind presentation --title "<template name>" \
+  --source <original.ppt|original.pptx|original.pdf|work-dir/upload/source.pdf> \
+  --pages <work-dir>/source-pages \
   --package <template-slug>
 ```
 
-`--source` accepts PPTX or PDF. Convert legacy PPT to PPTX; for images/screenshots, create a PDF preserving page order and retain input provenance. `--pages` must contain only original source screenshots in filename order, never reconstructed validation images.
-
-Completion requires the editable package, source layout coverage, reusable background elements with composition guidance, successful validation, and a successful publication command. Report publication failures explicitly; do not claim delivery before it succeeds.
+Confirm successful saving and retain any returned template reference; if publishing
+fails, report that the template was not saved.

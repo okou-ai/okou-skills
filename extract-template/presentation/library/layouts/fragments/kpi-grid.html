@@ -1,0 +1,14 @@
+<section class="builtin-layout" data-layout="kpi-grid">
+  <header class="bl-header" data-fit-region="title">
+    <div data-text-role="title">{{title}}</div>
+  </header>
+  <div class="bl-body" data-fit-region="body">
+    <div class="bl-grid bl-columns-4">
+      <article class="bl-stack" data-repeat="metrics">
+        <div data-text-role="metric-value">{{metric-value}}</div>
+        <div data-text-role="label">{{metric-label}}</div>
+        <div data-text-role="caption">{{metric-note}}</div>
+      </article>
+    </div>
+  </div>
+</section>
