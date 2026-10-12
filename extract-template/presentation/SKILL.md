@@ -15,17 +15,22 @@ presentation language.
 | --- | --- | --- |
 | This `SKILL.md`, `references/extract/` | Extract and record the source | No |
 | `references/generate/` | Generate, check and deliver new decks | Yes, at the same paths |
-| `scripts/inventory-html.py`, `scripts/source-derivatives.py`, `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
+| `scripts/prepare-pdf.py`, `scripts/inventory-html.py`, `scripts/source-derivatives.py`, `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
 
 The installer copies the generation guides and runtime by an explicit file list.
 The package's own `SKILL.md` is its generation entrypoint.
 
 ## 1. Inspect the source
 
-For HTML, batch-inventory the existing DOM with [html-source.md](references/extract/html-source.md)
-and reuse its editable fragments and CSS. For PPTX, read its structure/style metadata;
-for PDF/images, infer from the rendered pages. Keep the original as evidence.
-Source parsing and the independent page capture can run together.
+| Input | Extraction route |
+| --- | --- |
+| HTML file, directory or URL | [Inventory the HTML](references/extract/html-source.md) and reuse its fragments, CSS and assets. |
+| PDF deck | [Convert with pdf2htmlEX](references/extract/pdf-source.md), then follow the same HTML extraction route. |
+| PPTX / PPT | Read available structure/style metadata together with the rendered pages. |
+| Slide images | Infer layouts and styling from the supplied pages. |
+
+Keep the original as evidence. Source parsing/conversion and the independent page
+capture can run together.
 
 Use a new `<work-dir>` beside the template package. All commands below use fixed
 subdirectories: `source-pages/` for original pages, `previews/` for contact sheets
@@ -40,7 +45,8 @@ okou presentation screenshot --input <source.ppt|source.pptx|source.pdf|source.h
 
 Review every page through contact sheets; open individual captures only for details
 that are unclear at that size. The helper installs Pillow if needed and writes previews
-to their own directory. For HTML/images, create the upload PDF in the same pass:
+to their own directory. For HTML/images without an original PDF, create the upload
+PDF in the same pass:
 
 ```bash
 python3 scripts/source-derivatives.py --work-dir <work-dir> --contact-sheet --pdf

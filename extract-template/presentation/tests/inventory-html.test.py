@@ -54,6 +54,14 @@ class InventoryHTMLTest(unittest.TestCase):
         report, _ = MODULE.inventory(source, "deck.html", base="https://example.com/deck/")
         self.assertEqual(report["resources"][0]["resolved"], "https://example.com/shared/one.png")
 
+    def test_pdf_text_lines_are_observations_without_claiming_editability(self):
+        page = '<div class="pf" data-page-no="a"><div class="pc"><div class="t ff0">A <span>title</span></div><div class="t ff0" style="visibility:hidden">Hidden text</div></div></div>'
+        report, fragments = MODULE.inventory(page, "source.html", "pf", "pc", text_class="t")
+        self.assertEqual(fragments["source/page-001.html"], page)
+        self.assertEqual(report["layouts"][0]["regions"], [{"role": "source-text", "runs": 2,
+                         "characters": len("A titleHidden text"), "sample": "A titleHidden text"}])
+        self.assertTrue(report["layouts"][0]["issues"])
+
     def test_duplicate_and_misplaced_fit_are_reported(self):
         source = '<div class="slide"><div class="stage"><div class="fit"></div><div class="fit"></div></div></div><div class="slide"><div class="stage"></div><div class="fit"></div></div>'
         report, _ = MODULE.inventory(source, "deck.html")

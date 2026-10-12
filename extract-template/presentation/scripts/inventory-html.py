@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inventory an HTML deck once and preserve its editable slide fragments (stdlib only)."""
+"""Inventory an HTML deck once and preserve its original slide fragments (stdlib only)."""
 import argparse
 from dataclasses import dataclass, field
 from html.parser import HTMLParser
@@ -84,7 +84,7 @@ class Document(HTMLParser):
             node.text.append(data)
 
 
-def inventory(source, source_name, slide_class="slide", stage_class="stage", base=""):
+def inventory(source, source_name, slide_class="slide", stage_class="stage", base="", text_class=""):
     document = Document(source)
     if document.errors:
         raise ValueError("Use a browser-serialized DOM for HTML with omitted/unbalanced tags: "
@@ -129,6 +129,12 @@ def inventory(source, source_name, slide_class="slide", stage_class="stage", bas
             if role or re.fullmatch("h[1-6]", node.tag):
                 text = " ".join("".join(node.text).split())
                 regions.append({"role": role or node.tag, "characters": len(text), "sample": text[:100]})
+        if text_class:
+            runs = [node for node in descendants if node.has_class(text_class)]
+            text = " ".join("".join("".join(node.text) for node in runs).split())
+            if runs:
+                regions.append({"role": "source-text", "runs": len(runs),
+                                "characters": len(text), "sample": text[:100]})
         issues = []
         if len(stages) != 1:
             issues.append(f"Expected one stage; found {len(stages)}")
@@ -144,7 +150,9 @@ def inventory(source, source_name, slide_class="slide", stage_class="stage", bas
             "resources": unique_resources, "scripts": scripts,
             "notes": ["Character counts describe source content, not tested maximum capacity.",
                       "Fragments retain original markup and paths. Localize resources before packaging.",
-                      "Inspect CSS imports, url() and inline styles as well as the HTML resource list."]}, fragments
+                      "Inspect CSS imports, url() and inline styles as well as the HTML resource list."]
+                     + (["Classed text runs are source observations, not proven editable slots or reading order."]
+                        if text_class else [])}, fragments
 
 
 def main():
@@ -154,6 +162,7 @@ def main():
     parser.add_argument("--base-url", default="", help="Original URL for resolving HTML resource references")
     parser.add_argument("--slide-class", default="slide")
     parser.add_argument("--stage-class", default="stage")
+    parser.add_argument("--text-class", default="", help="Aggregate a source text-run class per page, e.g. t in pdf2htmlEX")
     args = parser.parse_args()
     started = time.monotonic()
     if args.out.exists() and any(args.out.iterdir()):
@@ -161,7 +170,7 @@ def main():
     try:
         report, fragments = inventory(args.input.read_text(encoding="utf-8"), args.base_url or args.input.name,
                                       args.slide_class, args.stage_class,
-                                      args.base_url or args.input.resolve().as_uri())
+                                      args.base_url or args.input.resolve().as_uri(), args.text_class)
     except ValueError as error:
         parser.error(str(error))
     for file, html in fragments.items():

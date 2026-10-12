@@ -1,8 +1,10 @@
 # Batch an HTML source
 
-Use during extraction. Keep the original HTML in the work directory; for a URL,
+Use during extraction, including HTML prepared from a PDF by [pdf-source.md](pdf-source.md).
+That helper already creates the inventory below; continue with its outputs.
+Keep the original HTML in the work directory; for a URL,
 download its entry HTML once. A dynamic site may need the browser-serialized DOM.
-This stdlib-only helper inventories all pages and exports their original editable
+This stdlib-only helper inventories all pages and exports their original
 fragments without rewriting their markup:
 
 ```bash
@@ -10,9 +12,11 @@ python3 scripts/inventory-html.py --input <work-dir>/source.html \
   --base-url <original-url> --out <work-dir>/html
 ```
 
-Omit `--base-url` for local files. For other class names, use `--slide-class` and
-`--stage-class`. For a directory of independent pages, reuse the files directly;
-this helper is for multiple slides in one document.
+Omit `--base-url` for local files. For other class names, use `--slide-class`,
+`--stage-class` and, where needed, `--text-class`. The latter summarizes fragmented
+text runs per page, without treating them as editable slots. For a directory of
+independent pages, reuse the files directly; this helper is for multiple slides
+in one document.
 
 Read `html/inventory.json` and the shared CSS together. The report lists page roles,
 text regions, source character counts, HTML resource references, scripts and missing

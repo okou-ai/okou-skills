@@ -39,6 +39,8 @@ prefer the authoring file: `.pptx` over its PDF, `.docx` over its PDF.
 
 Prepare another format only when the selected guide requires it:
 
+- PDF slide decks: convert with pdf2htmlEX, then use the presentation guide's HTML
+  extraction flow; keep the original PDF for captures and upload.
 - Scanned document images: assemble an ordered PDF for the PDF guide.
 - Cross-format reuse: export slides to PDF for a Word-style template, or a Word
   report to PDF for a presentation template. The requested template type stays
