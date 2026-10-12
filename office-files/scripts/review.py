@@ -73,7 +73,12 @@ def render_locked(source, cache, state, directory):
             Path(p).exists() and digest(p) == expected
             for p, expected in prior["hashes"].items()
         ):
-            return {**prior, "source": str(source), "cached": True}
+            return {
+                **prior,
+                "source": str(source),
+                "cached": True,
+                "seconds": round(time.monotonic() - started, 3),
+            }
     directory.mkdir(parents=True, exist_ok=True)
     result = {
         "source": str(source),

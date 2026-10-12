@@ -57,11 +57,15 @@ def writer_state():
 
 
 def probe_writer(python, cache):
+    started = time.monotonic()
     state = hashlib.sha256(json.dumps(writer_state()).encode()).hexdigest()
     cached = cache / f"writer-{state}.json"
     if cached.exists():
-        return {**json.loads(cached.read_text()), "cached": True}
-    started = time.monotonic()
+        return {
+            **json.loads(cached.read_text()),
+            "cached": True,
+            "seconds": round(time.monotonic() - started, 3),
+        }
     result = {"available": False, "cached": False}
     if (
         not shutil.which("soffice")
