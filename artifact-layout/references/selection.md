@@ -25,6 +25,11 @@ All use the same semantic tokens and components. Brand inputs may override
 tokens; a user-supplied visual template takes priority over the defaults.
 Use one theme throughout a document, with emphasis varying by content role.
 
+These theme and recipe IDs are local values for `report.json`. They are not
+resource-registry IDs for `okou generate --design-system` or `--template`;
+select them in the content model. Explicitly selected external resources keep
+their own identity and take priority over local defaults.
+
 ## Grids
 
 - `single`: long prose, compact reports, and wide evidence.
