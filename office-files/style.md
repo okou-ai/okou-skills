@@ -1,98 +1,39 @@
-# Document style v1
+# Document style
 
-Use these defaults for new Word/PDF documents across languages and document types
-when the user has not specified a design. User requirements and supplied templates
-take priority. These defaults describe the visual result, independently of its
-authoring tools or file format.
+Use this style for new Word/PDF documents without a specified design, across languages and topics. User requirements and templates take priority; preserve existing designs during narrow edits. This file defines the visual result, not the generation tool or page count.
 
-## Typography and page
+## Baseline
 
-Sizes below are in points; `12/16` means 12 pt type on 16 pt line spacing.
+Measurements are in points unless stated otherwise. `12/16` means 12 pt type with a target text line spacing of 16 pt. Increase line spacing when a script or equation needs it; never use it to constrain image height.
 
-| Element | Default |
+| Element | Style |
 | --- | --- |
-| Typeface | Charter for Latin text; script-appropriate companion fonts elsewhere, with the required weights and styles |
-| Body | 12/16; aligned to the reading start (left for LTR, right for RTL); 8 pt after paragraphs; no first-line indent |
-| Document title | 18/22 bold; 14 pt space after |
-| Section heading | 13/17 bold; 16 pt space before and 9 pt after |
-| Quote, when useful | 13/18, italic where suitable for the script; 12 pt inset on each side; attribution 10/13 |
-| Table text | 11/14; bold header row |
-| Table title | 11/14 bold, above the table |
-| Chart labels | 10–11 pt at their final placed size |
-| Figure captions and source notes | 10/13; below the figure |
-| Footer | 9/12; page number aligned to the right text edge |
-| Paper and columns | US Letter, 8.5 × 11 inches; single column |
-| Text area | 5.5 inches wide; left/right margins 108 pt; top 65 pt; bottom 64 pt |
-| Footer position | 33 pt from the bottom edge, clear of the body |
-| Color | White page; body `#191919`; secondary text `#555555`; accent `#345E6B` |
+| Paper and text area | US Letter, single column; 5.5-inch text width; margins: left/right 108, top 65, bottom 64 |
+| Body | 12/16; aligned to the reading start; 8 after paragraphs; no first-line indent |
+| Document title | 18/22, bold; 14 after |
+| Section heading | 13/17, bold; 16 before, 9 after; use real heading levels |
+| Tables | 11/14; bold header row; table title above, at the same size |
+| Chart labels | 10–11 at the final placed size, including after image scaling |
+| Captions and sources | 10/13, below the figure |
+| Footer | 9/12; page number at the right text edge, 33 from the bottom of the page, clear of the body |
+| Colors | White page; body `#191919`, secondary text `#555555`, accent `#345E6B` |
 
-For Latin body text, aim for an average of about 45–90 characters, including
-spaces, per full line; adapt line length for other scripts. Use real heading
-levels and consistent paragraph styles. Keep headings with the following content
-and avoid isolated first or last paragraph lines.
-Keep the hierarchy compact; add another heading level only when the content
-needs one.
+These type sizes are acceptance criteria for this style. Unless the user or template specifies otherwise, do not reduce them to fit content or cut page count. Adjust column widths, wrap text, split tables, or add pages first; use landscape pages for wide tables when needed.
 
-When using Charter, obtain it and its license from the [Charter page](https://practicaltypography.com/charter.html).
-Preserve the license when redistributing font files. Embed fonts in PDF and,
-where supported and permitted, in Word. If the intended font is unavailable,
-choose a readable alternative, disclose the substitution, and recheck wrapping
-and pagination.
+## Fonts and languages
 
-## Tables
+- Prefer Charter for Latin body text. For Chinese, Japanese, and Korean, use fonts covering the appropriate language and regional glyphs, such as Noto Serif CJK SC/JP/KR. Noto Naskh Arabic is an option for Arabic. Provide the required weights and avoid unintended fallback or synthetic italics.
+- If a font is unavailable, choose an available substitute with full script coverage and a similar style, and briefly disclose it. Respect font usage and embedding licenses; embed fonts in PDFs. Setting a font name does not prove it rendered correctly.
+- Adapt line spacing, line breaks, shaping, reading direction, and mixed-script text to the language. For RTL content, check punctuation, numbers, and table direction. Preserve the type hierarchy, colors, and table/chart treatment.
 
-- Align labels to the reading start and right-align numbers. Use consistent units,
-  precision, and number formats within a column.
-- Use light horizontal rules, no vertical grid, and a pale header background
-  (`#F1F3F0`). Start with 3 pt top/bottom and 4 pt left/right cell padding;
-  adjust widths and padding to the content.
-- Repeat the header on continuation pages. Keep an ordinary data row together;
-  restructure a row taller than a page so its contents remain readable.
-- Keep the table title with the header and first data row. Place notes and
-  sources immediately after the table.
+## Tables and charts
 
-## Charts
+- Use light horizontal table rules without vertical lines; use `#F1F3F0` for header backgrounds. Start cell padding at 3 top/bottom and 4 left/right, adjusting to the content.
+- Align text labels to the reading start and numbers to the right. Keep units, precision, and number formats consistent within a column. Repeat headers on continuation pages; keep ordinary rows together and restructure oversized rows. Keep table titles with the header and first row.
+- Fit charts within the available text area, preserve their aspect ratio, and leave room for labels and legends. Use the document fonts. Distinguish series with labels, markers, or line styles as well as color.
+- State chart units and sources; use the same data definitions as the prose and tables. Bar-chart value axes start at zero. Keep figures, captions, and sources on the same page where possible; label illustrative data.
 
-- Use the document's fonts and check labels at the final placed size. Fit the
-  chart inside the text area with enough room for ticks, labels, and legends.
-- Start with accent `#345E6B`, secondary series `#74716B`, and light grid lines
-  `#DEDEDA`. Distinguish series with labels, markers, or line styles as well as
-  color.
-- State units and data sources, and distinguish percentage change from
-  percentage-point change. Bar-chart value axes start at zero; label other
-  scales clearly. Values and interpretations must agree with the accompanying
-  tables and prose. Mark illustrative data explicitly.
-- Keep each figure, caption, and source note together. Add charts when they
-  help explain the data; the style does not require a chart in every report.
+## Pagination and variants
 
-## Adapt to language and content
-
-Use fonts with full coverage for the script. Adapt line spacing, text direction,
-line breaking, and alignment to the language. Keep the specified type sizes,
-heading hierarchy, text width, table/chart treatment, and colors as the baseline;
-language adaptation alone is not a reason to replace the visual style.
-
-Choose page count from the content. Adjust column widths, chart dimensions,
-spacing, or pagination before reducing type size. Wide tables may need a
-landscape section or a different arrangement.
-
-When A4 or a double-column layout is requested, adapt the page geometry and
-recheck line length, reading order, figure placement, and every page. Wide
-tables and charts may span both columns. These are adaptations of the baseline,
-not a reason to shrink body text to fit a fixed page count.
-
-Keep running information clear of the body; use the actual document's title,
-sources, and page numbers.
-
-## Basis
-
-This is a team style informed by Matthew Butterick's *Practical Typography*.
-Its baseline comes from the approved typography sample, including tables,
-charts, and a table continuing across pages. Butterick's Latin-text guidance
-recommends 10–12 pt print body text, line spacing of 120–145% of the type size,
-and an average line length of 45–90 characters. The precise values, colors,
-and page geometry above are the team's choices, not an official Butterick template.
-
-- [Summary of key rules](https://practicaltypography.com/summary-of-key-rules.html)
-- [Space between paragraphs](https://practicaltypography.com/space-between-paragraphs.html)
-- [Headings](https://practicaltypography.com/headings.html)
+- Let content determine page count. Keep headings with the following paragraph and avoid isolated first or last paragraph lines. Different language versions may have different page counts.
+- When A4 or two columns are requested, adapt margins and column widths; wide tables and charts may span both columns. Check reading order, line length, and actual pagination. Do not shrink body text to preserve the original page count.
