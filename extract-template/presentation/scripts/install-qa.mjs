@@ -24,7 +24,7 @@ cpSync(path.join(here, "../library"), path.join(target, "library"), {recursive: 
 // Remove the previously shipped machine catalogue when refreshing the library.
 rmSync(path.join(target, "library/references/catalog.json"), {force: true});
 mkdirSync(path.join(target, "references"), {recursive: true});
-for (const name of ["qa.md", "typography-fit.md", "layout-reuse.md"]) copyFileSync(path.join(here, "../references", name), path.join(target, "references", name));
+for (const name of ["qa.md", "runtime-contract.md", "typography-fit.md", "layout-reuse.md"]) copyFileSync(path.join(here, "../references", name), path.join(target, "references", name));
 const runtime = ["dom-metrics.js", "fit-text.js", "navigation.js"].map(name => readFileSync(path.join(here, name), "utf8")).join("\n");
 const json = JSON.stringify(config).replaceAll("<", "\\u003c");
 const block = `<!-- BEGIN PRESENTATION RUNTIME -->\n<script data-presentation-runtime>\nwindow.PRESENTATION_QA_CONFIG=${json};\n${runtime}\n</script>\n<!-- END PRESENTATION RUNTIME -->`;

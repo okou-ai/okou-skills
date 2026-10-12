@@ -63,7 +63,8 @@ page in it. Complete source-page coverage belongs in `source-index.json`. Source
 use paths relative to `layouts/`, where they are inserted into the shell.
 
 Write `tools/qa-config.json` with source-derived safe areas, required chrome and
-approved font fallbacks; see the [QA source contract](references/qa.md#source-specific-contract).
+approved font fallbacks; follow the [runtime contract](references/runtime-contract.md)
+for configuration, HTML hooks, navigation and chart marks.
 Then run from this guide's directory:
 
 ```bash
@@ -84,7 +85,7 @@ Write these **five steps for future generation** into the package's `SKILL.md`:
 4. **Run QA:** use the planned page count; diagnose geometry before changing copy.
    At unresolved 10px fitting, inspect text boxes, glyph bounds and line height first.
    Fix the cause and rerun on the same final HTML.
-   No need to repeat passing [interaction checks](references/qa.md#interaction-checks-already-included)
+   No need to repeat passing [interaction checks](references/runtime-contract.md#interaction-check-scope)
    on an unchanged deck.
 5. **Review as needed:** inspect only QA-designated pages unless a full review is requested.
    When review is required, record the receipt and rerun final QA; otherwise a passing

@@ -10,6 +10,9 @@ During generation, prefer a source layout whose regions and capacity fit. If non
 
 Keep the source upload and library originals immutable. Upload analysis preserves source compositions and copies the neutral library; it does not pre-style the full library. Library adaptations belong to the generated working deck, not the original-source inventory.
 
+When changing slide structure, navigation or charts, follow the
+[runtime contract](runtime-contract.md) for the required HTML hooks.
+
 ## Background elements and recipes
 
 Extract reusable elements and preserve their source combinations in `design-system.md`:

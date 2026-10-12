@@ -115,7 +115,7 @@ const countClass = (html, className) => [...htmlElements(html)]
   .filter(({attrs}) => (attrs.get("class") || "").split(/\s+/).includes(className)).length;
 for (const file of ["SKILL.md", "design-system.md", "layouts/_shell.html", "layouts/README.md", "layouts/source-index.json", "styles/template.css",
   "scripts/dom-metrics.js", "scripts/fit-text.js", "scripts/navigation.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "tools/run.sh", "tools/verify-package.mjs",
-  "references/qa.md", "references/typography-fit.md", "references/layout-reuse.md", "library/README.md", "library/references/catalog.md", "library/styles/geometry.css"]) {
+  "references/qa.md", "references/runtime-contract.md", "references/typography-fit.md", "references/layout-reuse.md", "library/README.md", "library/references/catalog.md", "library/styles/geometry.css"]) {
   checkResource(file, root, "Required package file");
 }
 try {
