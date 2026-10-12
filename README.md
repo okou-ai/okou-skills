@@ -59,6 +59,26 @@ To add a new skill or improve an existing one:
 3. Include a `SKILL.md` file with tested usage examples.
 4. Submit a pull request.
 
+## Analysis and report skills
+
+| Skill | Responsibility |
+| --- | --- |
+| [analysis-methods](analysis-methods/SKILL.md) | Choose methods from the question and evidence, perform analysis, and support conclusions. Works independently for chat answers and report content. |
+| [business-skill-index](business-skill-index/SKILL.md) | Find scenario-specific document structures, templates, and checks in pinned external references. |
+| [gen](gen/SKILL.md) | Use Okou artifact-generation commands and their available providers. |
+| [office-files](office-files/SKILL.md) | Author, edit, check, and deliver Word, Excel, and PDF files. |
+
+Use only the capabilities the task needs. Analysis does not require artifact
+generation, and an existing report can be reformatted without repeating its
+analysis. `gen` and `office-files` can use `analysis-methods` when installed;
+they do not bundle it or install it implicitly.
+
+The `data-analysis` marketplace bundle includes `analysis-methods` alongside
+the existing SQL, statistics, profiling, and quality-check skills. The directory
+can also be installed on its own using the direct-download method above.
+Registering a skill here does not change Okou's application-managed default
+skill list.
+
 ## Business document reference index
 
 [business-skill-index](business-skill-index/SKILL.md) provides a

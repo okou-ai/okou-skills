@@ -27,7 +27,7 @@ point to its inputs and reproducible calculation rather than pretend that a
 source published that value. Separate facts, calculations, estimates, forecasts,
 interpretations and recommendations.
 
-The [synthetic example](assets/evidence.example.json) illustrates this structure:
+The [synthetic example](../assets/evidence.example.json) illustrates this structure:
 
 | Record | Fields |
 | --- | --- |
@@ -41,10 +41,10 @@ unverified; assumptions are not observations. `source_ids` refer to inputs and
 supporting passages. `basis` identifies the inference or local code/query/formula
 and output. Conditional and unverified statements must disclose their limits.
 
-From the installed `gen` directory:
+From the installed `analysis-methods` skill directory:
 
 ```bash
-python3 analysis/scripts/check_evidence.py /path/to/evidence.json
+python3 scripts/check_evidence.py /path/to/evidence.json
 ```
 
 The checker detects missing fields, duplicate IDs, invalid dates, dangling source

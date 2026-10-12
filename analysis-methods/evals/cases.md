@@ -1,10 +1,12 @@
 # Behavioral checks
 
 These synthetic cases evaluate method selection and supported conclusions.
-Run the candidate `gen` skill with only the task and named fixture. Give the
-evaluator this rubric after completion, not to the agent doing the task. Use a
+Run the candidate `analysis-methods` skill with only the task and named fixture.
+Give the evaluator this rubric after completion, not to the agent doing the task. Use a
 temporary workspace; do not send messages, publish files, or call paid services.
-Helper tests do not substitute for these behavioral checks.
+Helper tests do not substitute for these behavioral checks. Install only this
+skill for the analytical cases to check that it works without `gen` or
+`office-files`.
 
 ## Conversion change
 

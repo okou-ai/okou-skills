@@ -133,10 +133,11 @@
     },
     {
       "name": "data-analysis",
-      "description": "Data analysis toolkit — multi-dialect SQL patterns, statistical methods, dataset profiling, and analysis quality assurance.",
+      "description": "Data analysis toolkit — analytical method selection, evidence-backed reports, multi-dialect SQL patterns, statistics, dataset profiling, and analysis quality assurance.",
       "source": "./",
       "strict": false,
       "skills": [
+        "./analysis-methods",
         "./sql-cookbook",
         "./stats-methods",
         "./data-profiling",

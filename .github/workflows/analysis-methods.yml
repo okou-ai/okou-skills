@@ -3,14 +3,16 @@ name: Analysis Methods
 on:
   pull_request:
     paths:
-      - "gen/analysis/**"
+      - "analysis-methods/**"
+      - ".claude-plugin/marketplace.json"
       - "gen/SKILL.md"
       - "office-files/SKILL.md"
       - ".github/workflows/analysis-methods.yml"
   push:
     branches: [main]
     paths:
-      - "gen/analysis/**"
+      - "analysis-methods/**"
+      - ".claude-plugin/marketplace.json"
       - "gen/SKILL.md"
       - "office-files/SKILL.md"
       - ".github/workflows/analysis-methods.yml"
@@ -27,6 +29,6 @@ jobs:
         with:
           python-version: "3.12"
       - name: Verify analytical helper behavior
-        run: python3 -m unittest discover -s gen/analysis/tests -v
+        run: python3 -m unittest discover -s analysis-methods/tests -v
       - name: Validate the documented evidence example
-        run: python3 gen/analysis/scripts/check_evidence.py gen/analysis/assets/evidence.example.json
+        run: python3 analysis-methods/scripts/check_evidence.py analysis-methods/assets/evidence.example.json

@@ -1,9 +1,18 @@
-# Analysis and reports
+---
+name: analysis-methods
+description: Select and apply analytical methods for business research, data interpretation, option comparisons, and evidence-backed reports. Use when a question needs supported conclusions, including answers delivered directly in chat.
+---
 
-Use this guide for business research, data analysis, option comparisons, and
+# Analysis methods
+
+Use this skill for business research, data analysis, option comparisons, and
 reports that need supported conclusions. Preserve the user's question, source
 restrictions, language, template, and delivery format. Scale effort to the
 decision: a single metric does not need a research dossier.
+
+Analysis can finish directly in chat. Formatting-only edits and ordinary prose
+revisions do not need this workflow. Reuse completed analysis when changing its
+output format.
 
 ## Define and route
 
@@ -13,8 +22,8 @@ information that would materially change the analysis. Otherwise state useful
 assumptions and continue. An exploratory request can start with a brief survey
 before committing to a method.
 
-Read [methods.md](methods.md) and select the smallest set of methods that answers
-the question. Record a short working plan for substantive tasks:
+Read [methods.md](references/methods.md) and select the smallest set of methods
+that answers the question. Record a short working plan for substantive tasks:
 
 | Question | Method and why it fits | Required evidence | Available / missing | Expected analysis output |
 | --- | --- | --- | --- | --- |
@@ -27,13 +36,13 @@ without its required evidence stays a proposed analysis.
 ## Execute only the relevant branches
 
 - **Tables, CSV, spreadsheets, metrics, or experiments:** read
-  [data-analysis.md](data-analysis.md). Inspect the actual data, execute
+  [data-analysis.md](references/data-analysis.md). Inspect the actual data, execute
   calculations, and retain reproducible queries or code.
 - **External research, conflicting sources, or inferred explanations:** read
-  [evidence.md](evidence.md). Gather evidence against the plan, examine rival
-  explanations, and return to collection when a consequential gap remains.
-- **Substantive report:** use [reporting.md](reporting.md) after the analysis.
-  Organize the report around findings and the user's question.
+  [evidence.md](references/evidence.md). Gather evidence against the plan, examine
+  rival explanations, and return to collection when a consequential gap remains.
+- **Substantive report:** use [reporting.md](references/reporting.md) after the
+  analysis. Organize the report around findings and the user's question.
 
 Use Okou's available search, file, and connector tools under the current task's
 authorization. Inspect current CLI help when needed. Attachment-only research
@@ -56,11 +65,12 @@ user needs them to use or reproduce the result.
 
 ## Deliver in the requested form
 
-Honor the requested format first. Keep short answers in chat. Use CSV for system
-imports, a spreadsheet for calculations or multi-sheet data, an editable document
-for prose the user will revise, and a hosted view for browsable reports. Follow
-the available `office-files` skill for Word, Excel, or PDF and this skill's
-generation workflow for HTML or presentations. Respect any attached generation
-template. Reuse the same checked numbers, content, and citations across formats.
+Honor the requested format first. Keep short answers in chat. When a file or
+hosted artifact is requested, hand the checked findings to the available output
+skill: `office-files` for Word, Excel, or PDF; `gen` for Okou's artifact-generation
+commands. Use the current environment's tools if those skills are unavailable.
+Analysis itself does not require either skill or a generation command. Respect
+any attached template and reuse the same checked numbers, content, and citations
+across formats.
 
 Adaptation provenance and retained MIT notices: [sources.md](sources.md).

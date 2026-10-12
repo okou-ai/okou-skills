@@ -20,10 +20,10 @@ Do not claim to have read sheets or recalculated formulas that were not inspecte
 
 ## Optional CSV profile
 
-From the installed `gen` skill directory, run:
+From the installed `analysis-methods` skill directory, run:
 
 ```bash
-python3 analysis/scripts/profile_csv.py /path/to/data.csv \
+python3 scripts/profile_csv.py /path/to/data.csv \
   --numeric revenue orders --key order_id > /path/to/profile.json
 ```
 

@@ -1,16 +1,13 @@
 ---
 name: gen
-description: Analyze business data and research evidence, develop reports, and use Okou generation pipelines for images, presentations, websites, and designs.
+description: Use Okou generation pipelines for images, presentations, websites, reports, and designs.
 ---
 
 # Gen
 
-For data analysis, business research, or a report whose conclusions need analysis,
-start with [the analysis guide](analysis/guide.md). It routes to methods by the
-question and available evidence, then to the requested output format. Reuse
-completed analysis across formats. A short analytical answer needs no generation
-command. Skip the analysis workflow for formatting-only edits and ordinary prose
-revisions. For visual and artifact-generation tasks, continue below.
+For artifacts whose conclusions require new analysis, use `analysis-methods`
+when available, then reuse its checked findings here. Analysis delivered in chat
+and ordinary prose revisions do not need this generation workflow.
 
 Use this skill to generate user-facing artifacts through the Okou CLI:
 

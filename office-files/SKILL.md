@@ -6,9 +6,8 @@ description: Create or edit Word documents, Excel spreadsheets, and PDFs, includ
 # Office files
 
 For reports requiring research, data interpretation, or calculations, use the
-default `gen` skill's analysis guide before rendering. Reuse completed analysis;
-formatting-only edits do not need a new analysis. In standalone installations
-without `gen`, use the available analytical tools and state evidence limitations.
+`analysis-methods` skill when available before authoring. Reuse completed
+analysis; formatting-only edits do not need a new analysis.
 
 Honor user requirements and supplied templates. Start edits from the original file and preserve unrelated content and formatting.
 
