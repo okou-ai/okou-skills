@@ -144,7 +144,7 @@
       if (M.textOverflow(element, limit)) fail("textOverflow", page, element, "Text crosses its safe area or is clipped by an ancestor");
       const background = ground(element);
       if (!background) {
-        review("unknownTextGround", page, "Text over imagery, gradients or overlapping paint layers needs source-style visual review");
+        review("unknownTextGround", page, "Visually confirm text readability over imagery, gradients or paint layers; readable texture/image overlap needs no content changes");
       } else {
         const style = getComputedStyle(element);
         if (element instanceof SVGElement && (/url\(/.test(style.fill) || (style.fill === "none" && style.stroke !== "none"))) {

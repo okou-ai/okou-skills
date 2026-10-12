@@ -21,12 +21,19 @@ The maximum reduction is **20%**. If no step fits, or a step would put text belo
 source text below 11px stays unchanged for QA to report. No need to recreate this
 logic or turn fitted pixels into new source defaults.
 
-Keep title/body `data-fit-region` areas disjoint with meaningful `data-text-role`
-labels. These retain local measurement bounds while sharing the page's scale.
-For `fit-floor`, inspect text boxes, glyph bounds, line height and ancestor clipping
-first. Shorten, recompose or split only when measurements show a genuine capacity
-limit. Keep text visible and editable. QA blocks `fit-floor`, scaling below 80%
-and text below 11px independently of its final overflow checks.
+`.fit` defines the page's content area. Preserve valid source measurement containers;
+use an additional `data-fit-region` only for a genuinely constrained subarea, such as
+a fixed content panel. Keep these areas disjoint; all share the page's scale.
+For ordinary flow titles/body, `data-text-role` labels are sufficient. No extra fit
+boundary is needed on the text element itself: its box can shrink with the font or
+exclude naturally overhanging glyphs even when the page has ample space.
+
+For `fit-floor`, compare glyph bounds with the intended container, safe area and
+ancestor clipping first. If a self-sized title was incorrectly marked as a fit region,
+use its actual container or remove that extra hook before changing the copy or size.
+Shorten, recompose or split only for a genuine capacity limit. Keep text visible and
+editable. QA blocks `fit-floor`, scaling below 80% and text below 11px independently
+of its final overflow checks.
 
 Source layouts and selected library fragments use the same runtime. Follow
 [qa.md](qa.md) for final checks, required visual review and delivery.

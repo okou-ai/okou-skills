@@ -18,8 +18,9 @@ paths are relative to that file. Purpose and capacity are selection hints.
    content. Derive chart geometry, units, baselines, segment sums and bubble areas from
    real data. Keep `data-plot-mark` hooks and fill bar/area `data-value` with the actual
    quantity, including zero or negative values. Use point/line hooks for other marks.
-4. Keep disjoint title/body `data-fit-region` measurement areas, one shared page
-   scale and the **11px logical-canvas minimum**. SVG sizes use viewBox units; `PresentationMetrics.fontFactor(element)`
+4. Retain disjoint `data-fit-region` hooks only where the adapted layout has genuinely
+   constrained subareas; ordinary flow text uses the enclosing `.fit`. Keep one shared
+   page scale and the **11px logical-canvas minimum**. SVG sizes use viewBox units; `PresentationMetrics.fontFactor(element)`
    maps them to logical pixels. Diagnose unresolved fitting through the geometry
    guidance in [typography-fit.md](../references/generate/typography-fit.md).
 

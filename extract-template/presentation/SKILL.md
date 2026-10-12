@@ -89,7 +89,8 @@ Create the source index and fragments in one batch; preserve every distinct comp
 and background variant. Equivalent structures may share a layout with explicit source-page
 coverage. Keep text, shapes, tables and ordinary charts editable in HTML/CSS/SVG.
 Use package-relative assets and `.deck > .slide`, one `.stage` and a `.fit` root per
-slide, with disjoint `data-fit-region` measurement areas that share one page-wide scale.
+slide. Extra `data-fit-region` hooks are only for genuinely constrained subareas;
+ordinary flow text needs no extra measurement boundary. All content shares one scale.
 
 `layouts/_shell.html` is the shared HTML document with one `.deck` insertion point.
 Its `.deck` can be empty or retain source examples; no need to assemble every source

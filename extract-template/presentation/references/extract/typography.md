@@ -14,7 +14,9 @@ Retain source runs below 11px as evidence; generation QA flags them against the
 fixed **11px logical-canvas minimum** for deliberate adaptation. Record any approved
 fallback families in the design notes and [QA configuration](qa-config.md).
 
-Create disjoint `data-fit-region` areas with meaningful `data-text-role` labels.
+Use `.fit` for the content area and `data-text-role` for text roles. Extra disjoint
+`data-fit-region` hooks are only for genuinely constrained subareas; self-sized
+titles/body need no additional fit boundary.
 The installer supplies the shared fitter once in the shell; its generation usage
 is documented in [typography-fit.md](../generate/typography-fit.md).
 No routine reconstruction or export pass is needed to save an extracted template.

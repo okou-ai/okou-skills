@@ -11,8 +11,11 @@ Carry over the selected source layout's `data-layout`/`data-source-profile` and
 required `data-chrome` roles so its recorded safe areas and fixed elements still apply.
 
 Use `.deck > .slide` with exactly one `.stage` per slide and a `.fit` content root.
-Add disjoint `data-fit-region` hooks for local title/body measurement bounds;
-the whole `.fit` content shares one fitting scale.
+The `.fit` root supplies the default measurement area. Extra `data-fit-region` hooks
+are only for genuinely constrained subareas; preserve valid source containers and
+keep them disjoint. Ordinary titles/body need `data-text-role` labels, with no extra
+fit boundary on a self-sized text element. See [typography-fit.md](typography-fit.md);
+the whole content shares one fitting scale.
 Keep text editable in real HTML or SVG text nodes. Hidden pages need their authored
 `data-fit-display` when a stylesheet conceals the display mode. Preserve source-compatible backgrounds,
 image crops, frames and absolute overlays: no foreign palette, universal 6% margin,

@@ -22,11 +22,12 @@ Keep the stored template, source index and library originals unchanged. Follow t
 - Select a fitting layout first, then a source-observed recipe suited to its role
   and content density. Explicit selections override defaults.
 - Respect the recipe's usable content area, compatible colors, placement, scale,
-  crop and repetition rules. Keep decoration out of body-copy regions unless the
-  source supports it; choose quiet backgrounds for dense content.
+  crop and repetition rules. Textures and imagery may overlap body copy when the
+  letters remain clear with sufficient visual contrast. Readable overlap needs no
+  content or decoration changes; [QA review](qa.md) judges actual readability.
 - Keep backgrounds behind content without changing its flow or intercepting clicks.
   Preserve shared logos/footers, asset proportions and documented color variants.
-- Resolve decoration conflicts through the recipe while preserving typography.
+- Resolve actual readability problems through the recipe while preserving typography.
   Actual content overflow uses the [shared fitter](typography-fit.md) with its 11px
   floor; source sizes are initial styles. Document inferred combinations and new
   layouts while preserving shared brand rules.

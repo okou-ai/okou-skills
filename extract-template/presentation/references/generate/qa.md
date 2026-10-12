@@ -30,6 +30,12 @@ node <template-dir>/tools/qa.mjs --final <web-dir>/index.html \
 ## 3. Review only when required
 
 Inspect only pages listed in `reviewRequired`, unless a full review was requested.
+`unknownTextGround` asks for a readability check: textures, imagery and gradients
+may overlap text when the letters remain clear with sufficient visual contrast.
+Intersecting boxes or transparent image margins alone are not a defect. If readable,
+keep the text and artwork unchanged and record the review; no shortening, moving or
+removing content is needed solely to avoid overlap. Adjust actual obscuration or poor
+readability.
 Capture the authored HTML; the prepared copy becomes available only after QA passes:
 
 ```bash
