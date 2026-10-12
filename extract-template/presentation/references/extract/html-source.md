@@ -1,7 +1,7 @@
 # Batch an HTML source
 
-Use during extraction, including HTML prepared from a PDF by [pdf-source.md](pdf-source.md).
-That helper already creates the inventory below; continue with its outputs.
+Use during HTML extraction. PDF input uses [pdf-source.md](pdf-source.md), whose helpers
+already run this inventory and assemble the package; a second pass is not needed.
 Keep the original HTML in the work directory; for a URL,
 download its entry HTML once. A dynamic site may need the browser-serialized DOM.
 This stdlib-only helper inventories all pages and exports their original

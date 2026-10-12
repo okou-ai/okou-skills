@@ -15,7 +15,7 @@ presentation language.
 | --- | --- | --- |
 | This `SKILL.md`, `references/extract/` | Extract and record the source | No |
 | `references/generate/` | Generate, check and deliver new decks | Yes, at the same paths |
-| `scripts/prepare-pdf.py`, `scripts/inventory-html.py`, `scripts/source-derivatives.py`, `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
+| Source helpers in `scripts/` and `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
 
 The installer copies the generation guides and runtime by an explicit file list.
 The package's own `SKILL.md` is its generation entrypoint.
@@ -25,7 +25,7 @@ The package's own `SKILL.md` is its generation entrypoint.
 | Input | Extraction route |
 | --- | --- |
 | HTML file, directory or URL | [Inventory the HTML](references/extract/html-source.md) and reuse its fragments, CSS and assets. |
-| PDF deck | [Convert with pdf2htmlEX](references/extract/pdf-source.md), then follow the same HTML extraction route. |
+| PDF deck | [Prepare, inspect and assemble](references/extract/pdf-source.md) through the HTML extraction contract; after `PACKAGE_VALID`, continue at step 5. |
 | PPTX / PPT | Read available structure/style metadata together with the rendered pages. |
 | Slide images | Infer layouts and styling from the supplied pages. |
 

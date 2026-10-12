@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Convert a PDF deck with pdf2htmlEX, then use the shared HTML inventory."""
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -56,8 +57,9 @@ def converter_path(explicit=None):
     return executable
 
 
-def prepare(source, work, converter=None):
+def prepare(source, work, converter=None, inspect=False):
     started = time.monotonic()
+    started_at = datetime.now(timezone.utc).isoformat()
     source, work = source.resolve(), work.resolve()
     with source.open("rb") as stream:
         if b"%PDF-" not in stream.read(1024):
@@ -82,10 +84,12 @@ def prepare(source, work, converter=None):
         command += [f"--embed-{resource}", "0"]
     command += [str(source), html.name]
     conversion_started = time.monotonic()
+    conversion_started_at = datetime.now(timezone.utc).isoformat()
     log = converted / "conversion.log"
     with log.open("w") as output:
         subprocess.run(command, check=True, stdout=output, stderr=subprocess.STDOUT)
     converted_seconds = time.monotonic() - conversion_started
+    conversion_finished_at = datetime.now(timezone.utc).isoformat()
     helper = Path(__file__).with_name("inventory-html.py")
     result = subprocess.run([sys.executable, str(helper), "--input", str(html),
                              "--slide-class", "pf", "--stage-class", "pc",
@@ -93,12 +97,22 @@ def prepare(source, work, converter=None):
                             check=True, capture_output=True, text=True)
     summary = json.loads(result.stdout)
     receipt = {
+        "startedAt": started_at, "conversionStartedAt": conversion_started_at,
+        "conversionFinishedAt": conversion_finished_at,
+        "inventoryFinishedAt": datetime.now(timezone.utc).isoformat(),
         "sourceFilename": source.name, "sourcePath": str(source), "sourceSha256": source_hash,
         "converterVersion": (version.stdout + version.stderr).strip(), "command": command,
         "html": str(html), "inventory": summary["inventory"], "pageCount": summary["pageCount"],
         "conversionSeconds": round(converted_seconds, 3),
         "elapsedSeconds": round(time.monotonic() - started, 3),
     }
+    (converted / "conversion.json").write_text(json.dumps(receipt, indent=2) + "\n")
+    if inspect:
+        result = subprocess.run(["node", str(helper.with_name("inspect-pdf.mjs")), "--work-dir", str(work)],
+                                check=True, capture_output=True, text=True)
+        receipt["inspection"] = json.loads(result.stdout)
+        receipt["elapsedSeconds"] = round(time.monotonic() - started, 3)
+    receipt["finishedAt"] = datetime.now(timezone.utc).isoformat()
     (converted / "conversion.json").write_text(json.dumps(receipt, indent=2) + "\n")
     return receipt
 
@@ -109,9 +123,10 @@ def main():
     parser.add_argument("--work-dir", type=Path, required=True,
                         help="Extraction work directory outside the saved template")
     parser.add_argument("--converter", help="Existing pdf2htmlEX executable; otherwise reuse or cache it")
+    parser.add_argument("--inspect", action="store_true", help="Also summarize rendered text visibility and page assets once")
     args = parser.parse_args()
     try:
-        receipt = prepare(args.input, args.work_dir, args.converter)
+        receipt = prepare(args.input, args.work_dir, args.converter, args.inspect)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         detail = error.stderr if isinstance(error, subprocess.CalledProcessError) else None
         parser.exit(1, f"PDF preparation failed: {detail or error}\n"

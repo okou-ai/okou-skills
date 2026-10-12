@@ -149,6 +149,8 @@ jobs:
         run: python3 extract-template/presentation/tests/inventory-html.test.py
       - name: PDF conversion to HTML inventory
         run: python3 extract-template/presentation/tests/prepare-pdf.test.py
+      - name: PDF package assembly
+        run: python3 extract-template/presentation/tests/assemble-pdf.test.py
       - name: Source preview and upload outputs
         run: |
           python3 -m pip install --quiet Pillow pypdf
