@@ -11,19 +11,21 @@ User requirements and supplied templates take priority. Start narrow edits from 
 
 Prefer native authoring: create files directly with tools that support the target format and language.
 
+Use the reusable tools in [references/native-authoring.md](references/native-authoring.md) for environment setup, ordinary paired reports, and cached checks. They add no report outline or palette. Prefer the preinstalled `/opt/office/bin/python`; `scripts/office_env.py` selects an available interpreter and fills missing dependencies on older hosts.
+
 - **Word**: for a new document, open [assets/blank.docx](assets/blank.docx) with `python-docx.Document(...)` and save a new file. Use its named styles: `Title`, `Heading 1`–`Heading 3`, `Normal`, `List Bullet`, `List Number`, `Table Text`, `Table Header`, `Table Title`, `Figure`, `Caption`, and `Source`. Keep paragraphs and tables editable.
 - **PDF**: copy [assets/blank.typ](assets/blank.typ), append content, and compile with `typst compile report.typ report.pdf` or Python's `typst.compile('report.typ', output='report.pdf')`. Use `#doc-title[...]`, headings, tables, and figure captions to inherit typography. Other native engines may use the same baseline. Markdown conversion is optional; DOCX-to-PDF serves Word layout checks or a requested matching export.
 - **Excel**: write cells and formulas with `openpyxl`. When results must already be displayed in the file, recalculate with a compatible calculation engine; do not replace formulas with static values.
 
 ## Execution constraints
 
-1. **Check the environment once.** Check libraries, fonts, and renderers together; reuse installed dependencies and install only missing ones. For Word, verify that the renderer can load a minimal DOCX; command availability alone is insufficient. Record tool versions during this check, not again at delivery.
+1. **Check the environment once.** From your working directory, run `python3 <skill-dir>/scripts/office_env.py --formats docx pdf --install-missing`, selecting only needed formats and adding `--charts` when used. Reuse its returned Python path and capability result. It checks libraries/fonts together and verifies actual Writer import; command availability alone is insufficient. Do not repeat installations, font searches, or failed probes without a relevant change.
 
-2. **Reuse the style from the first build.** Inherit the blank assets' typography and page settings; apply the table and figure styles explicitly. They contain no report outline, palette, or decoration. Adapt fonts to the language as described in `style.md`; avoid conflicting theme or run overrides. Keep image paragraphs at automatic or minimum line spacing and let rows grow. Draw any headers/footers once. Paired Word/PDF files share content, calculations, and the baseline; compute totals, ratios, and scores in code.
+2. **Reuse content and style from the first build.** Use shared content/data and the blank assets; compute totals, ratios, and scores once. For ordinary paired reports, `scripts/office.py` supplies native Word/PDF methods without rewriting two generators. Apply table/figure styles explicitly when authoring directly. Adapt script fonts as in `style.md`, remove conflicting overrides, let image paragraphs and rows grow, and draw headers/footers once. Run the baseline structural check during generation so size, alignment, header, and image-spacing defects are caught before visual review.
 
 3. **Trial complex layouts before full generation.** Try the widest table and largest chart with real content at final sizes. Adjust columns, split tables, or add pages when needed; preserve the specified type sizes.
 
-4. **Fix issues in batches.** Review the relevant pages, collect the issues, then edit and regenerate together. If two successive small adjustments fail to resolve the same issue, change the layout structure instead of continuing to tweak individual values.
+4. **Batch work and corrections.** Combine independent reads, calculations, and checks into as few tool calls as practical. Use `scripts/review.py` to render requested formats together and reuse unchanged results. Collect page issues, then edit and regenerate together. If two successive small adjustments fail to resolve the same issue, change the layout structure.
 
 5. **Retry only after a relevant change.** Diagnose whether a failed Word conversion comes from the file or the environment. Do not repeat the same failed command while the file, environment, and parameters remain unchanged.
 
