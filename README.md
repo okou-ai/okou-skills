@@ -77,6 +77,8 @@ copies of the upstream skill collection.
 [artifact-layout](artifact-layout/SKILL.md) maintains report and document layout
 resources independently of `gen`: a 121-term bilingual vocabulary, three visual
 recipes, four semantic-token themes, and shared HTML/Word/PDF components. Its
+ranked [Top 30 expressions](artifact-layout/references/top30.md) each have a
+runnable specimen, with four theme variants in the browsable preview. The
 preview is generated from the same resources as actual reports. Analysis and
 factual quality remain with their existing workflows.
 
