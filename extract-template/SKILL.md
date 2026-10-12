@@ -1,58 +1,62 @@
 ---
 name: extract-template
-description: "Decide what an uploaded file is — a deck, a Word document, a PDF document, or artwork — and hand it to the template-extraction guide that matches. Use when asked to extract a template from a deck or document, turn a PDF into a Word template, save an image style as a reusable template, apply a company template to Markdown, or save a file's visual language as a reusable template."
+description: "Extract a reusable presentation, document, or illustration template from source files. Use when asked to extract a deck or Word template, turn a PDF into a Word template, apply a company template to Markdown, or save an image style for reuse."
 ---
 
 # Extract a reusable template from a file
 
-Look at what the file holds, decide what it is, follow that guide to the end.
-Run the commands below from the directory containing this guide.
+Choose the intended template, select its extraction guide, then follow that guide
+through inspection, extraction, validation and saving.
 
-Render a `.pptx` or `.ppt` first. An image is already viewable.
+## 1. Choose the template type
 
-```bash
-okou presentation screenshot --input <source.pptx|source.ppt> --out shots
-```
+Use the user's requested template type. For example, a report can supply the
+visual style for a presentation template. When the user leaves the type open,
+identify what the source contains:
 
-Render a PDF or Word document at its own page proportions before judging layout:
+| Template type | Source content |
+| --- | --- |
+| Presentation | Slides organized around individual ideas, with display text and visual compositions |
+| Document | A report, letter, resume, invoice or other document with reading order and document structure |
+| Illustration | Artwork whose drawing style will be reused |
 
-```bash
-node scripts/render-document.mjs --input <source.pdf|source.docx> --out source-render
-```
+Classify PDFs and page images by their content. A slide screenshot belongs to
+presentation; a scanned document belongs to document. Sparse text or a short page
+count alone does not make a document a slide deck. Several artwork references in
+one drawing style form one illustration template.
 
-Use a new output directory for each render. Keep the original as the source;
-use the returned PDF and page images for inspection.
+## 2. Select the source and guide
 
-| The file is | Go to |
-|---|---|
-| a deck — `.pptx`, `.ppt`, an image deck, or a `.pdf` whose pages are slides | `presentation/SKILL.md` |
-| a Word document — `.docx` | `docx/SKILL.md` |
-| a PDF document — pages of prose, not slides | `pdf/SKILL.md` |
-| artwork — `.png`, `.jpg`, or several images of one drawing style | `illustration/SKILL.md` |
+Keep the original file. When both an authoring file and its export are available,
+prefer the authoring file: `.pptx` over its PDF, `.docx` over its PDF.
 
-A page carrying one idea in display type is a slide. A page carrying running
-prose under a repeated header, footer, or page number is a document. A picture with no
-reading order is artwork.
+| Chosen template | Available source | Guide |
+| --- | --- | --- |
+| Presentation | `.pptx`, `.ppt`, PDF or ordered slide images | [Presentation extraction](presentation/SKILL.md) |
+| Document | Word file | [Word extraction](docx/SKILL.md) |
+| Document | PDF | [PDF extraction](pdf/SKILL.md) |
+| Illustration | One or more artwork images | [Illustration extraction](illustration/SKILL.md) |
 
-Re-save a `.doc`, or a `.docx` written by WPS, as `.docx` from Word first.
+Prepare another format only when the selected guide requires it:
 
-Four rules override the table:
+- Scanned document images: assemble an ordered PDF for the PDF guide.
+- Cross-format reuse: export slides to PDF for a Word-style template, or a Word
+  report to PDF for a presentation template. The requested template type stays
+  the same.
 
-- A deliverable the user names beats the table. "Turn these slides into a Word
-  template" is `docx/`; "save this report's look as a presentation template" is
-  `presentation/`.
-- Extract from the authoring file when it sits beside an export of itself: `.docx`
-  over its PDF, `.pptx` over its PDF.
-- One or two pages at a paper size is never slides, however sparse. A resume and
-  an invoice carry as little text as a slide and are still documents.
-- Several images at once are one style to `illustration/`, not several
-  templates. A single image of a page — a scanned document, a screenshot of
-  slides — is that page's kind, not artwork.
+Keep conversions alongside the original source.
 
-`cd` into the branch directory; every path inside a branch guide is relative to
-it. Both document guides start with
-[`document-reuse.md`](document-reuse.md) to choose the reuse scope and package.
+## 3. Follow the selected guide
 
-For decks, `presentation/SKILL.md` contains the complete extraction and saving path.
-Its local library, fitter and QA tools are bundled for later generation; no separate
-catalogue or resource download is needed.
+`cd` into the selected guide's directory; its commands and paths are relative to
+that directory.
+
+The guide handles source rendering when needed. Rendering produces page images
+for inspecting layout, typography, colours and image crops; those captures become
+the visual reference for extraction. Keep the original for structure and style
+metadata. Reuse existing source captures; no need to render them again.
+
+Document guides use [document-reuse.md](document-reuse.md) to choose between slot
+filling, structure and expression reuse, and style extraction. The presentation
+guide separately identifies extraction files and the generation files bundled
+into the saved template.

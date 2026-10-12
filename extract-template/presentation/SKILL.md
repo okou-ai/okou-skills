@@ -22,7 +22,12 @@ The package's own `SKILL.md` is its generation entrypoint.
 
 ## 1. Inspect the source
 
-Render the source once, or reuse existing ordered source captures:
+Create ordered page images to inspect the original layouts, typography, colours
+and image crops. These captures are the visual reference for extraction and the
+saved template's source preview. Keep the original for structure and style metadata.
+
+Reuse existing ordered captures or supplied slide images. Otherwise, render once
+into a new output directory:
 
 ```bash
 okou presentation screenshot --input <source.ppt|source.pptx|source.pdf> --out <source-pages-dir>

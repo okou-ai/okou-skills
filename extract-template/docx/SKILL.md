@@ -10,13 +10,20 @@ resources match the selected reuse scope.
 
 Run every command below from `extract-template/docx/`.
 
-If the original has not been rendered, render it before choosing the reuse scope:
+For `.doc` or WPS-authored `.docx` input, first save a separate `.docx` copy from
+Word and keep the supplied original.
+
+Create page images to inspect the document's layout, typography and fillable
+areas, then choose the reuse scope. Keep the original for its editable structure
+and styles. Reuse existing source captures; otherwise render once at the original
+page proportions:
 
 ```bash
 node ../scripts/render-document.mjs --input <source.docx> --out source-render
 ```
 
-Inspect its page images. Use a new output directory for each later render.
+Inspect the returned page images; the returned PDF is also available for reference.
+Use a new output directory for each render.
 
 ## Choose the reuse scope
 

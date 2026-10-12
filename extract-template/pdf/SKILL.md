@@ -8,17 +8,21 @@ description: "Extract a template skill from a PDF document for filling slots, re
 Input: one `.pdf`. Output: a loadable skill package whose instructions and
 resources match the selected reuse scope.
 
-**If the original .docx exists, use `../docx/SKILL.md` instead.** If the PDF's
-pages are slides rather than a document, use `../presentation/SKILL.md`.
+**If the original .docx exists, use `../docx/SKILL.md` instead.** For slide PDFs,
+use `../presentation/SKILL.md` unless the user requested a document template.
 
 Run every command below from `extract-template/pdf/`.
 
-If the original has not been rendered, render it before choosing scope:
+Create page images to inspect the document's layout, typography and fillable
+areas, then choose the reuse scope. Keep the original for text and geometry.
+Reuse existing source captures; otherwise render once at the original page
+proportions:
 
 ```bash
 node ../scripts/render-document.mjs --input <source.pdf> --out source-render
 ```
 
+Inspect the returned page images; the returned PDF is also available for reference.
 Use a new output directory for each render.
 
 ## Choose the reuse scope
