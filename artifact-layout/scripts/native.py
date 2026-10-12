@@ -9,6 +9,8 @@ import subprocess
 from functools import lru_cache
 from pathlib import Path
 
+from primitives import DIRECTIONS, GRAPHICS, heat_color
+
 from render import (
     bundle_image,
     chart_domain,
@@ -43,7 +45,7 @@ def prepare(report, office_dir, formats):
                     "Word figures require PNG/JPEG; provide a raster copy of this SVG"
                 )
         has_charts = any(
-            block["type"] in {"bar-chart", "line-chart", "small-multiples"}
+            block["type"] in {"bar-chart", "line-chart", "small-multiples"} | GRAPHICS
             for block in all_blocks(report)
         )
         if has_charts and importlib.util.find_spec("PIL") is None:
@@ -79,7 +81,7 @@ def chart_png(block, theme, output, domain=None, label_size=30):
     scale = 2
     image = Image.new(
         "RGB",
-        (geometry["width"] * scale, geometry["height"] * scale),
+        (round(geometry["width"] * scale), round(geometry["height"] * scale)),
         theme["background"],
     )
     draw = ImageDraw.Draw(image)
@@ -243,7 +245,29 @@ def render_word(report, output, source_dir, office_dir):
 
     def draw_block(container, block, width):
         kind = block["type"]
-        if kind in {"bar-chart", "line-chart"}:
+        if kind == "heading":
+            paragraph(container, block["text"], f"Heading {block.get('level', 2) - 1}")
+            return
+        if kind == "standfirst":
+            p = paragraph(container, block["text"])
+            p.runs[0].font.color.rgb = RGBColor.from_string(theme["muted"][1:])
+            return
+        if kind == "metric-sparkline":
+            metric(container, {**block, "source": None})
+            image(
+                container,
+                chart_png(block, theme, output, label_size=640 * 10.5 / width),
+                width,
+            )
+            note(container, block)
+            return
+        if kind in {"target-comparison", "progress"}:
+            title(container, block)
+            p = paragraph(container, block["label"])
+            p.runs[0].bold = True
+            draw_chart(container, {**block, "title": None}, width)
+            return
+        if kind in {"bar-chart", "line-chart"} | GRAPHICS:
             draw_chart(container, block, width, block.get("_domain"))
             return
         if kind == "image-text":
@@ -275,6 +299,17 @@ def render_word(report, output, source_dir, office_dir):
                 paragraph(container, value)
         elif kind == "big-number":
             metric(container, block)
+        elif kind == "change-indicator":
+            p = paragraph(
+                container,
+                DIRECTIONS[block["direction"]] + " " + block["value"],
+                "Layout Quote",
+            )
+            p.runs[0].font.color.rgb = RGBColor.from_string(theme["accent"][1:])
+            p = paragraph(container, block["label"])
+            p.runs[0].bold = True
+            paragraph(container, block["comparison"], "Layout Meta")
+            note(container, block)
         elif kind == "pull-quote":
             paragraph(container, block["text"], "Layout Quote")
             if block.get("attribution"):
@@ -291,16 +326,39 @@ def render_word(report, output, source_dir, office_dir):
                 shading.set(qn("w:fill"), theme["tint"][1:])
                 p._p.get_or_add_pPr().append(shading)
             note(container, block)
-        elif kind == "takeaways":
+        elif kind in {"takeaways", "numbered-list"}:
             for value in block["items"]:
-                paragraph(container, value, "List Bullet")
+                paragraph(
+                    container,
+                    value,
+                    "List Number" if kind == "numbered-list" else "List Bullet",
+                )
             note(container, block)
         elif kind == "timeline":
+            table = container.add_table(rows=0, cols=2)
+            table.autofit = False
+            for index, column in enumerate(table.columns):
+                column.width = Pt(width * (0.25 if index == 0 else 0.75))
             for item in block["items"]:
-                p = paragraph(
-                    container, item["label"] + " — " + item["text"], "List Number"
-                )
-                p.paragraph_format.keep_with_next = False
+                row = table.add_row()
+                row._tr.get_or_add_trPr().append(OxmlElement("w:cantSplit"))
+                for index, value in enumerate([item["label"], item["text"]]):
+                    cell = row.cells[index]
+                    cell.width = Pt(width * (0.25 if index == 0 else 0.75))
+                    p = cell.paragraphs[0]
+                    p.style = "Normal"
+                    p.text = value
+                    if index == 0:
+                        p.runs[0].bold = True
+            note(container, block)
+            paragraph(container, "")
+        elif kind == "process-steps":
+            for item in block["items"]:
+                p = paragraph(container, item["label"], "List Number")
+                p.runs[0].bold = True
+                p.paragraph_format.keep_with_next = True
+                p = paragraph(container, item["text"])
+                p.paragraph_format.left_indent = Pt(18)
             note(container, block)
         elif kind == "figure":
             name = bundle_image((source_dir / block["image"]).resolve(), output)
@@ -316,7 +374,7 @@ def render_word(report, output, source_dir, office_dir):
                     width,
                 )
             note(container, block)
-        elif kind in {"data-table", "comparison-table"}:
+        elif kind in {"data-table", "comparison-table", "heatmap-table"}:
             table = container.add_table(rows=1, cols=len(block["headers"]))
             table.autofit = False
             for column in table.columns:
@@ -331,6 +389,33 @@ def render_word(report, output, source_dir, office_dir):
                     p = cell.paragraphs[0]
                     p.style = "Table Header" if row_index == 0 else "Table Text"
                     p.text = str(value)
+                    properties = cell._tc.get_or_add_tcPr()
+                    margins = OxmlElement("w:tcMar")
+                    for side in ["top", "bottom", "left", "right"]:
+                        margin = OxmlElement("w:" + side)
+                        margin.set(qn("w:w"), "100")
+                        margin.set(qn("w:type"), "dxa")
+                        margins.append(margin)
+                    properties.append(margins)
+                    borders = OxmlElement("w:tcBorders")
+                    border = OxmlElement("w:bottom")
+                    border.set(qn("w:val"), "single")
+                    border.set(qn("w:sz"), "8" if row_index == 0 else "4")
+                    border.set(
+                        qn("w:color"), theme["ink" if row_index == 0 else "rule"][1:]
+                    )
+                    borders.append(border)
+                    properties.append(borders)
+                    if row_index == 0:
+                        shading = OxmlElement("w:shd")
+                        shading.set(qn("w:fill"), theme["tint"][1:])
+                        properties.append(shading)
+                    if kind == "heatmap-table" and row_index:
+                        shading = OxmlElement("w:shd")
+                        shading.set(
+                            qn("w:fill"), heat_color(block, index, value, theme)[1:]
+                        )
+                        cell._tc.get_or_add_tcPr().append(shading)
                     p.paragraph_format.keep_with_next = row_index == 0
                     p.alignment = (
                         WD_ALIGN_PARAGRAPH.RIGHT
@@ -338,6 +423,12 @@ def render_word(report, output, source_dir, office_dir):
                         else WD_ALIGN_PARAGRAPH.LEFT
                     )
             note(container, block)
+            if kind == "heatmap-table":
+                paragraph(
+                    container,
+                    f"{block.get('scaleLabel', 'Color scale')}: {block['domain'][0]} → {block['domain'][1]}",
+                    "Caption",
+                )
             paragraph(container, "")
         else:
             raise ValueError(f"Unknown component: {kind}")
@@ -483,7 +574,39 @@ def render_pdf(report, output, source_dir, office_dir):
 
     def draw_block(block, width=available):
         kind = block["type"]
-        if kind in {"bar-chart", "line-chart"}:
+        if kind == "heading":
+            return (
+                "#heading(level: "
+                + str(block.get("level", 2) - 1)
+                + ", "
+                + literal(block["text"])
+                + ")"
+            )
+        if kind == "standfirst":
+            return (
+                '#block[#set text(fill: rgb("'
+                + theme["muted"]
+                + '"))\n#'
+                + literal(block["text"])
+                + "]"
+            )
+        if kind == "metric-sparkline":
+            return (
+                metric({**block, "source": None})
+                + "\n\n"
+                + chart(
+                    {**block, "period": None, "unit": None, "title": None}, width=width
+                )
+            )
+        if kind in {"target-comparison", "progress"}:
+            return (
+                title(block)
+                + "#strong("
+                + literal(block["label"])
+                + ")\n\n"
+                + chart({**block, "title": None}, width=width)
+            )
+        if kind in {"bar-chart", "line-chart"} | GRAPHICS:
             return chart(block, width=width)
         if kind == "image-text":
             return grid(
@@ -511,6 +634,11 @@ def render_pdf(report, output, source_dir, office_dir):
             content += paragraphs(block["paragraphs"])
         elif kind == "big-number":
             content += metric(block)
+        elif kind == "change-indicator":
+            content += (
+                f'#block[#set text(size: 18pt, fill: rgb("{theme["accent"]}"))\n#{literal(DIRECTIONS[block["direction"]] + " " + block["value"])}]\n\n#strong({literal(block["label"])})\n\n#{literal(block["comparison"])}'
+                + notes(block)
+            )
         elif kind in {"callout", "source-note", "pull-quote"}:
             text = "#" + literal(block["text"])
             if kind == "callout":
@@ -524,18 +652,31 @@ def render_pdf(report, output, source_dir, office_dir):
             else:
                 content += "#block[#set text(size: 10pt)\n" + text + "]"
             content += notes(block)
-        elif kind == "takeaways":
+        elif kind in {"takeaways", "numbered-list"}:
             content += (
-                "#list("
+                ("#enum(" if kind == "numbered-list" else "#list(")
                 + ", ".join(literal(item) for item in block["items"])
                 + ")"
                 + notes(block)
             )
         elif kind == "timeline":
+            content += "\n\n".join(
+                "#grid(columns: (1fr, 3fr), gutter: 12pt, strong("
+                + literal(item["label"])
+                + "), "
+                + literal(item["text"])
+                + ")"
+                for item in block["items"]
+            ) + notes(block)
+        elif kind == "process-steps":
             content += (
                 "#enum("
                 + ", ".join(
-                    literal(item["label"] + " — " + item["text"])
+                    "[\n#strong("
+                    + literal(item["label"])
+                    + ")\n\n#"
+                    + literal(item["text"])
+                    + "\n]"
                     for item in block["items"]
                 )
                 + ")"
@@ -555,7 +696,7 @@ def render_pdf(report, output, source_dir, office_dir):
                 + ")"
                 + notes(block)
             )
-        elif kind in {"data-table", "comparison-table"}:
+        elif kind in {"data-table", "comparison-table", "heatmap-table"}:
             headers = (
                 "table.header("
                 + ", ".join(
@@ -567,18 +708,32 @@ def render_pdf(report, output, source_dir, office_dir):
             cells.extend(
                 "table.cell(align: "
                 + ("right" if numeric_cell(block, index, value) else "start")
+                + (
+                    ', fill: rgb("' + heat_color(block, index, value, theme) + '")'
+                    if kind == "heatmap-table"
+                    else ""
+                )
                 + ", "
                 + literal(value)
                 + ")"
                 for row in block["rows"]
                 for index, value in enumerate(row)
             )
+            columns = "(" + ",".join("1fr" for _ in block["headers"]) + ",)"
             content += (
-                f'#table(columns: {len(block["headers"])}, stroke: (x: none, y: .5pt + rgb("{theme["rule"]}")), inset: 5pt, '
+                f'#table(columns: {columns}, stroke: (x: none, y: .5pt + rgb("{theme["rule"]}")), inset: 5pt, '
                 + ",\n".join(cells)
                 + ")"
                 + notes(block)
             )
+            if kind == "heatmap-table":
+                content += (
+                    "\n\n#block[#set text(size: 10pt)\n#"
+                    + literal(
+                        f"{block.get('scaleLabel', 'Color scale')}: {block['domain'][0]} → {block['domain'][1]}"
+                    )
+                    + "]"
+                )
         else:
             raise ValueError(f"Unknown component: {kind}")
         return content

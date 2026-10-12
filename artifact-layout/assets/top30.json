@@ -1,0 +1,185 @@
+{
+  "basis": "Curated priority for business reports, research and analysis: breadth of use, communicative value and composability. This is not a measured frequency ranking.",
+  "entries": [
+    {
+      "rank": 1,
+      "id": "T01",
+      "component": "heading",
+      "reason": "报告的标题层级决定浏览顺序，适用于几乎所有长内容。"
+    },
+    {
+      "rank": 2,
+      "id": "T02",
+      "component": "standfirst",
+      "reason": "先用短导语给出范围和背景，帮助读者进入正文。"
+    },
+    {
+      "rank": 3,
+      "id": "N01",
+      "component": "big-number",
+      "reason": "突出一个关键量值，适合核心结果和规模说明。"
+    },
+    {
+      "rank": 4,
+      "id": "N02",
+      "component": "metric-strip",
+      "reason": "并列展示少量关键指标，适合经营简报和数据摘要。"
+    },
+    {
+      "rank": 5,
+      "id": "T06",
+      "component": "takeaways",
+      "reason": "让读者快速找出已提供的要点，便于管理层扫读。"
+    },
+    {
+      "rank": 6,
+      "id": "C01",
+      "component": "bar-chart",
+      "reason": "类别大小和排名比较的通用图表。"
+    },
+    {
+      "rank": 7,
+      "id": "C03",
+      "component": "line-chart",
+      "reason": "呈现随时间的变化，适合趋势和业务周期。"
+    },
+    {
+      "rank": 8,
+      "id": "B01",
+      "component": "data-table",
+      "reason": "保留精确数值、明细和可核查的对照关系。"
+    },
+    {
+      "rank": 9,
+      "id": "B02",
+      "component": "comparison-table",
+      "reason": "按共同维度比较方案、产品或市场。"
+    },
+    {
+      "rank": 10,
+      "id": "L02",
+      "component": "two-column",
+      "reason": "适合连续长文，改善桌面和印刷报告的阅读节奏。"
+    },
+    {
+      "rank": 11,
+      "id": "L03",
+      "component": "sidebar",
+      "reason": "让正文与补充信息形成清楚的主次关系。"
+    },
+    {
+      "rank": 12,
+      "id": "L05",
+      "component": "modular",
+      "reason": "组合不同信息块，适合指标、图表和短文混排。"
+    },
+    {
+      "rank": 13,
+      "id": "T05",
+      "component": "callout",
+      "reason": "突出必要的解释或限制，防止被正文淹没。"
+    },
+    {
+      "rank": 14,
+      "id": "I01",
+      "component": "image-text",
+      "reason": "让图片与相关说明并置，适合案例和现场观察。"
+    },
+    {
+      "rank": 15,
+      "id": "I02",
+      "component": "figure",
+      "reason": "把图像、说明和来源作为一个整体保留。"
+    },
+    {
+      "rank": 16,
+      "id": "N03",
+      "component": "change-indicator",
+      "reason": "明确变化方向及比较基准，适合同比环比信息。"
+    },
+    {
+      "rank": 17,
+      "id": "N04",
+      "component": "target-comparison",
+      "reason": "把当前值放回目标和量程内阅读。"
+    },
+    {
+      "rank": 18,
+      "id": "N05",
+      "component": "metric-sparkline",
+      "reason": "在指标旁保留短期走势，适合紧凑摘要。"
+    },
+    {
+      "rank": 19,
+      "id": "N06",
+      "component": "progress",
+      "reason": "展示有明确总量的完成情况。"
+    },
+    {
+      "rank": 20,
+      "id": "C02",
+      "component": "grouped-bar-chart",
+      "reason": "同时比较类别与系列，适合年度或分组对照。"
+    },
+    {
+      "rank": 21,
+      "id": "C05",
+      "component": "stacked-bar-chart",
+      "reason": "在比较总量时保留组成部分。"
+    },
+    {
+      "rank": 22,
+      "id": "C06",
+      "component": "percent-stacked-bar-chart",
+      "reason": "跨不同规模的对象比较组成比例。"
+    },
+    {
+      "rank": 23,
+      "id": "C27",
+      "component": "small-multiples",
+      "reason": "用同一尺度比较多个小图，避免拥挤叠线。"
+    },
+    {
+      "rank": 24,
+      "id": "B03",
+      "component": "heatmap-table",
+      "reason": "在保留精确值的同时快速识别相对高低。"
+    },
+    {
+      "rank": 25,
+      "id": "D01",
+      "component": "timeline",
+      "reason": "按真实日期或阶段呈现事件顺序。"
+    },
+    {
+      "rank": 26,
+      "id": "D02",
+      "component": "process-steps",
+      "reason": "用清楚的序号和说明呈现线性操作步骤。"
+    },
+    {
+      "rank": 27,
+      "id": "T08",
+      "component": "numbered-list",
+      "reason": "呈现有顺序、可逐项引用的短条目。"
+    },
+    {
+      "rank": 28,
+      "id": "T03",
+      "component": "pull-quote",
+      "reason": "用原文摘句形成阅读停顿，适合访谈与研究报告。"
+    },
+    {
+      "rank": 29,
+      "id": "L07",
+      "component": "span-all",
+      "reason": "让宽图表和表格跨栏，保持可读尺寸。"
+    },
+    {
+      "rank": 30,
+      "id": "R06",
+      "component": "source-note",
+      "reason": "把已提供的来源和解释留在对应内容附近。"
+    }
+  ]
+}

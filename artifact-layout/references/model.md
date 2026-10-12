@@ -50,3 +50,30 @@ files relative to this JSON; outputs contain their own bundled copies.
 
 The schema enforces renderable structure, not whether supplied facts are true.
 See the three [examples](../assets/examples) for the actual component fields.
+
+The [Top 30 specimen collection](../assets/examples/top30.json) maps each
+vocabulary ID to a complete, runnable report model. Extract one ID's object,
+save it next to `field-study.png` when it uses that image, and pass it to the
+renderer. The preview's downloaded ZIP examples include `report.json` and their images
+with relative paths. Extract an example and render its `report.json` directly.
+
+Additional contracts:
+
+- `heading.level` is an HTML heading level from 2 to 4, below the report's H1;
+  native output maps these to document heading levels 1 to 3.
+- `change-indicator` takes literal string `value` and `comparison`; supply
+  `direction: "up"`, `"down"`, or `"flat"`. Arrows do not imply good/bad status.
+- `target-comparison` takes finite `actual`, `target`, and positive `maximum`;
+  both values lie between zero and maximum.
+- `progress` takes finite `value` and positive `total`, with `0 <= value <= total`.
+- `metric-sparkline` takes at least two finite `values`, a literal displayed
+  `value`, and a supplied `period`. No derived significance or change is added.
+- Grouped/stacked charts use `series: [{"name": "A", "values": [1, 2]}]` with
+  distinct names and the same number of values as `labels`. Stacks require
+  nonnegative values; percentage stacks require a positive total per category.
+- `heatmap-table.heatColumns` contains zero-based numeric cell indexes;
+  `domain` contains two increasing finite numbers. No row/column color
+  normalization is inferred.
+- `numbered-list.items` is an ordered string list; `process-steps.items` uses
+  objects with supplied `label` and `text`. `timeline` preserves supplied dates
+  or phases without inventing an order or date.

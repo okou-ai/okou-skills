@@ -1,0 +1,1100 @@
+{
+  "T01": {
+    "version": 1,
+    "title": "Display headline",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · T01 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "heading",
+            "level": 2,
+            "text": "The main section establishes hierarchy"
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "heading",
+            "level": 3,
+            "text": "A supporting subsection"
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "heading",
+            "level": 4,
+            "text": "A focused detail"
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "Heading levels remain semantic and editable in the document."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "T02": {
+    "version": 1,
+    "title": "Standfirst",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · T02 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "standfirst",
+            "text": "A short introduction explains the report scope and gives readers enough context to enter the supplied analysis."
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "N01": {
+    "version": 1,
+    "title": "Big Numbers",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · N01 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "big-number",
+            "value": "68",
+            "label": "Monthly requests",
+            "unit": "requests",
+            "period": "September 2026",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "N02": {
+    "version": 1,
+    "title": "Metric strip",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · N02 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "metric-strip",
+            "items": [
+              {
+                "value": "8.4",
+                "unit": "M USD",
+                "label": "Revenue",
+                "period": "Q3 2026"
+              },
+              {
+                "value": "82%",
+                "label": "Retention",
+                "period": "Q3 2026"
+              },
+              {
+                "value": "27",
+                "unit": "months",
+                "label": "Runway",
+                "period": "September 2026"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "T06": {
+    "version": 1,
+    "title": "Key takeaways",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · T06 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "takeaways",
+            "title": "Key takeaways",
+            "items": [
+              "A compact summary retains the supplied wording.",
+              "Each item carries one clear point.",
+              "The design does not invent conclusions."
+            ],
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "C01": {
+    "version": 1,
+    "title": "Bar",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · C01 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "bar-chart",
+            "title": "Requests by channel",
+            "labels": [
+              "Direct",
+              "Partner",
+              "Organic"
+            ],
+            "values": [
+              42,
+              31,
+              27
+            ],
+            "unit": "Requests",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "C03": {
+    "version": 1,
+    "title": "Line chart",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · C03 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "line-chart",
+            "title": "Monthly activity",
+            "labels": [
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep"
+            ],
+            "values": [
+              42,
+              49,
+              55,
+              52,
+              63,
+              68
+            ],
+            "unit": "Requests",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "B01": {
+    "version": 1,
+    "title": "Data table",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · B01 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "data-table",
+            "headers": [
+              "Channel",
+              "Requests",
+              "Share"
+            ],
+            "rows": [
+              [
+                "Direct",
+                42,
+                "42%"
+              ],
+              [
+                "Partner",
+                31,
+                "31%"
+              ],
+              [
+                "Organic",
+                27,
+                "27%"
+              ]
+            ],
+            "numericColumns": [
+              1,
+              2
+            ],
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "B02": {
+    "version": 1,
+    "title": "Comparison table",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · B02 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "comparison-table",
+            "headers": [
+              "Criterion",
+              "Option A",
+              "Option B",
+              "Option C"
+            ],
+            "rows": [
+              [
+                "Setup",
+                "2 weeks",
+                "4 weeks",
+                "3 weeks"
+              ],
+              [
+                "Operating cost",
+                "120",
+                "160",
+                "140"
+              ],
+              [
+                "Support",
+                "Email",
+                "Dedicated",
+                "Email + chat"
+              ]
+            ],
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "L02": {
+    "version": 1,
+    "title": "Two-column grid",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · L02 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "two-column",
+        "blocks": [
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "L03": {
+    "version": 1,
+    "title": "Asymmetric two-column",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · L03 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "sidebar",
+        "blocks": [
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "callout",
+            "placement": "aside",
+            "title": "Supporting fact",
+            "text": "A sidebar preserves supplementary context without interrupting the main text.",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "L05": {
+    "version": 1,
+    "title": "Modular grid",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · L05 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "modular",
+        "blocks": [
+          {
+            "type": "big-number",
+            "value": "68",
+            "label": "Monthly requests",
+            "unit": "requests",
+            "period": "September 2026",
+            "source": "Illustrative layout data; not a business result."
+          },
+          {
+            "type": "callout",
+            "title": "Context",
+            "text": "A modular grid aligns complementary blocks while keeping their hierarchy."
+          },
+          {
+            "type": "bar-chart",
+            "title": "Requests by channel",
+            "labels": [
+              "Direct",
+              "Partner",
+              "Organic"
+            ],
+            "values": [
+              42,
+              31,
+              27
+            ],
+            "unit": "Requests",
+            "source": "Illustrative layout data; not a business result."
+          },
+          {
+            "type": "takeaways",
+            "items": [
+              "Retain supplied labels.",
+              "Use the grid when the content benefits from it."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "T05": {
+    "version": 1,
+    "title": "Callout",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · T05 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "callout",
+            "title": "Important context",
+            "text": "This box contains a supplied explanation, limitation or detail worth making visible.",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "I01": {
+    "version": 1,
+    "title": "Image–text split",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · I01 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "image-text",
+            "image": "field-study.png",
+            "alt": "Original abstract field-study grid illustration",
+            "caption": "An illustrative image kept with its description.",
+            "source": "Original layout-library illustration.",
+            "title": "Image and explanation",
+            "paragraphs": [
+              "The illustration and its supplied explanation are placed side by side. On a narrow screen they return to a readable vertical order."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "I02": {
+    "version": 1,
+    "title": "Figure with caption",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · I02 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "figure",
+            "image": "field-study.png",
+            "alt": "Original abstract field-study grid illustration",
+            "caption": "An illustrative image kept with its description.",
+            "source": "Original layout-library illustration."
+          }
+        ]
+      }
+    ]
+  },
+  "N03": {
+    "version": 1,
+    "title": "Delta",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · N03 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "change-indicator",
+            "value": "+15.1%",
+            "direction": "up",
+            "label": "Revenue change",
+            "comparison": "Q3 2026 versus Q2 2026",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "N04": {
+    "version": 1,
+    "title": "Target",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · N04 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "target-comparison",
+            "label": "Quarterly target",
+            "actual": 72,
+            "target": 85,
+            "maximum": 100,
+            "unit": "Completed accounts",
+            "period": "Q3 2026",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "N05": {
+    "version": 1,
+    "title": "Metric with sparkline",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · N05 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "metric-sparkline",
+            "value": "68",
+            "label": "Monthly requests",
+            "values": [
+              42,
+              49,
+              55,
+              52,
+              63,
+              68
+            ],
+            "unit": "requests",
+            "period": "April–September 2026",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "N06": {
+    "version": 1,
+    "title": "Progress",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · N06 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "progress",
+            "label": "Delivery progress",
+            "value": 18,
+            "total": 24,
+            "unit": "Milestones",
+            "period": "September 2026",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "C02": {
+    "version": 1,
+    "title": "Grouped",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · C02 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "grouped-bar-chart",
+            "labels": [
+              "Product A",
+              "Product B",
+              "Product C"
+            ],
+            "series": [
+              {
+                "name": "2025",
+                "values": [
+                  42,
+                  24,
+                  32
+                ]
+              },
+              {
+                "name": "2026",
+                "values": [
+                  49,
+                  35,
+                  38
+                ]
+              }
+            ],
+            "unit": "Requests",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "C05": {
+    "version": 1,
+    "title": "Stacked bar",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · C05 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "stacked-bar-chart",
+            "labels": [
+              "Product A",
+              "Product B",
+              "Product C"
+            ],
+            "series": [
+              {
+                "name": "Direct",
+                "values": [
+                  42,
+                  24,
+                  32
+                ]
+              },
+              {
+                "name": "Partner",
+                "values": [
+                  31,
+                  35,
+                  18
+                ]
+              },
+              {
+                "name": "Organic",
+                "values": [
+                  27,
+                  41,
+                  50
+                ]
+              }
+            ],
+            "unit": "Requests",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "C06": {
+    "version": 1,
+    "title": "100% stacked bar",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · C06 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "percent-stacked-bar-chart",
+            "labels": [
+              "Product A",
+              "Product B",
+              "Product C"
+            ],
+            "series": [
+              {
+                "name": "Direct",
+                "values": [
+                  42,
+                  48,
+                  32
+                ]
+              },
+              {
+                "name": "Partner",
+                "values": [
+                  31,
+                  70,
+                  18
+                ]
+              },
+              {
+                "name": "Organic",
+                "values": [
+                  27,
+                  82,
+                  50
+                ]
+              }
+            ],
+            "unit": "Requests",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "C27": {
+    "version": 1,
+    "title": "Small multiples",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · C27 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "small-multiples",
+            "charts": [
+              {
+                "type": "bar-chart",
+                "title": "Market A",
+                "labels": [
+                  "Direct",
+                  "Partner",
+                  "Organic"
+                ],
+                "values": [
+                  42,
+                  31,
+                  27
+                ],
+                "unit": "Requests",
+                "source": "Illustrative layout data; not a business result."
+              },
+              {
+                "type": "bar-chart",
+                "title": "Market B",
+                "labels": [
+                  "Direct",
+                  "Partner",
+                  "Organic"
+                ],
+                "values": [
+                  34,
+                  25,
+                  19
+                ],
+                "unit": "Requests",
+                "source": "Illustrative layout data; not a business result."
+              }
+            ],
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "B03": {
+    "version": 1,
+    "title": "Heatmap table",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · B03 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "heatmap-table",
+            "headers": [
+              "Market",
+              "Awareness",
+              "Consideration",
+              "Retention"
+            ],
+            "rows": [
+              [
+                "North",
+                82,
+                64,
+                71
+              ],
+              [
+                "East",
+                68,
+                73,
+                80
+              ],
+              [
+                "South",
+                54,
+                61,
+                66
+              ]
+            ],
+            "numericColumns": [
+              1,
+              2,
+              3
+            ],
+            "heatColumns": [
+              1,
+              2,
+              3
+            ],
+            "domain": [
+              0,
+              100
+            ],
+            "scaleLabel": "Percentage scale; darker means higher",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "D01": {
+    "version": 1,
+    "title": "Timeline",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · D01 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "timeline",
+            "items": [
+              {
+                "label": "April 2026",
+                "text": "Discovery and interviews."
+              },
+              {
+                "label": "June 2026",
+                "text": "Prototype review."
+              },
+              {
+                "label": "September 2026",
+                "text": "Launch and follow-up."
+              }
+            ],
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "D02": {
+    "version": 1,
+    "title": "Process diagram",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · D02 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "process-steps",
+            "items": [
+              {
+                "label": "Collect the supplied material",
+                "text": "Keep existing sources and labels with their content."
+              },
+              {
+                "label": "Choose a suitable layout",
+                "text": "Match the grid and emphasis to the information."
+              },
+              {
+                "label": "Review the result",
+                "text": "Inspect the rendered page and reading order."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "T08": {
+    "version": 1,
+    "title": "Numbered list",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · T08 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "numbered-list",
+            "title": "Ordered checklist",
+            "items": [
+              "Confirm the required format.",
+              "Retain the supplied content and references.",
+              "Choose components that serve the material.",
+              "Inspect the rendered layout."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "T03": {
+    "version": 1,
+    "title": "Pull quote",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · T03 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "pull-quote",
+            "text": "A useful layout gives each piece of information the space it needs.",
+            "attribution": "Illustrative quotation for layout review",
+            "source": "Illustrative layout data; not a business result."
+          }
+        ]
+      }
+    ]
+  },
+  "L07": {
+    "version": 1,
+    "title": "Full-width",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · L07 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "two-column",
+        "blocks": [
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "data-table",
+            "headers": [
+              "Channel",
+              "Requests",
+              "Share"
+            ],
+            "rows": [
+              [
+                "Direct",
+                42,
+                "42%"
+              ],
+              [
+                "Partner",
+                31,
+                "31%"
+              ],
+              [
+                "Organic",
+                27,
+                "27%"
+              ]
+            ],
+            "numericColumns": [
+              1,
+              2
+            ],
+            "source": "Illustrative layout data; not a business result.",
+            "span": "all"
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "R06": {
+    "version": 1,
+    "title": "Footnote",
+    "language": "en",
+    "theme": "corporate",
+    "recipe": "executive-brief",
+    "meta": "LAYOUT STUDY · R06 · ILLUSTRATIVE CONTENT",
+    "sections": [
+      {
+        "layout": "single",
+        "blocks": [
+          {
+            "type": "prose",
+            "paragraphs": [
+              "The supplied explanation stays in its original reading order. A clear column width helps readers follow the argument and locate supporting detail.",
+              "Related figures and notes remain close to the content they describe. The layout adapts to the material rather than requiring extra sections or facts."
+            ]
+          },
+          {
+            "type": "source-note",
+            "title": "Supplied source",
+            "text": "Author / organization, document title, 2026, page 12. This example shows placement; it is not a real citation."
+          }
+        ]
+      }
+    ]
+  }
+}

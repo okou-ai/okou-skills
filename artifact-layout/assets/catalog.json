@@ -314,7 +314,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "two-column"
+        "component": "two-column",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#L02"
       }
     },
     {
@@ -340,7 +346,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "sidebar"
+        "component": "sidebar",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#L03"
       }
     },
     {
@@ -391,7 +403,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "modular"
+        "component": "modular",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#L05"
       }
     },
     {
@@ -442,7 +460,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "span-all"
+        "component": "span-all",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#L07"
       }
     },
     {
@@ -519,7 +543,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "prose"
+        "component": "heading",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#T01"
       }
     },
     {
@@ -545,7 +575,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "standfirst"
+        "component": "standfirst",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#T02"
       }
     },
     {
@@ -571,7 +607,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "pull-quote"
+        "component": "pull-quote",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#T03"
       }
     },
     {
@@ -621,7 +663,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "callout"
+        "component": "callout",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#T05"
       }
     },
     {
@@ -647,7 +695,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "takeaways"
+        "component": "takeaways",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#T06"
       }
     },
     {
@@ -699,8 +753,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "numbered-list",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#T08"
       }
     },
     {
@@ -830,7 +890,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "big-number"
+        "component": "big-number",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#N01"
       }
     },
     {
@@ -856,7 +922,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "metric-strip"
+        "component": "metric-strip",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#N02"
       }
     },
     {
@@ -883,7 +955,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "metric-strip"
+        "component": "change-indicator",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#N03"
       }
     },
     {
@@ -908,8 +986,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "target-comparison",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#N04"
       }
     },
     {
@@ -933,8 +1017,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "metric-sparkline",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#N05"
       }
     },
     {
@@ -959,8 +1049,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "progress",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#N06"
       }
     },
     {
@@ -987,7 +1083,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "image-text"
+        "component": "image-text",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#I01"
       }
     },
     {
@@ -1014,7 +1116,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "figure"
+        "component": "figure",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#I02"
       }
     },
     {
@@ -1198,7 +1306,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "bar-chart"
+        "component": "bar-chart",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#C01"
       }
     },
     {
@@ -1223,8 +1337,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "grouped-bar-chart",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#C02"
       }
     },
     {
@@ -1250,7 +1370,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "line-chart"
+        "component": "line-chart",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#C03"
       }
     },
     {
@@ -1299,8 +1425,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "stacked-bar-chart",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#C05"
       }
     },
     {
@@ -1325,8 +1457,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "percent-stacked-bar-chart",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#C06"
       }
     },
     {
@@ -1859,7 +1997,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "small-multiples"
+        "component": "small-multiples",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#C27"
       }
     },
     {
@@ -1990,7 +2134,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "data-table"
+        "component": "data-table",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#B01"
       }
     },
     {
@@ -2016,7 +2166,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "comparison-table"
+        "component": "comparison-table",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#B02"
       }
     },
     {
@@ -2040,8 +2196,14 @@
       ],
       "tier": "核心",
       "rendering": {
-        "coverage": "reference-only",
-        "component": null
+        "coverage": "built-in",
+        "component": "heatmap-table",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#B03"
       }
     },
     {
@@ -2147,7 +2309,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "timeline"
+        "component": "timeline",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#D01"
       }
     },
     {
@@ -2173,7 +2341,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "timeline"
+        "component": "process-steps",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#D02"
       }
     },
     {
@@ -2591,7 +2765,13 @@
       "tier": "核心",
       "rendering": {
         "coverage": "built-in",
-        "component": "source-note"
+        "component": "source-note",
+        "formats": [
+          "html",
+          "docx",
+          "pdf"
+        ],
+        "example": "examples/top30.json#R06"
       }
     },
     {

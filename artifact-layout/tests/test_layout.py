@@ -1,5 +1,7 @@
 """Behavioral coverage for layout composition, literal content, and native output."""
 
+# ruff: noqa: E402 -- Imports follow the local script path bootstrap.
+
 import hashlib
 import importlib.util
 import json

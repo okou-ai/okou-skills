@@ -8,9 +8,19 @@ from pathlib import Path
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 
 
-def lookup(*, query=None, group=None, ids=None):
+def lookup(*, query=None, group=None, ids=None, top30=False):
     catalog = json.loads((ASSETS / "catalog.json").read_text(encoding="utf-8"))
     entries = catalog["entries"]
+    if top30:
+        ranking = json.loads((ASSETS / "top30.json").read_text(encoding="utf-8"))
+        by_id = {entry["id"]: entry for entry in entries}
+        entries = [
+            {
+                **by_id[item["id"]],
+                "priority": {"rank": item["rank"], "reason": item["reason"]},
+            }
+            for item in ranking["entries"]
+        ]
     if ids is not None:
         selected = set(ids)
         known = {entry["id"] for entry in entries}
@@ -45,9 +55,12 @@ def main():
     selection.add_argument("--query")
     selection.add_argument("--group")
     selection.add_argument("--ids", nargs="+")
+    selection.add_argument("--top30", action="store_true")
     args = parser.parse_args()
     try:
-        result = lookup(query=args.query, group=args.group, ids=args.ids)
+        result = lookup(
+            query=args.query, group=args.group, ids=args.ids, top30=args.top30
+        )
     except ValueError as error:
         parser.error(str(error))
     print(json.dumps(result, ensure_ascii=False, indent=2))

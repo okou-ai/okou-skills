@@ -22,12 +22,16 @@ visual recipe proposes grids and emphasis, not mandatory business sections.
    runtime dependency.
 2. Select a few components appropriate to the supplied content. Read
    [components.md](references/components.md) for their fields and placement.
+   Start with the [Top 30](references/top30.md) for common business-report
+   expressions; each has a runnable model and HTML/Word/PDF support. This is a
+   curated maintenance priority, not a mandate to use all 30 in one report.
    Search the full bilingual vocabulary only when needed:
 
    ```bash
    python3 <layout-dir>/scripts/catalog.py --query "big numbers"
    python3 <layout-dir>/scripts/catalog.py --group L
    python3 <layout-dir>/scripts/catalog.py --ids N01 L02 I01
+   python3 <layout-dir>/scripts/catalog.py --top30
    ```
 
    The catalog contains 109 core entries and 12 extensions. Rendering coverage

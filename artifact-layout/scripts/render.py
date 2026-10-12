@@ -10,6 +10,15 @@ import re
 import unicodedata
 from pathlib import Path
 
+from primitives import (
+    DIRECTIONS,
+    EXTRA_TYPES,
+    GRAPHICS,
+    heat_color,
+    extra_geometry,
+    validate_extra,
+)
+
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 LAYOUTS = {"single", "two-column", "sidebar", "modular"}
 TYPES = {
@@ -28,7 +37,7 @@ TYPES = {
     "comparison-table",
     "timeline",
     "source-note",
-}
+} | EXTRA_TYPES
 
 
 def escape(value):
@@ -115,7 +124,7 @@ def validate_report(report, source_dir):
                         "Small multiples support bar-chart and line-chart panels"
                     )
                 chart(item)
-        if kind in {"data-table", "comparison-table"}:
+        if kind in {"data-table", "comparison-table", "heatmap-table"}:
             strings(block, "headers")
             rows = block.get("rows")
             if not isinstance(rows, list) or any(
@@ -130,6 +139,8 @@ def validate_report(report, source_dir):
                     or not 0 <= column < len(block["headers"])
                 ):
                     raise ValueError("Numeric table column is outside the headers")
+        if kind in EXTRA_TYPES:
+            validate_extra(block)
 
     if not isinstance(report, dict) or report.get("version") != 1:
         raise ValueError("Report model version must be 1")
@@ -193,6 +204,8 @@ def wrap_label(value, width, size=30):
 
 def chart_geometry(block, theme, domain=None, label_size=30):
     """The same coordinates drive HTML SVG and native Word chart images."""
+    if block["type"] in GRAPHICS:
+        return extra_geometry(block, theme, wrap_label, label_size)
     low, high = domain or chart_domain(block)
     width = 640
     height = 350
@@ -200,7 +213,10 @@ def chart_geometry(block, theme, domain=None, label_size=30):
     font = label_size
     if block["type"] == "bar-chart":
         start, end = 215, 530
-        scale = lambda value: start + (value - low) / (high - low) * (end - start)
+
+        def scale(value):
+            return start + (value - low) / (high - low) * (end - start)
+
         zero = scale(0)
         y = 36
         for label, value in zip(block["labels"], block["values"]):
@@ -280,7 +296,7 @@ def chart_geometry(block, theme, domain=None, label_size=30):
 
 def chart_svg(block, theme, domain=None, label_size=30):
     geometry = chart_geometry(block, theme, domain, label_size)
-    name = block.get("title", "Supplied chart")
+    name = block.get("title") or block.get("label") or "Supplied chart"
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {geometry["width"]} {geometry["height"]}" role="img" aria-label="{escape(name)}">',
         f"<title>{escape(name)}</title>",
@@ -381,7 +397,22 @@ def render_html(report, output, source_dir):
     def draw_block(block):
         kind = block["type"]
         title = heading(block)
-        if kind == "prose":
+        if kind == "heading":
+            level = block.get("level", 2)
+            content = f"<h{level}>{escape(block['text'])}</h{level}>"
+        elif kind == "standfirst":
+            content = f'<p class="standfirst">{escape(block["text"])}</p>'
+        elif kind == "change-indicator":
+            content = f'<div class="change-value">{DIRECTIONS[block["direction"]]} {escape(block["value"])}</div><strong>{escape(block["label"])}</strong><p class="metric-context">{escape(block["comparison"])}</p>{notes(block)}'
+        elif kind in {"target-comparison", "progress"}:
+            content = (
+                title
+                + f"<strong>{escape(block['label'])}</strong>"
+                + draw_chart({**block, "title": None})
+            )
+        elif kind == "metric-sparkline":
+            content = metric(block) + chart_svg(block, theme)
+        elif kind == "prose":
             content = title + paragraphs(block["paragraphs"])
         elif kind == "big-number":
             content = metric(block)
@@ -389,12 +420,13 @@ def render_html(report, output, source_dir):
             content = "".join(f"<div>{metric(item)}</div>" for item in block["items"])
         elif kind in {"callout", "source-note"}:
             content = title + paragraphs([block["text"]]) + notes(block)
-        elif kind == "takeaways":
+        elif kind in {"takeaways", "numbered-list"}:
+            tag = "ol" if kind == "numbered-list" else "ul"
             content = (
                 title
-                + "<ul>"
+                + f"<{tag}>"
                 + "".join(f"<li>{escape(item)}</li>" for item in block["items"])
-                + "</ul>"
+                + f"</{tag}>"
                 + notes(block)
             )
         elif kind == "pull-quote":
@@ -408,7 +440,7 @@ def render_html(report, output, source_dir):
             content = title + image_figure(block)
         elif kind == "image-text":
             content = f'<div class="image-text-inner">{image_figure(block)}<div>{title}{paragraphs(block["paragraphs"])}</div></div>'
-        elif kind in {"bar-chart", "line-chart"}:
+        elif kind in {"bar-chart", "line-chart"} | GRAPHICS:
             content = draw_chart(block)
         elif kind == "small-multiples":
             domain = chart_domain(block)
@@ -422,14 +454,20 @@ def render_html(report, output, source_dir):
                 + "</div>"
                 + notes(block)
             )
-        elif kind in {"data-table", "comparison-table"}:
+        elif kind in {"data-table", "comparison-table", "heatmap-table"}:
             headers = "".join(
                 f'<th scope="col">{escape(value)}</th>' for value in block["headers"]
             )
             rows = "".join(
                 "<tr>"
                 + "".join(
-                    f'<td class="{"numeric" if numeric_cell(block, index, value) else ""}">{escape(value)}</td>'
+                    f'<td class="{"numeric" if numeric_cell(block, index, value) else ""}"'
+                    + (
+                        f' style="background:{heat_color(block, index, value, theme)}"'
+                        if kind == "heatmap-table"
+                        else ""
+                    )
+                    + f">{escape(value)}</td>"
                     for index, value in enumerate(row)
                 )
                 + "</tr>"
@@ -440,12 +478,14 @@ def render_html(report, output, source_dir):
                 + f'<div class="table-scroll"><table><thead><tr>{headers}</tr></thead><tbody>{rows}</tbody></table></div>'
                 + notes(block)
             )
-        elif kind == "timeline":
+            if kind == "heatmap-table":
+                content += f'<p class="caption">{escape(block.get("scaleLabel", "Color scale"))}: {escape(block["domain"][0])} → {escape(block["domain"][1])}</p>'
+        elif kind in {"timeline", "process-steps"}:
             content = (
                 title
                 + "<ol>"
                 + "".join(
-                    f"<li><strong>{escape(item['label'])}</strong>{escape(item['text'])}</li>"
+                    f"<li><strong>{escape(item['label'])}</strong><p>{escape(item['text'])}</p></li>"
                     for item in block["items"]
                 )
                 + "</ol>"
@@ -454,7 +494,7 @@ def render_html(report, output, source_dir):
         else:
             raise ValueError(f"Unknown component: {kind}")
         classes = ["block", kind]
-        if kind in {"bar-chart", "line-chart"}:
+        if kind in {"bar-chart", "line-chart"} | GRAPHICS:
             classes.append("chart")
         if block.get("span") == "all":
             classes.append("span-all")

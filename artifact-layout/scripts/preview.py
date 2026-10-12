@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 
 from render import ASSETS, load_asset, render_report
+from specimens import build_specimens
 
 
 def build_preview(output):
@@ -54,6 +55,7 @@ def build_preview(output):
         for key, theme in themes.items()
     )
     vocabulary = load_asset("catalog.json")
+    specimens, specimen_links = build_specimens(output)
     term_rows = []
     for entry in vocabulary["entries"]:
         coverage = (
@@ -75,6 +77,40 @@ function sizeFrames(){document.querySelectorAll('.frame').forEach(frame=>{const 
         document.replace("THEME_BUTTONS", theme_buttons)
         .replace("CARDS", "".join(cards))
         .replace("TERMS", "".join(term_rows))
+        .replace("<strong>15</strong>", "<strong>27</strong>")
+        .replace(
+            '<div class="grid">',
+            specimens + '<h2 class="recipe-title">3套报告配方</h2><div class="grid">',
+            1,
+        )
+        .replace(
+            "</style>",
+            """
+.top30{margin:10px 0 44px}.top30 h2{font-size:26px}.specimen-grid{display:grid;grid-template-columns:minmax(260px, .9fr) minmax(0, 1.8fr);gap:22px;margin-top:24px}.term-picker{min-width:0}.term-picker label{display:block;font-size:13px;margin-bottom:6px}.term-picker input{width:100%;font:inherit;font-size:14px;border:1px solid #cbd2ce;padding:12px;background:#fff}.term-list{max-height:620px;overflow:auto;border:1px solid #d8dedb;border-top:0;background:#fff}.term-option{display:flex;gap:14px;width:100%;text-align:left;padding:13px 15px;border:0;border-bottom:1px solid #e5e9e6;border-radius:0}.term-option[hidden]{display:none}.term-rank{font-variant-numeric:tabular-nums;color:#7b8782;font-size:18px}.term-option strong{font-size:14px;font-weight:600}.term-option small{display:block;font-size:12px;line-height:1.5;color:#68766f;margin-top:3px}.term-option[aria-pressed="true"]{background:#e7eeea;color:#203831}.term-option[aria-pressed="true"] .term-rank{color:#254939}.specimen-stage{border:1px solid #d8dedb;min-width:0;background:white}.specimen-info{padding:22px 24px;border-bottom:1px solid #d8dedb}.specimen-info h3{margin:0;font-size:20px}.specimen-info p{font-size:14px;line-height:1.65;color:#5b6969;margin:10px 0 14px}.specimen-links{display:flex;gap:22px;flex-wrap:wrap;font-size:13px}#specimen-view{width:100%;height:580px;transform:none;pointer-events:auto;display:block}.recipe-title{margin:0 0 22px}@media(max-width:760px){.specimen-grid{grid-template-columns:1fr}.term-list{max-height:250px}#specimen-view{height:510px}.specimen-info{padding:18px}}
+</style>""",
+            1,
+        )
+        .replace(
+            "<script>",
+            "<script>\nconst specimens="
+            + json.dumps(specimen_links, ensure_ascii=False).replace("<", "\\u003c")
+            + ";\n",
+            1,
+        )
+        .replace(
+            "const theme=button.dataset.theme;",
+            "const theme=button.dataset.theme;activeTheme=theme;showTerm(activeTerm);",
+        )
+        .replace(
+            "function sizeFrames()",
+            """let activeTerm="N01",activeTheme="warm-editorial";
+function showTerm(id){activeTerm=id;const item=specimens[id],links=item.themes[activeTheme];document.getElementById('specimen-name').textContent=id+' · '+item.name;document.getElementById('specimen-reason').textContent=item.reason;document.getElementById('specimen-view').src=links.page;document.getElementById('specimen-open').href=links.page;document.getElementById('specimen-model').href=links.bundle;document.querySelectorAll('[data-term]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.term===id)));}
+document.querySelectorAll('[data-term]').forEach(button=>button.addEventListener('click',()=>showTerm(button.dataset.term)));
+document.getElementById('term-search').addEventListener('input',event=>{const query=event.target.value.trim().toLocaleLowerCase();let count=0;document.querySelectorAll('[data-term]').forEach(button=>{button.hidden=!button.textContent.toLocaleLowerCase().includes(query);if(!button.hidden)count++;});document.getElementById('no-terms').hidden=count>0;});
+document.getElementById('specimen-view').addEventListener('load',event=>{const frame=event.target,section=frame.contentDocument?.querySelector('section');if(section)frame.contentWindow.scrollTo(0,Math.max(0,section.offsetTop-24));});showTerm(activeTerm);
+function sizeFrames()""",
+            1,
+        )
     )
     (output / "index.html").write_text(document, encoding="utf-8")
     return output / "index.html"
