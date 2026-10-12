@@ -1,6 +1,6 @@
 # Document style
 
-Use this style for new Word/PDF documents without a specified design, across languages and topics. User requirements and templates take priority; preserve existing designs during narrow edits. This file defines the visual result, not the generation tool or page count.
+Use this baseline for new Word/PDF documents across languages and topics. User requirements and templates take priority; preserve existing designs during narrow edits. The blank assets provide typography and page settings, with no sample content, report outline, palette, decoration, or automatic page numbers. Choose any additional design for the task.
 
 ## Baseline
 
@@ -15,20 +15,21 @@ Measurements are in points unless stated otherwise. `12/16` means 12 pt type wit
 | Tables | 11/14; bold header row; table title above, at the same size |
 | Chart labels | 10–11 at the final placed size, including after image scaling |
 | Captions and sources | 10/13, below the figure |
-| Footer | 9/12; page number at the right text edge, 33 from the bottom of the page, clear of the body |
-| Colors | White page; body `#191919`, secondary text `#555555`, accent `#345E6B` |
+| Footer, when used | 9/12; clear of the body |
 
 These type sizes are acceptance criteria for this style. Unless the user or template specifies otherwise, do not reduce them to fit content or cut page count. Adjust column widths, wrap text, split tables, or add pages first; use landscape pages for wide tables when needed.
 
 ## Fonts and languages
 
-- Prefer Charter for Latin body text. For Chinese, Japanese, and Korean, use fonts covering the appropriate language and regional glyphs, such as Noto Serif CJK SC/JP/KR. Noto Naskh Arabic is an option for Arabic. Provide the required weights and avoid unintended fallback or synthetic italics.
+- The Word asset sets Latin `ascii`/`hAnsi` to Times New Roman, `eastAsia` to Noto Serif CJK SC, and complex-script `cs` to Noto Naskh Arabic. The PDF source uses Liberation Serif with Noto Serif CJK SC fallback. Adapt the East Asian regional font and complex-script font to the actual language; provide the required weights.
+- Keep Word's script-specific font slots separate in defaults, styles, and direct run formatting, including tables and headers/footers. Remove conflicting theme-font attributes when setting explicit fonts; do not map Latin text to an embedded CJK font merely to cover all scripts. This addresses a known Microsoft preview compatibility risk, not a ban on CJK fonts or embedding.
 - If a font is unavailable, choose an available substitute with full script coverage and a similar style, and briefly disclose it. Respect font usage and embedding licenses; embed fonts in PDFs. Setting a font name does not prove it rendered correctly.
-- Adapt line spacing, line breaks, shaping, reading direction, and mixed-script text to the language. For RTL content, check punctuation, numbers, and table direction. Preserve the type hierarchy, colors, and table/chart treatment.
+- Adapt line spacing, line breaks, shaping, reading direction, and mixed-script text to the language. For RTL content, check punctuation, numbers, and table direction. Preserve the type hierarchy.
+- Microsoft preview compatibility requires checking the final DOCX in the actual Okou/Microsoft viewer, including mixed-script text and selection/copy. Local Word/PDF renders alone do not establish that result; mark unavailable preview checks as unverified. Use a compatibility copy when repairing an existing file.
 
 ## Tables and charts
 
-- Use light horizontal table rules without vertical lines; use `#F1F3F0` for header backgrounds. Start cell padding at 3 top/bottom and 4 left/right, adjusting to the content.
+- Choose table rules, backgrounds, and padding to suit the content; the assets prescribe no decorative treatment.
 - Align text labels to the reading start and numbers to the right. Keep units, precision, and number formats consistent within a column. Repeat headers on continuation pages; keep ordinary rows together and restructure oversized rows. Keep table titles with the header and first row.
 - Fit charts within the available text area, preserve their aspect ratio, and leave room for labels and legends. Use the document fonts. Distinguish series with labels, markers, or line styles as well as color.
 - State chart units and sources; use the same data definitions as the prose and tables. Bar-chart value axes start at zero. Keep figures, captions, and sources on the same page where possible; label illustrative data.

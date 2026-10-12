@@ -11,15 +11,15 @@ User requirements and supplied templates take priority. Start narrow edits from 
 
 Prefer native authoring: create files directly with tools that support the target format and language.
 
-- **Word**: use `python-docx` or `docx` to create editable paragraphs, headings, lists, and tables.
-- **PDF**: lay out and export pages with ReportLab or Typst. Markdown conversion is optional; use DOCX-to-PDF for Word layout checks or a requested matching export.
+- **Word**: for a new document, open [assets/blank.docx](assets/blank.docx) with `python-docx.Document(...)` and save a new file. Use its named styles: `Title`, `Heading 1`–`Heading 3`, `Normal`, `List Bullet`, `List Number`, `Table Text`, `Table Header`, `Table Title`, `Figure`, `Caption`, and `Source`. Keep paragraphs and tables editable.
+- **PDF**: copy [assets/blank.typ](assets/blank.typ), append content, and compile with `typst compile report.typ report.pdf` or Python's `typst.compile('report.typ', output='report.pdf')`. Use `#doc-title[...]`, headings, tables, and figure captions to inherit typography. Other native engines may use the same baseline. Markdown conversion is optional; DOCX-to-PDF serves Word layout checks or a requested matching export.
 - **Excel**: write cells and formulas with `openpyxl`. When results must already be displayed in the file, recalculate with a compatible calculation engine; do not replace formulas with static values.
 
 ## Execution constraints
 
 1. **Check the environment once.** Check libraries, fonts, and renderers together; reuse installed dependencies and install only missing ones. For Word, verify that the renderer can load a minimal DOCX; command availability alone is insufficient. Record tool versions during this check, not again at delivery.
 
-2. **Apply the style in the first build.** Set fonts, heading styles, sizes, spacing, and text/table widths explicitly in code. Remove conflicting theme fonts and default title/table borders. Give image paragraphs automatic or minimum line spacing and let table rows grow. Draw headers and footers in one stage only. Paired Word/PDF files must share content, calculated values, and style parameters; compute totals, ratios, and scores in code.
+2. **Reuse the style from the first build.** Inherit the blank assets' typography and page settings; apply the table and figure styles explicitly. They contain no report outline, palette, or decoration. Adapt fonts to the language as described in `style.md`; avoid conflicting theme or run overrides. Keep image paragraphs at automatic or minimum line spacing and let rows grow. Draw any headers/footers once. Paired Word/PDF files share content, calculations, and the baseline; compute totals, ratios, and scores in code.
 
 3. **Trial complex layouts before full generation.** Try the widest table and largest chart with real content at final sizes. Adjust columns, split tables, or add pages when needed; preserve the specified type sizes.
 
