@@ -93,6 +93,9 @@ slide. Extra `data-fit-region` hooks are only for genuinely constrained subareas
 ordinary flow text needs no extra measurement boundary. All content shares one scale.
 
 `layouts/_shell.html` is the shared HTML document with one `.deck` insertion point.
+Use a pure-black (`#000`) viewer surround. Center the visible slide canvas horizontally
+and vertically, and fit the whole canvas within the viewport at its original aspect
+ratio, including after resize and navigation. Keep source styling inside the canvas.
 Its `.deck` can be empty or retain source examples; no need to assemble every source
 page in it. Complete source-page coverage belongs in `source-index.json`. Source fragments
 use paths relative to `layouts/`, where they are inserted into the shell.

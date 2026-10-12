@@ -5,6 +5,11 @@ The saved shell already includes the runtime and source configuration; no need t
 recreate them. Use the recorded safe areas, required chrome and approved font
 fallbacks in `tools/qa-config.json`. For final QA, follow [qa.md](qa.md).
 
+The viewer surround is pure black (`#000`). Keep the visible canvas centered on both
+axes and fully inside the viewport at its original aspect ratio, including after
+resize and navigation. Scale the canvas as a whole; its internal source layout and
+typography stay in canvas coordinates. This viewport scaling is separate from text fit.
+
 ## HTML hooks
 
 Carry over the selected source layout's `data-layout`/`data-source-profile` and
