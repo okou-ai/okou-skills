@@ -107,6 +107,41 @@ test("shell structure uses HTML attributes rather than comments or script string
   assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
 });
 
+for (const [label, contents, message] of [
+  ["missing fit", fragment.replace('class="fit"', 'class="content"'), "one .fit content root"],
+  ["duplicate fit", fragment.replace('<h1>', '<div class="fit"></div><h1>'), "one .fit content root"],
+  ["fit outside stage", '<section class="slide"><div class="stage"></div><div class="fit">Title</div></section>', "one .fit content root"],
+  ["fit on stage itself", '<section class="slide"><div class="stage fit">Title</div></section>', "one .fit content root"],
+  ["missing stage", '<section class="slide"><div class="fit">Title</div></section>', "one .stage"],
+  ["duplicate stage", fragment.replace('</section>', '<div class="stage"><div class="fit"></div></div></section>'), "one .stage"],
+  ["multiple slides", fragment.repeat(2), "one .slide"],
+  ["extra outer wrapper", `<div>${fragment}</div>`, "top-level fragment"],
+]) {
+  test(`source package catches ${label} before generation`, t => {
+    const {write, verify} = fixture(t);
+    write("layouts/source/title.html", contents);
+    blocked(verify(), message);
+  });
+}
+
+test("each shell example needs its own content root", t => {
+  const {write, verify} = fixture(t);
+  write("layouts/_shell.html", shell(fragment + fragment.replace('class="fit"', 'class="content"')));
+  blocked(verify(), "layouts/_shell.html: each .stage needs exactly one .fit");
+});
+
+test("shell examples must be direct deck children", t => {
+  const {write, verify} = fixture(t);
+  write("layouts/_shell.html", shell(`<div>${fragment}</div>`));
+  blocked(verify(), "direct children of .deck");
+});
+
+test("structure ignores comments and script strings and accepts unquoted classes and SVG", t => {
+  const {write, verify} = fixture(t);
+  write("layouts/source/title.html", '<section class=slide><div class=stage data-layout=title><div class=fit><img src="data:,a"><svg><path d="M0 0" /></svg>Title</div></div></section><!-- <div class=fit> --><script>const example = "<div class=fit>";</script>');
+  assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
+});
+
 for (const file of ["references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/layout-reuse.md", "references/generate/typography-fit.md", "scripts/navigation.js", "library/README.md", "library/styles/geometry.css"]) {
   test(`required package file cannot be missing: ${file}`, t => {
     const {root, verify} = fixture(t);
@@ -124,13 +159,13 @@ test("a directory cannot stand in for the QA guide", t => {
 
 test("installed generation package works without extraction references or helpers", t => {
   const {root, verify} = fixture(t);
-  for (const file of ["references/extract", "scripts/source-derivatives.py", "scripts/install-qa.mjs", "tools/verify-package.mjs", "tests"]) {
+  for (const file of ["references/extract", "scripts/inventory-html.py", "scripts/source-derivatives.py", "scripts/install-qa.mjs", "tools/verify-package.mjs", "tests"]) {
     assert.equal(existsSync(path.join(root, file)), false, file);
   }
   assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
 });
 
-for (const file of ["references/extract/layout-inventory.md", "scripts/source-derivatives.py", "scripts/install-qa.mjs", "tools/verify-package.mjs"]) {
+for (const file of ["references/extract/layout-inventory.md", "scripts/inventory-html.py", "scripts/source-derivatives.py", "scripts/install-qa.mjs", "tools/verify-package.mjs"]) {
   test(`rejects extraction files mixed into a generation package: ${file}`, t => {
     const {write, verify} = fixture(t);
     write(file, "Extraction-only content.");

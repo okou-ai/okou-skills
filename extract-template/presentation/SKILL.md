@@ -15,16 +15,17 @@ presentation language.
 | --- | --- | --- |
 | This `SKILL.md`, `references/extract/` | Extract and record the source | No |
 | `references/generate/` | Generate, check and deliver new decks | Yes, at the same paths |
-| `scripts/source-derivatives.py`, `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
+| `scripts/inventory-html.py`, `scripts/source-derivatives.py`, `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
 
 The installer copies the generation guides and runtime by an explicit file list.
 The package's own `SKILL.md` is its generation entrypoint.
 
 ## 1. Inspect the source
 
-Create ordered page images to inspect the original layouts, typography, colours
-and image crops. These captures are the visual reference for extraction and the
-saved template's source preview. Keep the original for structure and style metadata.
+For HTML, batch-inventory the existing DOM with [html-source.md](references/extract/html-source.md)
+and reuse its editable fragments and CSS. For PPTX, read its structure/style metadata;
+for PDF/images, infer from the rendered pages. Keep the original as evidence.
+Source parsing and the independent page capture can run together.
 
 Use a new `<work-dir>` beside the template package. All commands below use fixed
 subdirectories: `source-pages/` for original pages, `previews/` for contact sheets
@@ -37,20 +38,21 @@ Reuse existing ordered captures or supplied slide images at
 okou presentation screenshot --input <source.ppt|source.pptx|source.pdf|source.html|html-dir|url> --out <work-dir>/source-pages
 ```
 
-When a contact sheet helps inspection, the supplied helper writes it directly to
-`<work-dir>/previews/` and returns its paths. It installs Pillow only if needed:
+Review every page through contact sheets; open individual captures only for details
+that are unclear at that size. The helper installs Pillow if needed and writes previews
+to their own directory. For HTML/images, create the upload PDF in the same pass:
 
 ```bash
-python3 scripts/source-derivatives.py --work-dir <work-dir> --contact-sheet
+python3 scripts/source-derivatives.py --work-dir <work-dir> --contact-sheet --pdf
 ```
 
+For PPT/PPTX/PDF, omit `--pdf`: the original already supplies the upload source.
 For HTML, use `--slides "<slide-selector>"` when the source uses a different slide
 selector from `.deck > .slide`; use `--slides none` for one page per HTML file.
-Inspect the DOM, computed CSS, SVG and assets directly. Reuse editable source
-elements and copy their required resources into the package with local paths.
+Read computed CSS once per distinct style, including inherited styles and SVG.
 Record the original entry file or URL in `design-system.md`.
 
-Inspect every page. Record the filename, aspect ratio, page count, page roles and
+Record the filename, aspect ratio, page count, page roles and
 recurring structures. Check typography against source metadata and label visual
 estimates as inferred. Archive original-source captures, never reconstruction images.
 
@@ -83,8 +85,9 @@ and reusable background recipes.
   references/generate/      # generation-only guidance
 ```
 
-Cover every source page in the index; preserve distinct compositions and background
-variants. Keep text, shapes, tables and ordinary charts editable in HTML/CSS/SVG.
+Create the source index and fragments in one batch; preserve every distinct composition
+and background variant. Equivalent structures may share a layout with explicit source-page
+coverage. Keep text, shapes, tables and ordinary charts editable in HTML/CSS/SVG.
 Use package-relative assets and `.deck > .slide`, one `.stage` and a `.fit` root per
 slide, with disjoint `data-fit-region` measurement areas that share one page-wide scale.
 
@@ -116,16 +119,16 @@ When refreshing an older package, update its entrypoint links to `references/gen
 
 ## 4. Check the package
 
-From this guide's directory, check generation guidance and links, source coverage,
-source QA configuration, library links, capture count and local paths. The verifier
-also rejects extra entries in the capture directory and extraction references or
-helpers included in the saved package:
+From this guide's directory, run the package verifier. It checks slide/stage/fit
+structure, generation links, source coverage/configuration, library resources and
+capture inventory, and rejects extraction files mixed into the saved package:
 
 ```bash
 node tools/verify-package.mjs \
   --package <template-slug> --source-pages <work-dir>/source-pages
 ```
 
+No generation QA, interaction pass or runtime test-suite run is needed during extraction.
 Only for a specific reconstruction risk, compare one or two unchanged compositions
 with their source captures, using `--out <work-dir>/previews/reconstruction` for
 any check screenshots.
@@ -134,19 +137,9 @@ any check screenshots.
 
 After the package check passes, prepare the upload source.
 
-The upload accepts `.ppt`, `.pptx` or `.pdf` as `--source`. Use the original when
-it is one of these formats. For HTML or image decks, create the upload PDF directly
-at `<work-dir>/upload/source.pdf`:
-
-```bash
-python3 scripts/source-derivatives.py --work-dir <work-dir> --pdf
-```
-
-The helper reads only original page images. Its `--contact-sheet` and `--pdf` flags
-can be combined when both outputs are needed. Record this conversion
-and the original file or URL in `design-system.md`; the package retains the
-editable layouts and assets. No need to export or render the reconstructed package
-for this upload.
+Use the original `.ppt`, `.pptx` or `.pdf` as `--source`. For HTML/images, reuse
+`<work-dir>/upload/source.pdf` from step 1. Record this conversion in `design-system.md`;
+the package retains editable layouts and assets. No reconstructed export is needed.
 
 ```bash
 okou user-template publish --kind presentation --title "<template name>" \

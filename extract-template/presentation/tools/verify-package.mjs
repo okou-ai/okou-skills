@@ -97,15 +97,48 @@ function srcsetUrls(value) {
 }
 const htmlSource = html => html.replace(/<!--[\s\S]*?-->/g, "").replace(/(<script\b[^>]*>)[\s\S]*?<\/script\s*>/gi, "$1</script>");
 function* htmlElements(html) {
-  const tags = /<([a-z][\w:-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi;
+  const tags = /<(\/?)([a-z][\w:-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi;
   const attributes = /([^\s"'<>/=]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/g;
+  const stack = [], voids = new Set("area base br col embed hr img input link meta param source track wbr".split(" "));
   for (const tag of htmlSource(html).replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, "").matchAll(tags)) {
+    const name = tag[2].toLowerCase();
+    if (tag[1]) {
+      const at = stack.findLastIndex(element => element.name === name);
+      if (at >= 0) stack.length = at;
+      continue;
+    }
     const attrs = new Map();
     for (const match of tag[0].matchAll(attributes)) {
       const name = match[1].toLowerCase();
       if (!attrs.has(name)) attrs.set(name, decodeEntities(match[2] ?? match[3] ?? match[4]));
     }
-    yield {name: tag[1], attrs};
+    const element = {name, attrs, parent: stack.at(-1)};
+    yield element;
+    if (!voids.has(name) && !/\/\s*>$/.test(tag[0])) stack.push(element);
+  }
+}
+const hasClass = (element, name) => Boolean(element && (element.attrs.get("class") || "").split(/\s+/).includes(name));
+const inside = (element, ancestor) => {
+  for (let parent = element.parent; parent; parent = parent.parent) if (parent === ancestor) return true;
+  return false;
+};
+function inspectLayoutStructure(html, label, sharedShell = false) {
+  const elements = [...htmlElements(html)];
+  const slides = elements.filter(element => hasClass(element, "slide"));
+  const stages = elements.filter(element => hasClass(element, "stage"));
+  const fits = elements.filter(element => hasClass(element, "fit"));
+  if (!sharedShell && slides.length !== 1) errors.push(`${label}: source fragment needs exactly one .slide`);
+  for (const slide of slides) {
+    if (sharedShell && !hasClass(slide.parent, "deck")) errors.push(`${label}: shell slides must be direct children of .deck`);
+    if (!sharedShell && slide.parent) errors.push(`${label}: source .slide must be a top-level fragment`);
+    if (stages.filter(stage => inside(stage, slide)).length !== 1) errors.push(`${label}: each .slide needs exactly one .stage`);
+  }
+  for (const stage of stages) {
+    if (slides.filter(slide => inside(stage, slide)).length !== 1) errors.push(`${label}: .stage must belong to exactly one .slide`);
+    if (fits.filter(fit => inside(fit, stage)).length !== 1) errors.push(`${label}: each .stage needs exactly one .fit content root`);
+  }
+  for (const fit of fits) {
+    if (stages.filter(stage => inside(fit, stage)).length !== 1) errors.push(`${label}: .fit must be inside its .stage`);
   }
 }
 const inspectHtmlResources = (html, base, label, sourceLayout = false) => {
@@ -141,14 +174,14 @@ try {
   for (const name of readdirSync(path.join(root, "references"))) {
     if (name !== "generate") errors.push(`Package references are generation-only: references/${name}`);
   }
-  for (const file of ["scripts/source-derivatives.py", "scripts/install-qa.mjs", "scripts/render-pages.mjs", "scripts/libreoffice.mjs", "tools/verify-package.mjs", "tests"]) {
+  for (const file of ["scripts/inventory-html.py", "scripts/source-derivatives.py", "scripts/install-qa.mjs", "scripts/render-pages.mjs", "scripts/libreoffice.mjs", "tools/verify-package.mjs", "tests"]) {
     if (existsSync(path.join(root, file))) errors.push(`Extraction/development file belongs outside the saved package: ${file}`);
   }
   const index = JSON.parse(readFileSync(path.join(root, "layouts/source-index.json"), "utf8"));
   if (!index.sourceFilename || !Number.isInteger(index.pageCount) || index.pageCount < 1 || !index.sourceAspectRatio) errors.push("Source filename, positive pageCount and original sourceAspectRatio are required");
   const shell = readFileSync(path.join(root, "layouts/_shell.html"), "utf8");
   if (countClass(shell, "deck") !== 1) errors.push("Shared shell needs exactly one .deck insertion point");
-  if (countClass(shell, "slide") !== countClass(shell, "stage")) errors.push("Each example slide in the shared shell needs one stage");
+  inspectLayoutStructure(shell, "layouts/_shell.html", true);
   inspectHtmlResources(shell, layoutRoot, "layouts/_shell.html", true);
   checkResource("styles/template.css", root, "styles/template.css");
   const covered = new Set(), ids = new Set();
@@ -160,7 +193,11 @@ try {
     const relative = path.relative(path.join(root, "layouts/source"), file);
     if (relative.startsWith("..") || path.isAbsolute(relative) || !relative.endsWith(".html") || !existsSync(file)) errors.push(`Invalid source layout file: ${layout.id}`);
     if (!layout.purpose || !Array.isArray(layout.regions) || !layout.regions.length || !layout.capacity) errors.push(`Record purpose, regions and capacity for ${layout.id}`);
-    if (existsSync(file)) inspectHtmlResources(readFileSync(file, "utf8"), layoutRoot, `layouts/${layout.file}`, true);
+    if (existsSync(file)) {
+      const html = readFileSync(file, "utf8"), label = `layouts/${layout.file}`;
+      inspectLayoutStructure(html, label);
+      inspectHtmlResources(html, layoutRoot, label, true);
+    }
     if (!Array.isArray(layout.sourcePages) || !layout.sourcePages.length) errors.push(`Source pages missing: ${layout.id}`);
     for (const page of layout.sourcePages || []) {
       if (!Number.isInteger(page) || page < 1 || page > index.pageCount) errors.push(`Invalid source page: ${layout.id}`);
