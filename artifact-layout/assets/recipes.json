@@ -1,0 +1,75 @@
+{
+  "editorial-research": {
+    "name": "Editorial research",
+    "defaultLayout": "two-column",
+    "defaultTheme": "warm-editorial",
+    "components": [
+      "big-number",
+      "prose",
+      "pull-quote",
+      "figure",
+      "small-multiples",
+      "source-note"
+    ],
+    "vocabulary": [
+      "S01",
+      "L02",
+      "L07",
+      "N01",
+      "T02",
+      "T03",
+      "I02",
+      "C27",
+      "R06",
+      "P01",
+      "P02"
+    ],
+    "description": "Open with supplied findings, mix continuous prose and emphasized evidence, use full-width figures for dense material. No mandatory business outline."
+  },
+  "executive-brief": {
+    "name": "Executive brief",
+    "defaultLayout": "modular",
+    "defaultTheme": "corporate",
+    "components": [
+      "metric-strip",
+      "line-chart",
+      "bar-chart",
+      "data-table",
+      "callout",
+      "takeaways"
+    ],
+    "vocabulary": [
+      "L05",
+      "N02",
+      "N03",
+      "C01",
+      "C03",
+      "B01",
+      "T06"
+    ],
+    "description": "A metric overview followed by related trend and comparison blocks. Use open prose and wider tables where needed; no required metrics or manufactured deltas."
+  },
+  "comparison-review": {
+    "name": "Comparison review",
+    "defaultLayout": "sidebar",
+    "defaultTheme": "editorial",
+    "components": [
+      "comparison-table",
+      "prose",
+      "callout",
+      "bar-chart",
+      "takeaways",
+      "source-note"
+    ],
+    "vocabulary": [
+      "L03",
+      "L07",
+      "B02",
+      "C01",
+      "T06",
+      "R06",
+      "P04"
+    ],
+    "description": "Wide common-dimension comparisons with main commentary and quiet supporting notes. Keeps supplied criteria, order, and conclusions."
+  }
+}

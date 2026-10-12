@@ -1,0 +1,30 @@
+name: Artifact layout
+
+on:
+  pull_request:
+    paths:
+      - "artifact-layout/**"
+      - "office-files/assets/**"
+      - ".github/workflows/artifact-layout.yml"
+  push:
+    branches: [main]
+    paths:
+      - "artifact-layout/**"
+      - "office-files/assets/**"
+      - ".github/workflows/artifact-layout.yml"
+
+jobs:
+  layout:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install native layout dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fontconfig fonts-liberation fonts-noto-cjk
+          python -m pip install python-docx==1.2.0 typst==0.15.0 Pillow==12.3.0 pypdf==6.20.0
+      - name: Verify layout contracts and actual native output
+        run: python -m unittest discover -s artifact-layout/tests -v

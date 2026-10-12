@@ -11,6 +11,8 @@ Honor user requirements and supplied templates. Start edits from the original fi
 
 For new Word/PDF documents without a specified design, read [style.md](style.md) and inherit the blank assets from the first build. They define typography, not a report outline or palette.
 
+For a new report layout or requested redesign, use the installed `artifact-layout` skill to choose grids, emphasis components, and a visual theme. It is maintained separately at [artifact-layout/SKILL.md](../artifact-layout/SKILL.md); its native adapters inherit these blank assets and type sizes. Preserve the user's template and existing design when a redesign is not requested.
+
 | Format | Native starting point |
 | --- | --- |
 | Word | Open [blank.docx](assets/blank.docx) with `python-docx`; use named styles and editable paragraphs/tables. |

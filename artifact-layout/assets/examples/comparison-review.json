@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "title": "Give the comparison room to be read",
+  "language": "en",
+  "theme": "editorial",
+  "recipe": "comparison-review",
+  "meta": "LAYOUT STUDY · 03 / 03 · ILLUSTRATIVE CONTENT",
+  "subtitle": "A common-dimension table carries the comparison. Main commentary and supporting notes remain separate. This sample makes no purchasing recommendation.",
+  "sections": [
+    {
+      "title": "Common dimensions, consistent presentation",
+      "layout": "single",
+      "blocks": [
+        {
+          "type": "comparison-table",
+          "headers": [
+            "Illustrative dimension",
+            "Option A",
+            "Option B",
+            "Option C"
+          ],
+          "rows": [
+            [
+              "Setup",
+              "Guided",
+              "Self-serve",
+              "Partner-led"
+            ],
+            [
+              "Coverage",
+              "Three channels",
+              "Four channels",
+              "Two channels"
+            ],
+            [
+              "Plan cost",
+              "120",
+              "160",
+              "140"
+            ],
+            [
+              "Migration note",
+              "Supplied note A",
+              "Supplied note B",
+              "Supplied note C"
+            ]
+          ],
+          "numericColumns": [
+            1,
+            2,
+            3
+          ],
+          "source": "Illustrative fixture — synthetic values for layout review only."
+        }
+      ]
+    },
+    {
+      "title": "Commentary with an independent sidebar",
+      "layout": "sidebar",
+      "blocks": [
+        {
+          "type": "prose",
+          "title": "Use the main column for the explanation",
+          "paragraphs": [
+            "The main column follows the existing argument. The supporting column holds definitions, limitations, or supplied notes without becoming a second stream of continuous prose.",
+            "A comparison matrix needs enough width for each cell to wrap naturally. More rows should create more document space; smaller text should not be the default response.",
+            "Keep each criterion as supplied. This layout does not assign weights, calculate scores, or invent a recommended option."
+          ]
+        },
+        {
+          "type": "callout",
+          "placement": "aside",
+          "title": "A note belongs beside its subject",
+          "text": "Definitions and conditions can sit here when they support the adjacent explanation."
+        },
+        {
+          "type": "source-note",
+          "placement": "aside",
+          "title": "Source context",
+          "text": "Illustrative fixture — synthetic values for layout review only."
+        },
+        {
+          "type": "bar-chart",
+          "span": "all",
+          "title": "One comparable measure",
+          "labels": [
+            "Option A",
+            "Option B",
+            "Option C"
+          ],
+          "values": [
+            120,
+            160,
+            140
+          ],
+          "unit": "Illustrative cost units",
+          "source": "Illustrative fixture — synthetic values for layout review only."
+        },
+        {
+          "type": "takeaways",
+          "span": "all",
+          "title": "Keep the comparison legible",
+          "items": [
+            "Wide tables span the available text area.",
+            "The main argument and sidebar have distinct roles.",
+            "Shared scales help readers compare supplied values."
+          ]
+        }
+      ]
+    }
+  ]
+}

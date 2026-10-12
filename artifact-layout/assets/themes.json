@@ -1,0 +1,58 @@
+{
+  "editorial": {
+    "name": "Editorial",
+    "description": "Paper white, ink typography, restrained blue.",
+    "background": "#ffffff",
+    "ink": "#17222b",
+    "muted": "#53616c",
+    "accent": "#245770",
+    "tint": "#eef3f5",
+    "rule": "#d5dde2",
+    "display": "Liberation Serif",
+    "body": "Liberation Serif",
+    "cjk": "Noto Serif CJK SC",
+    "radius": 0
+  },
+  "warm-editorial": {
+    "name": "Warm editorial",
+    "description": "Cream paper, warm ink, terracotta emphasis.",
+    "background": "#fffaf2",
+    "ink": "#30251e",
+    "muted": "#716358",
+    "accent": "#995433",
+    "tint": "#f4e9d8",
+    "rule": "#dfcfbd",
+    "display": "Liberation Serif",
+    "body": "Liberation Serif",
+    "cjk": "Noto Serif CJK SC",
+    "radius": 0
+  },
+  "corporate": {
+    "name": "Corporate",
+    "description": "White paper, blue emphasis, clear sans-serif hierarchy.",
+    "background": "#ffffff",
+    "ink": "#182a40",
+    "muted": "#506279",
+    "accent": "#245bb4",
+    "tint": "#edf3fc",
+    "rule": "#d3deed",
+    "display": "Liberation Sans",
+    "body": "Liberation Sans",
+    "cjk": "Noto Sans CJK SC",
+    "radius": 4
+  },
+  "mono": {
+    "name": "Mono",
+    "description": "Grayscale hierarchy, rules, and neutral paper.",
+    "background": "#ffffff",
+    "ink": "#202020",
+    "muted": "#595959",
+    "accent": "#303030",
+    "tint": "#f1f1f1",
+    "rule": "#d4d4d4",
+    "display": "Liberation Sans",
+    "body": "Liberation Sans",
+    "cjk": "Noto Sans CJK SC",
+    "radius": 0
+  }
+}

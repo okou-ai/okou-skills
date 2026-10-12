@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "title": "A clearer way to read the evidence",
+  "language": "en",
+  "theme": "warm-editorial",
+  "recipe": "editorial-research",
+  "meta": "LAYOUT STUDY · 01 / 03 · ILLUSTRATIVE CONTENT",
+  "subtitle": "A report should make its strongest finding easy to see, then give the evidence room to breathe. This sample demonstrates reading flow, not a factual research result.",
+  "sections": [
+    {
+      "title": "The finding, in context",
+      "layout": "two-column",
+      "blocks": [
+        {
+          "type": "big-number",
+          "value": "64%",
+          "label": "Illustrative adoption rate",
+          "period": "Synthetic sample, 2026",
+          "note": "A large number stays connected to its meaning.",
+          "source": "Illustrative fixture — synthetic values for layout review only."
+        },
+        {
+          "type": "prose",
+          "title": "Make the first reading useful",
+          "paragraphs": [
+            "Readers often enter a report through a headline, a chart, or a number. A clear hierarchy lets them understand the main point before choosing where to read more deeply.",
+            "Two columns can support sustained reading when line lengths remain comfortable. They are continuous text columns: the reader follows one column before continuing into the next. This is different from a main column with an independent sidebar.",
+            "Wide evidence needs space. A chart that carries several comparisons should span the text columns, while a caption and source note stay close to the graphic."
+          ]
+        },
+        {
+          "type": "pull-quote",
+          "text": "The evidence needs enough space to remain legible.",
+          "attribution": "Original illustrative wording"
+        },
+        {
+          "type": "prose",
+          "title": "Use emphasis with restraint",
+          "paragraphs": [
+            "A large-number callout works best when only a few values deserve special attention. The next section should explain the same information rather than introduce another row of equally dominant cards.",
+            "This composition is deliberately quieter around the body text. Display type, paragraph spacing, shared alignment lines, and a small accent color establish a predictable rhythm."
+          ]
+        },
+        {
+          "type": "small-multiples",
+          "span": "all",
+          "title": "Two panels, one comparison scale",
+          "charts": [
+            {
+              "type": "bar-chart",
+              "title": "Illustrative group A",
+              "labels": [
+                "First",
+                "Second",
+                "Third"
+              ],
+              "values": [
+                34,
+                52,
+                64
+              ],
+              "unit": "%"
+            },
+            {
+              "type": "bar-chart",
+              "title": "Illustrative group B",
+              "labels": [
+                "First",
+                "Second",
+                "Third"
+              ],
+              "values": [
+                29,
+                47,
+                58
+              ],
+              "unit": "%"
+            }
+          ],
+          "source": "Illustrative fixture — synthetic values for layout review only."
+        }
+      ]
+    },
+    {
+      "title": "Put the figure next to its explanation",
+      "layout": "single",
+      "blocks": [
+        {
+          "type": "image-text",
+          "image": "field-study.png",
+          "alt": "Original abstract illustration with four color regions and thin grid lines.",
+          "title": "Image and text share one reading unit",
+          "paragraphs": [
+            "The visual occupies one side, and a short explanation occupies the other. On a small screen, the figure precedes its explanation.",
+            "The caption names the image. Supplied provenance remains below the illustration instead of becoming an unreadable footer."
+          ],
+          "caption": "Original vector-inspired layout illustration.",
+          "source": "Okou layout fixture; no external imagery."
+        },
+        {
+          "type": "takeaways",
+          "title": "The layout choices",
+          "items": [
+            "A large number is accompanied by a label and context.",
+            "Two-column analysis and full-width evidence alternate.",
+            "Figures, captions, and notes remain visibly connected."
+          ]
+        },
+        {
+          "type": "source-note",
+          "title": "About this sample",
+          "text": "Illustrative fixture — synthetic values for layout review only."
+        }
+      ]
+    }
+  ]
+}

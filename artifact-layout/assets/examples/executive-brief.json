@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "title": "A business update with a clear reading order",
+  "language": "en",
+  "theme": "corporate",
+  "recipe": "executive-brief",
+  "meta": "LAYOUT STUDY · 02 / 03 · ILLUSTRATIVE CONTENT",
+  "subtitle": "An overview of the supplied metrics, followed by the charts and commentary that explain their movement. All values below are synthetic layout fixtures.",
+  "sections": [
+    {
+      "title": "A compact overview",
+      "layout": "single",
+      "blocks": [
+        {
+          "type": "metric-strip",
+          "items": [
+            {
+              "value": "8.4M",
+              "unit": "USD",
+              "label": "Illustrative revenue",
+              "delta": "+14.6% vs prior quarter",
+              "period": "Synthetic Q3",
+              "source": "Illustrative fixture — synthetic values for layout review only."
+            },
+            {
+              "value": "82%",
+              "label": "Illustrative margin",
+              "delta": "+3 percentage points",
+              "period": "Synthetic Q3"
+            },
+            {
+              "value": "27",
+              "unit": "months",
+              "label": "Illustrative runway",
+              "period": "Synthetic Q3"
+            }
+          ]
+        },
+        {
+          "type": "prose",
+          "paragraphs": [
+            "Keep the overview short enough to scan. The commentary below provides the context; the metric strip does not have to carry the whole report."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Follow the overview with evidence",
+      "layout": "modular",
+      "blocks": [
+        {
+          "type": "line-chart",
+          "title": "Illustrative monthly revenue",
+          "labels": [
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep"
+          ],
+          "values": [
+            4.2,
+            4.8,
+            5.9,
+            6.3,
+            7.2,
+            8.4
+          ],
+          "unit": "USD millions",
+          "source": "Illustrative fixture — synthetic values for layout review only."
+        },
+        {
+          "type": "bar-chart",
+          "title": "Illustrative expense mix",
+          "labels": [
+            "Research",
+            "Sales",
+            "Support",
+            "Other"
+          ],
+          "values": [
+            42,
+            31,
+            18,
+            9
+          ],
+          "unit": "Share (%)",
+          "source": "Illustrative fixture — synthetic values for layout review only."
+        },
+        {
+          "type": "data-table",
+          "span": "all",
+          "title": "A wide table keeps numbers readable",
+          "headers": [
+            "Illustrative measure",
+            "Current",
+            "Prior",
+            "Supplied change"
+          ],
+          "rows": [
+            [
+              "Revenue",
+              "8.4M",
+              "7.3M",
+              "+14.6%"
+            ],
+            [
+              "Gross margin",
+              "82%",
+              "79%",
+              "+3 pp"
+            ],
+            [
+              "Runway",
+              "27 months",
+              "23 months",
+              "+4 months"
+            ]
+          ],
+          "numericColumns": [
+            1,
+            2,
+            3
+          ],
+          "source": "Illustrative fixture — synthetic values for layout review only."
+        },
+        {
+          "type": "callout",
+          "title": "Reserve emphasis for the point that matters",
+          "text": "This box shows how a supplied observation can be highlighted without turning every paragraph into a card."
+        },
+        {
+          "type": "timeline",
+          "title": "A compact sequence",
+          "items": [
+            {
+              "label": "Now",
+              "text": "Review the supplied observation."
+            },
+            {
+              "label": "Next",
+              "text": "Place related evidence beside the commentary."
+            },
+            {
+              "label": "Then",
+              "text": "Keep the existing action wording intact."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

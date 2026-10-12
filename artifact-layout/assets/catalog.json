@@ -1,0 +1,3726 @@
+{
+  "meta": {
+    "title": "报告视觉表达分类库",
+    "date": "2026-10-12",
+    "total": 121,
+    "core": 109,
+    "extensions": 12,
+    "sourceCount": 24,
+    "groupCount": 10,
+    "named": 93,
+    "descriptive": 28,
+    "scope": "Word、PDF中的调研、数据分析、白皮书、商务报告与操作文档。",
+    "limitation": "没有业界统一、穷尽的分类标准。本目录是基于公开来源整理的分层工作分类，不是官方标准，也不是使用频率统计。同族变体与内容型子类可重叠；条目数量不等于互斥图形或设计风格数量。",
+    "evidence": "英文名称来自通行术语或明确标注的描述性命名。引用资料支持名称、定义或组合原理；中文解释、注意事项与AI句式为本次整理，并非来源原文。",
+    "excluded": "未把每一种字体、配色、纸张、装饰或小众图形列为独立分类；交互筛选、悬停与动画不属于静态Word/PDF核心。",
+    "genspark": "未取得或查看你提到的Genspark原稿。参考配方仅根据你描述的双栏、大数字前置和图文结合组织。",
+    "package": "Okou artifact layout vocabulary",
+    "explanatoryLanguage": "zh-CN",
+    "coverageNote": "121 reference terms; built-in renderer coverage is marked per entry. This is a working taxonomy, not a popularity ranking or exhaustive industry standard."
+  },
+  "groups": [
+    {
+      "id": "S",
+      "name": "整体视觉方向",
+      "en": "Visual direction",
+      "layer": "方向",
+      "description": "选择整份报告的阅读气质。包含设计领域、历史流派与描述性方向；目录条目不是互斥风格。",
+      "coreCount": 6,
+      "extensionCount": 0
+    },
+    {
+      "id": "L",
+      "name": "页面版式与栅格",
+      "en": "Layout & grids",
+      "layer": "版式",
+      "description": "决定内容如何分区、对齐、跨栏与跨页。栅格是骨架，正文栏数只是其中一种选择。",
+      "coreCount": 9,
+      "extensionCount": 0
+    },
+    {
+      "id": "T",
+      "name": "文字强调与信息模块",
+      "en": "Editorial components",
+      "layer": "组件",
+      "description": "用标题、导语、摘句、引用、框和清单建立可扫读的内容层级。",
+      "coreCount": 12,
+      "extensionCount": 0
+    },
+    {
+      "id": "N",
+      "name": "关键数字与指标",
+      "en": "Numbers & metrics",
+      "layer": "组件",
+      "description": "将少量数字变成阅读入口，并提供变化、基准、趋势和口径。",
+      "coreCount": 6,
+      "extensionCount": 0
+    },
+    {
+      "id": "I",
+      "name": "图文组合与图片处理",
+      "en": "Image–text composition",
+      "layer": "组件",
+      "description": "决定图像如何支持文字：并置、图注、主辅图、绕排、满版、叠字、图集与标注。",
+      "coreCount": 8,
+      "extensionCount": 0
+    },
+    {
+      "id": "C",
+      "name": "数据图表与组合",
+      "en": "Charts & compositions",
+      "layer": "证据",
+      "description": "先选择数据关系，再选择图形。含图表本身、同族变体和小多图组合。",
+      "coreCount": 31,
+      "extensionCount": 11
+    },
+    {
+      "id": "B",
+      "name": "表格与对比矩阵",
+      "en": "Tables & matrices",
+      "layer": "证据",
+      "description": "精确查值、同维度比较、汇总、内嵌趋势和有依据的状态表达。",
+      "coreCount": 6,
+      "extensionCount": 0
+    },
+    {
+      "id": "D",
+      "name": "流程与结构图解",
+      "en": "Diagrams & models",
+      "layer": "证据",
+      "description": "展示步骤、分支、职责、层级、集合、时间与关系。普通箭头不自动代表数量。",
+      "coreCount": 12,
+      "extensionCount": 1
+    },
+    {
+      "id": "R",
+      "name": "导航与可信度模块",
+      "en": "Navigation & provenance",
+      "layer": "导航",
+      "description": "用目录、章节、页眉页码、来源、方法、术语和附录保持定位与可核查性。",
+      "coreCount": 12,
+      "extensionCount": 0
+    },
+    {
+      "id": "P",
+      "name": "叙事与阅读顺序",
+      "en": "Narrative patterns",
+      "layer": "叙事",
+      "description": "决定先看到什么、证据如何展开、解释如何成立以及如何导向行动。不是静态装饰。",
+      "coreCount": 7,
+      "extensionCount": 0
+    }
+  ],
+  "entries": [
+    {
+      "id": "S01",
+      "group": "S",
+      "zh": "杂志式／编辑设计方向",
+      "en": "Editorial design / magazine-style report",
+      "status": "通行术语",
+      "definition": "以栅格、字体层级和图文节奏组织多页阅读。Editorial design是设计领域，magazine-style是方向描述。",
+      "use": "行业研究、趋势报告、白皮书、品牌刊物",
+      "caution": "不等于所有正文都双栏；不能只换字体而忽略内容结构。",
+      "prompt": "采用杂志式编辑设计，建立统一栅格与字体层级，将正文、图表、摘句和留白组织成有节奏的多页报告。",
+      "sources": [
+        "S02",
+        "S03",
+        "S18"
+      ],
+      "preview": "editorial",
+      "tags": [
+        "杂志",
+        "出版物",
+        "editorial"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "S02",
+      "group": "S",
+      "zh": "瑞士／国际主义平面风格",
+      "en": "Swiss Style / International Typographic Style",
+      "status": "通行术语",
+      "definition": "以清晰栅格、非对称构图、无衬线字体和克制视觉元素传达信息的设计流派。",
+      "use": "理性研究、技术白皮书、数据密集报告",
+      "caution": "双栏或大数字本身不足以证明是瑞士风格；不要把红黑配色当成必要条件。",
+      "prompt": "采用瑞士国际主义平面设计方向，以严格栅格、非对称构图和清晰无衬线层级组织报告，装饰保持克制。",
+      "sources": [
+        "S19",
+        "S01"
+      ],
+      "preview": "swiss",
+      "tags": [
+        "瑞士",
+        "国际主义",
+        "grid"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "S03",
+      "group": "S",
+      "zh": "极简／字体主导方向",
+      "en": "Minimal / typography-led report",
+      "status": "描述性命名",
+      "definition": "依赖字号、字重、留白和对齐而不是大量装饰的报告方向。",
+      "use": "管理简报、观点报告、简洁商务文件",
+      "caution": "这是描述性组合，不是固定模板；极简不等于删掉必要证据。",
+      "prompt": "采用字体主导的极简报告设计，用明显的字号层级、统一对齐和充分留白区分结论、正文与注释。",
+      "sources": [
+        "S03",
+        "S18"
+      ],
+      "preview": "minimal",
+      "tags": [
+        "极简",
+        "typography",
+        "留白"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "S04",
+      "group": "S",
+      "zh": "品牌化商务报告方向",
+      "en": "Corporate / branded report",
+      "status": "描述性命名",
+      "definition": "把组织的字体、色彩、标识和图表语言统一到整份报告。",
+      "use": "企业年报、经营报告、对外方案",
+      "caution": "品牌一致性不要求每页塞入大Logo；必须保持图表可读性。",
+      "prompt": "采用品牌化商务报告设计，统一封面、页眉、标题、图表和表格的视觉语言，品牌元素不要压过内容。",
+      "sources": [
+        "S03",
+        "S05"
+      ],
+      "preview": "corporate",
+      "tags": [
+        "商务",
+        "企业",
+        "brand"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "S05",
+      "group": "S",
+      "zh": "信息图主导报告方向",
+      "en": "Infographic-led / visual report",
+      "status": "描述性命名",
+      "definition": "把关键内容转换为统计图、时间线、流程、对比和短文本的组合。",
+      "use": "调研摘要、公众报告、影响力报告",
+      "caution": "信息图是表达方式，不是装饰插画；不适合用来替代详细披露。",
+      "prompt": "采用信息图主导的报告方向，按信息关系选择统计图、流程、时间线或对比图，并保留简短解释与来源。",
+      "sources": [
+        "S14",
+        "S03"
+      ],
+      "preview": "infographic",
+      "tags": [
+        "信息图",
+        "infographic",
+        "visual"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "S06",
+      "group": "S",
+      "zh": "仪表盘式静态报告方向",
+      "en": "Dashboard-style / KPI report",
+      "status": "描述性命名",
+      "definition": "用指标行、图表和数据表提供状态概览的静态报告组合。",
+      "use": "经营月报、销售复盘、运营状态报告",
+      "caution": "PDF不具备筛选、悬停或钻取能力；长篇研究不应全部卡片化。",
+      "prompt": "采用仪表盘式静态报告，先给核心指标概览，再用少量图表与数据表解释变化，所有结论无需交互即可理解。",
+      "sources": [
+        "S05",
+        "S22"
+      ],
+      "preview": "dashboard",
+      "tags": [
+        "仪表盘",
+        "KPI",
+        "经营"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "L01",
+      "group": "L",
+      "zh": "单栏／正文块栅格",
+      "en": "Single-column / manuscript grid / block grid",
+      "status": "通行术语",
+      "definition": "在固定页边距内使用一个连续主文本区。",
+      "use": "长文、政策报告、正文解释较多的白皮书",
+      "caution": "过宽的行会降低阅读舒适度；单栏也需要标题和段落层级。",
+      "prompt": "正文使用单栏栅格，控制行长、行距和段落间距，图表靠近相关分析放置。",
+      "sources": [
+        "S01"
+      ],
+      "preview": "single",
+      "tags": [
+        "单栏",
+        "manuscript"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "single"
+      }
+    },
+    {
+      "id": "L02",
+      "group": "L",
+      "zh": "等宽双栏",
+      "en": "Two-column grid",
+      "status": "通行术语",
+      "definition": "正文在两个等宽栏中按明确的阅读顺序流动。",
+      "use": "研究报告、期刊式内容、杂志式白皮书",
+      "caution": "不要把左右两栏错误地逐行横读；导出后检查阅读顺序。",
+      "prompt": "正文采用等宽双栏栅格，保留清晰栏间距；大标题和复杂图表可跨栏。",
+      "sources": [
+        "S02",
+        "S01"
+      ],
+      "preview": "two",
+      "tags": [
+        "双栏",
+        "two-column"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "two-column"
+      }
+    },
+    {
+      "id": "L03",
+      "group": "L",
+      "zh": "非对称主栏＋侧栏",
+      "en": "Asymmetric two-column / main-content-and-sidebar layout",
+      "status": "描述性命名",
+      "definition": "较宽区域承担主论述，较窄区域容纳数字、方法或补充说明。",
+      "use": "分析与旁注并存的研究报告",
+      "caution": "主栏与侧栏并非两个连续正文栏；要明确谁是主阅读路径。",
+      "prompt": "采用非对称双栏，宽主栏放分析正文，窄侧栏放关键数字、定义和补充说明，避免互相打断。",
+      "sources": [
+        "S02",
+        "S18"
+      ],
+      "preview": "asym",
+      "tags": [
+        "非对称",
+        "侧栏",
+        "sidebar"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "sidebar"
+      }
+    },
+    {
+      "id": "L04",
+      "group": "L",
+      "zh": "多栏栅格",
+      "en": "Multi-column / column grid",
+      "status": "通行术语",
+      "definition": "用三个或更多栏线组织正文、图片与模块；元素可跨多栏。",
+      "use": "高密度刊物、数据与短文本混排",
+      "caution": "栅格栏数不等于正文栏数；A4正文不宜被切成过窄碎栏。",
+      "prompt": "建立多栏栅格，让正文、图片和数据模块按整数栏宽对齐，不要求每个元素只占一栏。",
+      "sources": [
+        "S01",
+        "S02"
+      ],
+      "preview": "multi",
+      "tags": [
+        "多栏",
+        "column"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "L05",
+      "group": "L",
+      "zh": "模块化栅格",
+      "en": "Modular grid",
+      "status": "通行术语",
+      "definition": "同时划分列和行，形成可合并的内容模块。",
+      "use": "数据摘要、案例集合、信息密集页面",
+      "caution": "不等于统一小卡片；模块应有主次和大小变化。Bento是相关描述，不是完全同义词。",
+      "prompt": "采用模块化栅格，按内容重要性合并不同大小的模块，避免整页等尺寸卡片。",
+      "sources": [
+        "S01",
+        "S02"
+      ],
+      "preview": "modular",
+      "tags": [
+        "模块",
+        "bento",
+        "card grid"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "modular"
+      }
+    },
+    {
+      "id": "L06",
+      "group": "L",
+      "zh": "层级栅格",
+      "en": "Hierarchical grid",
+      "status": "通行术语",
+      "definition": "按内容重要性和比例定制结构，而不是完全依赖重复等宽栏。",
+      "use": "封面、章节开篇、重点发现页",
+      "caution": "不等于随意摆放；仍须共享对齐线和阅读顺序。",
+      "prompt": "采用层级栅格，先确定主结论和主视觉，再安排支持信息，保留一致的对齐与间距。",
+      "sources": [
+        "S01"
+      ],
+      "preview": "hierarchical",
+      "tags": [
+        "层级",
+        "主次",
+        "hierarchy"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "L07",
+      "group": "L",
+      "zh": "通栏／跨栏内容",
+      "en": "Full-width / column-spanning block",
+      "status": "描述性命名",
+      "definition": "某个标题、图表或图片跨越正文的多个栏位。",
+      "use": "复杂图表、重点结论、宽表格",
+      "caution": "不是全页满版；跨栏模块后必须恢复清晰的正文阅读路径。",
+      "prompt": "正文保持双栏，关键图表与宽表格使用跨栏通栏模块，前后留出明确间距。",
+      "sources": [
+        "S01",
+        "S18"
+      ],
+      "preview": "span",
+      "tags": [
+        "通栏",
+        "跨栏",
+        "full-width"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "span-all"
+      }
+    },
+    {
+      "id": "L08",
+      "group": "L",
+      "zh": "对页／跨页展开",
+      "en": "Facing-page / double-page spread",
+      "status": "通行术语",
+      "definition": "把相邻两页作为一个整体构图来设计。",
+      "use": "印刷报告、杂志、电子刊物",
+      "caution": "手机与单页PDF查看器未必同时展示对页；关键文字不要落在装订中缝。",
+      "prompt": "以对页展开组织章节开篇和重要图文，但保证每一单页仍可独立阅读，关键内容避开中缝。",
+      "sources": [
+        "S18",
+        "S02"
+      ],
+      "preview": "spread",
+      "tags": [
+        "对页",
+        "跨页",
+        "spread"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "L09",
+      "group": "L",
+      "zh": "基线栅格",
+      "en": "Baseline grid",
+      "status": "通行术语",
+      "definition": "让跨栏文字的基线按统一节奏对齐，是叠加在页面栅格上的排版约束。",
+      "use": "多栏、长篇与高一致性出版物",
+      "caution": "不是一种独立内容版式；标题可按有规则的倍数偏离正文节奏。",
+      "prompt": "在分栏栅格之上建立正文基线节奏，使相邻栏的行文对齐，并统一段落间距。",
+      "sources": [
+        "S01"
+      ],
+      "preview": "baseline",
+      "tags": [
+        "基线",
+        "baseline",
+        "行距"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "T01",
+      "group": "T",
+      "zh": "大标题与标题层级",
+      "en": "Display headline / typographic hierarchy",
+      "status": "通行术语",
+      "definition": "通过大小、字重、位置区分主标题、副标题、正文和注释。",
+      "use": "几乎所有报告",
+      "caution": "不要让标题、数字和摘句同时争夺最高视觉层级。",
+      "prompt": "建立明确的标题层级，主标题最突出，副标题与正文次之，来源和注释最弱但保持可读。",
+      "sources": [
+        "S02",
+        "S18"
+      ],
+      "preview": "headline",
+      "tags": [
+        "大标题",
+        "标题层级",
+        "display"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "prose"
+      }
+    },
+    {
+      "id": "T02",
+      "group": "T",
+      "zh": "导语／题下摘要",
+      "en": "Standfirst / deck",
+      "status": "通行术语",
+      "definition": "位于标题与正文之间，用短段落交代主题、背景和主要发现。",
+      "use": "研究章节开头、专题报告",
+      "caution": "不是目录或整份执行摘要；kicker在不同出版语境含义不一致，不列为严格同义词。",
+      "prompt": "在章节标题下加入简短导语，概括这一节讨论的问题和主要发现，再进入正文分析。",
+      "sources": [
+        "S02",
+        "S18"
+      ],
+      "preview": "standfirst",
+      "tags": [
+        "导语",
+        "deck",
+        "standfirst"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "standfirst"
+      }
+    },
+    {
+      "id": "T03",
+      "group": "T",
+      "zh": "大字摘句",
+      "en": "Pull quote",
+      "status": "通行术语",
+      "definition": "从正文提取简短、有代表性的句子，独立放大作为视觉入口。",
+      "use": "观点、访谈、长文分析",
+      "caution": "不一定是别人说的话；若是概括而非原话，不要伪加引号或编造归属。",
+      "prompt": "从正文提取一句真实且有代表性的关键表述作为大字摘句，避免与相邻段落重复，保留准确语义。",
+      "sources": [
+        "S02",
+        "S03",
+        "S18"
+      ],
+      "preview": "pullquote",
+      "tags": [
+        "摘句",
+        "pull quote"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "pull-quote"
+      }
+    },
+    {
+      "id": "T04",
+      "group": "T",
+      "zh": "引用块",
+      "en": "Block quotation / blockquote",
+      "status": "通行术语",
+      "definition": "把较长的真实引用独立成块，区分引用与作者论述。",
+      "use": "访谈、政策引用、原始资料分析",
+      "caution": "与pull quote不同，重点是引用语义和出处，而非视觉放大。",
+      "prompt": "将真实长引用设为独立引用块，保留原文、引号或引用样式及明确来源，不把作者分析混入引文。",
+      "sources": [
+        "S24"
+      ],
+      "preview": "blockquote",
+      "tags": [
+        "引用",
+        "blockquote"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "pull-quote"
+      }
+    },
+    {
+      "id": "T05",
+      "group": "T",
+      "zh": "信息强调框",
+      "en": "Callout / callout box",
+      "status": "通行术语",
+      "definition": "用边线、底色或独立空间突出需要额外注意的信息。",
+      "use": "提示、定义、风险、特殊说明",
+      "caution": "callout也可指图片指引标注；用callout box明确此处是文本框。不要每段都加框。",
+      "prompt": "将少量需要特别注意的提示放进信息强调框，标题简短，视觉强度低于主结论。",
+      "sources": [
+        "S02",
+        "S03"
+      ],
+      "preview": "callout",
+      "tags": [
+        "提示框",
+        "callout",
+        "警告"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "callout"
+      }
+    },
+    {
+      "id": "T06",
+      "group": "T",
+      "zh": "关键要点／摘要框",
+      "en": "Key takeaways / summary box",
+      "status": "通行术语",
+      "definition": "从较长内容中提炼少量不可错过的发现或下一步。",
+      "use": "章节末尾、执行摘要、复杂分析",
+      "caution": "这是callout的内容型变体，可重叠，不代表独立设计流派；不要机械复制所有小标题。",
+      "prompt": "设置关键要点摘要框，用短列表概括少量核心发现或下一步，确保读者不读全文也能抓住重点。",
+      "sources": [
+        "S11",
+        "S02"
+      ],
+      "preview": "takeaways",
+      "tags": [
+        "要点",
+        "摘要",
+        "summary"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "takeaways"
+      }
+    },
+    {
+      "id": "T07",
+      "group": "T",
+      "zh": "侧栏事实框",
+      "en": "Sidebar / fact box",
+      "status": "通行术语",
+      "definition": "在主阅读路径旁放独立但相关的事实、定义、案例或方法。",
+      "use": "白皮书、研究报告、专题长文",
+      "caution": "补充信息不应比正文更长；区别于非对称双栏这一整页结构。",
+      "prompt": "在侧栏放简短事实框、术语解释或方法说明，使其与主论述相关但不打断正文阅读。",
+      "sources": [
+        "S02",
+        "S18"
+      ],
+      "preview": "sidebar",
+      "tags": [
+        "事实框",
+        "侧栏",
+        "fact box"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "callout"
+      }
+    },
+    {
+      "id": "T08",
+      "group": "T",
+      "zh": "编号／图标清单",
+      "en": "Numbered list / icon list",
+      "status": "通行术语",
+      "definition": "把并列要点或任务拆成独立条目；编号与图标是不同处理。",
+      "use": "建议、发现、核对事项、优缺点",
+      "caution": "编号可能暗示顺序；无顺序要点用项目符号或图标。图标不能代替文字。",
+      "prompt": "将并列发现整理为短清单，无顺序内容用项目符号或图标，有顺序内容才使用编号。",
+      "sources": [
+        "S21",
+        "S12",
+        "S14"
+      ],
+      "preview": "list",
+      "tags": [
+        "清单",
+        "编号",
+        "icon list"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "T09",
+      "group": "T",
+      "zh": "首字下沉",
+      "en": "Drop cap",
+      "status": "通行术语",
+      "definition": "段首的首字或首字母放大并下沉到后续行的高度。",
+      "use": "杂志式长文、章节正文开头",
+      "caution": "是装饰性阅读入口，不适合频繁使用；中文首字效果和英文首字母并不相同。",
+      "prompt": "在少数章节正文开头使用首字下沉作为阅读入口，保持正文可读性，不在每段重复。",
+      "sources": [
+        "S02",
+        "S18"
+      ],
+      "preview": "dropcap",
+      "tags": [
+        "首字",
+        "drop cap"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "T10",
+      "group": "T",
+      "zh": "边注／旁注",
+      "en": "Margin note / marginalia",
+      "status": "描述性命名",
+      "definition": "把紧贴某段内容的短解释放在页边，而不是正文或页底。",
+      "use": "术语解释、评论、补充口径",
+      "caution": "与脚注位置不同；页边空间和输出工具不足时改为行内说明或脚注。",
+      "prompt": "在相关段落旁放简短边注，说明术语或限制，保持明确对应关系；空间不足时转为脚注。",
+      "sources": [
+        "S02",
+        "S09",
+        "S18"
+      ],
+      "preview": "marginnote",
+      "tags": [
+        "边注",
+        "旁注",
+        "margin"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "T11",
+      "group": "T",
+      "zh": "问答式内容块",
+      "en": "Q&A / FAQ",
+      "status": "通行术语",
+      "definition": "用明确的问题和对应短回答组织读者最关心的信息。",
+      "use": "访谈、研究解读、决策问答和常见问题",
+      "caution": "Q&A可以是访谈或解释结构；FAQ通常是反复出现的问题，不要伪造真实采访。",
+      "prompt": "将适合解释的内容组织成问答，每个问题对应清楚且有证据的回答；真实访谈保留准确归属。",
+      "sources": [
+        "S14",
+        "S02"
+      ],
+      "preview": "qanda",
+      "tags": [
+        "问答",
+        "FAQ",
+        "Q&A"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "T12",
+      "group": "T",
+      "zh": "优缺点／应做与不应做对照",
+      "en": "Pros and cons / do-and-don’t lists",
+      "status": "通行术语",
+      "definition": "并置两组相对信息；优缺点是权衡，应做与不应做是行动规范。",
+      "use": "方案权衡、行动指导、建议与限制",
+      "caution": "两者不是同义词；优点与缺点应按同维度比较，行动要求要有依据。",
+      "prompt": "将权衡内容整理成优缺点对照，行动规范则使用应做与不应做清单，两侧按共同维度对应。",
+      "sources": [
+        "S14",
+        "S21"
+      ],
+      "preview": "proscons",
+      "tags": [
+        "优缺点",
+        "do don't",
+        "pros cons"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "N01",
+      "group": "N",
+      "zh": "大数字强调",
+      "en": "Big Numbers / standalone numbers / stat callout",
+      "status": "通行术语",
+      "definition": "单独放大一个关键数值，搭配清楚的指标名称与必要背景。",
+      "use": "调查发现、市场规模、核心成果",
+      "caution": "不是每个数都放大；KPI只是其中一种用途，研究统计数不一定是KPI。",
+      "prompt": "用大数字强调少量核心发现，每个数值必须带指标名称、单位、时间范围和来源，必要时补充解释。",
+      "sources": [
+        "S05",
+        "S09"
+      ],
+      "preview": "big",
+      "tags": [
+        "大数字",
+        "big numbers",
+        "stat callout"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "big-number"
+      }
+    },
+    {
+      "id": "N02",
+      "group": "N",
+      "zh": "指标条／指标行",
+      "en": "Metric strip / KPI row",
+      "status": "描述性命名",
+      "definition": "把少量相关的大数字以一行或一组对齐，形成概览。",
+      "use": "执行摘要、经营报告、成果概览",
+      "caution": "不要求做成有阴影的卡片；不同口径应标明，不能排列无关数字。",
+      "prompt": "在开篇使用对齐的指标行，展示少量相关指标，每项包含数值、名称与口径，不要堆砌无关数字。",
+      "sources": [
+        "S05",
+        "S01"
+      ],
+      "preview": "metricrow",
+      "tags": [
+        "指标行",
+        "KPI strip",
+        "metrics"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "metric-strip"
+      }
+    },
+    {
+      "id": "N03",
+      "group": "N",
+      "zh": "变化量／同比环比标记",
+      "en": "Delta / change indicator",
+      "status": "描述性命名",
+      "definition": "在当前值旁标出相对基准的增加、减少或百分点变化。",
+      "use": "月报、经营复盘、趋势摘要",
+      "caution": "百分比与百分点必须区分；上升不一定代表改善，不仅靠红绿颜色判断。",
+      "prompt": "在当前值旁显示同比或环比变化，注明基准期，区分百分比和百分点，并用文字解释变化方向。",
+      "sources": [
+        "S05",
+        "S09"
+      ],
+      "preview": "delta",
+      "tags": [
+        "同比",
+        "环比",
+        "delta",
+        "变化"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "metric-strip"
+      }
+    },
+    {
+      "id": "N04",
+      "group": "N",
+      "zh": "目标／基准比较",
+      "en": "Target / benchmark comparison",
+      "status": "描述性命名",
+      "definition": "把当前数值与目标、行业基准或历史参照一起表达。",
+      "use": "经营目标、绩效分析、市场对标",
+      "caution": "只显示一个大数字不足以判断好坏；基准定义和数据来源必须明确。",
+      "prompt": "每个重点指标旁加入适当的目标或基准比较，标明实际值、参照值、差距和参照口径。",
+      "sources": [
+        "S05",
+        "S06"
+      ],
+      "preview": "benchmark",
+      "tags": [
+        "目标",
+        "基准",
+        "benchmark"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "N05",
+      "group": "N",
+      "zh": "指标＋迷你趋势图",
+      "en": "Metric with sparkline",
+      "status": "描述性命名",
+      "definition": "用大数字表达当前状态，用小型折线提供近期走势。",
+      "use": "经营摘要、指标表、定期报告",
+      "caution": "sparkline是通行图表术语，整个组件为组合描述；不同指标的缩放不能暗示幅度可直接比较。",
+      "prompt": "为关键指标配迷你趋势线，注明时间窗口，并提供变化背景；需要精确比较时使用带坐标的图表。",
+      "sources": [
+        "S05"
+      ],
+      "preview": "spark",
+      "tags": [
+        "迷你趋势",
+        "sparkline",
+        "KPI"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "N06",
+      "group": "N",
+      "zh": "进度／完成率条",
+      "en": "Progress / completion indicator",
+      "status": "描述性命名",
+      "definition": "把完成量相对目标或总量显示为比例条与数值。",
+      "use": "项目进度、目标达成、任务完成",
+      "caution": "必须定义分母；100%以上和非比例指标不应强行塞入普通进度条。",
+      "prompt": "用简洁进度条显示完成率，同时标明已完成量、总量或目标值，明确超额完成的处理。",
+      "sources": [
+        "S05",
+        "S06"
+      ],
+      "preview": "progress",
+      "tags": [
+        "完成率",
+        "进度",
+        "progress"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "I01",
+      "group": "I",
+      "zh": "图文并置／图文分区",
+      "en": "Image–text split / side-by-side image and text",
+      "status": "描述性命名",
+      "definition": "图片与解释文本分别占据相邻区域，靠对齐和距离建立关系。",
+      "use": "案例分析、产品说明、实地研究",
+      "caution": "不等于双栏连续正文；图片必须支持分析，而不是无关装饰。",
+      "prompt": "采用图文并置，一侧放真实相关图片，另一侧放对应分析，统一对齐并保持图片与文字的明确关联。",
+      "sources": [
+        "S02",
+        "S03",
+        "S18"
+      ],
+      "preview": "splitimage",
+      "tags": [
+        "图文结合",
+        "并置",
+        "image text"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "image-text"
+      }
+    },
+    {
+      "id": "I02",
+      "group": "I",
+      "zh": "插图／图表＋图注",
+      "en": "Figure with caption",
+      "status": "通行术语",
+      "definition": "把图片或图表与编号、说明、来源作为一个阅读单元。",
+      "use": "研究证据、照片、图表和示意图",
+      "caution": "图注不仅是重复标题；来源和作者署名不能混为一谈。",
+      "prompt": "每张图配置靠近图像的图注，说明它展示了什么、与论点的关系，并按需要加入图号、来源与署名。",
+      "sources": [
+        "S02",
+        "S09",
+        "S15"
+      ],
+      "preview": "caption",
+      "tags": [
+        "图注",
+        "figure",
+        "caption"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "figure"
+      }
+    },
+    {
+      "id": "I03",
+      "group": "I",
+      "zh": "主图＋辅图",
+      "en": "Hero image with supporting images",
+      "status": "通行术语",
+      "definition": "一张主图承担视觉入口，较小辅图提供细节或上下文。",
+      "use": "章节开篇、案例、产品或现场记录",
+      "caution": "主图不一定占固定比例；不要把所有图片做成同等大小。",
+      "prompt": "每个图像主导章节设置一张清晰主图，辅图用于说明细节，控制尺度差异与一致间距。",
+      "sources": [
+        "S18",
+        "S02"
+      ],
+      "preview": "heroimage",
+      "tags": [
+        "主图",
+        "hero",
+        "辅图"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "I04",
+      "group": "I",
+      "zh": "文字绕图／轮廓绕排",
+      "en": "Text wrap / runaround text / contour wrapping",
+      "status": "通行术语",
+      "definition": "文字沿图片边界或主体轮廓流动；轮廓绕排是其变体。",
+      "use": "杂志式长文、人物或物体特写",
+      "caution": "复杂绕排容易产生过短行和混乱阅读顺序；Word与PDF导出要逐页检查。",
+      "prompt": "对少量合适图片使用文字绕排，保持一致安全间距，避免过短文本行；复杂轮廓无法稳定输出时改成矩形绕排。",
+      "sources": [
+        "S04"
+      ],
+      "preview": "wrap",
+      "tags": [
+        "文字绕排",
+        "text wrap",
+        "轮廓"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "I05",
+      "group": "I",
+      "zh": "满版／出血图",
+      "en": "Full-bleed image",
+      "status": "通行术语",
+      "definition": "图片延伸到页面边缘，不保留常规外边距。",
+      "use": "封面、开篇、影像主导章节",
+      "caution": "满版不等于放大低分辨率图片；印刷出血与屏幕贴边不是同一生产要求。",
+      "prompt": "在封面或章节开篇使用少量满版图片，关键内容避开裁切和装订区域；印刷版按印厂要求设置出血。",
+      "sources": [
+        "S18",
+        "S02"
+      ],
+      "preview": "bleed",
+      "tags": [
+        "满版",
+        "full bleed",
+        "出血"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "I06",
+      "group": "I",
+      "zh": "图片上叠加文字",
+      "en": "Text overlay on image",
+      "status": "描述性命名",
+      "definition": "标题、标签或短文字放在图片之上。",
+      "use": "封面、主视觉、短说明",
+      "caution": "必须保证对比度；重要数据与长正文不要压在复杂背景上。",
+      "prompt": "仅在适合的图片留白区域叠加短标题或标签，保证文字对比度和裁切安全，正文另设阅读区。",
+      "sources": [
+        "S03",
+        "S18"
+      ],
+      "preview": "overlay",
+      "tags": [
+        "叠字",
+        "overlay",
+        "图片背景"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "I07",
+      "group": "I",
+      "zh": "图片组／网格图集",
+      "en": "Image grid / contact-sheet-style layout",
+      "status": "描述性命名",
+      "definition": "把多张相关图片按统一网格组织，便于浏览或对比。",
+      "use": "案例集、样本对照、现场或产品图集",
+      "caution": "contact sheet来自摄影工作流，这里只借其网格形态；不是所有图片都必须等大。",
+      "prompt": "将相关图片整理为统一间距的网格图集，保持必要图注，并按重要性调整主次大小。",
+      "sources": [
+        "S01",
+        "S18"
+      ],
+      "preview": "imagegrid",
+      "tags": [
+        "图集",
+        "网格",
+        "contact sheet",
+        "diptych"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "I08",
+      "group": "I",
+      "zh": "带指引标注的图片",
+      "en": "Annotated image / labeled illustration",
+      "status": "描述性命名",
+      "definition": "在图像或插图中用标签、指引线标明关键部位或现象。",
+      "use": "产品构造、现场分析、截图解释",
+      "caution": "不要用箭头装饰而不解释；标注要靠近对象且不遮挡证据。",
+      "prompt": "为图片中的关键部位添加简短标签和清晰指引线，每条标注对应实际对象，不遮挡原始证据。",
+      "sources": [
+        "S08",
+        "S13",
+        "S14"
+      ],
+      "preview": "annotatedimage",
+      "tags": [
+        "标注",
+        "指引线",
+        "annotation"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C01",
+      "group": "C",
+      "zh": "条形图／柱状图",
+      "en": "Bar / column chart",
+      "status": "通行术语",
+      "definition": "用长度或高度比较类别的数值，横向与纵向是同族变体。",
+      "use": "规模、排名、类别比较",
+      "caution": "数值轴通常从零开始；长名称适合横向条形。类别排序应有意义。",
+      "prompt": "用条形或柱状图比较类别数值，设置合理排序与零基线，标明单位，并强调与结论有关的项目。",
+      "sources": [
+        "S06",
+        "S07"
+      ],
+      "preview": "bar",
+      "tags": [
+        "比较",
+        "大小",
+        "排名",
+        "bar"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "bar-chart"
+      }
+    },
+    {
+      "id": "C02",
+      "group": "C",
+      "zh": "分组条形／柱状图",
+      "en": "Grouped / clustered bar or column chart",
+      "status": "通行术语",
+      "definition": "在每个类别中并排展示两个或少量系列，使用共同尺度。",
+      "use": "预算与实际、地区或人群对照",
+      "caution": "系列太多会难读；不能把不同单位的指标不加说明混在同一轴。",
+      "prompt": "使用分组条形图比较少量系列，保持共同单位、尺度和清晰图例，突出关键差异。",
+      "sources": [
+        "S06",
+        "S05"
+      ],
+      "preview": "groupbar",
+      "tags": [
+        "对比",
+        "分组",
+        "clustered"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C03",
+      "group": "C",
+      "zh": "折线图",
+      "en": "Line chart",
+      "status": "通行术语",
+      "definition": "用连续或有序时间轴显示趋势变化。",
+      "use": "时间序列、增长、季节变化",
+      "caution": "不要用线连接没有顺序关系的类别；缺失数据和时间间隔需正确处理。",
+      "prompt": "用折线图展示时间趋势，保持真实时间间隔和明确单位，适度标注重要转折，不连接不相关类别。",
+      "sources": [
+        "S06",
+        "S05"
+      ],
+      "preview": "line",
+      "tags": [
+        "趋势",
+        "时间",
+        "line"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "line-chart"
+      }
+    },
+    {
+      "id": "C04",
+      "group": "C",
+      "zh": "面积图／堆叠面积图",
+      "en": "Area / stacked area chart",
+      "status": "通行术语",
+      "definition": "以填充面积强调总量或随时间变化的组成。",
+      "use": "累计规模、总量与构成变化",
+      "caution": "面积和堆叠成分不适合精确比较；与折线图用途不同。",
+      "prompt": "需要强调总量时使用面积图；需要展示时间上的组成变化时使用堆叠面积图，并保持共同零基线。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "area",
+      "tags": [
+        "时间",
+        "组成",
+        "area"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C05",
+      "group": "C",
+      "zh": "堆叠条形／柱状图",
+      "en": "Stacked bar / column chart",
+      "status": "通行术语",
+      "definition": "同时显示总量与组成部分。",
+      "use": "收入构成、预算分配、部门组成",
+      "caution": "除第一段外缺少共同起点，难以精确比较各部分；类别不宜过多。",
+      "prompt": "用堆叠条形图展示总量与组成，保持成分颜色一致，需要精确比较成分时另加分组图或表格。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "stacked",
+      "tags": [
+        "构成",
+        "总量",
+        "stacked"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C06",
+      "group": "C",
+      "zh": "百分比堆叠图",
+      "en": "100% stacked bar / column chart",
+      "status": "通行术语",
+      "definition": "把每组总量归一化到100%，比较其比例结构。",
+      "use": "问卷结构、市场份额、人群构成",
+      "caution": "会隐藏各组绝对规模；必须补充样本量或总量。",
+      "prompt": "用百分比堆叠图比较各组构成，统一分类顺序，同时注明每组总量或样本量。",
+      "sources": [
+        "S06",
+        "S07"
+      ],
+      "preview": "stacked100",
+      "tags": [
+        "占比",
+        "100%",
+        "问卷"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C07",
+      "group": "C",
+      "zh": "发散条形图",
+      "en": "Diverging bar / diverging stacked bar",
+      "status": "通行术语",
+      "definition": "以零点、中性或基准为中心显示正负偏差或态度分布。",
+      "use": "目标偏差、净增长、同意度问卷",
+      "caution": "数值偏差图与Likert态度堆叠是变体；需明确中性项和参照点。",
+      "prompt": "以清楚的基准线制作发散条形图，区分正负偏差；态度问卷需说明中性项与各档定义。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "diverging",
+      "tags": [
+        "偏差",
+        "正负",
+        "Likert"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C08",
+      "group": "C",
+      "zh": "点图",
+      "en": "Dot plot",
+      "status": "通行术语",
+      "definition": "用位置而非条形长度表达类别数值；不等同于分布中的点带图。",
+      "use": "多个类别的紧凑比较、接近值比较",
+      "caution": "要保留可理解的数值轴；明确这是类别比较点图而非散点相关图。",
+      "prompt": "用类别点图在共同数值轴上比较各项，保留清晰类别标签，并突出重点类别。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "dot",
+      "tags": [
+        "点图",
+        "比较",
+        "dot"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C09",
+      "group": "C",
+      "zh": "棒棒糖图",
+      "en": "Lollipop chart",
+      "status": "通行术语",
+      "definition": "用细杆连接基线和末端圆点，强调数值位置与排名。",
+      "use": "排序比较、数据点强调",
+      "caution": "不是散点图；不宜用过粗圆点或截轴夸大差异。",
+      "prompt": "用棒棒糖图展示排序后的类别数值，细杆作为引导，圆点强调数值，保持透明一致的尺度。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "lollipop",
+      "tags": [
+        "排名",
+        "lollipop"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C10",
+      "group": "C",
+      "zh": "斜率图",
+      "en": "Slopegraph / slope chart",
+      "status": "通行术语",
+      "definition": "连接两期或少量时点上的值或排名，显示变化方向。",
+      "use": "前后比较、排名变化",
+      "caution": "不能代替完整时间序列；大量交叉线需筛选或强调重点。",
+      "prompt": "用斜率图比较两个明确时期，直接标注名称与两端数值，强调主要变化，避免省略重要中间波动。",
+      "sources": [
+        "S06",
+        "S05"
+      ],
+      "preview": "slope",
+      "tags": [
+        "前后",
+        "变化",
+        "slope"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C11",
+      "group": "C",
+      "zh": "哑铃图",
+      "en": "Dumbbell chart",
+      "status": "通行术语",
+      "definition": "同一类别内的两个点用线连接，突出两值差距。",
+      "use": "预算与实际、两人群差异、前后值比较",
+      "caution": "与斜率图不同：常在同一数值轴上按类别排列；两端含义须明确。",
+      "prompt": "用哑铃图比较每个类别的两组数值，明确两端标签、共同尺度和差距。",
+      "sources": [
+        "S05"
+      ],
+      "preview": "dumbbell",
+      "tags": [
+        "差距",
+        "对比",
+        "dumbbell"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C12",
+      "group": "C",
+      "zh": "瀑布图",
+      "en": "Waterfall chart",
+      "status": "通行术语",
+      "definition": "显示从起始值经过正负贡献到最终值的分解过程。",
+      "use": "利润桥、预算变化、收入贡献",
+      "caution": "每个贡献必须可计算并与最终值对账；不能把无加减关系的类别硬连起来。",
+      "prompt": "用瀑布图解释起始值如何通过各项正负贡献变为最终值，标明贡献与合计并核对总和。",
+      "sources": [
+        "S06",
+        "S05"
+      ],
+      "preview": "waterfall",
+      "tags": [
+        "贡献",
+        "分解",
+        "waterfall"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C13",
+      "group": "C",
+      "zh": "饼图／环形图",
+      "en": "Pie / donut chart",
+      "status": "通行术语",
+      "definition": "用扇区表示有限类别的部分与整体关系；环形图是变体。",
+      "use": "简单组成、少数类别的占比",
+      "caution": "不适合大量类别或精确比较；不要3D化，比例必须有正确整体。",
+      "prompt": "仅在类别较少且整体明确时使用饼图或环形图，直接标注占比与整体总量，精确比较优先条形图。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "donut",
+      "tags": [
+        "占比",
+        "整体",
+        "pie",
+        "donut"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C14",
+      "group": "C",
+      "zh": "单位格／图标数量图",
+      "en": "Waffle / gridplot / pictogram / Isotype",
+      "status": "通行术语",
+      "definition": "用重复格子或图标表达单位数量或比例，是同一表达族的不同变体。",
+      "use": "公众报告、易理解的比例或人数表达",
+      "caution": "格子图与图标图不是同义词；必须说明每个单位代表什么，避免任意裁掉图标。",
+      "prompt": "用重复单位格或图标呈现比例或数量，说明每个单位的含义，保持可数且不制造不真实精度。",
+      "sources": [
+        "S06",
+        "S17"
+      ],
+      "preview": "waffle",
+      "tags": [
+        "格子",
+        "图标数量",
+        "waffle",
+        "isotype"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C15",
+      "group": "C",
+      "zh": "矩形树图",
+      "en": "Treemap",
+      "status": "通行术语",
+      "definition": "用嵌套矩形的面积表达层级组成和大小。",
+      "use": "层级份额、预算、品类结构",
+      "caution": "面积不适合精确比较；太多小矩形会难以阅读。",
+      "prompt": "用矩形树图展示层级组成和规模，标明主要类别，合并或另列过小项，精确数值补充到表格。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "treemap",
+      "tags": [
+        "层级",
+        "组成",
+        "treemap"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C16",
+      "group": "C",
+      "zh": "散点图",
+      "en": "Scatterplot",
+      "status": "通行术语",
+      "definition": "用二维位置表达两个连续变量之间的关系。",
+      "use": "相关、分群、异常值",
+      "caution": "相关不代表因果；标明样本、单位与统计口径，趋势线应有依据。",
+      "prompt": "用散点图分析两个变量的关系，明确横纵轴与样本范围，标注重要异常点，不把相关性表述成因果。",
+      "sources": [
+        "S06",
+        "S05"
+      ],
+      "preview": "scatter",
+      "tags": [
+        "相关",
+        "关系",
+        "scatter"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C17",
+      "group": "C",
+      "zh": "气泡图",
+      "en": "Bubble chart",
+      "status": "通行术语",
+      "definition": "在散点图上用气泡面积加入第三个变量。",
+      "use": "三变量比较、市场规模与表现",
+      "caution": "面积必须与数值成比例，而不是半径；细微大小差异很难精确判断。",
+      "prompt": "使用气泡图比较三个变量，横纵轴表示两项指标，气泡面积表示第三项，给出大小图例。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "bubble",
+      "tags": [
+        "三变量",
+        "气泡",
+        "bubble"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C18",
+      "group": "C",
+      "zh": "直方图",
+      "en": "Histogram",
+      "status": "通行术语",
+      "definition": "把连续数值分箱，显示数据分布的形状与频数。",
+      "use": "价格、时长、年龄或评分分布",
+      "caution": "与类别柱状图不同；分箱宽度会改变印象，必须说明选择。",
+      "prompt": "用直方图展示连续变量分布，注明单位、样本量和分箱方式，不把连续区间误作独立类别。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "histogram",
+      "tags": [
+        "分布",
+        "频数",
+        "histogram"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C19",
+      "group": "C",
+      "zh": "箱线图",
+      "en": "Boxplot / box-and-whisker plot",
+      "status": "通行术语",
+      "definition": "概括分布的中位数、分位数和按规则定义的须与离群点。",
+      "use": "不同群体分布比较、波动分析",
+      "caution": "须的定义并不总是最大最小值；面向非专业读者要解释各部位。",
+      "prompt": "用箱线图比较各组分布，说明中位数、箱体、须和离群点的定义，并保留样本量。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "boxplot",
+      "tags": [
+        "分布",
+        "中位数",
+        "boxplot"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C20",
+      "group": "C",
+      "zh": "热力图",
+      "en": "Heatmap",
+      "status": "通行术语",
+      "definition": "以颜色深浅编码二维矩阵或空间上的数值强弱。",
+      "use": "类别交叉、相关矩阵、时间与分组模式",
+      "caution": "颜色不适合精确数值比较；需图例与一致尺度，不能只靠红绿。",
+      "prompt": "用热力图发现二维数据中的模式，设置清晰连续色标与图例，必要时在格内标注数值。",
+      "sources": [
+        "S06",
+        "S05"
+      ],
+      "preview": "heatmap",
+      "tags": [
+        "矩阵",
+        "颜色",
+        "heatmap"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C21",
+      "group": "C",
+      "zh": "分级设色地图",
+      "en": "Choropleth map",
+      "status": "通行术语",
+      "definition": "按行政区或区域给比率类数据分级着色。",
+      "use": "地域差异、渗透率、密度",
+      "caution": "区域面积会影响感知；通常用率或密度而不是原始总量，并注明分级方法。",
+      "prompt": "仅在地理关系重要时用分级设色地图，优先表达比率或密度，标明区域、分级和时间。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "choropleth",
+      "tags": [
+        "地域",
+        "地图",
+        "比率"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C22",
+      "group": "C",
+      "zh": "比例符号地图",
+      "en": "Proportional-symbol map",
+      "status": "通行术语",
+      "definition": "在地理位置上用符号面积表达总量或规模。",
+      "use": "地区销量、城市人口、事件规模",
+      "caution": "和分级设色地图用途不同；符号面积而不是半径对应数值，并控制遮挡。",
+      "prompt": "用比例符号地图显示各地总量，按面积缩放符号，保留规模图例，减少重叠遮挡。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "symbolmap",
+      "tags": [
+        "地域",
+        "总量",
+        "地图"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C23",
+      "group": "C",
+      "zh": "桑基图",
+      "en": "Sankey diagram",
+      "status": "通行术语",
+      "definition": "用连线宽度表达状态或类别之间的数量流向。",
+      "use": "资金分配、人群迁移、渠道去向",
+      "caution": "必须有真实可定义的流；不是给普通流程图加粗箭头。",
+      "prompt": "用桑基图展示可量化的流向，连线宽度对应数量，明确各节点定义并检查输入输出口径。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "sankey",
+      "tags": [
+        "流向",
+        "桑基",
+        "sankey"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C24",
+      "group": "C",
+      "zh": "漏斗图",
+      "en": "Funnel chart",
+      "status": "通行术语",
+      "definition": "表示同一群体在顺序阶段中的数量或转化变化。",
+      "use": "销售管道、注册流程、渠道转化",
+      "caution": "不同群体或不同时间窗口不可强行组成漏斗；标明分母和流失。",
+      "prompt": "用漏斗图展示同一群体在连续阶段的转化，标明各阶段数量、转化率与统计窗口。",
+      "sources": [
+        "S05"
+      ],
+      "preview": "funnel",
+      "tags": [
+        "转化",
+        "流失",
+        "funnel"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C25",
+      "group": "C",
+      "zh": "子弹图／目标比较图",
+      "en": "Bullet chart",
+      "status": "通行术语",
+      "definition": "将实际值、目标标记与可选绩效区间放在紧凑的共同尺度上。",
+      "use": "预算达成、绩效、目标比较",
+      "caution": "区间含义须清楚；不是普通进度条，也不需装饰性仪表盘。",
+      "prompt": "用子弹图比较实际值与目标，在同一轴上标出目标线，必要时加入有定义的绩效区间。",
+      "sources": [
+        "S06",
+        "S05"
+      ],
+      "preview": "bullet",
+      "tags": [
+        "目标",
+        "bullet",
+        "绩效"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C26",
+      "group": "C",
+      "zh": "雷达图",
+      "en": "Radar / spider chart",
+      "status": "通行术语",
+      "definition": "把多个指标放在辐射轴上显示多维轮廓。",
+      "use": "少量对象的能力或特征概览",
+      "caution": "指标需归一化且方向一致；轴顺序影响面积，不能把面积当成总体评分。",
+      "prompt": "仅在多维轮廓比精确比较更重要时用雷达图，说明归一化与轴顺序，避免把封闭面积解释成总成绩。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "radar",
+      "tags": [
+        "多维",
+        "雷达",
+        "radar"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C27",
+      "group": "C",
+      "zh": "小多图／分面小图",
+      "en": "Small multiples / trellis / faceted charts",
+      "status": "通行术语",
+      "definition": "重复同一图表形式分别展示类别或分组，是组合方式而非独立图形。",
+      "use": "跨地区、跨群体或多指标趋势比较",
+      "caution": "可比图应使用共同尺度；独立尺度必须显著注明。",
+      "prompt": "使用小多图，把各组数据放在相同形式的独立小图中，保持可比较的尺度、排序和标题。",
+      "sources": [
+        "S22",
+        "S06"
+      ],
+      "preview": "multiples",
+      "tags": [
+        "小多图",
+        "分面",
+        "small multiples"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "small-multiples"
+      }
+    },
+    {
+      "id": "C28",
+      "group": "C",
+      "zh": "区间点图／不确定性带",
+      "en": "Range / interval plot; uncertainty band",
+      "status": "通行术语",
+      "definition": "用区间或带状区域表示估计或预测的不确定性；两者是同族表达。",
+      "use": "抽样研究、估计比较、预测",
+      "caution": "置信区间与预测区间不同；范围必须来自有效方法，不能为美观编造。ONS优先范围点图／带而非柱图误差棒。",
+      "prompt": "在不确定性会影响结论时，用区间点图或趋势带表达范围，解释范围含义与计算依据。",
+      "sources": [
+        "S23"
+      ],
+      "preview": "interval",
+      "tags": [
+        "误差",
+        "区间",
+        "置信",
+        "uncertainty"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C40",
+      "group": "C",
+      "zh": "带解释标注的图表",
+      "en": "Annotated chart / point, line and range annotations",
+      "status": "通行术语",
+      "definition": "在图表上加入点注释、参考线或区域注释，解释关键数据和背景。",
+      "use": "转折、异常、重要事件、阈值和特殊期间",
+      "caution": "是图表的叠加表达，不是独立图形；背景区域注释与不确定性带含义不同。",
+      "prompt": "为图表添加少量相关解释标注，点注释对应具体数据，参考线说明阈值，区域注释解释时间或数值范围，避免遮挡。",
+      "sources": [
+        "S08",
+        "S09"
+      ],
+      "preview": "annotatedchart",
+      "tags": [
+        "图表标注",
+        "annotation",
+        "参考线"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C41",
+      "group": "C",
+      "zh": "重点系列＋弱化背景",
+      "en": "Highlighted series / focus-plus-context treatment",
+      "status": "描述性命名",
+      "definition": "让重要数据更突出，同时保留弱化的其他数据作为上下文。",
+      "use": "多系列趋势、重点对象、解释型分析",
+      "caution": "不能用弱化来隐瞒相反证据；突出程度应反映分析目的而不是夸大效果。",
+      "prompt": "在多系列图中突出与结论有关的少量对象，其他系列以较弱视觉保留上下文，不删去影响解释的重要证据。",
+      "sources": [
+        "S07",
+        "S18"
+      ],
+      "preview": "highlightseries",
+      "tags": [
+        "强调",
+        "重点系列",
+        "focus context"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C42",
+      "group": "C",
+      "zh": "直接标签／随图标签",
+      "en": "Direct labeling / on-chart labels",
+      "status": "描述性命名",
+      "definition": "把系列或数据的名称放到对应图形附近，减少反复寻找图例。",
+      "use": "少量系列的折线、条形和简单比较",
+      "caution": "不是取消所有图例；标签太多会重叠，复杂系列仍应使用适当图例。",
+      "prompt": "系列较少时把名称直接标在对应图形附近，保证不重叠；复杂系列使用清晰图例，并保持名称一致。",
+      "sources": [
+        "S09",
+        "S08",
+        "S13"
+      ],
+      "preview": "directlabels",
+      "tags": [
+        "标签",
+        "图例",
+        "direct labels"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "B01",
+      "group": "B",
+      "zh": "标准数据表",
+      "en": "Data table",
+      "status": "通行术语",
+      "definition": "按行列提供精确值与可查找的信息。",
+      "use": "明细、精确对照、少量相关数据",
+      "caution": "不要强迫所有数据做图；表头、单位、数值格式和分组要一致。",
+      "prompt": "需要精确查值时使用数据表，给出清晰表头与单位，统一数值格式，长表重复表头并避免截断。",
+      "sources": [
+        "S10",
+        "S15"
+      ],
+      "preview": "table",
+      "tags": [
+        "表格",
+        "精确",
+        "data table"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "data-table"
+      }
+    },
+    {
+      "id": "B02",
+      "group": "B",
+      "zh": "横向对比表／比较矩阵",
+      "en": "Comparison table / comparison matrix",
+      "status": "描述性命名",
+      "definition": "用共同维度逐项比较少量方案、对象或产品。",
+      "use": "竞品分析、方案选择、研究对照",
+      "caution": "维度要一致；过多对象应分组，避免主观评分伪装成事实。",
+      "prompt": "用对比表按共同维度比较各方案，注明事实来源与判断依据，让读者横向找到差异。",
+      "sources": [
+        "S14",
+        "S10"
+      ],
+      "preview": "comparisontable",
+      "tags": [
+        "对比表",
+        "竞品",
+        "matrix"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "comparison-table"
+      }
+    },
+    {
+      "id": "B03",
+      "group": "B",
+      "zh": "带条件格式的热力表",
+      "en": "Heatmap table / conditionally formatted table",
+      "status": "描述性命名",
+      "definition": "保留精确数字，同时用底色或符号提示强弱和异常。",
+      "use": "密集交叉数据、分群、表现对照",
+      "caution": "与只看颜色的热力图不同；应解释阈值，不让底色压低文字对比度。",
+      "prompt": "为需要查值的密集表格增加克制的条件格式，保留数值与色标说明，强调真正异常而非每个单元格。",
+      "sources": [
+        "S10",
+        "S06"
+      ],
+      "preview": "heattable",
+      "tags": [
+        "条件格式",
+        "热力表"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "B04",
+      "group": "B",
+      "zh": "分组汇总／财务表",
+      "en": "Grouped summary / financial table",
+      "status": "描述性命名",
+      "definition": "通过缩进、分组、小计与合计表达可对账的数字层级。",
+      "use": "预算、利润、财务与业务汇总",
+      "caution": "同一列的币种、时间和精度须一致；合计必须可重算，负值表达需统一。",
+      "prompt": "用分组汇总表呈现财务数据，区分明细、小计和合计，统一单位、精度与负值格式，并核对合计。",
+      "sources": [
+        "S03",
+        "S10",
+        "S15"
+      ],
+      "preview": "financial",
+      "tags": [
+        "财务",
+        "小计",
+        "合计"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "data-table"
+      }
+    },
+    {
+      "id": "B05",
+      "group": "B",
+      "zh": "内嵌图表数据表",
+      "en": "Table with in-cell bars / sparklines",
+      "status": "描述性命名",
+      "definition": "在精确数值旁加入短条形或迷你趋势图，帮助扫描。",
+      "use": "排行、指标表、类目趋势",
+      "caution": "迷你图不取代精确值；不同单元格的尺度规则要明确。",
+      "prompt": "在数据表中为相关列加入内嵌条形或迷你趋势线，保留精确值，说明统一或独立的缩放规则。",
+      "sources": [
+        "S05",
+        "S10"
+      ],
+      "preview": "sparktable",
+      "tags": [
+        "内嵌图表",
+        "sparkline table"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "B06",
+      "group": "B",
+      "zh": "评分卡／状态矩阵",
+      "en": "Scorecard / status matrix / RAG table",
+      "status": "描述性命名",
+      "definition": "按目标或规则列出状态、得分、偏差和必要解释。",
+      "use": "绩效、风险、项目健康状态",
+      "caution": "红黄绿不是通用真值；阈值、评分方法与文字状态需明确。",
+      "prompt": "用状态矩阵列出目标、实际、状态和解释，公开阈值或评分方法，颜色同时配文字标签。",
+      "sources": [
+        "S05",
+        "S10",
+        "S13"
+      ],
+      "preview": "status",
+      "tags": [
+        "评分卡",
+        "状态",
+        "RAG",
+        "scorecard"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D01",
+      "group": "D",
+      "zh": "时间线",
+      "en": "Timeline",
+      "status": "通行术语",
+      "definition": "沿时间顺序排列事件或里程碑，可横向或纵向。",
+      "use": "历史、行业演进、项目里程碑",
+      "caution": "纯序列不是持续时间；不等间隔的时间不得画成等距后仍暗示真实尺度。",
+      "prompt": "用时间线组织关键事件与里程碑，标明日期；如时间间隔不按比例，明确说明是顺序示意。",
+      "sources": [
+        "S14",
+        "S06"
+      ],
+      "preview": "timeline",
+      "tags": [
+        "时间线",
+        "事件",
+        "timeline"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "timeline"
+      }
+    },
+    {
+      "id": "D02",
+      "group": "D",
+      "zh": "步骤流程／流程清单",
+      "en": "Process diagram / process list",
+      "status": "通行术语",
+      "definition": "以编号、箭头和简短解释显示顺序步骤。",
+      "use": "操作手册、研究方法、业务流程",
+      "caution": "无顺序项目不能硬画成流程；此处不包含复杂分支条件。",
+      "prompt": "将真正顺序执行的内容拆成流程步骤，每步有动作和结果，明确起点、终点与必要前置条件。",
+      "sources": [
+        "S12",
+        "S14"
+      ],
+      "preview": "process",
+      "tags": [
+        "步骤",
+        "流程",
+        "process"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "timeline"
+      }
+    },
+    {
+      "id": "D03",
+      "group": "D",
+      "zh": "循环图",
+      "en": "Cycle diagram / circular process",
+      "status": "通行术语",
+      "definition": "表示阶段反复发生、反馈或闭环关系。",
+      "use": "迭代、周期、运营闭环",
+      "caution": "不能把一次性流程为了美观弯成圆；循环必须有业务依据。",
+      "prompt": "用循环图表示实际存在的周期或反馈闭环，标明方向和各阶段，不把一次性过程画成循环。",
+      "sources": [
+        "S14",
+        "S13"
+      ],
+      "preview": "cycle",
+      "tags": [
+        "循环",
+        "反馈",
+        "cycle"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D04",
+      "group": "D",
+      "zh": "分支流程／决策树",
+      "en": "Flowchart / decision tree",
+      "status": "通行术语",
+      "definition": "用有方向的节点与连线表示条件、分支和结果；决策树是特定变体。",
+      "use": "决策规则、审批、复杂流程",
+      "caution": "判断条件应可验证，节点形状和箭头语义应一致；并非所有流程图都是树。",
+      "prompt": "有条件分支时使用流程图或决策树，写清判断条件与分支标签，保证每条路径有可理解的结果。",
+      "sources": [
+        "S20",
+        "S13"
+      ],
+      "preview": "flow",
+      "tags": [
+        "决策",
+        "分支",
+        "flowchart"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D05",
+      "group": "D",
+      "zh": "泳道图",
+      "en": "Swimlane diagram / cross-functional flowchart",
+      "status": "通行术语",
+      "definition": "在流程图中按部门、角色或系统划分责任区域。",
+      "use": "跨部门交接、服务流程、协作职责",
+      "caution": "泳道表示负责主体，而不是随意的视觉分组；交接要明确。",
+      "prompt": "用泳道图展示跨角色流程，每条泳道对应一个责任主体，明确步骤归属、交接和依赖。",
+      "sources": [
+        "S20",
+        "S13"
+      ],
+      "preview": "swimlane",
+      "tags": [
+        "泳道",
+        "责任",
+        "交接"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D06",
+      "group": "D",
+      "zh": "层级／组织结构图",
+      "en": "Hierarchy / organizational chart / tree diagram",
+      "status": "通行术语",
+      "definition": "用父子连线表达上下级、分类或组织关系。",
+      "use": "组织结构、分类体系、组成层级",
+      "caution": "组织上下级和产品分类是不同语义；不要把相邻位置当成关系证据。",
+      "prompt": "用层级结构图展示真实父子或上下级关系，明确连线含义，并保持同层节点一致。",
+      "sources": [
+        "S13",
+        "S20",
+        "S14"
+      ],
+      "preview": "tree",
+      "tags": [
+        "组织图",
+        "层级",
+        "tree"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D07",
+      "group": "D",
+      "zh": "思维导图／概念图",
+      "en": "Mind map / concept map",
+      "status": "通行术语",
+      "definition": "思维导图从中心主题发散；概念图还可用带标签连线表达多对多关系。",
+      "use": "主题梳理、知识结构、分析框架",
+      "caution": "两者不是同义词；复杂关系不要强行改成一棵树。",
+      "prompt": "按信息关系选择中心发散的思维导图或带关系标签的概念图，明确连接含义，避免无意义装饰线。",
+      "sources": [
+        "S20",
+        "S13"
+      ],
+      "preview": "mindmap",
+      "tags": [
+        "思维导图",
+        "概念",
+        "concept map"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D08",
+      "group": "D",
+      "zh": "韦恩图",
+      "en": "Venn diagram",
+      "status": "通行术语",
+      "definition": "用相交区域表达集合重叠和区别，通常是概念示意。",
+      "use": "概念交集、受众重合、范围讨论",
+      "caution": "任意画出的面积不代表数量；需要量化面积时必须用可验证方法。",
+      "prompt": "用韦恩图解释少量集合的交集与差异，标明每个区域含义；非定量示意明确标注不按比例。",
+      "sources": [
+        "S06",
+        "S20"
+      ],
+      "preview": "venn",
+      "tags": [
+        "交集",
+        "集合",
+        "venn"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D09",
+      "group": "D",
+      "zh": "二维象限／2×2矩阵",
+      "en": "Quadrant / two-by-two matrix",
+      "status": "通行术语",
+      "definition": "按两个定义明确的维度把对象放入四个区域或坐标空间。",
+      "use": "优先级、战略选择、定位分析",
+      "caution": "SWOT等属于内容框架，不是独立排版术语；主观位置需说明判断依据。",
+      "prompt": "用二维象限分析对象，定义两轴方向和分界，标明定位依据，不把主观判断包装成测量数据。",
+      "sources": [
+        "S20",
+        "S13"
+      ],
+      "preview": "quadrant",
+      "tags": [
+        "象限",
+        "2x2",
+        "优先级"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D10",
+      "group": "D",
+      "zh": "鱼骨／因果分析图",
+      "en": "Fishbone / Ishikawa diagram",
+      "status": "通行术语",
+      "definition": "按原因类别拆解某个问题的潜在驱动因素。",
+      "use": "复盘、质量分析、原因排查",
+      "caution": "图上列出的原因是待验证假设，不自动证明因果。",
+      "prompt": "用鱼骨图组织问题的潜在原因，将已验证因素与待验证假设区分，并保留证据或验证计划。",
+      "sources": [
+        "S20"
+      ],
+      "preview": "fishbone",
+      "tags": [
+        "原因",
+        "鱼骨",
+        "fishbone"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D11",
+      "group": "D",
+      "zh": "甘特图",
+      "en": "Gantt chart",
+      "status": "通行术语",
+      "definition": "用时间轴上的任务条显示开始、持续时间及可能的依赖。",
+      "use": "项目计划、实施路径、交付安排",
+      "caution": "不是纯里程碑时间线；实际进度、计划进度和依赖应区分。",
+      "prompt": "用甘特图表达任务周期，标明开始、结束、负责人和关键依赖，区分计划与实际进展。",
+      "sources": [
+        "S05",
+        "S20"
+      ],
+      "preview": "gantt",
+      "tags": [
+        "项目",
+        "工期",
+        "gantt"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D12",
+      "group": "D",
+      "zh": "系统／关系网络图",
+      "en": "System / network diagram",
+      "status": "通行术语",
+      "definition": "用节点与连线说明组成、关系或交互，不要求单一树形层级。",
+      "use": "产业生态、系统结构、利益相关者关系",
+      "caution": "连线方向、粗细与类型应有语义；不要把普通关系线理解为数量流。",
+      "prompt": "用关系网络图说明系统组成和连接，图例解释节点与连线类型，给关键关系加文字标签。",
+      "sources": [
+        "S13",
+        "S20",
+        "S06"
+      ],
+      "preview": "network",
+      "tags": [
+        "系统",
+        "网络",
+        "ecosystem"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R01",
+      "group": "R",
+      "zh": "封面／标题页",
+      "en": "Cover / title page",
+      "status": "通行术语",
+      "definition": "建立报告主题、归属、时间和整体视觉入口。",
+      "use": "正式报告、研究和对外交付",
+      "caution": "封面不能代替执行摘要；需有具体题目而不是仅写Report。",
+      "prompt": "封面包含具体标题、必要副标题、作者或机构及日期，视觉方向与内页一致。",
+      "sources": [
+        "S03",
+        "S15"
+      ],
+      "preview": "cover",
+      "tags": [
+        "封面",
+        "title page"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R02",
+      "group": "R",
+      "zh": "目录／图表目录",
+      "en": "Table of contents / list of figures and tables",
+      "status": "通行术语",
+      "definition": "按标题层级及页码帮助查找；图表目录是独立辅助索引。",
+      "use": "长篇、有多个章节或图表的报告",
+      "caution": "短报告未必需要；标题与页码必须随最终版本更新。",
+      "prompt": "为较长报告生成与正文一致的目录，包含适当标题层级和最终页码；图表多时增加图表目录。",
+      "sources": [
+        "S15",
+        "S25"
+      ],
+      "preview": "contents",
+      "tags": [
+        "目录",
+        "TOC",
+        "索引"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R03",
+      "group": "R",
+      "zh": "章节开篇／分隔页",
+      "en": "Section opener / divider",
+      "status": "通行术语",
+      "definition": "通过章节号、标题与更开放的版面提示主题转换。",
+      "use": "长报告、专题与重要章节转换",
+      "caution": "不必每节都占独立整页；节奏设计不能制造空洞页数。",
+      "prompt": "在主要章节转换处使用章节开篇模块或分隔页，以章节号和标题引导阅读，避免无内容的填充页。",
+      "sources": [
+        "S18",
+        "S02"
+      ],
+      "preview": "opener",
+      "tags": [
+        "开篇",
+        "分隔页",
+        "section"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R04",
+      "group": "R",
+      "zh": "页眉／页脚／页码",
+      "en": "Running head / running foot / folio",
+      "status": "通行术语",
+      "definition": "重复标注文档或章节名称与页码，维持定位。",
+      "use": "多页Word、PDF和印刷报告",
+      "caution": "folio在此指设计中的页码，不是纸张开本；封面及开篇可按规则省略。",
+      "prompt": "设置统一页眉、页脚和自动页码，帮助读者识别文档与当前章节，重要正文仍保持足够空间。",
+      "sources": [
+        "S15",
+        "S18"
+      ],
+      "preview": "running",
+      "tags": [
+        "页眉",
+        "页脚",
+        "页码",
+        "folio"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R05",
+      "group": "R",
+      "zh": "章节标记／颜色编码",
+      "en": "Section marker / section color coding",
+      "status": "描述性命名",
+      "definition": "用章节号、色签或稳定标记区分内容区域。",
+      "use": "长篇、多主题报告",
+      "caution": "颜色不能是唯一定位方式；品牌强调色与数据语义色应区分。",
+      "prompt": "为章节设置稳定的文字或色签标记，并与目录对应，确保去掉颜色后仍能识别章节。",
+      "sources": [
+        "S02",
+        "S18",
+        "S13"
+      ],
+      "preview": "sectionmark",
+      "tags": [
+        "章节标记",
+        "色签",
+        "navigation"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R06",
+      "group": "R",
+      "zh": "脚注／来源说明",
+      "en": "Footnote / endnote / source line",
+      "status": "通行术语",
+      "definition": "在局部或文末解释口径、限制和出处；三者位置与功能不同。",
+      "use": "研究数据、引文、方法限制",
+      "caution": "来源不能仅藏在最后；图表附近应有关键口径，长说明可转文末注释。",
+      "prompt": "在相关图表或论述附近加入必要来源与口径说明，简短补充用脚注，较长说明可用文末注释并建立引用对应。",
+      "sources": [
+        "S09",
+        "S15"
+      ],
+      "preview": "footnote",
+      "tags": [
+        "脚注",
+        "来源",
+        "footnote"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "source-note"
+      }
+    },
+    {
+      "id": "R07",
+      "group": "R",
+      "zh": "方法／样本说明框",
+      "en": "Methodology / sample note box",
+      "status": "描述性命名",
+      "definition": "把数据来源、样本、期间、方法和限制集中为可查找的小模块。",
+      "use": "调研、调查、估计和数据分析",
+      "caution": "方法模块不证明研究有效；关键限制不能因版面弱化而被隐藏。",
+      "prompt": "为研究报告设置方法说明框，注明来源、样本、统计期间、分析方法和限制，重要限制同时在正文提示。",
+      "sources": [
+        "S15",
+        "S09",
+        "S23"
+      ],
+      "preview": "method",
+      "tags": [
+        "方法",
+        "样本",
+        "methodology"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "source-note"
+      }
+    },
+    {
+      "id": "R08",
+      "group": "R",
+      "zh": "术语表",
+      "en": "Glossary",
+      "status": "通行术语",
+      "definition": "集中解释读者可能不熟悉的术语与缩写。",
+      "use": "专业术语密集、跨团队或公众报告",
+      "caution": "术语表不能代替正文首次解释；不应加入正文未用的术语凑篇幅。",
+      "prompt": "为不熟悉的专业术语和缩写建立简明术语表，同时在正文首次出现时解释。",
+      "sources": [
+        "S25"
+      ],
+      "preview": "glossary",
+      "tags": [
+        "术语表",
+        "glossary"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R09",
+      "group": "R",
+      "zh": "参考资料列表",
+      "en": "Reference list / bibliography",
+      "status": "通行术语",
+      "definition": "集中提供引用或参考资料的完整检索信息。",
+      "use": "研究、白皮书、正式报告",
+      "caution": "references通常对应已引用来源；bibliography可包含更广阅读资料，两者不应混用而不说明。",
+      "prompt": "建立与正文引用对应的参考资料列表，包含足够检索信息；额外推荐阅读与实际引文分开。",
+      "sources": [
+        "S15",
+        "S25"
+      ],
+      "preview": "references",
+      "tags": [
+        "参考资料",
+        "reference"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "built-in",
+        "component": "source-note"
+      }
+    },
+    {
+      "id": "R10",
+      "group": "R",
+      "zh": "附录",
+      "en": "Appendix / appendices",
+      "status": "通行术语",
+      "definition": "把重要但会打断主线的明细、数据或技术说明放到辅助章节。",
+      "use": "长表、详细方法、补充计算和证据",
+      "caution": "正文须引用相关附录；不能把影响主要结论的限制全部藏到附录。",
+      "prompt": "将会打断主线的明细和补充证据放入清楚编号的附录，正文提供对应引用，核心限制留在主文。",
+      "sources": [
+        "S15",
+        "S25"
+      ],
+      "preview": "appendix",
+      "tags": [
+        "附录",
+        "appendix"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R11",
+      "group": "R",
+      "zh": "执行摘要",
+      "en": "Executive summary",
+      "status": "通行术语",
+      "definition": "以可独立阅读的摘要呈现报告目的、关键发现、结论和必要建议。",
+      "use": "管理层、决策者与长报告的开篇",
+      "caution": "不是目录，也不是把全部内容压成小字；应让没有时间读全文的人理解主要结果。",
+      "prompt": "在报告开篇加入可独立阅读的执行摘要，覆盖目的、关键发现、主要结论与有依据的建议，细节留在正文。",
+      "sources": [
+        "S25",
+        "S15",
+        "S03"
+      ],
+      "preview": "takeaways",
+      "tags": [
+        "执行摘要",
+        "executive summary"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "R12",
+      "group": "R",
+      "zh": "内容摘要／描述性摘要",
+      "en": "Abstract / descriptive abstract",
+      "status": "通行术语",
+      "definition": "以简短文字说明报告的目的、范围或内容；描述性摘要通常不承担完整决策总结。",
+      "use": "研究或技术报告、封面后的简短预览",
+      "caution": "摘要要求随文档规范变化；描述性摘要与执行摘要不是同义词。",
+      "prompt": "按文档用途提供简短摘要，说明目的、范围和内容；需要关键结果和建议时另设执行摘要，不混用两者。",
+      "sources": [
+        "S25"
+      ],
+      "preview": "standfirst",
+      "tags": [
+        "摘要",
+        "abstract"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "P01",
+      "group": "P",
+      "zh": "结论优先／洞察先行",
+      "en": "Conclusion-first / insight-led structure",
+      "status": "描述性命名",
+      "definition": "让读者先获得主要发现，再进入支持证据与细节。",
+      "use": "管理层简报、研究摘要、决策报告",
+      "caution": "不是把未经证实的结论放大；也不是所有研究必须用同一种叙事顺序。",
+      "prompt": "先给核心发现或执行摘要，再按重要性展开证据、分析与限制，不让读者从原始表格中自行寻找结论。",
+      "sources": [
+        "S03",
+        "S05",
+        "S09"
+      ],
+      "preview": "insight",
+      "tags": [
+        "结论优先",
+        "insight",
+        "摘要"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "P02",
+      "group": "P",
+      "zh": "观点—证据—含义",
+      "en": "Claim–evidence–implication",
+      "status": "描述性命名",
+      "definition": "每个分析单元先明确观点，再给可核查证据，最后解释意义。",
+      "use": "调研发现、数据分析、方案论证",
+      "caution": "这是实用组织句式，不是唯一标准；含义不能超过数据支持的范围。",
+      "prompt": "每个主要发现按观点、证据和含义组织：先一句发现，再放相关图表或数据，最后解释业务意义与限制。",
+      "sources": [
+        "S07",
+        "S05",
+        "S17"
+      ],
+      "preview": "claim",
+      "tags": [
+        "观点",
+        "证据",
+        "含义"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "P03",
+      "group": "P",
+      "zh": "总览到细节／渐进展开",
+      "en": "Overview-to-detail / gradual reveal",
+      "status": "通行术语",
+      "definition": "先建立整体背景，再逐步展示分组、异常、驱动和详细证据。",
+      "use": "复杂研究、多层数据和分析报告",
+      "caution": "静态报告用页面与章节顺序实现，不依赖悬停或点击。",
+      "prompt": "先给总览，再逐层展开关键分组和驱动因素，详细数据放在后续页面或附录，保持全程可静态阅读。",
+      "sources": [
+        "S17",
+        "S22"
+      ],
+      "preview": "reveal",
+      "tags": [
+        "总览",
+        "细节",
+        "gradual reveal"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "P04",
+      "group": "P",
+      "zh": "对照／比较叙事",
+      "en": "Compare / contrast",
+      "status": "通行术语",
+      "definition": "通过并置的证据揭示差异或相似之处，可跨类别、对象或时期。",
+      "use": "竞品、群体差异、方案评估",
+      "caution": "比较需有共同口径、尺度或明确换算；对照不自动证明原因。",
+      "prompt": "围绕同一问题并置两组或少量对象的证据，统一口径并明确关键差异，再讨论可能解释与限制。",
+      "sources": [
+        "S17",
+        "S14"
+      ],
+      "preview": "compare",
+      "tags": [
+        "对照",
+        "compare",
+        "contrast"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "P05",
+      "group": "P",
+      "zh": "前后变化叙事",
+      "en": "Before–after comparison",
+      "status": "描述性命名",
+      "definition": "围绕同一对象的基准状态、变化和结果组织内容，可用图、图片或表。",
+      "use": "项目成果、改造、效果复盘",
+      "caution": "前后差异不能单独证明干预导致结果；照片需尽量可比。",
+      "prompt": "以前后对照组织变化，定义基准期与结果期，保持测量口径或拍摄条件可比，说明其他可能影响因素。",
+      "sources": [
+        "S17",
+        "S05",
+        "S14"
+      ],
+      "preview": "beforeafter",
+      "tags": [
+        "前后",
+        "变化",
+        "before after"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "P06",
+      "group": "P",
+      "zh": "具体化／案例解释",
+      "en": "Concretize / case-based explanation",
+      "status": "通行术语",
+      "definition": "用真实对象、案例或可理解的参照帮助理解抽象数据。",
+      "use": "公众报告、影响力、研究解释",
+      "caution": "案例不代表总体，不能以单例替代统计；数值类比需有正确换算。",
+      "prompt": "用真实案例或可核查的参照解释抽象结果，明确其代表性和限制，再回到总体证据。",
+      "sources": [
+        "S17",
+        "S03"
+      ],
+      "preview": "case",
+      "tags": [
+        "案例",
+        "具体化",
+        "concretize"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "P07",
+      "group": "P",
+      "zh": "建议／行动收束",
+      "en": "Recommendation / call to action",
+      "status": "通行术语",
+      "definition": "把分析结果连接到可实施的选择、下一步或建议。",
+      "use": "决策报告、研究总结、经营复盘",
+      "caution": "不能为每个图强行输出建议；区分事实发现、建议与待验证假设。",
+      "prompt": "结尾给出有证据支持的建议与下一步，写明依据、优先级和必要条件，区分已知事实与待验证假设。",
+      "sources": [
+        "S17",
+        "S05",
+        "S15"
+      ],
+      "preview": "action",
+      "tags": [
+        "行动",
+        "建议",
+        "call to action"
+      ],
+      "tier": "核心",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C29",
+      "group": "C",
+      "zh": "小提琴图",
+      "en": "Violin plot",
+      "status": "通行术语",
+      "definition": "用密度形状表现分布，可补充中位数或分位数信息。",
+      "use": "专业统计、复杂或多峰分布",
+      "caution": "依赖密度估计与参数；小样本形状可能不稳定。",
+      "prompt": "在专业分析中用小提琴图比较分布，注明样本量与估计方法，必要时叠加观测点。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "violin",
+      "tags": [
+        "专业扩展",
+        "分布"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C30",
+      "group": "C",
+      "zh": "蜂群图",
+      "en": "Beeswarm plot",
+      "status": "通行术语",
+      "definition": "沿数值方向保留观测位置，用另一方向错开点以减少遮挡。",
+      "use": "中等样本分布、个体差异",
+      "caution": "大量样本会拥挤；偏移方向本身通常不代表额外数值。",
+      "prompt": "用蜂群图展示个体值的分布，说明错开方向仅为避免重叠，并提供样本量。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "beeswarm",
+      "tags": [
+        "专业扩展",
+        "个体",
+        "分布"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C31",
+      "group": "C",
+      "zh": "人口金字塔",
+      "en": "Population pyramid",
+      "status": "通行术语",
+      "definition": "用左右相对的条形比较两个群体在年龄等分组中的结构。",
+      "use": "人口、年龄与性别结构",
+      "caution": "一般不是任意层级金字塔；需说明数量或占比与分组规则。",
+      "prompt": "用人口金字塔比较两组的年龄结构，保持共同尺度，并注明各组样本或人口总量。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "pyramid",
+      "tags": [
+        "专业扩展",
+        "人口"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C32",
+      "group": "C",
+      "zh": "蜡烛／K线图",
+      "en": "Candlestick chart",
+      "status": "通行术语",
+      "definition": "在每个时期显示开盘、收盘、最高和最低值。",
+      "use": "金融行情与有对应四值的序列",
+      "caution": "不是普通趋势图；颜色定义和周期必须明确。",
+      "prompt": "仅在数据包含对应四值时使用蜡烛图，注明周期以及开收高低的含义和颜色规则。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "candlestick",
+      "tags": [
+        "专业扩展",
+        "金融",
+        "K线"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C33",
+      "group": "C",
+      "zh": "预测扇形图",
+      "en": "Fan chart",
+      "status": "通行术语",
+      "definition": "用扩展的多层区间显示未来预测的不确定性。",
+      "use": "预测、经济展望、情景研究",
+      "caution": "不是多条任意装饰曲线；各层概率或区间定义需说明。",
+      "prompt": "在预测图中用有依据的扇形区间表示不确定性，区分历史观测与预测，并解释每层区间含义。",
+      "sources": [
+        "S06",
+        "S23"
+      ],
+      "preview": "fan",
+      "tags": [
+        "专业扩展",
+        "预测"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C34",
+      "group": "C",
+      "zh": "日历热力图",
+      "en": "Calendar heatmap",
+      "status": "通行术语",
+      "definition": "按日历布局用颜色表示每日数值。",
+      "use": "日常活动、季节与日期模式",
+      "caution": "牺牲精确查值；缺失数据不应与零值同色而无说明。",
+      "prompt": "用日历热力图展示按日的模式，注明色标、缺失值处理与统计时区，精确值可另附表。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "calendar",
+      "tags": [
+        "专业扩展",
+        "日历"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C35",
+      "group": "C",
+      "zh": "排名变化图",
+      "en": "Bump chart",
+      "status": "通行术语",
+      "definition": "沿时间显示多个对象的排名变化。",
+      "use": "榜单、行业位次、排名演变",
+      "caution": "排名隐藏绝对差距；需说明并列和入榜规则。",
+      "prompt": "用排名变化图展示位次演变，说明排名规则，必要时同时提供关键绝对数值。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "bump",
+      "tags": [
+        "专业扩展",
+        "排名"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C36",
+      "group": "C",
+      "zh": "马赛克／Marimekko图",
+      "en": "Marimekko / Mekko chart",
+      "status": "通行术语",
+      "definition": "通过二维矩形布局同时表达组的总规模与内部构成。",
+      "use": "市场细分、规模与份额共同分析",
+      "caution": "面积与宽度阅读负担高，不适合快速精确比较。",
+      "prompt": "仅在需要同时表达组规模和组成时使用Marimekko图，清楚解释宽度与高度的含义。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "mekko",
+      "tags": [
+        "专业扩展",
+        "组成",
+        "市场"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C37",
+      "group": "C",
+      "zh": "平行坐标图",
+      "en": "Parallel coordinates",
+      "status": "通行术语",
+      "definition": "让对象跨多条平行指标轴形成连线，以观察多变量模式。",
+      "use": "多变量探索、少数重点对象对比",
+      "caution": "轴顺序与标准化影响印象；线太多时不适合公众报告。",
+      "prompt": "专业多变量分析可使用平行坐标图，解释各轴和标准化，突出少量对象并保留上下文。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "parallel",
+      "tags": [
+        "专业扩展",
+        "多变量"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C38",
+      "group": "C",
+      "zh": "弦图",
+      "en": "Chord diagram",
+      "status": "通行术语",
+      "definition": "在环形布局内用弦表达节点间的数量关系。",
+      "use": "多方往来、相互流量",
+      "caution": "关系多时难读；必须解释方向、宽度与总量口径。",
+      "prompt": "仅在数量关系重要且节点有限时用弦图，明确连线宽度与方向的定义，复杂细节另附表。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "chord",
+      "tags": [
+        "专业扩展",
+        "往来"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "C39",
+      "group": "C",
+      "zh": "变形地图",
+      "en": "Cartogram",
+      "status": "通行术语",
+      "definition": "通过等面积单元或按数值变形的区域改变地理面积表达。",
+      "use": "选举、人口与地域规模",
+      "caution": "与普通地图不同；等面积与数值变形是不同变体，需解释形变编码。",
+      "prompt": "使用变形地图时明确说明地理形状被调整，解释单元面积或区域面积代表的数值，提供必要地域标签。",
+      "sources": [
+        "S06"
+      ],
+      "preview": "cartogram",
+      "tags": [
+        "专业扩展",
+        "地图"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    },
+    {
+      "id": "D13",
+      "group": "D",
+      "zh": "客户／用户旅程图",
+      "en": "Customer / user journey map",
+      "status": "通行术语",
+      "definition": "按阶段组织用户动作、触点、体验和机会，是业务分析框架的图形表达。",
+      "use": "客户研究、服务设计、体验报告",
+      "caution": "不是简单流程清单；触点和情绪需要研究证据，不要替用户编造感受。",
+      "prompt": "根据真实研究材料制作用户旅程图，按阶段列出动作、触点、问题和机会，标明证据与待验证假设。",
+      "sources": [
+        "S20"
+      ],
+      "preview": "journey",
+      "tags": [
+        "专业扩展",
+        "客户",
+        "用户旅程"
+      ],
+      "tier": "专业扩展",
+      "rendering": {
+        "coverage": "reference-only",
+        "component": null
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "S01",
+      "publisher": "Design Force",
+      "title": "Grid systems in graphic design",
+      "url": "https://designforce.co/blog/grid-systems-in-graphic-design/",
+      "kind": "设计实践",
+      "supports": "单栏、分栏、模块、层级和基线栅格的定义与用途。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S02",
+      "publisher": "Flip180 Media",
+      "title": "Magazine Designing: From First Sketch to Final Issue",
+      "url": "https://flip180media.com/tips-for-periodical-publishers/magazine-designing-from-first-sketch-to-final-issue/",
+      "kind": "出版物设计实践",
+      "supports": "双栏与多栏、标题层级、standfirst、pull quote、drop cap、caption、sidebar、callout。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S03",
+      "publisher": "Adobe",
+      "title": "Ideas for your next annual report",
+      "url": "https://www.adobe.com/creativecloud/business/teams/resources/how-to/annual-report-design.html",
+      "kind": "官方设计指南",
+      "supports": "报告中的叙事、图表、文本框、摘句、留白、品牌一致性和摘要页。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S04",
+      "publisher": "Adobe",
+      "title": "Apply text wrap in InDesign",
+      "url": "https://helpx.adobe.com/indesign/desktop/format-and-style-text/composition-and-text-wrapping/apply-text-wrap.html",
+      "kind": "官方工具文档",
+      "supports": "文字绕排的定义、矩形／轮廓绕排以及绕排间距。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S05",
+      "publisher": "Datylon",
+      "title": "Support Your Executives: Optimize Reporting for Strategic Success",
+      "url": "https://www.datylon.com/blog/executive-reports",
+      "kind": "数据报告设计实践",
+      "supports": "Big Numbers、standalone numbers、指标前置、目标比较、注释、迷你趋势图、哑铃图、漏斗图等。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S06",
+      "publisher": "Financial Times",
+      "title": "Visual Vocabulary",
+      "url": "https://raw.githubusercontent.com/Financial-Times/chart-doctor/main/visual-vocabulary/Visual-vocabulary-en.pdf",
+      "kind": "新闻数据可视化指南",
+      "supports": "按偏差、相关、排名、分布、时间变化、大小、部分与整体、空间和流向九种关系选择图表；明确清单并非穷尽。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S07",
+      "publisher": "Office for National Statistics",
+      "title": "Data visualisation principles",
+      "url": "https://service-manual.ons.gov.uk/data-visualisation/guidance/principles",
+      "kind": "官方数据可视化规范",
+      "supports": "解释型可视化、图文协同、重要比较、简化图表以及选择有意义的数据。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S08",
+      "publisher": "Office for National Statistics",
+      "title": "Annotations",
+      "url": "https://service-manual.ons.gov.uk/data-visualisation/guidance/annotations",
+      "kind": "官方数据可视化规范",
+      "supports": "点注释、参考线与区域注释；注释靠近相关数据且不遮挡。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S09",
+      "publisher": "Office for National Statistics",
+      "title": "Chart text",
+      "url": "https://service-manual.ons.gov.uk/data-visualisation/guidance/chart-text",
+      "kind": "官方数据可视化规范",
+      "supports": "结论型图表标题、统计口径、地域、时间、数据来源、图表脚注、单位和标签。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S10",
+      "publisher": "IBM Carbon Design System",
+      "title": "Data table guidelines",
+      "url": "https://www.carbondesignsystem.com/building-blocks/core/components/data-table/guidelines",
+      "kind": "官方设计系统",
+      "supports": "数据表的结构、空间、表头、行列以及斑马纹等静态处理；交互部分不移植到PDF。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S11",
+      "publisher": "U.S. Web Design System",
+      "title": "Summary box",
+      "url": "https://designsystem.digital.gov/components/summary-box/",
+      "kind": "官方设计系统",
+      "supports": "提炼长文关键内容与短行动清单的摘要框；用于报告时保留静态语义。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S12",
+      "publisher": "U.S. Web Design System",
+      "title": "Process list",
+      "url": "https://designsystem.digital.gov/components/process-list/",
+      "kind": "官方设计系统",
+      "supports": "顺序步骤的层级、编号和过程进展；无顺序内容不应伪装成流程。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S13",
+      "publisher": "IBM Design Language",
+      "title": "Technical diagrams",
+      "url": "https://www.ibm.com/design/language/infographics/technical-diagrams/usage/",
+      "kind": "官方设计指南",
+      "supports": "白皮书和文档中的系统关系、层级与过程；图例、节点、连线和文字标签。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S14",
+      "publisher": "Visme",
+      "title": "13 Types of Infographics You Should Be Creating",
+      "url": "https://visme.co/blog/types-of-infographics/",
+      "kind": "视觉表达分类实践",
+      "supports": "统计、信息、时间线、流程、对比、清单、层级、解剖与地域等信息图类型；交互型不属于静态报告核心。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S15",
+      "publisher": "Boise State University, College of Business and Economics",
+      "title": "Guidelines for Reports",
+      "url": "https://www.boisestate.edu/cobe/cobe-writing-style-guide/guidelines-for-reports/",
+      "kind": "高校商务写作指南",
+      "supports": "封面、目录、执行摘要、方法、发现、结论、参考资料与附录，以及页眉页码；不将其APA格式设为通用审美要求。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S17",
+      "publisher": "Benjamin Bach 等（数据叙事研究）",
+      "title": "Narrative Design Patterns for Data-Driven Storytelling",
+      "url": "https://datavis2020.github.io/pdfs/Narrative_Design_Patterns__for_Data_Driven_Storytelling.pdf",
+      "kind": "研究文献",
+      "supports": "Compare、Concretize、Gradual reveal、Humans-behind-the-dots、Call to action 等叙事模式；说明模式可组合、重叠且非最终全集。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S18",
+      "publisher": "BAS BG",
+      "title": "Editorial Layout Design Principles",
+      "url": "https://www.bas-bg.com/editorial-layout-design-principles-how-to-create-magazine-spreads-that-captivate-readers/",
+      "kind": "出版物设计实践",
+      "supports": "满版、嵌入图片、图片分组、主图与辅图、跨页图片、摘句、页面节奏与页码。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S19",
+      "publisher": "Cooper Hewitt, Smithsonian Design Museum",
+      "title": "A Harmony of Contrasts",
+      "url": "https://www.cooperhewitt.org/2018/08/05/aharmonyofcontrasts/",
+      "kind": "博物馆设计史资料",
+      "supports": "Swiss Style／International Typographic Style 的命名及栅格、非对称、无衬线字体和摄影特征。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S20",
+      "publisher": "Miro",
+      "title": "Diagramming templates",
+      "url": "https://miro.com/templates/diagrams/",
+      "kind": "官方图解目录",
+      "supports": "流程、决策树、泳道、组织图、概念图、思维导图、韦恩、鱼骨、甘特、网络和客户旅程等图解。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S21",
+      "publisher": "U.S. Web Design System",
+      "title": "Icon list",
+      "url": "https://designsystem.digital.gov/components/icon-list/",
+      "kind": "官方设计系统",
+      "supports": "图标清单、行动要求与do／don't对照；图标加强文本而非替代文本。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S22",
+      "publisher": "Office for National Statistics",
+      "title": "Interactive charts and animations",
+      "url": "https://service-manual.ons.gov.uk/data-visualisation/guidance/interactive-charts-and-animations",
+      "kind": "官方数据可视化规范",
+      "supports": "使用多个小图（small multiples）替代过多系列；静态图应无需交互即可传达重点。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S23",
+      "publisher": "Office for National Statistics",
+      "title": "Showing uncertainty in charts",
+      "url": "https://service-manual.ons.gov.uk/data-visualisation/guidance/showing-uncertainty-in-charts",
+      "kind": "官方数据可视化规范",
+      "supports": "范围点图与不确定性带；说明哪些情况下不确定性影响解释，ONS不推荐柱图误差棒。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S24",
+      "publisher": "MDN Web Docs",
+      "title": "blockquote: HTML block quotation element",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/blockquote",
+      "kind": "技术语义参考",
+      "supports": "长引用块及引文归属；只引用其语义，不把HTML实现当作Word排版要求。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    },
+    {
+      "id": "S25",
+      "publisher": "Lumen Learning / SUNY Empire State",
+      "title": "Report Design",
+      "url": "https://courses.lumenlearning.com/suny-esc-technicalwriting/chapter/report-design/",
+      "kind": "高校技术写作教材",
+      "supports": "目录、图表目录、参考列表、附录、术语表、索引与报告页码。",
+      "checked": "2026-10-12",
+      "verification": "相关正文已提取并核对；PDF为文本抽取"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "editorial-research",
+      "title": "你描述的杂志式研究报告",
+      "note": "根据“双栏＋大数字＋图文结合”的文字描述组合，并非复刻或验证Genspark原稿。",
+      "ids": [
+        "S01",
+        "L02",
+        "L07",
+        "N01",
+        "T02",
+        "T03",
+        "I02",
+        "C27",
+        "R06",
+        "R07",
+        "R11",
+        "P01",
+        "P02"
+      ],
+      "brief": "制作一份杂志式、数据驱动的调研报告。正文采用等宽双栏，重要图表可跨栏。开篇先给关键发现，用少量大数字强调核心统计，每个数字注明名称、单位、时间和来源。正文按“观点—证据—含义”组织，图表靠近相关分析并配图注；较复杂比较使用统一尺度的小多图。适量使用导语与摘句，保持字体层级、对齐和留白。加入方法与限制说明，避免通篇长段落或仪表盘卡片堆砌。"
+    },
+    {
+      "id": "executive",
+      "title": "经营分析／管理层简报",
+      "note": "强调状态、变化与决策；没有实际业务数据时不填造示例指标。",
+      "ids": [
+        "S06",
+        "L05",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "C03",
+        "C25",
+        "B06",
+        "R06",
+        "P01",
+        "P07"
+      ],
+      "brief": "制作可静态阅读的管理层经营简报。先给少量相关指标的概览，再显示同比环比、目标差距和近期趋势。使用有明确坐标的趋势图、目标比较图与状态表解释表现；公开阈值和统计口径。结尾给出有依据的建议与下一步。颜色不能替代文字，所有关键信息无需悬停或筛选即可理解。"
+    },
+    {
+      "id": "comparison",
+      "title": "竞品／方案对照报告",
+      "note": "比较维度、时间、尺度和证据必须统一；不把主观评分伪装成测量。",
+      "ids": [
+        "S04",
+        "L03",
+        "B02",
+        "C02",
+        "C11",
+        "D09",
+        "T06",
+        "R09",
+        "P04",
+        "P07"
+      ],
+      "brief": "制作品牌一致的方案对照报告。先定义比较问题和共同维度，用横向对比表与少量分组图或哑铃图呈现差异。若使用二维象限，解释两轴和定位依据。侧栏放必要定义或限制，每节提炼关键要点，结尾给出适用条件明确的建议与参考来源。"
+    },
+    {
+      "id": "guide",
+      "title": "操作手册／流程说明",
+      "note": "用流程、泳道与分支解释真实步骤，不用装饰箭头制造顺序。",
+      "ids": [
+        "S03",
+        "L01",
+        "D02",
+        "D04",
+        "D05",
+        "I08",
+        "T05",
+        "T08",
+        "R02",
+        "R08"
+      ],
+      "brief": "制作清晰可执行的操作手册。正文使用单栏和稳定标题层级。顺序步骤用流程清单，条件判断用分支图，跨角色交接用泳道图。必要截图加真实对象标注；风险或特殊说明放进少量强调框。加入目录和术语解释，并保持步骤、图号与引用一致。"
+    }
+  ],
+  "chartTasks": [
+    {
+      "zh": "偏差",
+      "en": "Deviation",
+      "question": "离零点、目标或基准有多远？",
+      "ids": [
+        "C07",
+        "C11",
+        "C25"
+      ]
+    },
+    {
+      "zh": "相关",
+      "en": "Correlation",
+      "question": "两个或多个变量有什么关系？",
+      "ids": [
+        "C16",
+        "C17",
+        "C20"
+      ]
+    },
+    {
+      "zh": "排名",
+      "en": "Ranking",
+      "question": "谁在前，排名如何变化？",
+      "ids": [
+        "C01",
+        "C09",
+        "C10",
+        "C35"
+      ]
+    },
+    {
+      "zh": "分布",
+      "en": "Distribution",
+      "question": "值如何分散，哪些群体不同？",
+      "ids": [
+        "C18",
+        "C19",
+        "C29",
+        "C30",
+        "C31"
+      ]
+    },
+    {
+      "zh": "时间变化",
+      "en": "Change over time",
+      "question": "趋势、波动和变化是什么？",
+      "ids": [
+        "C03",
+        "C04",
+        "C10",
+        "N05",
+        "C34"
+      ]
+    },
+    {
+      "zh": "大小比较",
+      "en": "Magnitude",
+      "question": "各项规模差多少？",
+      "ids": [
+        "C01",
+        "C02",
+        "C08",
+        "C09",
+        "C25"
+      ]
+    },
+    {
+      "zh": "部分与整体",
+      "en": "Part-to-whole",
+      "question": "整体由什么构成？",
+      "ids": [
+        "C05",
+        "C06",
+        "C13",
+        "C14",
+        "C15"
+      ]
+    },
+    {
+      "zh": "空间",
+      "en": "Spatial",
+      "question": "哪里不同，地理位置是否关键？",
+      "ids": [
+        "C21",
+        "C22",
+        "C39"
+      ]
+    },
+    {
+      "zh": "流向",
+      "en": "Flow",
+      "question": "数量流到哪里，状态如何连接？",
+      "ids": [
+        "C23",
+        "C12",
+        "D12"
+      ]
+    }
+  ],
+  "principles": [
+    {
+      "name": "视觉层级",
+      "en": "Visual hierarchy",
+      "text": "主结论、证据、正文和注释有明确主次；大数字不能压过必要限制。",
+      "refs": [
+        "S03",
+        "S18"
+      ]
+    },
+    {
+      "name": "对齐与栅格",
+      "en": "Alignment & grid",
+      "text": "共享对齐线、页边距和栏间距，跨栏也遵守同一结构。",
+      "refs": [
+        "S01"
+      ]
+    },
+    {
+      "name": "邻近关系",
+      "en": "Proximity",
+      "text": "图注贴近图片，图表贴近相关分析，旁注有明确对应对象。",
+      "refs": [
+        "S07",
+        "S18"
+      ]
+    },
+    {
+      "name": "对比与强调",
+      "en": "Contrast & emphasis",
+      "text": "用字号、字重、位置或有限颜色强调重点，不靠装饰堆叠。",
+      "refs": [
+        "S02",
+        "S18"
+      ]
+    },
+    {
+      "name": "一致性",
+      "en": "Consistency & repetition",
+      "text": "相同角色使用相同样式，字体、图表与数值口径跨页一致。",
+      "refs": [
+        "S03",
+        "S07"
+      ]
+    },
+    {
+      "name": "留白与密度",
+      "en": "Whitespace & density",
+      "text": "留白是结构；密集证据与开放页面有节奏，不用空白凑页数。",
+      "refs": [
+        "S03",
+        "S18"
+      ]
+    },
+    {
+      "name": "可读性与可访问性",
+      "en": "Legibility & accessibility",
+      "text": "不依赖颜色或悬停；文字不遮挡，阅读顺序正确，缩小后仍能理解。",
+      "refs": [
+        "S07",
+        "S10",
+        "S13",
+        "S22"
+      ]
+    },
+    {
+      "name": "数据诚信与语境",
+      "en": "Integrity & context",
+      "text": "数字有单位、期间、分母和来源；尺度与面积真实，推断和不确定性不被隐藏。",
+      "refs": [
+        "S06",
+        "S09",
+        "S23"
+      ]
+    }
+  ]
+}

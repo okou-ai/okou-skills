@@ -161,6 +161,13 @@
         "./customer-intel",
         "./research-synthesis"
       ]
+    },
+    {
+      "name": "artifact-layout",
+      "description": "Shared report layouts, grids, large numbers, figures, charts, tables, and four themes for HTML, Word, and PDF.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./artifact-layout"]
     }
   ]
 }

@@ -74,4 +74,14 @@ copies of the upstream skill collection.
 
 ## Resources
 
+[artifact-layout](artifact-layout/SKILL.md) maintains report and document layout
+resources independently of `gen`: a 121-term bilingual vocabulary, three visual
+recipes, four semantic-token themes, and shared HTML/Word/PDF components. Its
+preview is generated from the same resources as actual reports. Analysis and
+factual quality remain with their existing workflows.
+
+```bash
+/plugin install artifact-layout@vm0-skills
+```
+
 - [Agent Skills Specification](https://agentskills.io/specification)
