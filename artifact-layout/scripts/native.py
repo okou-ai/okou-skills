@@ -186,6 +186,24 @@ def render_word(report, output, source_dir, office_dir):
     def paragraph(container, value, style="Normal"):
         return container.add_paragraph(str(value), style)
 
+    def ordered_sequence():
+        numbering = document.part.numbering_part.element
+        base_id = document.styles["List Number"].element.pPr.numPr.numId.val
+        abstract = numbering.xpath(f'./w:num[@w:numId="{base_id}"]/w:abstractNumId')[0]
+        instance = numbering.add_num(int(abstract.get(qn("w:val"))))
+        override = instance.add_lvlOverride(0)
+        start = OxmlElement("w:startOverride")
+        start.set(qn("w:val"), "1")
+        override.append(start)
+        return instance.numId
+
+    def ordered_paragraph(container, value, sequence):
+        p = paragraph(container, value, "List Number")
+        properties = p._p.get_or_add_pPr().get_or_add_numPr()
+        properties.get_or_add_ilvl().val = 0
+        properties.get_or_add_numId().val = sequence
+        return p
+
     def note(container, block):
         for key, style in [("caption", "Caption"), ("source", "Source")]:
             if block.get(key):
@@ -327,12 +345,12 @@ def render_word(report, output, source_dir, office_dir):
                 p._p.get_or_add_pPr().append(shading)
             note(container, block)
         elif kind in {"takeaways", "numbered-list"}:
+            sequence = ordered_sequence() if kind == "numbered-list" else None
             for value in block["items"]:
-                paragraph(
-                    container,
-                    value,
-                    "List Number" if kind == "numbered-list" else "List Bullet",
-                )
+                if kind == "numbered-list":
+                    ordered_paragraph(container, value, sequence)
+                else:
+                    paragraph(container, value, "List Bullet")
             note(container, block)
         elif kind == "timeline":
             table = container.add_table(rows=0, cols=2)
@@ -353,8 +371,9 @@ def render_word(report, output, source_dir, office_dir):
             note(container, block)
             paragraph(container, "")
         elif kind == "process-steps":
+            sequence = ordered_sequence()
             for item in block["items"]:
-                p = paragraph(container, item["label"], "List Number")
+                p = ordered_paragraph(container, item["label"], sequence)
                 p.runs[0].bold = True
                 p.paragraph_format.keep_with_next = True
                 p = paragraph(container, item["text"])

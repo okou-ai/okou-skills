@@ -233,6 +233,28 @@ class Top30NativeTests(unittest.TestCase):
     setUp = Top30Tests.setUp
     render = Top30Tests.render
 
+    def test_ordered_blocks_restart_independent_sequences(self):
+        from docx import Document
+
+        reports = {entry["id"]: report for entry, report in ranked_reports()}
+        report = reports["T08"]
+        report["sections"][0]["blocks"] += reports["D02"]["sections"][0]["blocks"]
+        word = Document(self.render(report, formats=("docx",))["docx"])
+        items = [
+            paragraph
+            for paragraph in word.paragraphs
+            if paragraph.style.name == "List Number"
+        ]
+        sequences = [item._p.pPr.numPr.numId.val for item in items]
+        self.assertEqual(len(set(sequences[:4])), 1)
+        self.assertEqual(len(set(sequences[4:])), 1)
+        self.assertNotEqual(sequences[0], sequences[4])
+        for sequence in set(sequences):
+            starts = word.part.numbering_part.element.xpath(
+                f'./w:num[@w:numId="{sequence}"]/w:lvlOverride/w:startOverride/@w:val'
+            )
+            self.assertEqual(starts, ["1"])
+
     def test_every_expression_produces_editable_word_and_real_pdf(self):
         from docx import Document
         from pypdf import PdfReader

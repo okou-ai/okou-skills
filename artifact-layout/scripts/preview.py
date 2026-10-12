@@ -107,7 +107,7 @@ function sizeFrames(){document.querySelectorAll('.frame').forEach(frame=>{const 
 function showTerm(id){activeTerm=id;const item=specimens[id],links=item.themes[activeTheme];document.getElementById('specimen-name').textContent=id+' · '+item.name;document.getElementById('specimen-reason').textContent=item.reason;document.getElementById('specimen-view').src=links.page;document.getElementById('specimen-open').href=links.page;document.getElementById('specimen-model').href=links.bundle;document.querySelectorAll('[data-term]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.term===id)));}
 document.querySelectorAll('[data-term]').forEach(button=>button.addEventListener('click',()=>showTerm(button.dataset.term)));
 document.getElementById('term-search').addEventListener('input',event=>{const query=event.target.value.trim().toLocaleLowerCase();let count=0;document.querySelectorAll('[data-term]').forEach(button=>{button.hidden=!button.textContent.toLocaleLowerCase().includes(query);if(!button.hidden)count++;});document.getElementById('no-terms').hidden=count>0;});
-document.getElementById('specimen-view').addEventListener('load',event=>{const frame=event.target,section=frame.contentDocument?.querySelector('section');if(section)frame.contentWindow.scrollTo(0,Math.max(0,section.offsetTop-24));});showTerm(activeTerm);
+document.getElementById('specimen-view').addEventListener('load',event=>{const doc=event.target.contentDocument;if(!doc)return;const header=doc.querySelector('.masthead'),report=doc.querySelector('.report');if(header)header.hidden=true;if(report){report.style.margin='0';report.style.padding='32px';}});showTerm(activeTerm);
 function sizeFrames()""",
             1,
         )
