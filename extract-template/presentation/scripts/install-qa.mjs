@@ -17,7 +17,8 @@ const config = JSON.parse(readFileSync(configPath, "utf8"));
 config.minFontSizePx = 11;
 mkdirSync(path.join(target, "scripts"), {recursive: true});
 mkdirSync(path.join(target, "tools"), {recursive: true});
-for (const name of ["dom-metrics.js", "fit-text.js", "navigation.js"]) copyFileSync(path.join(here, name), path.join(target, "scripts", name));
+const runtimeFiles = ["dom-metrics.js", "viewport.js", "fit-text.js", "navigation.js"];
+for (const name of runtimeFiles) copyFileSync(path.join(here, name), path.join(target, "scripts", name));
 for (const name of ["audit.js", "qa.mjs", "run.sh"]) copyFileSync(path.join(here, "../tools", name), path.join(target, "tools", name));
 rmSync(path.join(target, "tools/verify-package.mjs"), {force: true});
 writeFileSync(path.join(target, "tools/qa-config.json"), JSON.stringify(config, null, 2) + "\n");
@@ -30,7 +31,7 @@ for (const name of ["workflow.md", "qa.md", "runtime-contract.md", "typography-f
 }
 // Retire the formerly mixed guides when refreshing a package.
 for (const name of ["qa.md", "runtime-contract.md", "typography-fit.md", "layout-reuse.md"]) rmSync(path.join(target, "references", name), {force: true});
-const runtime = ["dom-metrics.js", "fit-text.js", "navigation.js"].map(name => readFileSync(path.join(here, name), "utf8")).join("\n");
+const runtime = runtimeFiles.map(name => readFileSync(path.join(here, name), "utf8")).join("\n");
 const json = JSON.stringify(config).replaceAll("<", "\\u003c");
 const block = `<!-- BEGIN PRESENTATION RUNTIME -->\n<script data-presentation-runtime>\nwindow.PRESENTATION_QA_CONFIG=${json};\n${runtime}\n</script>\n<!-- END PRESENTATION RUNTIME -->`;
 let html = readFileSync(shell, "utf8");

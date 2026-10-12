@@ -134,6 +134,7 @@ function inspectLayoutStructure(html, label, sharedShell = false) {
     if (stages.filter(stage => inside(stage, slide)).length !== 1) errors.push(`${label}: each .slide needs exactly one .stage`);
   }
   for (const stage of stages) {
+    if (!hasClass(stage.parent, "slide")) errors.push(`${label}: .stage must be a direct child of .slide`);
     if (slides.filter(slide => inside(stage, slide)).length !== 1) errors.push(`${label}: .stage must belong to exactly one .slide`);
     if (fits.filter(fit => inside(fit, stage)).length !== 1) errors.push(`${label}: each .stage needs exactly one .fit content root`);
   }
@@ -160,7 +161,7 @@ const inspectHtmlResources = (html, base, label, sourceLayout = false) => {
 const countClass = (html, className) => [...htmlElements(html)]
   .filter(({attrs}) => (attrs.get("class") || "").split(/\s+/).includes(className)).length;
 for (const file of ["SKILL.md", "design-system.md", "layouts/_shell.html", "layouts/README.md", "layouts/source-index.json", "styles/template.css",
-  "scripts/dom-metrics.js", "scripts/fit-text.js", "scripts/navigation.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "tools/run.sh",
+  "scripts/dom-metrics.js", "scripts/viewport.js", "scripts/fit-text.js", "scripts/navigation.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "tools/run.sh",
   "references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/typography-fit.md", "references/generate/layout-reuse.md",
   "library/README.md", "library/references/catalog.md", "library/styles/geometry.css"]) {
   checkResource(file, root, "Required package file");

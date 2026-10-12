@@ -12,6 +12,9 @@ The package is ready to use; no need to extract, install or save the template ag
 - Choose slide roles and layouts from `layouts/source-index.json`; use
   `library/references/catalog.md` when source layouts do not fit. Let the content
   determine the count within any user-requested count or range.
+- For the cover and ending, prefer the source's corresponding layouts, defaulting
+  to its opening and closing pages and retaining their main imagery. Use another
+  variant when the user requests it or the content calls for it.
 
 ## 2. Batch-read the build set
 

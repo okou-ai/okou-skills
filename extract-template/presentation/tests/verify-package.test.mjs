@@ -114,6 +114,7 @@ for (const [label, contents, message] of [
   ["fit on stage itself", '<section class="slide"><div class="stage fit">Title</div></section>', "one .fit content root"],
   ["missing stage", '<section class="slide"><div class="fit">Title</div></section>', "one .stage"],
   ["duplicate stage", fragment.replace('</section>', '<div class="stage"><div class="fit"></div></div></section>'), "one .stage"],
+  ["nested stage", fragment.replace('<div class="stage"', '<div><div class="stage"').replace('</section>', '</div></section>'), "direct child of .slide"],
   ["multiple slides", fragment.repeat(2), "one .slide"],
   ["extra outer wrapper", `<div>${fragment}</div>`, "top-level fragment"],
 ]) {
@@ -142,7 +143,7 @@ test("structure ignores comments and script strings and accepts unquoted classes
   assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
 });
 
-for (const file of ["references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/layout-reuse.md", "references/generate/typography-fit.md", "scripts/navigation.js", "library/README.md", "library/styles/geometry.css"]) {
+for (const file of ["references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/layout-reuse.md", "references/generate/typography-fit.md", "scripts/viewport.js", "scripts/navigation.js", "library/README.md", "library/styles/geometry.css"]) {
   test(`required package file cannot be missing: ${file}`, t => {
     const {root, verify} = fixture(t);
     rmSync(path.join(root, file));

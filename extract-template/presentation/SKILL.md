@@ -88,14 +88,14 @@ and reusable background recipes.
 Create the source index and fragments in one batch; preserve every distinct composition
 and background variant. Equivalent structures may share a layout with explicit source-page
 coverage. Keep text, shapes, tables and ordinary charts editable in HTML/CSS/SVG.
-Use package-relative assets and `.deck > .slide`, one `.stage` and a `.fit` root per
+Use package-relative assets and `.deck > .slide > .stage`, with a `.fit` root per
 slide. Extra `data-fit-region` hooks are only for genuinely constrained subareas;
 ordinary flow text needs no extra measurement boundary. All content shares one scale.
 
 `layouts/_shell.html` is the shared HTML document with one `.deck` insertion point.
-Use a pure-black (`#000`) viewer surround. Center the visible slide canvas horizontally
-and vertically, and fit the whole canvas within the viewport at its original aspect
-ratio, including after resize and navigation. Keep source styling inside the canvas.
+The installer supplies a pure-black viewer surround with centered, proportional
+canvas scaling. Keep source dimensions, backgrounds and styling on `.stage` and
+inside it; no separate viewport or resize script is needed.
 Its `.deck` can be empty or retain source examples; no need to assemble every source
 page in it. Complete source-page coverage belongs in `source-index.json`. Source fragments
 use paths relative to `layouts/`, where they are inserted into the shell.
@@ -111,8 +111,8 @@ node scripts/install-qa.mjs --package <template-slug>
 ```
 
 The installer supplies the library, tools, references and shared runtime, including
-four-arrow navigation. Keep neutral library layouts separate from the source index;
-adapt only selected layouts during later generation.
+the viewport frame and four-arrow navigation. Keep neutral library layouts separate
+from the source index; adapt only selected layouts during later generation.
 
 Write the package's `SKILL.md` with its template identity, source/language caveats,
 links to `design-system.md` and `layouts/source-index.json`, and a Markdown link to

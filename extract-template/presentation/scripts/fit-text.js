@@ -90,6 +90,7 @@
     const completed = new Map();
     const allElements = new Set();
     try {
+      await window.PresentationViewportReady;
       if (!stages.length) throw new Error("EMPTY_DECK");
       for (const stage of stages) undo.push(M.revealStage(stage));
       for (const stage of stages) {

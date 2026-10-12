@@ -22,12 +22,22 @@
   };
   if (!M) { fail("missingRuntime", 0, null, "Load the packaged dom-metrics.js"); return JSON.stringify(report); }
   await window.PresentationNavigationReady;
+  await window.PresentationViewportReady;
   if (M.MIN_FONT_SIZE_PX !== MIN_FONT_SIZE_PX) fail("invalidRuntime", 0, null, "Refresh the shell and runtime together to use the 11px minimum");
   if (config.minFontSizePx !== undefined && config.minFontSizePx !== MIN_FONT_SIZE_PX) fail("invalidConfig", 0, null, "The minimum font size is fixed at 11px");
   if (config.minContrastRatio !== undefined && (!Number.isFinite(config.minContrastRatio) || config.minContrastRatio < 3 || config.minContrastRatio > 21)) fail("invalidConfig", 0, null, "minContrastRatio must be within 3..21");
   const decks = [...document.querySelectorAll(".deck")];
   const slides = [...document.querySelectorAll(".slide")];
   const stages = [...document.querySelectorAll(".stage")];
+  if (window.PresentationViewport && [document.documentElement, document.body, ...decks, ...slides].some(
+    element => getComputedStyle(element).backgroundColor !== "rgb(0, 0, 0)")) {
+    fail("viewportBackground", 0, null, "The viewer surround must be pure black; keep source backgrounds on the stage");
+  }
+  if (window.PresentationViewport && decks.some(deck => {
+    const frame = deck.getBoundingClientRect();
+    return Math.abs(frame.left) > 1 || Math.abs(frame.top) > 1 ||
+      Math.abs(frame.right - innerWidth) > 1 || Math.abs(frame.bottom - innerHeight) > 1;
+  })) fail("viewportFrame", 0, null, "The viewer frame must cover the browser viewport");
   report.decks = decks.length; report.pages = stages.length;
   report.navigableSlides = decks.reduce((count, deck) => count + [...deck.children].filter(child => child.classList.contains("slide")).length, 0);
   if (decks.length !== 1 || !slides.length || !stages.length) fail("deckStructure", 0, null, "Exactly one nonempty deck is required");
@@ -114,6 +124,14 @@
     let restoreHidden;
     try {
     restoreHidden = M.revealStage(stage);
+    if (window.PresentationViewport) {
+      const canvas = stage.getBoundingClientRect(), frame = stage.parentElement.getBoundingClientRect();
+      if (!(canvas.width > 0 && canvas.height > 0) || M.outside(canvas, frame, 1) ||
+        Math.abs((canvas.left + canvas.right) - (frame.left + frame.right)) > 2 ||
+        Math.abs((canvas.top + canvas.bottom) - (frame.top + frame.bottom)) > 2) {
+        fail("viewportFrame", page, stage, "The complete canvas must fit and be centered within its slide viewport");
+      }
+    }
     const rect = stage.getBoundingClientRect();
     if (!rect.width || !rect.height) { fail("unmeasurablePage", page, stage, "Page has zero geometry; use the documented hidden-page display adapter"); continue; }
     const content = stage.querySelector(".fit");
