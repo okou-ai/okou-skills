@@ -1,6 +1,6 @@
 ---
 name: extract-template
-description: "Extract a reusable presentation, document, or illustration template from source files. Use when asked to extract a deck or Word template, turn a PDF into a Word template, apply a company template to Markdown, or save an image style for reuse."
+description: "Extract a reusable presentation, document, or illustration template from source files or an HTML deck URL. Use when asked to extract a deck or Word template, turn a PDF into a Word template, apply a company template to Markdown, or save an image style for reuse."
 ---
 
 # Extract a reusable template from a file
@@ -32,7 +32,7 @@ prefer the authoring file: `.pptx` over its PDF, `.docx` over its PDF.
 
 | Chosen template | Available source | Guide |
 | --- | --- | --- |
-| Presentation | `.pptx`, `.ppt`, PDF or ordered slide images | [Presentation extraction](presentation/SKILL.md) |
+| Presentation | HTML file, HTML directory or deck URL; `.pptx`, `.ppt`, PDF or ordered slide images | [Presentation extraction](presentation/SKILL.md) |
 | Document | Word file | [Word extraction](docx/SKILL.md) |
 | Document | PDF | [PDF extraction](pdf/SKILL.md) |
 | Illustration | One or more artwork images | [Illustration extraction](illustration/SKILL.md) |

@@ -1,7 +1,8 @@
 # Extract source typography
 
 Record font families, sizes, weights, leading, tracking and mixed-run relationships
-as initial styles. Resolve effective PPTX styles through runs, paragraphs,
+as initial styles. For HTML, read computed CSS, including inherited styles and
+transforms. Resolve effective PPTX styles through runs, paragraphs,
 placeholders, layouts, masters, themes and existing source autofit, then compare
 with rendered source pages. Label PDF/image estimates as inferred.
 

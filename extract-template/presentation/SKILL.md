@@ -1,6 +1,6 @@
 ---
 name: presentation-extract-template
-description: Extract source style and editable HTML layouts from PPTX, PPT, PDF or slide images, then save a reusable Custom Template.
+description: Extract source style and editable HTML layouts from HTML decks (files, directories or URLs), PPTX, PPT, PDF or slide images, then save a reusable Custom Template.
 ---
 
 # Extract a presentation template
@@ -30,8 +30,14 @@ Reuse existing ordered captures or supplied slide images. Otherwise, render once
 into a new output directory:
 
 ```bash
-okou presentation screenshot --input <source.ppt|source.pptx|source.pdf> --out <source-pages-dir>
+okou presentation screenshot --input <source.ppt|source.pptx|source.pdf|source.html|html-dir|url> --out <source-pages-dir>
 ```
+
+For HTML, use `--slides "<slide-selector>"` when the source uses a different slide
+selector from `.deck > .slide`; use `--slides none` for one page per HTML file.
+Inspect the DOM, computed CSS, SVG and assets directly. Reuse editable source
+elements and copy their required resources into the package with local paths.
+Record the original entry file or URL in `design-system.md`.
 
 Inspect every page. Record the filename, aspect ratio, page count, page roles and
 recurring structures. Check typography against source metadata and label visual
@@ -113,14 +119,20 @@ with their source captures. Keep these check outputs outside the package.
 
 ## 5. Save the Custom Template
 
-After the package check passes:
+After the package check passes, prepare the upload source.
+
+The upload accepts `.ppt`, `.pptx` or `.pdf` as `--source`. Use the original when
+it is one of these formats. For HTML or image decks, combine the ordered original
+source captures into `normalized-source.pdf` for upload. Record this conversion
+and the original file or URL in `design-system.md`; the package retains the
+editable layouts and assets. No need to export or render the reconstructed package
+for this upload.
 
 ```bash
 okou user-template publish --kind presentation --title "<template name>" \
-  --source <source.pptx|normalized-source.pdf> --pages <source-pages-dir> \
+  --source <original.ppt|original.pptx|original.pdf|normalized-source.pdf> --pages <source-pages-dir> \
   --package <template-slug>
 ```
 
-Convert legacy PPT to PPTX or image decks to an ordered PDF with provenance only
-when needed for upload. Confirm successful saving and retain any returned template
-reference; if publishing fails, report that the template was not saved.
+Confirm successful saving and retain any returned template reference; if publishing
+fails, report that the template was not saved.
