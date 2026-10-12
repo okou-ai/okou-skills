@@ -57,6 +57,11 @@ variants. Keep text, shapes, tables and ordinary charts editable in HTML/CSS/SVG
 Use package-relative assets and `.deck > .slide`, one `.stage` and a `.fit` root per
 slide, with disjoint `data-fit-region` areas for independently fitted content.
 
+`layouts/_shell.html` is the shared HTML document with one `.deck` insertion point.
+Its `.deck` can be empty or retain source examples; no need to assemble every source
+page in it. Complete source-page coverage belongs in `source-index.json`. Source fragments
+use paths relative to `layouts/`, where they are inserted into the shell.
+
 Write `tools/qa-config.json` with source-derived safe areas, required chrome and
 approved font fallbacks; see the [QA source contract](references/qa.md#source-specific-contract).
 Then run from this guide's directory:
@@ -81,8 +86,9 @@ Write these **five steps for future generation** into the package's `SKILL.md`:
    Fix the cause and rerun on the same final HTML.
    No need to repeat passing [interaction checks](references/qa.md#interaction-checks-already-included)
    on an unchanged deck.
-5. **Review as needed:** inspect only QA-designated pages unless a full review is requested;
-   record the review receipt and rerun final QA. Keep captures outside the web directory.
+5. **Review as needed:** inspect only QA-designated pages unless a full review is requested.
+   When review is required, record the receipt and rerun final QA; otherwise a passing
+   result completes QA. Keep captures outside the web directory.
    For requested delivery, clean that directory before conversion; finish PPTX checks,
    then publish and upload the final outputs once. See the QA guide for capture staging.
 
@@ -92,7 +98,8 @@ linking back to `SKILL.md`. Keep output handling within these five steps.
 
 ## 4. Check the package
 
-Check required files, source coverage, library links, capture count and local paths:
+Check required guidance/runtime files, source coverage, source QA configuration,
+library links, capture count and local paths:
 
 ```bash
 node <template-slug>/tools/verify-package.mjs \

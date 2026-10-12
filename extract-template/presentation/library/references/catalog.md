@@ -15,7 +15,7 @@ Capacity is a selection hint, not a fixed slide count or a guarantee of fit. Ada
 | [two-column](../layouts/fragments/two-column.html) | Narrative | Two independent narratives | Two independent medium-length prose blocks |
 | [three-column](../layouts/fragments/three-column.html) | Narrative | Three parallel narratives | Three concise peer readings |
 | [longform](../layouts/fragments/longform.html) | Narrative | Structured prose with a supporting aside | Several short paragraphs and one aside |
-| [bullets](../layouts/fragments/bullets.html) | Narrative | Unordered findings | 3–5 concise points; do not invent order |
+| [bullets](../layouts/fragments/bullets.html) | Narrative | Unordered findings | 3–5 concise points; preserve their unordered meaning |
 | [numbered-list](../layouts/fragments/numbered-list.html) | Narrative | Ranked or explicitly ordered findings | 3–5 ordered points; retain supplied order |
 | [todo-checklist](../layouts/fragments/todo-checklist.html) | Narrative | Action, owner and completion state | 3–5 actions with explicit states and owners |
 | [comparison](../layouts/fragments/comparison.html) | Comparison | Compare evidence under the same criteria | Two comparable options; consistent criteria |
@@ -32,7 +32,7 @@ Capacity is a selection hint, not a fixed slide count or a guarantee of fit. Ada
 | [detail-summary](../layouts/fragments/detail-summary.html) | Records | Detailed records with a short conclusion | A compact table and one supporting conclusion |
 | [case-study](../layouts/fragments/case-study.html) | Narrative | Situation, intervention and outcome | One case; retain evidence and causal qualifications |
 | [big-quote](../layouts/fragments/big-quote.html) | Narrative | One attributed quotation | One short quotation and its attribution |
-| [quote-cards](../layouts/fragments/quote-cards.html) | Narrative | Several attributed perspectives | 2–3 short quotes; do not invent endorsements |
+| [quote-cards](../layouts/fragments/quote-cards.html) | Narrative | Several attributed perspectives | 2–3 short, source-attributed quotes |
 | [process-steps](../layouts/fragments/process-steps.html) | Time/process | An ordered method with meaningful connections | 3–4 ordered stages; state their relationship |
 | [timeline](../layouts/fragments/timeline.html) | Time/process | Dated events in chronological order | 3–5 events; retain actual dates and order |
 | [roadmap](../layouts/fragments/roadmap.html) | Time/process | Future horizons and deliverables | Three horizons; distinguish commitments from proposals |
@@ -56,7 +56,7 @@ Capacity is a selection hint, not a fixed slide count or a guarantee of fit. Ada
 | [heatmap](../layouts/fragments/heatmap.html) | Charts | A matrix of numeric intensity | A compact matrix and a source-compatible quantitative colour scale |
 | [scatter-plot](../layouts/fragments/scatter-plot.html) | Charts | Two quantitative dimensions | A few observations with units and comparable axes |
 | [bubble-chart](../layouts/fragments/bubble-chart.html) | Charts | Two coordinates and a third size dimension | Encode the stated non-negative third quantity by area, not radius |
-| [forecast-scenarios](../layouts/fragments/forecast-scenarios.html) | Analysis | Explicit conditional future cases | A few scenarios; do not present forecasts as observations |
+| [forecast-scenarios](../layouts/fragments/forecast-scenarios.html) | Analysis | Explicit conditional future cases | A few scenarios; label forecasts as conditional |
 | [risk-recommendations](../layouts/fragments/risk-recommendations.html) | Analysis | A signal paired with an accountable response | 2–3 supported risks with owners and next steps |
 | [methods-definitions](../layouts/fragments/methods-definitions.html) | Analysis | Definitions and calculation boundaries | A few definitions/formulas, units and exclusions |
 | [appendix-index](../layouts/fragments/appendix-index.html) | Framing | References and supporting material | A few real references; retain original identifiers |

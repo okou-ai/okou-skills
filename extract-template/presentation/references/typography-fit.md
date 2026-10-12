@@ -7,13 +7,12 @@ with rendered source pages. PDF/image estimates remain inferred, not extracted.
 
 Map typography and geometry with the same uniform source-to-canvas transform.
 A 24pt font on a 960pt-wide slide becomes 40px on a 1600px-wide canvas. Record original
-units, aspect adaptation and scale. Do not treat 24pt as 24px or apply viewport zoom
-to the immutable source baseline.
+units, aspect adaptation and scale. Keep source units and the logical canvas
+baseline independent of viewport zoom.
 
-The sole runtime minimum is **10px on the logical 1600px-wide HTML canvas**. Never
-use the source's smallest font, a role-specific inferred minimum or a foreign
-preset as the lower bound. A source run below 10px is retained as evidence but its
-rendered size is raised to 10px. This applies even when the page does not overflow,
+The runtime minimum is **10px on the logical 1600px-wide HTML canvas**, independent
+of the source's smallest font or role-specific sizes. A source run below 10px is
+retained as evidence but its rendered size is raised to 10px. This applies even when the page does not overflow,
 and includes captions, footers, inline runs and SVG labels. SVG viewBox transforms
 and text-only scale transforms count; outer viewport zoom does not change the policy.
 
@@ -38,9 +37,6 @@ The supplied `dom-metrics.js` and `fit-text.js` expose `PresentationFit.fit()` a
 
 Use disjoint `data-fit-region` areas with meaningful `data-text-role` labels.
 Source-layout clones and selectively adapted local fragments use the same runtime.
-Do not build a token compiler or redraw every library layout during extraction.
-Run final QA and prepare the measured capture copy as documented in `qa.md`.
-
-Synthetic fixture success demonstrates code behaviour, not source fidelity. Real
-source rebuilds, actual font availability, and the delivery screenshot/export path
-still require validation before a template is reported as published or shipped.
+Source evidence guides typography choices; fitting checks geometry. Follow
+[qa.md](qa.md) for generated-deck QA, targeted visual review and delivery checks.
+No routine reconstruction or export pass is needed to save an extracted template.

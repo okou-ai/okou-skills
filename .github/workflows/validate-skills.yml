@@ -138,8 +138,10 @@ jobs:
       - name: JavaScript syntax
         run: |
           set -euo pipefail
-          find extract-template/presentation/scripts extract-template/presentation/tools \
+          find extract-template/presentation/scripts extract-template/presentation/tools extract-template/presentation/tests \
             -type f \( -name '*.js' -o -name '*.mjs' \) -print0 |
             while IFS= read -r -d '' file; do
               node --check "$file"
             done
+      - name: Presentation package contract
+        run: node --test extract-template/presentation/tests/verify-package.test.mjs

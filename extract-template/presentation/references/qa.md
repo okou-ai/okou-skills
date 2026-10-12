@@ -1,19 +1,12 @@
 # QA for decks generated after extraction
 
-This guide is for a presentation assembled later from the saved Custom Template.
-It is not an extraction acceptance checklist: do not run `tools/qa.mjs` on the
-source archive or build a sample deck merely to save the template. Extraction uses
-`tools/verify-package.mjs` for package completeness and local resource paths.
-
-Copy the supplied implementation with `node scripts/install-qa.mjs --package <dir>`;
-do not ask the authoring model to recreate the fitter or audit. The installer
-copies the untouched neutral library, scripts and tools, and inlines the common
-runtime once in `layouts/_shell.html`. Installing it again updates that block,
-not the user's source layouts, CSS, assets or uploaded original.
+Run this guide on the final HTML generated from the saved Custom Template. The
+package already includes its source configuration, fitter, navigation and audit;
+no need to install or recreate them. Assemble from a copy of `layouts/_shell.html`.
 
 ## Source-specific contract
 
-Before installation, write `<dir>/tools/qa-config.json` using observed source rules:
+`tools/qa-config.json` records observed source rules. Its shape is:
 
 ```json
 {
@@ -26,9 +19,10 @@ Before installation, write `<dir>/tools/qa-config.json` using observed source ru
 }
 ```
 
-The inset numbers above are an **illustration**, not extraction defaults. Record
-actual source margins, including separate `layoutSafeAreas` keyed by a stage's
-`data-layout` or `data-source-profile`. An absent safe-area contract blocks QA.
+The inset numbers above are an **illustration**. Use the saved source margins,
+including any `layoutSafeAreas` keyed by a stage's `data-layout` or
+`data-source-profile`. Extraction supplies either a valid global safe area or an
+entry for every source profile; package verification rejects missing or invalid rules.
 A required chrome rule names `role`, optional `min`/`max`, and optional `layouts`.
 Mark only source-required items with `data-chrome="<role>"`; absence in the source
 is not a reason to invent a footer, motif or page marker. Fallback font families
@@ -38,10 +32,9 @@ font. When a used webfont fails, the first available family in that text's CSS
 font stack must be an approved fallback; approving a later, unused family is insufficient.
 
 Use `.deck > .slide` with exactly one `.stage` per slide and a `.fit` content root.
-Add disjoint `data-fit-region` hooks to independently replaceable title/body areas;
-do not nest fitting regions. Put text in real HTML or SVG text nodes, not a full-page
-bitmap or CSS pseudo-element. Hidden pages need their authored `data-fit-display`
-when a stylesheet conceals the display mode. Preserve source-compatible backgrounds,
+Add disjoint `data-fit-region` hooks to independently replaceable title/body areas.
+Keep text editable in real HTML or SVG text nodes. Hidden pages need their authored
+`data-fit-display` when a stylesheet conceals the display mode. Preserve source-compatible backgrounds,
 image crops, frames and absolute overlays: no foreign palette, universal 6% margin,
 forced contain mode or blanket decoration-hiding policy is imported.
 
@@ -77,8 +70,7 @@ node <template-dir>/tools/qa.mjs --final <web-dir>/index.html \
   --prepared <web-dir>/index.ready.html
 ```
 
-`--expected-pages` comes from the later deck-generation plan, not from recounting
-the output. Do not use this command as an extraction gate. Zero pages,
+`--expected-pages` comes from the deck-generation plan. Zero pages,
 indirect/unreachable slides, count mismatches, <10px effective text, clipped or unsafe
 text, collapsed nonzero chart marks, unresolved/unmeasurable fitting, required chrome
 mistakes, broken images,
@@ -97,12 +89,14 @@ visual check. Review only QA-designated pages unless a full pass is requested.
 Text on imagery, gradients, painted pseudo-elements or overlapping background
 layers yields `NEEDS_VISUAL_REVIEW`, not an automatic pass. Ancestor background
 colours cannot establish contrast when another layer may be behind the text.
-Compare the relevant page images with the source. A `--review <json>` receipt can
-record `deckSha256`, reviewed `pages`, existing `sourceReferences` and nonempty
+Compare the relevant page images with the source. A `--review <json>` receipt records
+`deckSha256`, reviewed `pages`, existing `sourceReferences` and nonempty
 `notes`. It must match the exact HTML bytes and cover all requested review pages;
 any HTML change invalidates it. Freeze local assets throughout review and delivery.
 After review, rerun the same final QA command with `--review <qa-dir>/review.json`.
-The receipt records actual review; all hard failures still need resolution.
+The receipt records actual review; all hard failures still need resolution. A
+`READY_TO_PUBLISH` result with no required review completes QA directly; no need
+for a receipt or another QA run on that unchanged deck.
 
 ## Interaction checks already included
 
@@ -113,7 +107,8 @@ the active-page marker and target-page visibility.
 No need to repeat passing checks on an unchanged deck. Rerun QA after edits; use
 targeted checks for failures, uncovered behavior or an explicit user request.
 Page-number synchronization, notes, custom buttons and native keyboard/focus behavior
-remain outside this check. Keep source-style review and requested PPTX validation.
+remain outside this check. Visual review follows the required pages above; requested
+PPTX validation follows the delivery steps below.
 
 ## Targeted review and requested output
 
@@ -156,20 +151,3 @@ not proof that the template is a native PPTX in-place editing engine.
 
 After the required checks pass, publish the clean web directory once and upload the
 final requested file once. Reuse these delivery links in the response.
-
-## Keep extraction and generation separate
-
-- **Extraction:** run `tools/verify-package.mjs` to check required package files,
-  source-index coverage, ordered source-page capture count, local library links and
-  package-local asset paths, including every `srcset` candidate and resources in
-  linked/imported CSS and SVG files. If source-to-HTML reconstruction creates a specific
-  fidelity risk, compare one or two unchanged representative pages. Do not build a
-  full sample deck, run final-deck QA or compare every reconstructed page by default.
-  Save the Custom Template only after the package check succeeds.
-- **Generation:** follow the five-step authoring path in the package. Run final QA on
-  the final web HTML, review QA-designated pages, and rerun with the receipt or after
-  fixes. Keep the stored source package unchanged.
-
-The portable package retains its runtime QA and 10px fitter for future generation.
-Repository CI checks skill metadata and JavaScript syntax; it does not certify rendered
-layout quality. Run packaged final QA on generated decks only, not during extraction.

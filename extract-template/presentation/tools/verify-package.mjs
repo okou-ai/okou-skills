@@ -11,6 +11,7 @@ const errors = [];
 // package-relative resources from layouts/ just as the assembled shell does.
 const layoutRoot = path.join(root, "layouts");
 const inspected = new Set();
+const sourceProfiles = new Set();
 const decodeEntities = value => value.replace(/&(?:amp|quot|apos|lt|gt|#\d+|#x[\da-f]+);/gi, entity => {
   const name = entity.slice(1, -1).toLowerCase();
   if (!name.startsWith("#")) return {amp: "&", quot: '"', apos: "'", lt: "<", gt: ">"}[name];
@@ -81,19 +82,27 @@ function srcsetUrls(value) {
   }
   return urls;
 }
-const inspectHtmlResources = (html, base, label) => {
-  const source = html.replace(/<!--[\s\S]*?-->/g, "").replace(/(<script\b[^>]*>)[\s\S]*?<\/script\s*>/gi, "$1</script>");
-  for (const style of source.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi)) inspectCssResources(style[1], base, label);
+const htmlSource = html => html.replace(/<!--[\s\S]*?-->/g, "").replace(/(<script\b[^>]*>)[\s\S]*?<\/script\s*>/gi, "$1</script>");
+function* htmlElements(html) {
   const tags = /<([a-z][\w:-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi;
   const attributes = /([^\s"'<>/=]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/g;
-  for (const tag of source.replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, "").matchAll(tags)) {
+  for (const tag of htmlSource(html).replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, "").matchAll(tags)) {
     const attrs = new Map();
     for (const match of tag[0].matchAll(attributes)) {
       const name = match[1].toLowerCase();
       if (!attrs.has(name)) attrs.set(name, decodeEntities(match[2] ?? match[3] ?? match[4]));
     }
+    yield {name: tag[1], attrs};
+  }
+}
+const inspectHtmlResources = (html, base, label, sourceLayout = false) => {
+  for (const style of htmlSource(html).matchAll(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi)) inspectCssResources(style[1], base, label);
+  for (const {name, attrs} of htmlElements(html)) {
+    if (sourceLayout && (attrs.get("class") || "").split(/\s+/).includes("stage")) {
+      sourceProfiles.add(attrs.get("data-layout") || attrs.get("data-source-profile") || "default");
+    }
     if (attrs.has("style")) inspectCssResources(attrs.get("style"), base, label);
-    if (!/^(img|script|source|video|audio|link|iframe|object|embed|image|use)$/i.test(tag[1])) continue;
+    if (!/^(img|script|source|video|audio|link|iframe|object|embed|image|use)$/i.test(name)) continue;
     for (const name of ["src", "href", "xlink:href", "poster", "data"]) {
       if (attrs.has(name)) checkResource(attrs.get(name), base, label);
     }
@@ -102,18 +111,20 @@ const inspectHtmlResources = (html, base, label) => {
     }
   }
 };
-const countClass = (html, className) => [...html.matchAll(/<[^>]+\bclass\s*=\s*(["'])(.*?)\1[^>]*>/gs)]
-  .filter(match => match[2].split(/\s+/).includes(className)).length;
-for (const file of ["SKILL.md", "design-system.md", "layouts/_shell.html", "layouts/README.md", "styles/template.css", "scripts/dom-metrics.js", "scripts/fit-text.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "library/references/catalog.md"]) {
-  if (!existsSync(path.join(root, file))) errors.push(`Missing ${file}`);
+const countClass = (html, className) => [...htmlElements(html)]
+  .filter(({attrs}) => (attrs.get("class") || "").split(/\s+/).includes(className)).length;
+for (const file of ["SKILL.md", "design-system.md", "layouts/_shell.html", "layouts/README.md", "layouts/source-index.json", "styles/template.css",
+  "scripts/dom-metrics.js", "scripts/fit-text.js", "scripts/navigation.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "tools/run.sh", "tools/verify-package.mjs",
+  "references/qa.md", "references/typography-fit.md", "references/layout-reuse.md", "library/README.md", "library/references/catalog.md", "library/styles/geometry.css"]) {
+  checkResource(file, root, "Required package file");
 }
 try {
   const index = JSON.parse(readFileSync(path.join(root, "layouts/source-index.json"), "utf8"));
   if (!index.sourceFilename || !Number.isInteger(index.pageCount) || index.pageCount < 1 || !index.sourceAspectRatio) errors.push("Source filename, positive pageCount and original sourceAspectRatio are required");
   const shell = readFileSync(path.join(root, "layouts/_shell.html"), "utf8");
-  if (countClass(shell, "slide") !== index.pageCount) errors.push(`Source shell has ${countClass(shell, "slide")} slides; expected ${index.pageCount}`);
-  if (countClass(shell, "stage") !== index.pageCount) errors.push(`Source shell has ${countClass(shell, "stage")} stages; expected ${index.pageCount}`);
-  inspectHtmlResources(shell, layoutRoot, "layouts/_shell.html");
+  if (countClass(shell, "deck") !== 1) errors.push("Shared shell needs exactly one .deck insertion point");
+  if (countClass(shell, "slide") !== countClass(shell, "stage")) errors.push("Each example slide in the shared shell needs one stage");
+  inspectHtmlResources(shell, layoutRoot, "layouts/_shell.html", true);
   checkResource("styles/template.css", root, "styles/template.css");
   const covered = new Set(), ids = new Set();
   if (!Array.isArray(index.layouts) || !index.layouts.length) throw new Error("Source layouts are required");
@@ -124,7 +135,7 @@ try {
     const relative = path.relative(path.join(root, "layouts/source"), file);
     if (relative.startsWith("..") || path.isAbsolute(relative) || !relative.endsWith(".html") || !existsSync(file)) errors.push(`Invalid source layout file: ${layout.id}`);
     if (!layout.purpose || !Array.isArray(layout.regions) || !layout.regions.length || !layout.capacity) errors.push(`Record purpose, regions and capacity for ${layout.id}`);
-    if (existsSync(file)) inspectHtmlResources(readFileSync(file, "utf8"), layoutRoot, `layouts/${layout.file}`);
+    if (existsSync(file)) inspectHtmlResources(readFileSync(file, "utf8"), layoutRoot, `layouts/${layout.file}`, true);
     if (!Array.isArray(layout.sourcePages) || !layout.sourcePages.length) errors.push(`Source pages missing: ${layout.id}`);
     for (const page of layout.sourcePages || []) {
       if (!Number.isInteger(page) || page < 1 || page > index.pageCount) errors.push(`Invalid source page: ${layout.id}`);
@@ -147,7 +158,30 @@ try {
     if (JSON.stringify(pages) !== JSON.stringify(expected)) errors.push("Original ordered page images must exactly match source pageCount");
   }
   const config = JSON.parse(readFileSync(path.join(root, "tools/qa-config.json"), "utf8"));
+  const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
+  const validSafe = value => object(value) && ["left", "right", "top", "bottom"].every(key => Number.isFinite(value[key]) && value[key] >= 0 && value[key] < 1) && value.left + value.right < 1 && value.top + value.bottom < 1;
+  if (!object(config)) throw new Error("qa-config.json must be an object");
   if (config.minFontSizePx !== 10) errors.push("The fixed minimum is 10px");
+  if (config.safeArea != null && !validSafe(config.safeArea)) errors.push("Invalid source safeArea");
+  const areas = config.layoutSafeAreas ?? {};
+  if (!object(areas)) errors.push("layoutSafeAreas must be an object");
+  else {
+    for (const [key, area] of Object.entries(areas)) if (!key.trim() || !validSafe(area)) errors.push(`Invalid layoutSafeAreas entry: ${key}`);
+    if (!validSafe(config.safeArea)) {
+      if (!Object.values(areas).some(validSafe)) errors.push("Record a source safeArea or layoutSafeAreas before saving the template");
+      for (const key of sourceProfiles) if (!Object.hasOwn(areas, key) || !validSafe(areas[key])) errors.push(`Missing source safe area for ${key}`);
+    }
+  }
+  if (config.minContrastRatio !== undefined && (!Number.isFinite(config.minContrastRatio) || config.minContrastRatio < 3 || config.minContrastRatio > 21)) errors.push("minContrastRatio must be within 3..21");
+  if (config.allowedFontFallbacks !== undefined && (!Array.isArray(config.allowedFontFallbacks) || config.allowedFontFallbacks.some(family => typeof family !== "string" || !family.trim()))) errors.push("allowedFontFallbacks must be an array of font-family names");
+  if (config.requiredChrome !== undefined) {
+    if (!Array.isArray(config.requiredChrome)) errors.push("requiredChrome must be an array");
+    else for (const rule of config.requiredChrome) {
+      const min = rule?.min ?? 1, max = rule?.max ?? min;
+      if (!object(rule) || typeof rule.role !== "string" || !rule.role.trim() || !Number.isInteger(min) || min < 0 || !Number.isInteger(max) || max < min ||
+        (rule.layouts !== undefined && (!Array.isArray(rule.layouts) || rule.layouts.some(key => typeof key !== "string" || !key.trim())))) errors.push("Invalid source requiredChrome rule");
+    }
+  }
 } catch (error) { errors.push(error.message); }
 console.log(JSON.stringify({status: errors.length ? "BLOCKED" : "PACKAGE_VALID", errors}, null, 2));
 process.exitCode = errors.length ? 1 : 0;
