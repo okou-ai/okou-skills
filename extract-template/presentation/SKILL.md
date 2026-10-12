@@ -33,6 +33,10 @@ into a new output directory:
 okou presentation screenshot --input <source.ppt|source.pptx|source.pdf|source.html|html-dir|url> --out <source-pages-dir>
 ```
 
+Keep `<source-pages-dir>` exclusively for original `page-001.png`, `page-002.png`,
+etc. Put optional contact sheets, review images and the upload PDF in a sibling
+working directory; every image in `--pages` becomes a template page.
+
 For HTML, use `--slides "<slide-selector>"` when the source uses a different slide
 selector from `.deck > .slide`; use `--slides none` for one page per HTML file.
 Inspect the DOM, computed CSS, SVG and assets directly. Reuse editable source
@@ -107,7 +111,8 @@ When refreshing an older package, update its entrypoint links to `references/gen
 
 From this guide's directory, check generation guidance and links, source coverage,
 source QA configuration, library links, capture count and local paths. The verifier
-also rejects extraction references or helpers included in the saved package:
+also rejects extra entries in the capture directory and extraction references or
+helpers included in the saved package:
 
 ```bash
 node tools/verify-package.mjs \
@@ -127,6 +132,8 @@ source captures into `normalized-source.pdf` for upload. Record this conversion
 and the original file or URL in `design-system.md`; the package retains the
 editable layouts and assets. No need to export or render the reconstructed package
 for this upload.
+
+Pass the same verified capture directory as `--pages` below.
 
 ```bash
 okou user-template publish --kind presentation --title "<template name>" \

@@ -33,8 +33,8 @@ function fixture(t, examples = 0) {
   const config = {minFontSizePx: 10, safeArea, layoutSafeAreas: {}, requiredChrome: [], allowedFontFallbacks: [], minContrastRatio: 3};
   write("tools/qa-config.json", config);
   execFileSync(process.execPath, [installer, "--package", root]);
-  const verify = () => {
-    const result = spawnSync(process.execPath, [verifier, "--package", root], {encoding: "utf8"});
+  const verify = (...args) => {
+    const result = spawnSync(process.execPath, [verifier, "--package", root, ...args], {encoding: "utf8"});
     assert.equal(result.error, undefined);
     return {code: result.status, ...JSON.parse(result.stdout)};
   };
@@ -59,6 +59,40 @@ test("empty shell still requires complete source-page coverage", t => {
   index.layouts[0].sourcePages = [1, 2];
   write("layouts/source-index.json", index);
   blocked(verify(), "Covered 2 of 3");
+});
+
+function sourceCaptures(t) {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "presentation-source-pages-"));
+  t.after(() => rmSync(dir, {recursive: true, force: true}));
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jBz8AAAAASUVORK5CYII=", "base64");
+  for (const name of ["page-001.png", "page-002.png", "page-003.png"]) writeFileSync(path.join(dir, name), png);
+  return {dir, png};
+}
+
+test("source capture directory accepts only the original ordered page images", t => {
+  const {verify} = fixture(t);
+  const {dir} = sourceCaptures(t);
+  assert.deepEqual(verify("--source-pages", dir), {code: 0, status: "PACKAGE_VALID", errors: []});
+  rmSync(path.join(dir, "page-002.png"));
+  blocked(verify("--source-pages", dir), "Original ordered page images must exactly match source pageCount");
+});
+
+test("source capture directory rejects a contact sheet before upload", t => {
+  const {verify} = fixture(t);
+  const {dir, png} = sourceCaptures(t);
+  const contactSheet = path.join(dir, "contact-sheet.png");
+  writeFileSync(contactSheet, png);
+  blocked(verify("--source-pages", dir), "contact-sheet.png");
+  rmSync(contactSheet);
+  assert.deepEqual(verify("--source-pages", dir), {code: 0, status: "PACKAGE_VALID", errors: []});
+});
+
+test("source capture directory rejects a directory posing as a page image", t => {
+  const {verify} = fixture(t);
+  const {dir} = sourceCaptures(t);
+  const page = path.join(dir, "page-002.png");
+  rmSync(page); mkdirSync(page);
+  blocked(verify("--source-pages", dir), "page-002.png");
 });
 
 test("shared shell requires one deck insertion point", t => {

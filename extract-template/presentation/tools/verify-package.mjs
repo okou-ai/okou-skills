@@ -178,8 +178,11 @@ try {
     if (file !== `${id}.html` || !existsSync(path.join(root, "library/layouts/fragments", file))) errors.push(`Missing or invalid local reference ${id}`);
   }
   if (options["source-pages"]) {
-    const pages = readdirSync(options["source-pages"]).filter(name => /^page-\d{3}\.png$/.test(name)).sort();
+    const entries = readdirSync(options["source-pages"], {withFileTypes: true});
+    const pages = entries.map(entry => entry.name).sort();
     const expected = Array.from({length: index.pageCount}, (_, i) => `page-${String(i + 1).padStart(3, "0")}.png`);
+    const unexpected = entries.filter(entry => !entry.isFile() || !expected.includes(entry.name)).map(entry => entry.name);
+    if (unexpected.length) errors.push(`Unexpected source capture entries: ${unexpected.join(", ")}. Keep contact sheets, review outputs and PDFs outside --source-pages.`);
     if (JSON.stringify(pages) !== JSON.stringify(expected)) errors.push("Original ordered page images must exactly match source pageCount");
   }
   const config = JSON.parse(readFileSync(path.join(root, "tools/qa-config.json"), "utf8"));
