@@ -145,3 +145,7 @@ jobs:
             done
       - name: Presentation package contract
         run: node --test extract-template/presentation/tests/verify-package.test.mjs
+      - name: Source preview and upload outputs
+        run: |
+          python3 -m pip install --quiet Pillow pypdf
+          python3 extract-template/presentation/tests/source-derivatives.test.py

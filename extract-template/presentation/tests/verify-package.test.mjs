@@ -124,13 +124,13 @@ test("a directory cannot stand in for the QA guide", t => {
 
 test("installed generation package works without extraction references or helpers", t => {
   const {root, verify} = fixture(t);
-  for (const file of ["references/extract", "scripts/install-qa.mjs", "tools/verify-package.mjs", "tests"]) {
+  for (const file of ["references/extract", "scripts/source-derivatives.py", "scripts/install-qa.mjs", "tools/verify-package.mjs", "tests"]) {
     assert.equal(existsSync(path.join(root, file)), false, file);
   }
   assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
 });
 
-for (const file of ["references/extract/layout-inventory.md", "scripts/install-qa.mjs", "tools/verify-package.mjs"]) {
+for (const file of ["references/extract/layout-inventory.md", "scripts/source-derivatives.py", "scripts/install-qa.mjs", "tools/verify-package.mjs"]) {
   test(`rejects extraction files mixed into a generation package: ${file}`, t => {
     const {write, verify} = fixture(t);
     write(file, "Extraction-only content.");

@@ -141,7 +141,7 @@ try {
   for (const name of readdirSync(path.join(root, "references"))) {
     if (name !== "generate") errors.push(`Package references are generation-only: references/${name}`);
   }
-  for (const file of ["scripts/install-qa.mjs", "scripts/render-pages.mjs", "scripts/libreoffice.mjs", "tools/verify-package.mjs", "tests"]) {
+  for (const file of ["scripts/source-derivatives.py", "scripts/install-qa.mjs", "scripts/render-pages.mjs", "scripts/libreoffice.mjs", "tools/verify-package.mjs", "tests"]) {
     if (existsSync(path.join(root, file))) errors.push(`Extraction/development file belongs outside the saved package: ${file}`);
   }
   const index = JSON.parse(readFileSync(path.join(root, "layouts/source-index.json"), "utf8"));

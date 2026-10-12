@@ -15,7 +15,7 @@ presentation language.
 | --- | --- | --- |
 | This `SKILL.md`, `references/extract/` | Extract and record the source | No |
 | `references/generate/` | Generate, check and deliver new decks | Yes, at the same paths |
-| `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Assemble and check the package | No |
+| `scripts/source-derivatives.py`, `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Prepare source files, assemble and check the package | No |
 
 The installer copies the generation guides and runtime by an explicit file list.
 The package's own `SKILL.md` is its generation entrypoint.
@@ -26,16 +26,23 @@ Create ordered page images to inspect the original layouts, typography, colours
 and image crops. These captures are the visual reference for extraction and the
 saved template's source preview. Keep the original for structure and style metadata.
 
-Reuse existing ordered captures or supplied slide images. Otherwise, render once
-into a new output directory:
+Use a new `<work-dir>` beside the template package. All commands below use fixed
+subdirectories: `source-pages/` for original pages, `previews/` for contact sheets
+and review images, and `upload/` for the upload PDF.
+
+Reuse existing ordered captures or supplied slide images at
+`<work-dir>/source-pages/page-001.png`, etc. Otherwise, render once:
 
 ```bash
-okou presentation screenshot --input <source.ppt|source.pptx|source.pdf|source.html|html-dir|url> --out <source-pages-dir>
+okou presentation screenshot --input <source.ppt|source.pptx|source.pdf|source.html|html-dir|url> --out <work-dir>/source-pages
 ```
 
-Keep `<source-pages-dir>` exclusively for original `page-001.png`, `page-002.png`,
-etc. Put optional contact sheets, review images and the upload PDF in a sibling
-working directory; every image in `--pages` becomes a template page.
+When a contact sheet helps inspection, the supplied helper writes it directly to
+`<work-dir>/previews/` and returns its paths. It installs Pillow only if needed:
+
+```bash
+python3 scripts/source-derivatives.py --work-dir <work-dir> --contact-sheet
+```
 
 For HTML, use `--slides "<slide-selector>"` when the source uses a different slide
 selector from `.deck > .slide`; use `--slides none` for one page per HTML file.
@@ -116,28 +123,35 @@ helpers included in the saved package:
 
 ```bash
 node tools/verify-package.mjs \
-  --package <template-slug> --source-pages <source-pages-dir>
+  --package <template-slug> --source-pages <work-dir>/source-pages
 ```
 
 Only for a specific reconstruction risk, compare one or two unchanged compositions
-with their source captures. Keep these check outputs outside the package.
+with their source captures, using `--out <work-dir>/previews/reconstruction` for
+any check screenshots.
 
 ## 5. Save the Custom Template
 
 After the package check passes, prepare the upload source.
 
 The upload accepts `.ppt`, `.pptx` or `.pdf` as `--source`. Use the original when
-it is one of these formats. For HTML or image decks, combine the ordered original
-source captures into `normalized-source.pdf` for upload. Record this conversion
+it is one of these formats. For HTML or image decks, create the upload PDF directly
+at `<work-dir>/upload/source.pdf`:
+
+```bash
+python3 scripts/source-derivatives.py --work-dir <work-dir> --pdf
+```
+
+The helper reads only original page images. Its `--contact-sheet` and `--pdf` flags
+can be combined when both outputs are needed. Record this conversion
 and the original file or URL in `design-system.md`; the package retains the
 editable layouts and assets. No need to export or render the reconstructed package
 for this upload.
 
-Pass the same verified capture directory as `--pages` below.
-
 ```bash
 okou user-template publish --kind presentation --title "<template name>" \
-  --source <original.ppt|original.pptx|original.pdf|normalized-source.pdf> --pages <source-pages-dir> \
+  --source <original.ppt|original.pptx|original.pdf|work-dir/upload/source.pdf> \
+  --pages <work-dir>/source-pages \
   --package <template-slug>
 ```
 
