@@ -1,35 +1,14 @@
-# Presentation runtime contract
+# Runtime hooks for generated decks
 
-Use when extracting a package or changing slide structure, navigation or charts.
-Existing shell copies already include the runtime; no need to recreate it.
-For final generation QA, follow [qa.md](qa.md).
+Use when changing slide structure, navigation or charts in a working deck.
+The saved shell already includes the runtime and source configuration; no need to
+recreate them. Use the recorded safe areas, required chrome and approved font
+fallbacks in `tools/qa-config.json`. For final QA, follow [qa.md](qa.md).
 
-## Source configuration and authoring hooks
+## HTML hooks
 
-`tools/qa-config.json` records observed source rules. Its shape is:
-
-```json
-{
-  "minFontSizePx": 10,
-  "safeArea": {"left": 0.06, "right": 0.06, "top": 0.14, "bottom": 0.1},
-  "layoutSafeAreas": {},
-  "requiredChrome": [],
-  "allowedFontFallbacks": [],
-  "minContrastRatio": 3
-}
-```
-
-The inset numbers above are an **illustration**. Use the saved source margins,
-including any `layoutSafeAreas` keyed by a stage's `data-layout` or
-`data-source-profile`. Extraction supplies either a valid global safe area or an
-entry for every source profile; package verification rejects missing or invalid rules.
-A required chrome rule names `role`, optional `min`/`max`, and optional `layouts`.
-Mark only source-required items with `data-chrome="<role>"`; absence in the source
-is not a reason to invent a footer, motif or page marker. Fallback font families
-must be explicitly approved in design notes before listing them here.
-List replacement families (for example `Arial`), not the name of a failed primary
-font. When a used webfont fails, the first available family in that text's CSS
-font stack must be an approved fallback; approving a later, unused family is insufficient.
+Carry over the selected source layout's `data-layout`/`data-source-profile` and
+required `data-chrome` roles so its recorded safe areas and fixed elements still apply.
 
 Use `.deck > .slide` with exactly one `.stage` per slide and a `.fit` content root.
 Add disjoint `data-fit-region` hooks to independently replaceable title/body areas.

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {execFileSync, spawnSync} from "node:child_process";
-import {mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync} from "node:fs";
+import {existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync} from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
@@ -8,6 +8,7 @@ import test from "node:test";
 
 const guide = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const installer = path.join(guide, "scripts/install-qa.mjs");
+const verifier = path.join(guide, "tools/verify-package.mjs");
 const safeArea = {left: 0, right: 0, top: 0, bottom: 0};
 const fragment = '<section class="slide"><div class="stage" data-layout="title"><div class="fit"><h1>Source title</h1></div></div></section>';
 const shell = contents => `<!doctype html><html><head><link rel="stylesheet" href="../styles/template.css"></head><body><main class="deck">${contents}</main></body></html>`;
@@ -19,7 +20,7 @@ function fixture(t, examples = 0) {
     mkdirSync(path.dirname(path.join(root, file)), {recursive: true});
     writeFileSync(path.join(root, file), typeof value === "string" ? value : JSON.stringify(value));
   };
-  write("SKILL.md", "---\nname: fixture\ndescription: Package contract fixture.\n---\nSee references/qa.md.\n");
+  write("SKILL.md", "---\nname: fixture\ndescription: Package contract fixture.\n---\nFollow the [generation workflow](references/generate/workflow.md).\n");
   write("design-system.md", "Source rules and safe area.\n");
   write("layouts/README.md", "Insert source fragments into _shell.html.\n");
   write("styles/template.css", ".stage { width: 1600px; height: 900px; }\n");
@@ -33,7 +34,7 @@ function fixture(t, examples = 0) {
   write("tools/qa-config.json", config);
   execFileSync(process.execPath, [installer, "--package", root]);
   const verify = () => {
-    const result = spawnSync(process.execPath, [path.join(root, "tools/verify-package.mjs"), "--package", root], {encoding: "utf8"});
+    const result = spawnSync(process.execPath, [verifier, "--package", root], {encoding: "utf8"});
     assert.equal(result.error, undefined);
     return {code: result.status, ...JSON.parse(result.stdout)};
   };
@@ -72,7 +73,7 @@ test("shell structure uses HTML attributes rather than comments or script string
   assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
 });
 
-for (const file of ["references/qa.md", "references/layout-reuse.md", "references/typography-fit.md", "scripts/navigation.js", "library/README.md", "library/styles/geometry.css"]) {
+for (const file of ["references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/layout-reuse.md", "references/generate/typography-fit.md", "scripts/navigation.js", "library/README.md", "library/styles/geometry.css"]) {
   test(`required package file cannot be missing: ${file}`, t => {
     const {root, verify} = fixture(t);
     rmSync(path.join(root, file));
@@ -82,9 +83,56 @@ for (const file of ["references/qa.md", "references/layout-reuse.md", "reference
 
 test("a directory cannot stand in for the QA guide", t => {
   const {root, verify} = fixture(t);
-  const file = path.join(root, "references/qa.md");
+  const file = path.join(root, "references/generate/qa.md");
   rmSync(file); mkdirSync(file);
-  blocked(verify(), "references/qa.md");
+  blocked(verify(), "references/generate/qa.md");
+});
+
+test("installed generation package works without extraction references or helpers", t => {
+  const {root, verify} = fixture(t);
+  for (const file of ["references/extract", "scripts/install-qa.mjs", "tools/verify-package.mjs", "tests"]) {
+    assert.equal(existsSync(path.join(root, file)), false, file);
+  }
+  assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
+});
+
+for (const file of ["references/extract/layout-inventory.md", "scripts/install-qa.mjs", "tools/verify-package.mjs"]) {
+  test(`rejects extraction files mixed into a generation package: ${file}`, t => {
+    const {write, verify} = fixture(t);
+    write(file, "Extraction-only content.");
+    blocked(verify(), file.startsWith("references/") ? "references/extract" : file);
+  });
+}
+
+test("generation entrypoint must route to the bundled workflow", t => {
+  const {write, verify} = fixture(t);
+  write("SKILL.md", "# Template\nUse the [design system](design-system.md).\n");
+  blocked(verify(), "must link to references/generate/workflow.md");
+});
+
+test("checks nested local guidance links while allowing provenance and code examples", t => {
+  const {root, write, verify} = fixture(t);
+  const file = "references/generate/qa.md";
+  const guide = readFileSync(path.join(root, file), "utf8");
+  write(file, guide + '\n[Source](https://example.com/deck)\n`[example](unused.md)`\n```md\n[example](unused.md)\n```\n[Notes][notes]\n[notes]: <Usage notes.md>\n');
+  write("references/generate/Usage notes.md", "Extra generation guidance.\n");
+  assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
+  write("references/generate/Usage notes.md", "See [missing guide](missing.md).\n");
+  blocked(verify(), "missing.md");
+});
+
+test("refresh removes legacy mixed guides and catches stale entrypoint links", t => {
+  const {root, write, verify} = fixture(t);
+  write("references/layout-reuse.md", "Old mixed guidance.\n");
+  write("tools/verify-package.mjs", "Old bundled extraction helper.\n");
+  const skill = readFileSync(path.join(root, "SKILL.md"), "utf8");
+  write("SKILL.md", skill + "[Layouts](references/layout-reuse.md)\n");
+  execFileSync(process.execPath, [installer, "--package", root]);
+  assert.equal(existsSync(path.join(root, "references/layout-reuse.md")), false);
+  assert.equal(existsSync(path.join(root, "tools/verify-package.mjs")), false);
+  blocked(verify(), "Missing package resource: SKILL.md -> references/layout-reuse.md");
+  write("SKILL.md", skill + "[Layouts](references/generate/layout-reuse.md)\n");
+  assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
 });
 
 for (const [label, change, message] of [

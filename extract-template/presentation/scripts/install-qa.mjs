@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Copy QA into a user package and inline the common runtime exactly once. */
+/* Extraction only: install generation guides and runtime into a user package. */
 import {copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync} from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
@@ -18,13 +18,18 @@ config.minFontSizePx = 10;
 mkdirSync(path.join(target, "scripts"), {recursive: true});
 mkdirSync(path.join(target, "tools"), {recursive: true});
 for (const name of ["dom-metrics.js", "fit-text.js", "navigation.js"]) copyFileSync(path.join(here, name), path.join(target, "scripts", name));
-for (const name of ["audit.js", "qa.mjs", "run.sh", "verify-package.mjs"]) copyFileSync(path.join(here, "../tools", name), path.join(target, "tools", name));
+for (const name of ["audit.js", "qa.mjs", "run.sh"]) copyFileSync(path.join(here, "../tools", name), path.join(target, "tools", name));
+rmSync(path.join(target, "tools/verify-package.mjs"), {force: true});
 writeFileSync(path.join(target, "tools/qa-config.json"), JSON.stringify(config, null, 2) + "\n");
 cpSync(path.join(here, "../library"), path.join(target, "library"), {recursive: true});
 // Remove the previously shipped machine catalogue when refreshing the library.
 rmSync(path.join(target, "library/references/catalog.json"), {force: true});
-mkdirSync(path.join(target, "references"), {recursive: true});
-for (const name of ["qa.md", "runtime-contract.md", "typography-fit.md", "layout-reuse.md"]) copyFileSync(path.join(here, "../references", name), path.join(target, "references", name));
+mkdirSync(path.join(target, "references/generate"), {recursive: true});
+for (const name of ["workflow.md", "qa.md", "runtime-contract.md", "typography-fit.md", "layout-reuse.md"]) {
+  copyFileSync(path.join(here, "../references/generate", name), path.join(target, "references/generate", name));
+}
+// Retire the formerly mixed guides when refreshing a package.
+for (const name of ["qa.md", "runtime-contract.md", "typography-fit.md", "layout-reuse.md"]) rmSync(path.join(target, "references", name), {force: true});
 const runtime = ["dom-metrics.js", "fit-text.js", "navigation.js"].map(name => readFileSync(path.join(here, name), "utf8")).join("\n");
 const json = JSON.stringify(config).replaceAll("<", "\\u003c");
 const block = `<!-- BEGIN PRESENTATION RUNTIME -->\n<script data-presentation-runtime>\nwindow.PRESENTATION_QA_CONFIG=${json};\n${runtime}\n</script>\n<!-- END PRESENTATION RUNTIME -->`;

@@ -21,14 +21,14 @@ paths are relative to that file. Purpose and capacity are selection hints.
 4. Keep disjoint title/body `data-fit-region` areas and the **10px logical-canvas
    minimum**. SVG sizes use viewBox units; `PresentationMetrics.fontFactor(element)`
    maps them to logical pixels. Diagnose unresolved fitting through the geometry
-   guidance in [typography-fit.md](../references/typography-fit.md).
+   guidance in [typography-fit.md](../references/generate/typography-fit.md).
 
 geometry.css supplies structure, not PPT parsing or the user's visual style.
 Its selectors use `.builtin-layout` and zero-specificity `:where()`. Apply only
 selected rules to adapted fragments; preserved source layouts keep their own CSS.
 Equal columns, `1em` gaps and `contain` are reference starting points.
 
-Source evidence guides adaptation; [qa.md](../references/qa.md) defines final QA and
+Source evidence guides adaptation; [qa.md](../references/generate/qa.md) defines final QA and
 visual review. Review only QA-designated pages unless a full pass is requested;
 no extra review pass is needed solely because a fragment was adapted.
 

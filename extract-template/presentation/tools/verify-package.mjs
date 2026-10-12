@@ -22,7 +22,7 @@ const escapesRoot = target => {
   const relative = path.relative(realpathSync(root), target);
   return relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative);
 };
-const checkResource = (value, base, label) => {
+const checkResource = (value, base, label, inspectContent = true) => {
   const reference = value.trim();
   if (!reference || /^(?:data:|blob:|#)/i.test(reference)) return;
   if (/^(?:https?:)?\/\//i.test(reference) || /^[a-z][a-z\d+.-]*:/i.test(reference)) {
@@ -38,13 +38,26 @@ const checkResource = (value, base, label) => {
     errors.push(`Package resource escapes package: ${label} -> ${reference}`);
   } else if (!existsSync(target) || !statSync(target).isFile()) {
     errors.push(`Missing package resource: ${label} -> ${reference}`);
-  } else if (!inspected.has(target) && /\.(?:css|svg|html?)$/i.test(target)) {
+  } else if (!inspected.has(target) && (/\.md$/i.test(target) || inspectContent && /\.(?:css|svg|html?)$/i.test(target))) {
     inspected.add(target);
     const source = readFileSync(target, "utf8"), resourceLabel = path.relative(root, target);
-    if (/\.css$/i.test(target)) inspectCssResources(source, path.dirname(target), resourceLabel);
+    if (/\.md$/i.test(target)) {
+      for (const reference of markdownTargets(source)) {
+        // Provenance links may be external; local guidance must travel with the package.
+        if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(reference)) continue;
+        checkResource(reference, path.dirname(target), resourceLabel, false);
+      }
+    } else if (/\.css$/i.test(target)) inspectCssResources(source, path.dirname(target), resourceLabel);
     else inspectHtmlResources(source, path.dirname(target), resourceLabel);
   }
 };
+function markdownTargets(source) {
+  const text = source.replace(/^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1[ \t]*$/gm, "")
+    .replace(/(`+)[^\n]*?\1/g, "");
+  const inline = [...text.matchAll(/\[[^\]\n]*\]\(\s*(?:<([^>\n]+)>|([^\s)]+))(?:\s+["'][^"'\n]*["'])?\s*\)/g)];
+  const definitions = [...text.matchAll(/^ {0,3}\[[^\]\n]+\]:[ \t]*(?:<([^>\n]+)>|([^\s]+))/gm)];
+  return [...inline, ...definitions].map(match => match[1] ?? match[2]);
+}
 const cssUnescape = value => value.replace(/\\([\da-f]{1,6})(?:\s)?|\\(.)/gi, (_, hex, character) => {
   const code = hex ? parseInt(hex, 16) : 0;
   return hex ? code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : "\ufffd" : character;
@@ -114,11 +127,23 @@ const inspectHtmlResources = (html, base, label, sourceLayout = false) => {
 const countClass = (html, className) => [...htmlElements(html)]
   .filter(({attrs}) => (attrs.get("class") || "").split(/\s+/).includes(className)).length;
 for (const file of ["SKILL.md", "design-system.md", "layouts/_shell.html", "layouts/README.md", "layouts/source-index.json", "styles/template.css",
-  "scripts/dom-metrics.js", "scripts/fit-text.js", "scripts/navigation.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "tools/run.sh", "tools/verify-package.mjs",
-  "references/qa.md", "references/runtime-contract.md", "references/typography-fit.md", "references/layout-reuse.md", "library/README.md", "library/references/catalog.md", "library/styles/geometry.css"]) {
+  "scripts/dom-metrics.js", "scripts/fit-text.js", "scripts/navigation.js", "tools/qa-config.json", "tools/audit.js", "tools/qa.mjs", "tools/run.sh",
+  "references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/typography-fit.md", "references/generate/layout-reuse.md",
+  "library/README.md", "library/references/catalog.md", "library/styles/geometry.css"]) {
   checkResource(file, root, "Required package file");
 }
 try {
+  const entrypoint = readFileSync(path.join(root, "SKILL.md"), "utf8");
+  const workflow = path.join(root, "references/generate/workflow.md");
+  if (!markdownTargets(entrypoint).some(reference => path.resolve(root, decodeURIComponent(reference.split(/[?#]/, 1)[0])) === workflow)) {
+    errors.push("Package SKILL.md must link to references/generate/workflow.md");
+  }
+  for (const name of readdirSync(path.join(root, "references"))) {
+    if (name !== "generate") errors.push(`Package references are generation-only: references/${name}`);
+  }
+  for (const file of ["scripts/install-qa.mjs", "scripts/render-pages.mjs", "scripts/libreoffice.mjs", "tools/verify-package.mjs", "tests"]) {
+    if (existsSync(path.join(root, file))) errors.push(`Extraction/development file belongs outside the saved package: ${file}`);
+  }
   const index = JSON.parse(readFileSync(path.join(root, "layouts/source-index.json"), "utf8"));
   if (!index.sourceFilename || !Number.isInteger(index.pageCount) || index.pageCount < 1 || !index.sourceAspectRatio) errors.push("Source filename, positive pageCount and original sourceAspectRatio are required");
   const shell = readFileSync(path.join(root, "layouts/_shell.html"), "utf8");

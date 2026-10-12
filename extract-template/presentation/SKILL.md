@@ -11,6 +11,15 @@ for later generation.** Rebuild samples only when requested, within that scope.
 Write package instructions in English; preserve source content and the requested
 presentation language.
 
+| Files in this guide | Stage | Included in the saved template |
+| --- | --- | --- |
+| This `SKILL.md`, `references/extract/` | Extract and record the source | No |
+| `references/generate/` | Generate, check and deliver new decks | Yes, at the same paths |
+| `scripts/install-qa.mjs`, `tools/verify-package.mjs` | Assemble and check the package | No |
+
+The installer copies the generation guides and runtime by an explicit file list.
+The package's own `SKILL.md` is its generation entrypoint.
+
 ## 1. Inspect the source
 
 Render the source once, or reuse existing ordered source captures:
@@ -30,9 +39,9 @@ safe areas, borders, image crops, required chrome and reusable backgrounds/decor
 Distinguish source observations from inferred adaptations, including unit conversion
 and aspect-ratio mapping to 16:9.
 
-Use [typography-fit.md](references/typography-fit.md) for font mapping and the fixed
-**10px runtime minimum**; use [layout-reuse.md](references/layout-reuse.md) for source
-inventory, background recipes and layout selection.
+Use [typography.md](references/extract/typography.md) for source font mapping and
+[layout-inventory.md](references/extract/layout-inventory.md) for source coverage
+and reusable background recipes.
 
 ## 3. Build the editable package
 
@@ -48,8 +57,8 @@ inventory, background recipes and layout selection.
   assets/
   library/                  # supplied neutral layouts and Markdown catalogue
   scripts/                  # supplied fitter and navigation
-  tools/                    # package verifier and future-generation QA
-  references/               # supplied usage guidance
+  tools/                    # source configuration and generation QA
+  references/generate/      # generation-only guidance
 ```
 
 Cover every source page in the index; preserve distinct compositions and background
@@ -63,8 +72,9 @@ page in it. Complete source-page coverage belongs in `source-index.json`. Source
 use paths relative to `layouts/`, where they are inserted into the shell.
 
 Write `tools/qa-config.json` with source-derived safe areas, required chrome and
-approved font fallbacks; follow the [runtime contract](references/runtime-contract.md)
-for configuration, HTML hooks, navigation and chart marks.
+approved font fallbacks; follow [qa-config.md](references/extract/qa-config.md).
+Use the [runtime hooks](references/generate/runtime-contract.md) when creating
+the source HTML, so later generation can reuse it directly.
 Then run from this guide's directory:
 
 ```bash
@@ -75,35 +85,21 @@ The installer supplies the library, tools, references and shared runtime, includ
 four-arrow navigation. Keep neutral library layouts separate from the source index;
 adapt only selected layouts during later generation.
 
-Write these **five steps for future generation** into the package's `SKILL.md`:
-
-1. **Outline:** establish purpose, audience, language, page count and each page's message.
-2. **Choose layouts:** prefer `layouts/source-index.json`; use `library/references/catalog.md`
-   when source layouts do not fit. Note source-specific and language caveats here.
-3. **Replace/adapt or rewrite:** assemble a copy in the final web directory with final
-   asset paths, supported facts and source styling. Keep content editable and the 10px floor.
-4. **Run QA:** use the planned page count; diagnose geometry before changing copy.
-   At unresolved 10px fitting, inspect text boxes, glyph bounds and line height first.
-   Fix the cause and rerun on the same final HTML.
-   No need to repeat passing [interaction checks](references/runtime-contract.md#interaction-check-scope)
-   on an unchanged deck.
-5. **Review as needed:** inspect only QA-designated pages unless a full review is requested.
-   When review is required, record the receipt and rerun final QA; otherwise a passing
-   result completes QA. Keep captures outside the web directory.
-   For requested delivery, clean that directory before conversion; finish PPTX checks,
-   then publish and upload the final outputs once. See the QA guide for capture staging.
-
-Link the design system, source index and QA guide; include exact QA and screenshot
-commands from [qa.md](references/qa.md). Keep `layouts/README.md` a short path map
-linking back to `SKILL.md`. Keep output handling within these five steps.
+Write the package's `SKILL.md` with its template identity, source/language caveats,
+links to `design-system.md` and `layouts/source-index.json`, and a Markdown link to
+`references/generate/workflow.md`. That supplied [workflow](references/generate/workflow.md)
+contains the generation steps and routes to the other guides; no need to duplicate
+them. Keep `layouts/README.md` a short path map linking back to the package's `SKILL.md`.
+When refreshing an older package, update its entrypoint links to `references/generate/`.
 
 ## 4. Check the package
 
-Check required guidance/runtime files, source coverage, source QA configuration,
-library links, capture count and local paths:
+From this guide's directory, check generation guidance and links, source coverage,
+source QA configuration, library links, capture count and local paths. The verifier
+also rejects extraction references or helpers included in the saved package:
 
 ```bash
-node <template-slug>/tools/verify-package.mjs \
+node tools/verify-package.mjs \
   --package <template-slug> --source-pages <source-pages-dir>
 ```
 
