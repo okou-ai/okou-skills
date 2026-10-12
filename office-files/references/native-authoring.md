@@ -1,20 +1,20 @@
-# Reuse the native tools
+# Native authoring
 
-These helpers serve new documents using the blank baseline. They supply typography and mechanical checks, not a business outline, fixed page count, or palette. For existing files, user templates, complex layouts, or language-specific typesetting, use the native libraries directly and preserve the requested design.
+Use these helpers for new documents with the blank baseline. For existing files or layouts the helpers cannot express, use the native libraries directly.
 
 ## Prepare once
 
-From your working directory, replace `<skill-dir>` with this skill's absolute directory and run:
+From your working directory, replace `<skill-dir>` with this skill's absolute path:
 
 ```bash
-python3 <skill-dir>/scripts/office_env.py --formats docx pdf --charts --install-missing
+python3 <skill-dir>/scripts/office_env.py --formats docx pdf --install-missing
 ```
 
-Select only the formats needed; omit `--charts` without charts. Use the returned `python` path for subsequent commands, without shell activation. The [setup helper](../scripts/office_env.py) reuses the current Python or `.office-cache/venv`; with `--install-missing`, it creates or updates that local environment only when required libraries are missing. System Python is unchanged. For DOCX checks, it installs missing Writer components before one real import probe. Failed probes are cached until the renderer changes. Font mappings are reported, not silently accepted as language coverage. On hosts without apt/sudo, use an available compatible renderer or report Word rendering as unverified.
+Select needed formats (`docx`, `pdf`, `xlsx`); add `--charts` only for charts. Use the returned `python` path in subsequent commands. The [helper](../scripts/office_env.py) reuses available packages, installs missing ones into `.office-cache/venv`, and leaves system Python unchanged. For DOCX, it installs missing Writer components where supported and caches a real import probe. Font mappings still need language-coverage checks; unavailable rendering remains unverified.
 
 ## Write shared content once
 
-Add `scripts/` to your generator's Python import path, then use the small `OfficeDocument` helper for ordinary prose, lists, tables, and images:
+Add `<skill-dir>/scripts` to your Python import path. Pass content and computed values once:
 
 ```python
 from office import OfficeDocument
@@ -22,31 +22,30 @@ from office import OfficeDocument
 report = OfficeDocument()
 report.title(title)
 report.paragraph(summary)
-for section in sections:
-    report.heading(section["heading"])
-    report.paragraph(section["text"])
+report.heading(section_title)
+report.paragraph(section_text)
 report.table(headers, rows, numeric_columns=(1, 2), widths=(2, 1, 1))
 report.list(next_actions, numbered=True)
 report.figure(chart_path, caption=chart_caption, source=source_note)
-result = report.save("output", name="report", formats=("docx", "pdf"))
-print(result)
+report.save("output", name="report", formats=("docx", "pdf"))
 ```
 
-The variable names above are illustrative, not required report fields. Compute the underlying values once in Python and reuse them in prose, table rows, and chart data. Plain strings are escaped as literal Typst text. Both formats inherit the blank assets; tables get bold repeated headers, 11 pt text, and right-aligned numbers. Images preserve their aspect ratio and use automatic Word line spacing. Draw charts at their intended placed width so labels keep their specified size.
+Variables illustrate methods, not required report fields. `OfficeDocument` inherits both blank assets, escapes text, repeats bold table headers, right-aligns numeric cells, and preserves image proportions. Draw charts at their placed size. `save()` checks the Word baseline before writing editable DOCX and/or independently compiling Typst PDF.
 
-`report.word` exposes the python-docx document; `report.preamble` is the copied Typst baseline. Adapt both when changing page settings, fonts, or language direction. Use native authoring directly when the helper does not cover the task; do not build a second copy of the content. `save(..., baseline_check=False)` is for a deliberately different user/template design, not a way to bypass a baseline defect.
+`report.word` and `report.preamble` allow native layout/language changes. `baseline_check=False` is for deliberately different user/template designs, not unresolved baseline defects.
+
+When authoring directly:
+
+- **Word:** open `assets/blank.docx` with `python-docx.Document`. Apply `Title`, `Heading 1`–`Heading 3`, `Normal`, `List Bullet`/`List Number`, `Table Text`/`Table Header`/`Table Title`, `Figure`, `Caption`, and `Source` styles.
+- **PDF:** copy `assets/blank.typ`, append content using `#doc-title[...]`, headings, tables, and figure captions, then run `typst compile report.typ report.pdf` or `typst.compile('report.typ', output='report.pdf')` in Python. Copying preserves the top-level style rules.
 
 ## Check and render together
 
-`save()` runs a structural Word style check before writing. For a document created directly with python-docx, use:
+Use the selected Python path. Run the checker separately only when authoring outside `OfficeDocument`:
 
 ```bash
 python <skill-dir>/scripts/check_docx.py output/report.docx
 python <skill-dir>/scripts/review.py output/report.docx output/report.pdf
 ```
 
-Use the selected Python executable in place of `python`. The checker catches common baseline regressions: type sizes, table headers, numeric alignment, exact-height image paragraphs/rows, and theme-font overrides. It does not prove full multilingual rendering or inspect PDF typography.
-
-The review command batches independent formats and caches conversions/page images against file bytes, renderer versions, and installed fonts. It preserves differing Word/PDF page counts. Reuse cached images for unchanged pages; inspect every final page, including downstream reflow, and verify content and numbers. A cache hit is not a new visual review. Mixed portrait/landscape PDFs use Poppler directly to preserve each page's dimensions.
-
-Keep `.typ` sources, page PNGs, caches, and timing output local. Only upload the files needed by the user. Measured write/compile/render durations exclude content authoring, reasoning, visual review, and delivery.
+The checker detects known DOCX size, alignment, header, image-spacing, and font-theme defects. `review.py` renders actual DOCX/PDF files together and reuses results only while file bytes, renderers, and fonts remain unchanged; identical failed conversions are cached too. Neither structural checks nor cached page images replace visual inspection. Write/compile/render timings cover those commands only.
