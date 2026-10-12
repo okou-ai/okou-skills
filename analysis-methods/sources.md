@@ -1,46 +1,39 @@
-# Sources and adaptation
+# Integrated sources and Okou adaptations
 
-This package selectively adapts MIT-licensed analytical instructions from the
-following fixed upstream revisions. It is maintained in Okou; runtime use does
-not download or execute those upstream repositories.
+This package integrates selected material from two MIT-licensed repositories. The files listed as `verbatim` are byte-for-byte copies, including the calculation helpers and their matching templates. Reference adaptations retain the upstream method tables, procedures and examples while adjusting scope, paths and output handoff. It does not download upstream content at runtime.
 
-| Upstream | Pinned revision | Retained material |
+| Local file | Upstream file | Integration |
 | --- | --- | --- |
-| [DeerFlow](https://github.com/bytedance/deer-flow/tree/1f15e0b43ca58b9601514f9f5c408fb032022833) | `1f15e0b43ca58b9601514f9f5c408fb032022833` | Question/domain routing, complementary and data-feasible framework selection, per-question data requirements, schema-first analysis and evidence-backed reports |
-| [Scientific Agent Skills](https://github.com/K-Dense-AI/scientific-agent-skills/tree/92ace75ac21efe19a620434e0ca4e356081fe807) | `92ace75ac21efe19a620434e0ca4e356081fe807` | Market definitions, claim/source separation, reproducible calculations, statistical design and assumptions, uncertainty, rival hypotheses and critical appraisal |
+| [references/methods.md](references/methods.md) | [bytedance/deer-flow: skills/public/consulting-analysis/SKILL.md](https://github.com/bytedance/deer-flow/blob/1f15e0b43ca58b9601514f9f5c408fb032022833/skills/public/consulting-analysis/SKILL.md) | Retain Steps 1.1–1.5, all six framework tables, chapter/data/visualization planning examples. Remove fixed framework quotas and consulting-title constraint; scope chapter planning to substantive reports; distinguish untested causes. |
+| [references/data-analysis.md](references/data-analysis.md) | [bytedance/deer-flow: skills/public/data-analysis/SKILL.md](https://github.com/bytedance/deer-flow/blob/1f15e0b43ca58b9601514f9f5c408fb032022833/skills/public/data-analysis/SKILL.md) | Retain basic exploration, grouping, joins, window and pivot SQL patterns. Use current local/connector tools and actual schemas, not DeerFlow runtime paths or automatic dependency installation. Keep the existing measurement and inference guidance. |
+| [scripts/_common.py](scripts/_common.py) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/scripts/_common.py](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/scripts/_common.py) | Unmodified upstream standard-library helper; all sibling imports retained. |
+| [scripts/calculate_market_sizing.py](scripts/calculate_market_sizing.py) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/scripts/calculate_market_sizing.py](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/scripts/calculate_market_sizing.py) | Unmodified upstream standard-library helper; all sibling imports retained. |
+| [scripts/check_unit_consistency.py](scripts/check_unit_consistency.py) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/scripts/check_unit_consistency.py](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/scripts/check_unit_consistency.py) | Unmodified upstream standard-library helper; all sibling imports retained. |
+| [scripts/audit_claim_citations.py](scripts/audit_claim_citations.py) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/scripts/audit_claim_citations.py](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/scripts/audit_claim_citations.py) | Unmodified upstream standard-library helper; all sibling imports retained. |
+| [scripts/validate_evidence_ledger.py](scripts/validate_evidence_ledger.py) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/scripts/validate_evidence_ledger.py](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/scripts/validate_evidence_ledger.py) | Unmodified upstream standard-library helper; all sibling imports retained. |
+| [scripts/forecast_sensitivity.py](scripts/forecast_sensitivity.py) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/scripts/forecast_sensitivity.py](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/scripts/forecast_sensitivity.py) | Unmodified upstream standard-library helper; all sibling imports retained. |
+| [assets/source_ledger_template.csv](assets/source_ledger_template.csv) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/assets/source_ledger_template.csv](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/assets/source_ledger_template.csv) | Unmodified synthetic/example template. Replace example rows with task evidence before use. |
+| [assets/claims_ledger_template.csv](assets/claims_ledger_template.csv) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/assets/claims_ledger_template.csv](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/assets/claims_ledger_template.csv) | Unmodified synthetic/example template. Replace example rows with task evidence before use. |
+| [assets/consistency_check_template.csv](assets/consistency_check_template.csv) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/assets/consistency_check_template.csv](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/assets/consistency_check_template.csv) | Unmodified synthetic/example template. Replace example rows with task evidence before use. |
+| [assets/market_sizing_scenarios_template.json](assets/market_sizing_scenarios_template.json) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/assets/market_sizing_scenarios_template.json](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/assets/market_sizing_scenarios_template.json) | Unmodified synthetic/example template. Replace example rows with task evidence before use. |
+| [assets/forecast_sensitivity_template.json](assets/forecast_sensitivity_template.json) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/assets/forecast_sensitivity_template.json](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/assets/forecast_sensitivity_template.json) | Unmodified synthetic/example template. Replace example rows with task evidence before use. |
+| [references/evidence.md](references/evidence.md) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/references/evidence_model.md](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/references/evidence_model.md) | Retain the complete claim/source, conflict, revision, lineage, and audit model. Add local template/tool links and the general appraisal workflow below. |
+| [references/evidence.md](references/evidence.md) | [K-Dense-AI/scientific-agent-skills: skills/scientific-critical-thinking/SKILL.md](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-critical-thinking/SKILL.md) | Append Appraisal Workflow; omit clinical GRADE/tool-specific requirements and use business recommendations as the application context. |
+| [references/reporting.md](references/reporting.md) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/references/report_structure_guide.md](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/references/report_structure_guide.md) | Retain modular report structure and substantive checklists. Replace mandatory disclaimer with relevant task boundaries; remove unavailable matrix-tool dependency; avoid invented owners/dates; add Okou format handoff. |
+| [references/market-analysis.md](references/market-analysis.md) | [K-Dense-AI/scientific-agent-skills: skills/market-research-reports/references/data_analysis_patterns.md](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/references/data_analysis_patterns.md) | Retain complete measurement, TAM/SAM/SOM, reconciliation, forecasts, units, concentration and synthesis guidance. Add local CLI/template links. |
+| [references/statistics.md](references/statistics.md) | [K-Dense-AI/scientific-agent-skills: skills/statistical-analysis/references/test_selection_guide.md](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/statistical-analysis/references/test_selection_guide.md) | Retain the full test-selection decision tree and design considerations. Resolve the optional upstream effect-size link to its fixed revision and make model/prior dependence explicit. |
 
-## Upstream files inspected and adapted
+## Scope
 
-- DeerFlow: [`consulting-analysis/SKILL.md`](https://github.com/bytedance/deer-flow/blob/1f15e0b43ca58b9601514f9f5c408fb032022833/skills/public/consulting-analysis/SKILL.md)
-  and [`data-analysis/SKILL.md`](https://github.com/bytedance/deer-flow/blob/1f15e0b43ca58b9601514f9f5c408fb032022833/skills/public/data-analysis/SKILL.md).
-- Scientific Agent Skills:
-  [`market-research-reports/SKILL.md`](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/market-research-reports/SKILL.md),
-  [`statistical-analysis/SKILL.md`](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/statistical-analysis/SKILL.md),
-  [`scientific-critical-thinking/SKILL.md`](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/scientific-critical-thinking/SKILL.md),
-  and [`hypothesis-generation/SKILL.md`](https://github.com/K-Dense-AI/scientific-agent-skills/blob/92ace75ac21efe19a620434e0ca4e356081fe807/skills/hypothesis-generation/SKILL.md).
+Included: business framework selection, per-question/chapter data requirements, SQL analysis patterns, statistical test selection, market sizing and scenario sensitivity, evidence/claim ledgers, units and report structure.
 
-The local Python helpers and tests are Okou implementations of the documented
-CSV profiling and evidence-record contracts, not copied upstream scripts.
+Excluded: clinical/laboratory workflows, specialty services, paid generation/provider bindings, consulting-brand imitation, fixed framework/page quotas, the upstream LaTeX rendering stack, and DeerFlow runtime-specific installation/cache commands. Okou supplies source access and output tools.
 
-## Deliberate scope
+The small evaluation cases in `evals/` are Okou fixtures for local behavior checks. Their expected answers are for the reviewer, not the task executor. They are not claims about production report quality.
 
-Retained: general business research, market/competitive questions, data analysis,
-method selection, evidence checking and reports in the user's chosen format.
+## Version and licenses
 
-Excluded: scientific/clinical/laboratory workflows, specialty databases, trading
-execution, provider/model bindings, product promotion, paid diagram generation,
-upstream runtime paths and dependency installers, mandatory word/page/framework
-quotas, and consulting-brand voice imitation. Rendering uses Okou's existing
-skills and selected templates; this package supplies analytical content guidance.
+- DeerFlow: `1f15e0b43ca58b9601514f9f5c408fb032022833` — [retained MIT notice](licenses/deerflow-MIT.txt).
+- Scientific Agent Skills: `92ace75ac21efe19a620434e0ca4e356081fe807` — [retained MIT notice](licenses/scientific-skills-MIT.txt).
 
-Adaptations keep input checks and uncertainty proportional to the question.
-They are not validation of every upstream method or a claim of equivalent output
-quality. Updating a source requires reviewing the affected guidance and rerunning
-the helper and behavioral checks.
-
-## Licenses
-
-Keep both copyright and MIT permission notices with this package:
-
-- [DeerFlow MIT notice](licenses/deerflow-MIT.txt)
-- [K-Dense MIT notice](licenses/scientific-skills-MIT.txt)
+Keep both original notices with this package. `upstream-manifest.json` records each source file, its hash, whether it is copied or adapted, and the local hash. Updating a source requires reviewing its actual changes and rerunning the relevant helper checks.

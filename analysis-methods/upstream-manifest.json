@@ -1,0 +1,194 @@
+{
+  "sources": [
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "1f15e0b43ca58b9601514f9f5c408fb032022833"
+    },
+    {
+      "repository": "K-Dense-AI/scientific-agent-skills",
+      "commit": "92ace75ac21efe19a620434e0ca4e356081fe807"
+    }
+  ],
+  "files": [
+    {
+      "file": "references/methods.md",
+      "upstream_repository": "bytedance/deer-flow",
+      "upstream_commit": "1f15e0b43ca58b9601514f9f5c408fb032022833",
+      "upstream_path": "skills/public/consulting-analysis/SKILL.md",
+      "upstream_sha256": "5bc99df7e5f8af5471eaa5d20b85fc46e99895cf3f2642fa9da94108d03ca13e",
+      "mode": "adapted excerpt",
+      "changes": "Retain Steps 1.1\u20131.5, all six framework tables, chapter/data/visualization planning examples. Remove fixed framework quotas and consulting-title constraint; scope chapter planning to substantive reports; distinguish untested causes.",
+      "local_sha256": "119fee521ea05544468b4cde9d212532f9b849b38659c550179f6f4ac2fb0527"
+    },
+    {
+      "file": "references/data-analysis.md",
+      "upstream_repository": "bytedance/deer-flow",
+      "upstream_commit": "1f15e0b43ca58b9601514f9f5c408fb032022833",
+      "upstream_path": "skills/public/data-analysis/SKILL.md",
+      "upstream_sha256": "d9383f31df40250c7dd58b31f3518bc80c95f670eada6e8222c7925d80a0b3a1",
+      "mode": "adapted excerpt",
+      "changes": "Retain basic exploration, grouping, joins, window and pivot SQL patterns. Use current local/connector tools and actual schemas, not DeerFlow runtime paths or automatic dependency installation. Keep the existing measurement and inference guidance.",
+      "local_sha256": "fe571466ce9436f96e601964c701c02b12454fe04c71805554fee7bc71affba3"
+    },
+    {
+      "file": "scripts/_common.py",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/scripts/_common.py",
+      "upstream_sha256": "ec1f8424e6f9bc147e8c0e17228cd277512678ba811c94388c19be004e6970ed",
+      "mode": "verbatim",
+      "changes": "Unmodified upstream standard-library helper; all sibling imports retained.",
+      "local_sha256": "ec1f8424e6f9bc147e8c0e17228cd277512678ba811c94388c19be004e6970ed"
+    },
+    {
+      "file": "scripts/calculate_market_sizing.py",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/scripts/calculate_market_sizing.py",
+      "upstream_sha256": "aa6daa9b80707099572cdf513d519fa15836c0bd6c72ba7123d83282b4949c0f",
+      "mode": "verbatim",
+      "changes": "Unmodified upstream standard-library helper; all sibling imports retained.",
+      "local_sha256": "aa6daa9b80707099572cdf513d519fa15836c0bd6c72ba7123d83282b4949c0f"
+    },
+    {
+      "file": "scripts/check_unit_consistency.py",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/scripts/check_unit_consistency.py",
+      "upstream_sha256": "e7ae86dc78556d3570b920d6187a5dc3b483382c5f48f2bcfac6db4630fc6bf6",
+      "mode": "verbatim",
+      "changes": "Unmodified upstream standard-library helper; all sibling imports retained.",
+      "local_sha256": "e7ae86dc78556d3570b920d6187a5dc3b483382c5f48f2bcfac6db4630fc6bf6"
+    },
+    {
+      "file": "scripts/audit_claim_citations.py",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/scripts/audit_claim_citations.py",
+      "upstream_sha256": "4a6a8f254838aaefe6d14bf38e0bdb2b03bafb9e1ca93afec873527bf0c2b054",
+      "mode": "verbatim",
+      "changes": "Unmodified upstream standard-library helper; all sibling imports retained.",
+      "local_sha256": "4a6a8f254838aaefe6d14bf38e0bdb2b03bafb9e1ca93afec873527bf0c2b054"
+    },
+    {
+      "file": "scripts/validate_evidence_ledger.py",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/scripts/validate_evidence_ledger.py",
+      "upstream_sha256": "c1176271a8a9d3b41363f187dbec55a60c481e39bba8356e4ecde30ec32cc3d5",
+      "mode": "verbatim",
+      "changes": "Unmodified upstream standard-library helper; all sibling imports retained.",
+      "local_sha256": "c1176271a8a9d3b41363f187dbec55a60c481e39bba8356e4ecde30ec32cc3d5"
+    },
+    {
+      "file": "scripts/forecast_sensitivity.py",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/scripts/forecast_sensitivity.py",
+      "upstream_sha256": "a8580d913613fb4432329d8cf49b92072e168420db3b23a35ce64ee0274b00f6",
+      "mode": "verbatim",
+      "changes": "Unmodified upstream standard-library helper; all sibling imports retained.",
+      "local_sha256": "a8580d913613fb4432329d8cf49b92072e168420db3b23a35ce64ee0274b00f6"
+    },
+    {
+      "file": "assets/source_ledger_template.csv",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/assets/source_ledger_template.csv",
+      "upstream_sha256": "a2e10d3ab743a6e879b43efb47c3069104d45f68898b1ab71ac2ca1f161f8ad7",
+      "mode": "verbatim",
+      "changes": "Unmodified synthetic/example template. Replace example rows with task evidence before use.",
+      "local_sha256": "a2e10d3ab743a6e879b43efb47c3069104d45f68898b1ab71ac2ca1f161f8ad7"
+    },
+    {
+      "file": "assets/claims_ledger_template.csv",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/assets/claims_ledger_template.csv",
+      "upstream_sha256": "ff8daf6e418713a51a1a13c6ccff88e3f5716b2cc098b9a4c4385653bb731348",
+      "mode": "verbatim",
+      "changes": "Unmodified synthetic/example template. Replace example rows with task evidence before use.",
+      "local_sha256": "ff8daf6e418713a51a1a13c6ccff88e3f5716b2cc098b9a4c4385653bb731348"
+    },
+    {
+      "file": "assets/consistency_check_template.csv",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/assets/consistency_check_template.csv",
+      "upstream_sha256": "8bd009d185eb415640f14ffc1a0dc3a123a724390a729b6f4a3979db6c9329f4",
+      "mode": "verbatim",
+      "changes": "Unmodified synthetic/example template. Replace example rows with task evidence before use.",
+      "local_sha256": "8bd009d185eb415640f14ffc1a0dc3a123a724390a729b6f4a3979db6c9329f4"
+    },
+    {
+      "file": "assets/market_sizing_scenarios_template.json",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/assets/market_sizing_scenarios_template.json",
+      "upstream_sha256": "58722edb120d11273e3b121a8a1d2fa122c33c21d242c3efae7d6094e8f25817",
+      "mode": "verbatim",
+      "changes": "Unmodified synthetic/example template. Replace example rows with task evidence before use.",
+      "local_sha256": "58722edb120d11273e3b121a8a1d2fa122c33c21d242c3efae7d6094e8f25817"
+    },
+    {
+      "file": "assets/forecast_sensitivity_template.json",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/assets/forecast_sensitivity_template.json",
+      "upstream_sha256": "f29a38e188c01cca6e52ce860424fe08905460e5505f1ac89528357e18fdf0b6",
+      "mode": "verbatim",
+      "changes": "Unmodified synthetic/example template. Replace example rows with task evidence before use.",
+      "local_sha256": "f29a38e188c01cca6e52ce860424fe08905460e5505f1ac89528357e18fdf0b6"
+    },
+    {
+      "file": "references/evidence.md",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/references/evidence_model.md",
+      "upstream_sha256": "180631d70e9602c995f4e001ed9305d928d10441a6dc396df924a88f7c03d2a1",
+      "mode": "adapted",
+      "changes": "Retain the complete claim/source, conflict, revision, lineage, and audit model. Add local template/tool links and the general appraisal workflow below.",
+      "local_sha256": "62f0163fd39dba699d53b6343f32d3736edf145f3637faa210dc65f5621a0835"
+    },
+    {
+      "file": "references/evidence.md",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/scientific-critical-thinking/SKILL.md",
+      "upstream_sha256": "563af70571b7dcd6a96bf2e303bedfdcba623b4e9f082d58f04aacbc961fdae4",
+      "mode": "adapted excerpt",
+      "changes": "Append Appraisal Workflow; omit clinical GRADE/tool-specific requirements and use business recommendations as the application context.",
+      "local_sha256": "62f0163fd39dba699d53b6343f32d3736edf145f3637faa210dc65f5621a0835"
+    },
+    {
+      "file": "references/reporting.md",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/references/report_structure_guide.md",
+      "upstream_sha256": "0b8d3dd6821b9cafa35f6a9739e31e46f965ba4994077a205f1bfa7c8fd9417d",
+      "mode": "adapted",
+      "changes": "Retain modular report structure and substantive checklists. Replace mandatory disclaimer with relevant task boundaries; remove unavailable matrix-tool dependency; avoid invented owners/dates; add Okou format handoff.",
+      "local_sha256": "4a568e31a99bfc58afcd7343b6e0dd68bb5880d556cf1308900539f0fd066f5f"
+    },
+    {
+      "file": "references/market-analysis.md",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/market-research-reports/references/data_analysis_patterns.md",
+      "upstream_sha256": "af33ed9575d0c44e47a220b8234be904b47f2741a7f3276c521d32f6d2bcf399",
+      "mode": "adapted",
+      "changes": "Retain complete measurement, TAM/SAM/SOM, reconciliation, forecasts, units, concentration and synthesis guidance. Add local CLI/template links.",
+      "local_sha256": "6cbaefa51873fc935351c97014471ef686a5c4e4f2974b888c54a8b683e2a063"
+    },
+    {
+      "file": "references/statistics.md",
+      "upstream_repository": "K-Dense-AI/scientific-agent-skills",
+      "upstream_commit": "92ace75ac21efe19a620434e0ca4e356081fe807",
+      "upstream_path": "skills/statistical-analysis/references/test_selection_guide.md",
+      "upstream_sha256": "e72e00b6ebe9450e5e84849503db223c4908a8d9a68c3b87cf0ab8ec3254fe83",
+      "mode": "adapted",
+      "changes": "Retain the full test-selection decision tree and design considerations. Resolve the optional upstream effect-size link to its fixed revision and make model/prior dependence explicit.",
+      "local_sha256": "c054d800aefea7c1b650bdf2ea72a4f69557b6de07ae347e169c8e26923bb37f"
+    }
+  ]
+}

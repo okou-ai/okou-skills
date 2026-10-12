@@ -1,88 +1,186 @@
-# Select methods by the question
+# Framework selection and data requirements
 
-Choose a method for the conclusion it can support, then check its inputs. Use
-additional methods only for distinct subquestions. Do not fill a fixed quota of
-frameworks or force an exploratory brief into a recommendation.
+Adapted from DeerFlow consulting-analysis, Steps 1.1–1.5. Use this planning detail for substantive research and reports; a short answer does not require chapters or a written framework. Frameworks organize analysis, not evidence by themselves. User scope and available data determine which rows apply.
 
-| Question | Candidate method | Minimum inputs | Required analytical result |
-| --- | --- | --- | --- |
-| What is happening? | Descriptive analysis or structured evidence synthesis | Defined population, period, measures, and attributable observations | Magnitude, distribution or themes, comparison basis, and coverage limits |
-| What changed, and where? | Driver decomposition, funnel, segment or cohort analysis | Comparable periods, stable metric definitions, denominators and relevant dimensions | Reconciled contributions or stage/segment changes; candidate causes separated from demonstrated effects |
-| Did an intervention make a difference? | Experiment analysis or an appropriate causal design | Outcome, assignment/sampling unit, comparison, timing, dependence, and design assumptions | Effect estimate and uncertainty; design limitations and practical significance |
-| Which option should we choose? | Hard-constraint screening, total cost, multi-criteria comparison | Alternatives, requirements, usage, costs, decision criteria and their priorities | Feasible options, comparable costs, tradeoffs, and conditions under which the recommendation changes |
-| Is a market opportunity attractive? | Market sizing, competitive structure, customer-job analysis | Market boundaries, disjoint segments, dated demand and competitor evidence, achievable reach | Conditional opportunity estimate, competitive constraints and unmet needs supported by evidence |
-| What could happen next? | Baseline forecast or scenario and sensitivity analysis | Dated comparable history or explicit driver assumptions and horizon | Baseline, plausible scenarios, influential assumptions and decision thresholds |
-| Which explanation is better supported? | Rival hypotheses and evidence appraisal | Observations, competing explanations, source lineage and relevant counterevidence | Evidence that distinguishes explanations; residual uncertainty and discriminating next observations |
+### Step 1.1: Understand the Research Subject
 
-## Business change and growth
+- Parse the research subject to identify the **core entity** (market, brand, product, industry, consumer segment, financial instrument, etc.)
+- Identify the **analytical domain** (marketing, finance, industry, competitive, consumer, investment, macro, etc.)
+- Determine the **natural analytical dimensions** based on domain:
 
-For revenue, start with a driver identity such as units times price. For a
-conversion change, start with the eligible population and funnel stages. For
-retention, compare cohorts at the same age. Inspect segment mix before attributing
-an aggregate change to product performance.
+| Domain | Typical Dimensions |
+|--------|--------------------|
+| Market Analysis | Market size, growth trends, market segmentation, growth drivers, competitive landscape, consumer profiling |
+| Brand Analysis | Brand positioning, market share, consumer perception, marketing strategy, competitor comparison |
+| Consumer Insights | Demographic profiling, purchase behavior, decision journey, pain points, scenario analysis |
+| Financial Analysis | Macro environment, industry trends, company fundamentals, financial metrics, valuation, risk assessment |
+| Industry Research | Value chain analysis, market size, competitive landscape, policy environment, technology trends, entry barriers |
+| Investment Due Diligence | Business model, financial health, management assessment, market opportunity, risk factors, exit pathways |
+| Competitive Intelligence | Competitor identification, strategic comparison, SWOT analysis, differentiated positioning, market dynamics |
 
-Example for one comparable product: with quantity `q` and price `p`,
-`delta_revenue = (q1-q0)*p0 + q1*(p1-p0)`. The allocation of the interaction is
-explicit here. State the chosen decomposition convention and reconcile it to the
-total; a driver identity alone does not establish why behavior changed.
+### Step 1.2: Select Analysis Frameworks & Models
 
-If only aggregate rates are available, explain the observed change and request
-or locate denominators and segments before claiming a root cause.
+Based on the identified domain and research subject, select **one or more** professional analysis frameworks to structure the reasoning in each chapter. The chosen frameworks guide the **Analysis Logic** in the chapter skeleton (Step 1.3).
 
-## Options and procurement
+#### Strategic & Environmental Analysis
 
-1. Apply non-negotiable constraints before scoring. Unknown compliance with a
-   requirement stays unknown; it is not a pass or a zero-valued cost.
-2. Compare like-for-like usage, currency, period, taxes, support, implementation,
-   migration, and ongoing costs. Cite quote dates and contractual assumptions.
-3. Derive criteria from the user's goals. Make proposed weights and subjective
-   judgments explicit. Do not manufacture a weighted ranking when priorities
-   are unresolved; show tradeoffs or conditional rankings.
-4. Vary consequential assumptions and find switching or break-even conditions.
-   State what a pilot or additional evidence needs to resolve.
+| Framework | Description | Best For |
+|-----------|-------------|----------|
+| **SWOT Analysis** | Strengths, Weaknesses, Opportunities, Threats | Brand assessment, competitive positioning, strategic planning |
+| **PEST / PESTEL Analysis** | Political, Economic, Social, Technological (+ Environmental, Legal) | Macro-environment scanning, market entry assessment, policy impact analysis |
+| **Porter's Five Forces** | Supplier bargaining power, buyer bargaining power, threat of new entrants, threat of substitutes, industry rivalry | Industry competitive landscape, entry barrier assessment, profit margin analysis |
+| **Porter's Diamond Model** | Factor conditions, demand conditions, related industries, firm strategy & structure | National/regional competitive advantage analysis |
+| **VRIO Analysis** | Value, Rarity, Imitability, Organization | Core competency assessment, resource advantage analysis |
 
-## Markets and competition
+#### Market & Growth Analysis
 
-- **TAM/SAM/SOM:** define buyer, geography, offering, period, unit, and denominator
-  before calculating. Bottom-up counts times spending and top-down estimates
-  are independent approaches to reconcile, not quantities to add. Keep segments
-  disjoint. SOM needs reachable customers, capacity, channels, and conversion
-  assumptions rather than an arbitrary market-share percentage.
-- **Porter's five forces:** examine supplier and buyer power, substitutes, entry
-  barriers, and rivalry using evidence of behavior and economics. It describes
-  industry pressures; it does not by itself establish a company's ability to win.
-- **JTBD:** use interviews, observed workflows, or attributable customer evidence
-  to describe the situation, desired outcome, alternatives and switching costs.
-  Inferred motives remain hypotheses; online anecdotes do not estimate prevalence.
-- **PESTEL or SWOT:** use selectively to structure relevant context or summarize
-  findings. Each consequential item needs evidence and an implication. The
-  completed framework is not itself support for a conclusion.
-- **DuPont analysis:** for compatible financial statements, decompose return on
-  equity into margin, asset turnover, and leverage. Align periods and average
-  balance definitions; explain when unusual or negative denominators make the
-  decomposition uninformative. It describes accounting drivers, not valuation.
+| Framework | Description | Best For |
+|-----------|-------------|----------|
+| **STP Analysis** | Segmentation, Targeting, Positioning | Market segmentation, target market selection, brand positioning |
+| **BCG Matrix (Growth-Share Matrix)** | Stars, Cash Cows, Question Marks, Dogs | Product portfolio management, resource allocation decisions |
+| **Ansoff Matrix** | Market penetration, market development, product development, diversification | Growth strategy selection |
+| **Product Life Cycle (PLC)** | Introduction, growth, maturity, decline | Product strategy formulation, market timing decisions |
+| **TAM-SAM-SOM** | Total / Serviceable / Obtainable Market | Market sizing, opportunity quantification |
+| **Technology Adoption Lifecycle** | Innovators → Early Adopters → Early Majority → Late Majority → Laggards | Emerging technology/category penetration analysis |
 
-## Experiments and statistical comparisons
+#### Consumer & Behavioral Analysis
 
-Use [data-analysis.md](data-analysis.md) to choose a test from the target effect,
-outcome type and sampling design. Before/after observations without a credible
-counterfactual support a change description, not an intervention effect. Unknown
-assignment, dependence, or selection cannot be repaired by a small p-value.
+| Framework | Description | Best For |
+|-----------|-------------|----------|
+| **Consumer Decision Journey** | Awareness → Consideration → Evaluation → Purchase → Loyalty | Consumer behavior path mapping, touchpoint optimization |
+| **AARRR Funnel (Pirate Metrics)** | Acquisition, Activation, Retention, Revenue, Referral | User growth analysis, conversion rate optimization |
+| **RFM Model** | Recency, Frequency, Monetary | Customer value segmentation, precision marketing |
+| **Maslow's Hierarchy of Needs** | Physiological → Safety → Social → Esteem → Self-actualization | Consumer psychology analysis, product value proposition |
+| **Jobs-to-be-Done (JTBD)** | The "job" a user needs to accomplish in a specific context | Demand insight, product innovation direction |
 
-## Forecasts and scenarios
+#### Financial & Valuation Analysis
 
-Compare a forecast against a simple recent-value or seasonal baseline, using
-time-ordered evaluation with no future leakage. Show the horizon, data cutoff,
-errors and material assumptions. Separate model-based prediction intervals from
-scenario ranges; neither is automatically a guarantee or a confidence interval.
+| Framework | Description | Best For |
+|-----------|-------------|----------|
+| **DuPont Analysis** | ROE = Net Profit Margin × Asset Turnover × Equity Multiplier | Profitability decomposition, financial health diagnosis |
+| **DCF (Discounted Cash Flow)** | Free cash flow discounting | Enterprise/project valuation |
+| **Comparable Company Analysis** | PE, PB, PS, EV/EBITDA multiples comparison | Relative valuation, peer benchmarking |
+| **EVA (Economic Value Added)** | After-tax operating profit - Cost of capital | Value creation capability assessment |
 
-When history is inadequate, use explicit low/base/high assumptions and explain
-the drivers. Do not invent probabilities or present assumptions as observed data.
+#### Competitive & Strategic Positioning
 
-## Rival explanations
+| Framework | Description | Best For |
+|-----------|-------------|----------|
+| **Benchmarking** | Key performance indicator item-by-item comparison | Competitor gap analysis, best practice identification |
+| **Strategic Group Mapping** | Cluster competitors along two key dimensions | Competitive landscape visualization, white-space identification |
+| **Value Chain Analysis** | Primary activities + support activities value decomposition | Cost advantage sources, differentiation opportunity identification |
+| **Blue Ocean Strategy** | Value curve, four-action framework (Eliminate-Reduce-Raise-Create) | Differentiated innovation, new market space creation |
+| **Perceptual Mapping** | Plot brand positions along two consumer-perceived dimensions | Brand positioning analysis, market gap discovery |
 
-List plausible alternatives before favoring one. For each important observation,
-record whether it supports, contradicts, or cannot distinguish the alternatives.
-Seek disconfirming evidence and inspect dependence among sources. Report the
-best-supported interpretation and the evidence that would change it. Do not
-convert checklist counts into probabilities or evidence-quality scores.
+#### Industry & Supply Chain Analysis
+
+| Framework | Description | Best For |
+|-----------|-------------|----------|
+| **Industry Value Chain** | Upstream → Midstream → Downstream decomposition | Industry structure understanding, profit distribution analysis |
+| **Gartner Hype Cycle** | Technology Trigger → Peak of Inflated Expectations → Trough of Disillusionment → Slope of Enlightenment → Plateau of Productivity | Emerging technology maturity assessment |
+| **GE-McKinsey Matrix** | Industry Attractiveness × Competitive Strength | Business portfolio prioritization, investment decisions |
+
+#### Selection Principles
+
+1. **Domain-First**: Based on the domain identified in Step 1.1, select only the relevant frameworks needed to answer the question from the toolkit above
+2. **Complementary**: Choose complementary rather than overlapping frameworks (e.g., macro-level with PESTEL + micro-level with Porter's Five Forces)
+3. **Depth over Breadth**: Apply the selected methods deeply; there is no framework quota
+4. **Data-Feasible**: Selected frameworks must be supportable by downstream data collection skills — if the data required by a framework cannot be reasonably obtained, downgrade or substitute
+5. **Explicit Mapping**: In the chapter skeleton, explicitly annotate which framework each chapter uses and how it is applied
+
+#### Framework Selection Output Format
+
+```markdown
+## Framework Selection
+
+| Chapter | Selected Framework(s) | Application |
+|---------|----------------------|-------------|
+| Market Size & Growth Trends | TAM-SAM-SOM + Product Life Cycle | TAM-SAM-SOM to quantify market space, PLC to determine market stage |
+| Competitive Landscape Assessment | Porter's Five Forces + Strategic Group Mapping | Five Forces to assess industry competition intensity, Group Mapping to visualize competitive positioning |
+| Consumer Profiling | RFM + Consumer Decision Journey | RFM to segment customer value, Decision Journey to identify key conversion nodes |
+| Brand Strategy Recommendations | SWOT + Blue Ocean Strategy | SWOT to summarize overall landscape, Blue Ocean to guide differentiation direction |
+```
+
+### Step 1.3: Design Chapter Skeleton
+
+Produce a hierarchical chapter structure. Each chapter must include:
+
+1. **Chapter Title** — Professional, concise, and appropriate to the user’s question
+2. **Analysis Objective** — What this chapter aims to reveal
+3. **Analysis Logic** — The reasoning chain or framework (must reference the frameworks selected in Step 1.2)
+4. **Core Hypothesis** — Preliminary hypotheses, where relevant, to be validated or refuted by data
+
+#### Chapter Skeleton Output Format
+
+```markdown
+## Analysis Framework
+
+### Chapter 1: [Title]
+- **Analysis Objective**: [This chapter aims to...]
+- **Analysis Logic**: [Framework or reasoning chain used]
+- **Core Hypothesis**: [Hypotheses to validate]
+- **Data Requirements**: (see Step 1.4)
+- **Visualization Plan**: (see Step 1.5)
+
+### Chapter 2: [Title]
+...
+```
+
+### Step 1.4: Define Data Query Requirements Per Chapter
+
+For each chapter, specify **exactly what data needs to be collected**. This is the bridge to downstream data collection skills.
+
+Each data requirement entry must include:
+
+| Field | Description |
+|-------|-------------|
+| **Data Metric** | The specific metric or data point needed (e.g., "China skincare market size 2020-2025 (in billion CNY)") |
+| **Data Type** | Quantitative, Qualitative, or Mixed |
+| **Suggested Sources** | Suggested source categories: Industry reports, financial statements, government statistics, social media, e-commerce platforms, survey data, news |
+| **Search Keywords** | Suggested search queries for data collection |
+| **Priority** | P0 (Required) / P1 (Important) / P2 (Supplementary) |
+| **Time Range** | The time period the data should cover |
+
+#### Data Requirements Output Format (per chapter)
+
+```markdown
+#### Data Requirements
+
+| # | Data Metric | Data Type | Suggested Sources | Search Keywords | Priority | Time Range |
+|---|-------------|-----------|-------------------|-----------------|----------|------------|
+| 1 | Market size (billion CNY) | Quantitative | Industry reports, government statistics | "China skincare market size 2024" | P0 | 2020-2025 |
+| 2 | CAGR | Quantitative | Industry reports | "skincare CAGR growth rate" | P0 | 2020-2025 |
+| 3 | Sub-category share | Quantitative | E-commerce platforms, industry reports | "skincare category share cream serum sunscreen" | P1 | Latest |
+| 4 | Policy & regulatory updates | Qualitative | Government announcements, news | "cosmetics regulation 2024" | P2 | Past 1 year |
+```
+
+### Step 1.5: Define Visualization & Content Structure Per Chapter
+
+For each chapter, specify the **planned visualization** and **content structure** for the final report:
+
+| Field | Description |
+|-------|-------------|
+| **Visualization Type** | Chart type: Line chart, bar chart, pie chart, scatter plot, radar chart, heatmap, Sankey diagram, comparison table, etc. |
+| **Visualization Title** | Descriptive title for the chart |
+| **Visualization Data Mapping** | Which data indicators map to X/Y axes or segments |
+| **Comparison Table Design** | Column headers and comparison dimensions for the data contrast table |
+| **Argument Structure** | The planned "What → Why → So What" narrative outline |
+
+#### Visualization Plan Output Format (per chapter)
+
+```markdown
+#### Visualization & Content Plan
+
+**Chart 1**: [Type] — [Title]
+- X-axis: [Dimension], Y-axis: [Metric]
+- Data source: Corresponds to Data Requirement #1, #2
+
+**Comparison Table**:
+| Dimension | Item A | Item B | Item C |
+|-----------|--------|--------|--------|
+
+**Argument Structure**:
+1. **Observation (What)**: [Surface phenomenon revealed by data]
+2. **Attribution (Why)**: [Supported drivers; label untested causal explanations as hypotheses]
+3. **Implication (So What)**: [Strategic implications or recommended actions]
+```

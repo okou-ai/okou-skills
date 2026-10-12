@@ -18,33 +18,6 @@ result is not zero; use a compatible calculation engine or a transparent
 recalculation. Check date encodings, merged headers and totals embedded in data.
 Do not claim to have read sheets or recalculated formulas that were not inspected.
 
-## Optional CSV profile
-
-From the installed `analysis-methods` skill directory, run:
-
-```bash
-python3 scripts/profile_csv.py /path/to/data.csv \
-  --numeric revenue orders --key order_id > /path/to/profile.json
-```
-
-The helper uses only Python's standard library. It preserves textual IDs, counts
-missing and invalid numeric cells separately, detects duplicate composite keys,
-and reports summaries of valid numeric observations. Choose numeric columns
-explicitly: numeric-looking IDs should not be summarized. Defaults recognize
-only blank cells as missing. Use `--missing NA null` only when the source defines
-those tokens as missing. Locale-specific currency and thousands separators need
-an explicit, recorded conversion first.
-
-It fails on malformed rows, ambiguous headers, missing columns, files over 32 MiB,
-or more than 100,000 rows rather than silently sampling. Use `--max-rows` to change
-the row limit or a suitable dataframe/database for larger inputs. Summaries use
-binary floating-point; use decimal arithmetic for exact financial reconciliation.
-The profile reports data quality, not business meaning or representativeness.
-
-For Excel or larger analysis, use the available Python/SQL tools. Install only
-missing dependencies in a task-local environment and record their versions.
-There is no required provider, model, DuckDB extension, or statistics package.
-
 ## Compute descriptive and business results
 
 - Report the relevant counts and denominators alongside rates. Aggregate rates
@@ -92,3 +65,67 @@ identify causation. Check selection, attrition, measurement changes, confounding
 overlapping samples and survivorship. Aggregate and subgroup trends can disagree.
 If data cannot support the requested inference, report the descriptive result
 and the design or evidence needed to answer the stronger question.
+
+## Reusable SQL patterns from DeerFlow
+
+The following patterns retain the upstream examples. Use an available SQL engine or task-local Python environment after inspecting actual tables and column names; replace the example names with the input schema. Check join cardinality and reconcile totals. This integration does not install DeerFlow’s runtime or its DuckDB helper, which installs dependencies and a spatial extension automatically.
+
+
+### Basic Exploration
+```sql
+-- Row count
+SELECT COUNT(*) FROM Sheet1
+
+-- Distinct values in a column
+SELECT DISTINCT category FROM Sheet1
+
+-- Value distribution
+SELECT category, COUNT(*) as cnt FROM Sheet1 GROUP BY category ORDER BY cnt DESC
+
+-- Date range
+SELECT MIN(date_col), MAX(date_col) FROM Sheet1
+```
+
+### Aggregation & Grouping
+```sql
+-- Revenue by category and month
+SELECT category, DATE_TRUNC('month', order_date) as month,
+       SUM(revenue) as total_revenue
+FROM Sales
+GROUP BY category, month
+ORDER BY month, total_revenue DESC
+
+-- Top 10 customers by spend
+SELECT customer_name, SUM(amount) as total_spend
+FROM Orders GROUP BY customer_name
+ORDER BY total_spend DESC LIMIT 10
+```
+
+### Cross-file Joins
+```sql
+-- Join sales with customer info from different files
+SELECT s.order_id, s.amount, c.customer_name, c.region
+FROM sales s
+JOIN customers c ON s.customer_id = c.id
+WHERE s.amount > 500
+```
+
+### Window Functions
+```sql
+-- Running total and rank
+SELECT order_date, amount,
+       SUM(amount) OVER (ORDER BY order_date) as running_total,
+       RANK() OVER (ORDER BY amount DESC) as amount_rank
+FROM Sales
+```
+
+### Pivot-style Analysis
+```sql
+-- Pivot: monthly revenue by category
+SELECT category,
+       SUM(CASE WHEN MONTH(date) = 1 THEN revenue END) as Jan,
+       SUM(CASE WHEN MONTH(date) = 2 THEN revenue END) as Feb,
+       SUM(CASE WHEN MONTH(date) = 3 THEN revenue END) as Mar
+FROM Sales
+GROUP BY category
+```

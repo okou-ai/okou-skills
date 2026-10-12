@@ -28,7 +28,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Verify analytical helper behavior
-        run: python3 -m unittest discover -s analysis-methods/tests -v
-      - name: Validate the documented evidence example
-        run: python3 analysis-methods/scripts/check_evidence.py analysis-methods/assets/evidence.example.json
+      - name: Verify imported helpers on their upstream examples
+        run: |
+          python3 analysis-methods/scripts/validate_evidence_ledger.py analysis-methods/assets/source_ledger_template.csv
+          python3 analysis-methods/scripts/audit_claim_citations.py analysis-methods/assets/claims_ledger_template.csv analysis-methods/assets/source_ledger_template.csv
+          python3 analysis-methods/scripts/calculate_market_sizing.py analysis-methods/assets/market_sizing_scenarios_template.json
+          python3 analysis-methods/scripts/forecast_sensitivity.py analysis-methods/assets/forecast_sensitivity_template.json
+          python3 analysis-methods/scripts/check_unit_consistency.py analysis-methods/assets/consistency_check_template.csv
