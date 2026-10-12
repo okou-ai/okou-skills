@@ -189,7 +189,7 @@ try {
   const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
   const validSafe = value => object(value) && ["left", "right", "top", "bottom"].every(key => Number.isFinite(value[key]) && value[key] >= 0 && value[key] < 1) && value.left + value.right < 1 && value.top + value.bottom < 1;
   if (!object(config)) throw new Error("qa-config.json must be an object");
-  if (config.minFontSizePx !== 10) errors.push("The fixed minimum is 10px");
+  if (config.minFontSizePx !== 11) errors.push("The fixed minimum is 11px");
   if (config.safeArea != null && !validSafe(config.safeArea)) errors.push("Invalid source safeArea");
   const areas = config.layoutSafeAreas ?? {};
   if (!object(areas)) errors.push("layoutSafeAreas must be an object");

@@ -20,7 +20,7 @@ if (!options.input || !/^[1-9]\d*$/.test(options["expected-pages"] || "")) {
 }
 const config = JSON.parse(readFileSync(options.config || path.join(here, "qa-config.json"), "utf8"));
 config.expectedPages = Number(options["expected-pages"]);
-if (config.minFontSizePx !== 10) throw new Error("qa-config.json must set minFontSizePx to 10");
+if (config.minFontSizePx !== 11) throw new Error("qa-config.json must set minFontSizePx to 11");
 const session = `presentation-qa-${process.pid}`;
 const browser = (...command) => execFileSync("agent-browser", ["--session", session, ...command], {encoding: "utf8", timeout: 60000, maxBuffer: 8 * 1024 * 1024});
 const parse = value => { const decoded = JSON.parse(value.trim()); return typeof decoded === "string" ? JSON.parse(decoded) : decoded; };

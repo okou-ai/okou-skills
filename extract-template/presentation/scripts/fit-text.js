@@ -1,8 +1,9 @@
-/* Fit only declared text regions. Source styles are baselines, never minimums. */
+/* Fit each page's content at descending source-relative steps; restore on failure. */
 (() => {
   const M = window.PresentationMetrics;
   if (!M) throw new Error("Load dom-metrics.js before fit-text.js");
   const properties = ["font-size", "line-height", "letter-spacing"];
+  const STEPS = [0.95, 0.9, 0.85, 0.8];
   const queues = new WeakMap();
   function restore(element) {
     if (!element.hasAttribute("data-presentation-baseline")) {
@@ -32,39 +33,54 @@
       return {element, size: parseFloat(style.fontSize), lineHeight: parseFloat(style.lineHeight), tracking: parseFloat(style.letterSpacing)};
     });
   }
-  function clampFloor(elements) {
-    for (let pass = 0; pass < 3; pass++) {
-      let changed = false;
-      for (const element of elements) {
-        const factor = M.fontFactor(element);
-        if (!(factor > 0)) throw new Error("Text geometry is unmeasurable");
-        const size = parseFloat(getComputedStyle(element).fontSize);
-        if (size * factor < M.MIN_FONT_SIZE_PX - 1e-6) {
-          element.style.setProperty("font-size", `${(M.MIN_FONT_SIZE_PX + 0.0001) / factor}px`, "important");
-          changed = true;
-        }
-      }
-      if (!changed) return;
-    }
-    if (elements.some(element => M.logicalFontSize(element) < M.MIN_FONT_SIZE_PX - 1e-6)) throw new Error("10px floor could not be applied");
-  }
   function apply(items, scale) {
     for (const item of items) {
-      const factor = M.fontFactor(item.element);
-      if (!(factor > 0)) throw new Error("Text geometry is unmeasurable");
-      const size = Math.max((M.MIN_FONT_SIZE_PX + 0.0001) / factor, item.size * scale);
-      const ratio = size / item.size;
-      item.element.style.setProperty("font-size", `${size}px`, "important");
-      if (Number.isFinite(item.lineHeight)) item.element.style.setProperty("line-height", `${item.lineHeight * ratio}px`, "important");
-      if (Number.isFinite(item.tracking)) item.element.style.setProperty("letter-spacing", `${item.tracking * ratio}px`, "important");
+      item.element.style.setProperty("font-size", `${item.size * scale}px`, "important");
+      if (Number.isFinite(item.lineHeight)) item.element.style.setProperty("line-height", `${item.lineHeight * scale}px`, "important");
+      if (Number.isFinite(item.tracking)) item.element.style.setProperty("letter-spacing", `${item.tracking * scale}px`, "important");
     }
-    clampFloor(items.map(item => item.element));
   }
-  function regionsOf(stage) {
-    const explicit = [...stage.querySelectorAll("[data-fit-region]")];
+  function contentOf(stage) {
+    const roots = [...stage.querySelectorAll(".fit")];
+    if (roots.length !== 1) throw new Error("Each page needs exactly one .fit content root");
+    return roots[0];
+  }
+  function regionsOf(content) {
+    const explicit = [...content.querySelectorAll("[data-fit-region]")];
     if (explicit.some(region => region.querySelector("[data-fit-region]"))) throw new Error("Fit regions must not be nested");
-    return explicit.length ? explicit : [...stage.querySelectorAll(".fit")];
+    return [content, ...explicit];
   }
+  function pageState(content) {
+    // Regions retain their local bounds, but share one scale for the whole page.
+    const states = regionsOf(content).map(M.regionState);
+    return states.includes("unmeasurable") ? "unmeasurable" : states.includes("overflow") ? "overflow" : "fits";
+  }
+  function minimumFont(stage) {
+    const sizes = M.leaves(stage).filter(M.visible).map(M.logicalFontSize);
+    for (const element of [stage, ...stage.querySelectorAll("*")].filter(M.visible)) {
+      for (const pseudo of ["::before", "::after"]) {
+        const style = getComputedStyle(element, pseudo);
+        if (["none", "normal", '""', "''"].includes(style.content) || style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0) continue;
+        sizes.push(parseFloat(style.fontSize) * M.fontFactor(element));
+      }
+    }
+    return Math.min(...sizes);
+  }
+  function clearState(content) {
+    for (const region of regionsOf(content)) {
+      delete region.dataset.fitState;
+      delete region.dataset.fitScale;
+      if (region.dataset.overflow === "fit-floor") delete region.dataset.overflow;
+    }
+  }
+  function recordState(content, result) {
+    content.dataset.fitState = result.status;
+    content.dataset.fitScale = result.scale.toFixed(3);
+    if (result.status === "fit-floor") content.dataset.overflow = "fit-floor";
+  }
+  // CSSOM rounds computed font sizes; allow a subpixel rounding error at 80%.
+  const withinScaleLimit = (leaves, baseline) => leaves.every((element, index) =>
+    M.logicalFontSize(element) >= baseline[index] * 0.8 - 0.001);
   async function execute(root, options) {
     const started = performance.now();
     const stages = [...root.querySelectorAll(".stage")];
@@ -72,62 +88,72 @@
     const report = {status: "BLOCKED", minFontSizePx: M.MIN_FONT_SIZE_PX, regions: [], errors: [], elapsedMs: 0};
     const undo = [];
     const completed = new Map();
+    const allElements = new Set();
     try {
       if (!stages.length) throw new Error("EMPTY_DECK");
       for (const stage of stages) undo.push(M.revealStage(stage));
-      const allElements = new Set(stages.flatMap(stage => [...M.leaves(stage), ...regionsOf(stage).flatMap(fontElements)]));
+      for (const stage of stages) {
+        const content = contentOf(stage);
+        clearState(content);
+        for (const element of [...M.leaves(stage), ...fontElements(content)]) allElements.add(element);
+      }
       for (const element of allElements) restore(element);
       await M.assetsReady(root, options.allowedFontFallbacks || []);
       const originalSizes = new Map([...allElements].map(element => [element, M.logicalFontSize(element)]));
-      clampFloor([...allElements]);
       for (const [index, stage] of stages.entries()) {
-        const regions = regionsOf(stage);
-        if (!regions.length) throw new Error(`Page ${index + 1} has no .fit content root`);
-        for (const region of regions) {
-          const leaves = M.leaves(region);
-          const items = records(fontElements(region));
-          const result = {page: index + 1, region: region.dataset.fitRegion || "content", scale: 1,
-            baselineSizesPx: leaves.map(element => originalSizes.get(element)), status: "unchanged"};
-          if (M.regionState(region) === "unmeasurable") result.status = "unmeasurable";
-          else if (M.regionState(region) !== "fits") {
-            if (!items.length) result.status = "unresolved";
-            else {
-              apply(items, 0);
-              if (M.regionState(region) !== "fits") {
-                apply(items, 1);
-                result.status = "unresolved";
-                result.reason = "Content cannot fit at the 10px minimum; change layout or split";
-              } else {
-                let low = 0, high = 1;
-                for (let attempt = 0; attempt < 14; attempt++) {
-                  const midpoint = (low + high) / 2;
-                  apply(items, midpoint);
-                  if (M.regionState(region) === "fits") low = midpoint; else high = midpoint;
-                }
-                apply(items, low);
-                result.scale = low;
-                result.status = "fitted";
-              }
+        const content = contentOf(stage);
+        const leaves = M.leaves(content);
+        const items = records(fontElements(content));
+        const result = {page: index + 1, region: "content", scale: 1,
+          baselineSizesPx: leaves.map(element => originalSizes.get(element)), status: "unchanged"};
+        const initial = pageState(content);
+        if (initial === "unmeasurable") result.status = "unmeasurable";
+        else if (initial === "overflow") {
+          result.status = "fit-floor";
+          result.reason = "Content cannot fit within 95/90/85/80% and the 11px minimum; inspect geometry, recompose or split";
+          for (const step of STEPS) {
+            apply(items, step);
+            if (!(minimumFont(stage) >= M.MIN_FONT_SIZE_PX - 1e-6)) break;
+            if (!withinScaleLimit(leaves, result.baselineSizesPx)) break;
+            const state = pageState(content);
+            if (state === "unmeasurable") { result.status = state; break; }
+            if (state === "fits") {
+              result.scale = step;
+              result.status = "fitted";
+              delete result.reason;
+              break;
             }
           }
-          result.finalSizesPx = leaves.map(M.logicalFontSize);
-          region.dataset.fitState = result.status;
-          report.regions.push(result);
-          completed.set(region, result);
+          if (result.status !== "fitted") items.forEach(({element}) => restore(element));
         }
+        recordState(content, result);
+        report.regions.push(result);
+        completed.set(content, {result, items, leaves});
       }
-      // Font changes may reflow neighbouring regions. Recheck the committed geometry.
+      // Recheck committed geometry; a failed page always returns to its source styles.
       for (const stage of stages) {
-        for (const region of regionsOf(stage)) {
-          const result = completed.get(region);
-          if (M.regionState(region) !== "fits" && ["fitted", "unchanged"].includes(result.status)) {
-            result.status = "unresolved"; result.reason = "Peer geometry changed after fitting";
-            region.dataset.fitState = result.status;
-          }
+        const content = contentOf(stage);
+        const {result, items, leaves} = completed.get(content);
+        if (["fitted", "unchanged"].includes(result.status) && (pageState(content) !== "fits" ||
+          (result.status === "fitted" && (!(minimumFont(stage) >= M.MIN_FONT_SIZE_PX - 1e-6) ||
+            !withinScaleLimit(leaves, result.baselineSizesPx))))) {
+          items.forEach(({element}) => restore(element));
+          result.status = "fit-floor"; result.scale = 1;
+          result.reason = "Page geometry changed after fitting; source typography restored";
+          recordState(content, result);
         }
+        result.finalSizesPx = leaves.map(M.logicalFontSize);
       }
       report.status = report.regions.every(region => ["unchanged", "fitted"].includes(region.status)) ? "READY" : "BLOCKED";
-    } catch (error) { report.errors.push(error.message); }
+    } catch (error) {
+      for (const element of allElements) restore(element);
+      for (const [content, {result, leaves}] of completed) {
+        result.status = "unmeasurable"; result.scale = 1;
+        result.finalSizesPx = leaves.map(M.logicalFontSize);
+        recordState(content, result);
+      }
+      report.errors.push(error.message);
+    }
     finally { undo.reverse().forEach(restoreHidden => restoreHidden()); }
     report.elapsedMs = performance.now() - started;
     api.report = report;
@@ -147,6 +173,9 @@
     },
     reset(root = document.documentElement) {
       for (const element of root.querySelectorAll("[data-presentation-baseline]")) restore(element);
+      for (const content of root.querySelectorAll(".fit")) clearState(content);
+      api.report = null;
+      delete root.dataset.fitStatus;
     },
   };
   window.PresentationFit = api;

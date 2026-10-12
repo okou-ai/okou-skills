@@ -14,7 +14,7 @@ if (!existsSync(shell)) throw new Error("Create layouts/_shell.html before insta
 const configPath = options.config ? path.resolve(options.config) : path.join(target, "tools/qa-config.json");
 if (!existsSync(configPath)) throw new Error("Write the source-specific qa-config.json before installing QA");
 const config = JSON.parse(readFileSync(configPath, "utf8"));
-config.minFontSizePx = 10;
+config.minFontSizePx = 11;
 mkdirSync(path.join(target, "scripts"), {recursive: true});
 mkdirSync(path.join(target, "tools"), {recursive: true});
 for (const name of ["dom-metrics.js", "fit-text.js", "navigation.js"]) copyFileSync(path.join(here, name), path.join(target, "scripts", name));
@@ -43,4 +43,4 @@ else {
   html = html.replace(/<\/body\s*>/i, `${block}\n</body>`);
 }
 writeFileSync(shell, html);
-console.log(JSON.stringify({package: target, shell, minFontSizePx: 10, runtime: "inlined", sourceSafeAreaConfigured: Boolean(config.safeArea || Object.keys(config.layoutSafeAreas || {}).length)}));
+console.log(JSON.stringify({package: target, shell, minFontSizePx: 11, runtime: "inlined", sourceSafeAreaConfigured: Boolean(config.safeArea || Object.keys(config.layoutSafeAreas || {}).length)}));

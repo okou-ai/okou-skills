@@ -27,7 +27,7 @@ Keep the stored template, source index and library originals unchanged. Follow t
 - Keep backgrounds behind content without changing its flow or intercepting clicks.
   Preserve shared logos/footers, asset proportions and documented color variants.
 - Resolve decoration conflicts through the recipe while preserving typography.
-  Actual content overflow uses the [shared fitter](typography-fit.md) with its 10px
+  Actual content overflow uses the [shared fitter](typography-fit.md) with its 11px
   floor; source sizes are initial styles. Document inferred combinations and new
   layouts while preserving shared brand rules.
 

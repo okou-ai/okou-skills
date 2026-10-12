@@ -6,7 +6,7 @@ Use during extraction, before installing the generation runtime.
 
 ```json
 {
-  "minFontSizePx": 10,
+  "minFontSizePx": 11,
   "safeArea": {"left": 0.06, "right": 0.06, "top": 0.14, "bottom": 0.1},
   "layoutSafeAreas": {},
   "requiredChrome": [],

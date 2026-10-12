@@ -10,8 +10,8 @@ Map typography and geometry with the same uniform source-to-canvas transform.
 A 24pt font on a 960pt-wide slide becomes 40px on a 1600px-wide canvas. Record
 original units, aspect adaptation and scale independently of viewport zoom.
 
-Retain source runs below 10px as evidence; the installed runtime raises their
-rendered size to the fixed **10px logical-canvas minimum**. Record any approved
+Retain source runs below 11px as evidence; generation QA flags them against the
+fixed **11px logical-canvas minimum** for deliberate adaptation. Record any approved
 fallback families in the design notes and [QA configuration](qa-config.md).
 
 Create disjoint `data-fit-region` areas with meaningful `data-text-role` labels.

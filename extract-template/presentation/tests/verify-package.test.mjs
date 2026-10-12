@@ -30,7 +30,7 @@ function fixture(t, examples = 0) {
     {id: "title", file: "source/title.html", sourcePages: [1, 2, 3], purpose: "Title", regions: ["title"], capacity: {title: 40}},
   ]};
   write("layouts/source-index.json", index);
-  const config = {minFontSizePx: 10, safeArea, layoutSafeAreas: {}, requiredChrome: [], allowedFontFallbacks: [], minContrastRatio: 3};
+  const config = {minFontSizePx: 11, safeArea, layoutSafeAreas: {}, requiredChrome: [], allowedFontFallbacks: [], minContrastRatio: 3};
   write("tools/qa-config.json", config);
   execFileSync(process.execPath, [installer, "--package", root]);
   const verify = (...args) => {
@@ -170,6 +170,7 @@ test("refresh removes legacy mixed guides and catches stale entrypoint links", t
 });
 
 for (const [label, change, message] of [
+  ["legacy 10px minimum", {minFontSizePx: 10}, "The fixed minimum is 11px"],
   ["missing safe area", {safeArea: null}, "Record a source safeArea"],
   ["overlapping safe insets", {safeArea: {...safeArea, left: 0.7, right: 0.4}}, "Invalid source safeArea"],
   ["malformed layout map", {layoutSafeAreas: []}, "layoutSafeAreas must be an object"],
@@ -185,6 +186,15 @@ for (const [label, change, message] of [
     blocked(verify(), message);
   });
 }
+
+test("refresh upgrades a legacy 10px package configuration and embedded runtime together", t => {
+  const {root, write, config, verify} = fixture(t);
+  write("tools/qa-config.json", {...config, minFontSizePx: 10});
+  const installed = JSON.parse(execFileSync(process.execPath, [installer, "--package", root], {encoding: "utf8"}));
+  assert.equal(installed.minFontSizePx, 11);
+  assert.equal(JSON.parse(readFileSync(path.join(root, "tools/qa-config.json"), "utf8")).minFontSizePx, 11);
+  assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
+});
 
 test("per-profile safe areas can replace a global safe area", t => {
   const {write, config, verify} = fixture(t);

@@ -1,6 +1,6 @@
 /* Shared, style-neutral measurements for presentation fitting and QA. */
 (() => {
-  const MIN_FONT_SIZE_PX = 10;
+  const MIN_FONT_SIZE_PX = 11;
   const CANVAS_WIDTH = 1600;
   const ownText = element => [...element.childNodes].filter(node => node.nodeType === 3 && node.textContent.trim());
   const visible = element => {

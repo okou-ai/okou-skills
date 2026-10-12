@@ -149,3 +149,21 @@ jobs:
         run: |
           python3 -m pip install --quiet Pillow pypdf
           python3 extract-template/presentation/tests/source-derivatives.test.py
+
+  presentation-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: extract-template/presentation/tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: extract-template/presentation/tests/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Rendered fitter and QA regressions
+        run: npm test

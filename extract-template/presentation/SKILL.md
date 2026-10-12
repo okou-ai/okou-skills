@@ -86,7 +86,7 @@ and reusable background recipes.
 Cover every source page in the index; preserve distinct compositions and background
 variants. Keep text, shapes, tables and ordinary charts editable in HTML/CSS/SVG.
 Use package-relative assets and `.deck > .slide`, one `.stage` and a `.fit` root per
-slide, with disjoint `data-fit-region` areas for independently fitted content.
+slide, with disjoint `data-fit-region` measurement areas that share one page-wide scale.
 
 `layouts/_shell.html` is the shared HTML document with one `.deck` insertion point.
 Its `.deck` can be empty or retain source examples; no need to assemble every source

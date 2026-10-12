@@ -24,7 +24,7 @@ extraction guides or QA/runtime implementation files, or reread unchanged files.
 
 Copy `layouts/_shell.html` into the final web directory, resolve final asset paths
 and adapt the selected fragments to the supplied material. Preserve the source
-styling, required chrome and [10px floor](typography-fit.md), with shared CSS and
+styling, required chrome and [11px floor](typography-fit.md), with shared CSS and
 runtime included once. Keep the stored template and library originals unchanged.
 Make content and layout decisions autonomously while authoring.
 

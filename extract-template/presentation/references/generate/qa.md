@@ -18,8 +18,9 @@ node <template-dir>/tools/qa.mjs --final <web-dir>/index.html \
 ## 2. Act on the JSON result
 
 - **`BLOCKED`:** fix the reported causes together, then rerun step 1 on the same HTML.
-  For unresolved fitting at 10px, inspect text boxes, glyph bounds, line height and
-  clipping before shortening copy; confirm a real capacity limit first.
+  For `fitFloor`, inspect text boxes, glyph bounds, line height and clipping before
+  shortening copy; confirm a real capacity limit first. `fitScale` blocks reductions
+  beyond 20%; `smallText` blocks text below the 11px logical-canvas minimum.
 - **`NEEDS_VISUAL_REVIEW`:** follow step 3.
 - **`READY_TO_PUBLISH` with zero `hardGateFailures`:** proceed to step 4. No need for
   a review receipt, another QA run or repeated passing interaction checks on an

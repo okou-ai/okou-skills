@@ -2,11 +2,18 @@
 (async () => {
   const M = window.PresentationMetrics;
   const config = window.PRESENTATION_QA_CONFIG || {};
-  const report = {pages: 0, navigableSlides: 0, decks: 0, minFontSizePx: 10, status: "BLOCKED", hardGateFailures: 0, blocking: {}, failures: [], reviewRequired: []};
+  const MIN_FONT_SIZE_PX = 11;
+  const report = {pages: 0, navigableSlides: 0, decks: 0, minFontSizePx: MIN_FONT_SIZE_PX, status: "BLOCKED", hardGateFailures: 0, blocking: {}, failures: [], reviewRequired: []};
   const fail = (code, page, element, message) => {
     report.hardGateFailures++;
     report.blocking[code] = (report.blocking[code] || 0) + 1;
     if (report.failures.length < 80) report.failures.push({code, page, element: element ? `${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ""}` : null, message});
+  };
+  const fitFloorPages = new Set();
+  const failFitFloor = (page, element, message) => {
+    if (fitFloorPages.has(page)) return;
+    fitFloorPages.add(page);
+    fail("fitFloor", page, element, message);
   };
   const reviews = new Set();
   const review = (code, page, message) => {
@@ -15,7 +22,8 @@
   };
   if (!M) { fail("missingRuntime", 0, null, "Load the packaged dom-metrics.js"); return JSON.stringify(report); }
   await window.PresentationNavigationReady;
-  if (config.minFontSizePx !== undefined && config.minFontSizePx !== 10) fail("invalidConfig", 0, null, "The minimum font size is fixed at 10px");
+  if (M.MIN_FONT_SIZE_PX !== MIN_FONT_SIZE_PX) fail("invalidRuntime", 0, null, "Refresh the shell and runtime together to use the 11px minimum");
+  if (config.minFontSizePx !== undefined && config.minFontSizePx !== MIN_FONT_SIZE_PX) fail("invalidConfig", 0, null, "The minimum font size is fixed at 11px");
   if (config.minContrastRatio !== undefined && (!Number.isFinite(config.minContrastRatio) || config.minContrastRatio < 3 || config.minContrastRatio > 21)) fail("invalidConfig", 0, null, "minContrastRatio must be within 3..21");
   const decks = [...document.querySelectorAll(".deck")];
   const slides = [...document.querySelectorAll(".slide")];
@@ -33,8 +41,13 @@
   const fit = window.PresentationFit;
   if (!fit || !fit.report) fail("missingFit", 0, null, "The shared fitter must finish before QA");
   else {
+    if (fit.report.minFontSizePx !== MIN_FONT_SIZE_PX) fail("invalidRuntime", 0, null, "The fitter must use the 11px minimum");
     for (const error of fit.report.errors) fail("fitReadiness", 0, null, error);
-    for (const region of fit.report.regions) if (!["unchanged", "fitted"].includes(region.status)) fail("unresolvedFit", region.page, null, `${region.region}: ${region.reason || region.status}`);
+    for (const region of fit.report.regions) {
+      if (region.status === "fit-floor") failFitFloor(region.page, null, region.reason || "Content reached the fitting limit");
+      else if (!["unchanged", "fitted"].includes(region.status)) fail("unresolvedFit", region.page, null, `${region.region}: ${region.reason || region.status}`);
+      if (!Number.isFinite(region.scale) || region.scale < 0.8 - 1e-6 || region.scale > 1 + 1e-6) fail("fitScale", region.page, null, "Typography must stay within 80–100% of source size");
+    }
     if (fit.report.status !== "READY" && !fit.report.errors.length && !fit.report.regions.some(region => !["unchanged", "fitted"].includes(region.status))) fail("fitReadiness", 0, null, "Fit report is not ready");
   }
   const context = document.createElement("canvas").getContext("2d", {willReadFrequently: true});
@@ -114,11 +127,17 @@
     } : M.innerBox(content);
     const allText = M.leaves(stage);
     const contents = allText.filter(M.visible);
+    const pageFit = fit?.report?.regions.find(region => region.page === page && region.region === "content");
+    const contentText = M.leaves(content);
+    if (pageFit?.baselineSizesPx?.length === contentText.length && contentText.some((element, i) =>
+      M.visible(element) && M.logicalFontSize(element) < pageFit.baselineSizesPx[i] * 0.8 - 0.001)) {
+      fail("fitScale", page, content, "Rendered text is below 80% of its source size, including transforms and SVG scaling");
+    }
     for (const element of allText.filter(element => !M.visible(element))) fail("hiddenText", page, element, "Remove unused slots; never conceal content to make it fit");
     if (!M.leaves(content).some(M.visible) && !content.querySelector("img,svg[data-chart-kind],svg[data-diagram-kind],svg[data-content],canvas[data-content]")) fail("emptyPage", page, stage, "Page has no meaningful content");
     for (const element of contents) {
       const size = M.logicalFontSize(element);
-      if (!Number.isFinite(size) || size < 10 - 1e-6) fail("smallText", page, element, `Rendered logical font size ${size.toFixed(3)}px is below 10px`);
+      if (!Number.isFinite(size) || size < MIN_FONT_SIZE_PX - 1e-6) fail("smallText", page, element, `Rendered logical font size ${size.toFixed(3)}px is below 11px`);
       const own = M.ownText(element).map(node => node.textContent).join("");
       if (/\{\{[\w-]+\}\}/.test(own) && !element.closest("[data-literal-content]")) fail("placeholder", page, element, "Replace every library content slot");
       const limit = element.closest("[data-chrome]") ? rect : boundary;
@@ -152,7 +171,7 @@
     for (const chart of stage.querySelectorAll("svg[data-chart-kind]")) {
       if (!chart.querySelector("[data-plot-mark]")) fail("unmarkedChart", page, chart, "Mark quantitative SVG geometry with data-plot-mark so final QA can measure it");
     }
-    for (const element of stage.querySelectorAll("*")) {
+    for (const element of [stage, ...stage.querySelectorAll("*")]) {
       const height = /(?:^|;)\s*height\s*:\s*([\d.]+)%/i.exec(element.getAttribute("style") || "");
       if (element.hasAttribute("data-plot-mark")) {
         const kind = element.dataset.plotMark || "bar", raw = element.dataset.value;
@@ -172,7 +191,7 @@
       for (const pseudo of ["::before", "::after"]) {
         const style = getComputedStyle(element, pseudo);
         if (["none", "normal", '""', "''"].includes(style.content) || style.display === "none") continue;
-        if (parseFloat(style.fontSize) * M.fontFactor(element) < 10 - 1e-6) fail("smallText", page, element, "Text-bearing pseudo-element is below 10px; materialize it as editable HTML");
+        if (parseFloat(style.fontSize) * M.fontFactor(element) < MIN_FONT_SIZE_PX - 1e-6) fail("smallText", page, element, "Text-bearing pseudo-element is below 11px; materialize it as editable HTML");
       }
     }
     for (const rule of config.requiredChrome || []) {
@@ -192,7 +211,9 @@
       if (mark.dataset.plotMark === "line" || mark.closest("[data-overlap-ok]")) continue;
       if (contents.filter(element => !mark.contains(element) && !element.closest("[data-overlap-ok]")).some(element => M.textRects(element).map(ink).some(box => overlap(box, mark.getBoundingClientRect())))) fail("plotTextOverlap", page, mark, "A plot mark overlaps unrelated text");
     }
-    if (stage.querySelector('[data-fit-state="unresolved"],[data-fit-state="unmeasurable"],[data-overflow]')) fail("unresolvedFit", page, stage, "Unresolved fit flag remains");
+    const floorSelector = '[data-fit-state="fit-floor"],[data-overflow="fit-floor"]';
+    if (stage.matches(floorSelector) || stage.querySelector(floorSelector)) failFitFloor(page, stage, "fit-floor remains; restore capacity through geometry, recomposition or splitting");
+    if (stage.querySelector('[data-fit-state="unresolved"],[data-fit-state="unmeasurable"],[data-overflow]:not([data-overflow="fit-floor"])')) fail("unresolvedFit", page, stage, "Unresolved fit flag remains");
     } catch (error) { fail("unmeasurablePage", page, stage, error.message); }
     finally { if (restoreHidden) restoreHidden(); }
   }
