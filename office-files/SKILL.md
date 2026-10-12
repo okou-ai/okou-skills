@@ -3,6 +3,11 @@ name: office-files
 description: Generate or edit docx, xlsx and PDF deliverables — Word documents, spreadsheets, reports — including editing a file the user uploaded.
 ---
 
+For reports requiring research, data interpretation, or calculations, use the
+default `gen` skill's analysis guide before rendering. Reuse completed analysis;
+formatting-only edits do not need a new analysis. In standalone installations
+without `gen`, use the available analytical tools and state evidence limitations.
+
 ## Setup — run these two lines first
 
 ```bash

@@ -1,0 +1,32 @@
+name: Analysis Methods
+
+on:
+  pull_request:
+    paths:
+      - "gen/analysis/**"
+      - "gen/SKILL.md"
+      - "office-files/SKILL.md"
+      - ".github/workflows/analysis-methods.yml"
+  push:
+    branches: [main]
+    paths:
+      - "gen/analysis/**"
+      - "gen/SKILL.md"
+      - "office-files/SKILL.md"
+      - ".github/workflows/analysis-methods.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  helpers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify analytical helper behavior
+        run: python3 -m unittest discover -s gen/analysis/tests -v
+      - name: Validate the documented evidence example
+        run: python3 gen/analysis/scripts/check_evidence.py gen/analysis/assets/evidence.example.json

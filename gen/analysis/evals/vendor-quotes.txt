@@ -1,0 +1,7 @@
+Synthetic vendor comparison fixture, USD, same service scope, 20 seats.
+Both vendors meet the stated security and integration requirements.
+Evaluation horizon: 12 months. Budget limit: USD 18,000 total for that horizon.
+
+Vendor A: USD 1,000 per month. Migration is required but its price is not quoted.
+Vendor B: USD 1,250 per month, plus a one-time USD 2,000 migration charge.
+No other differences in service quality, expected benefits or costs are documented.
