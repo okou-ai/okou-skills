@@ -49,6 +49,12 @@ the shared geometry as a high-resolution PNG through Pillow (`--charts` during
 Office setup); PDF and HTML use SVG. PNG/JPEG figures need no chart dependency. Figure sizes must
 fit the current column or span both columns.
 
+Native metric, quotation, figure and chart units retain their associated
+labels, attributions, captions and supplied source notes at page/column breaks.
+PDF units taller than a full text area remain breakable; long prose and tables
+continue in normal document flow. Line-chart gutters and wrapped label spacing
+adapt to the placed label size rather than clipping labels in narrow grids.
+
 Word's sidebar, metric-strip, and modular layouts use editable layout tables.
 Their prose keeps 12 pt body text; actual data tables use 11 pt text. A checker
 that assumes every Word table is a data table needs this distinction when

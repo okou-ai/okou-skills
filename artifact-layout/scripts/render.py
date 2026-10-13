@@ -262,17 +262,21 @@ def chart_geometry(block, theme, domain=None, label_size=30):
             ]
         )
     else:
-        start, end, top, bottom = 76, 580, 30, 276
+        ticks = [format(low + step * (high - low) / 2, ".5g") for step in range(3)]
+        # Native charts retain 10–11pt labels even in a narrow column. Reserve
+        # room for their actual scale labels rather than a fixed left gutter.
+        start = max(76, max(len(value) for value in ticks) * font * 0.65 + 14)
+        end, top, bottom = 580, 30, 276
         for step in range(3):
-            value = low + step * (high - low) / 2
             y = bottom - step * (bottom - top) / 2
             lines.append((start, y, end, y, theme["rule"]))
             texts.append(
-                (62, y + font * 0.3, format(value, ".5g"), "end", theme["muted"], font)
+                (start - 14, y + font * 0.3, ticks[step], "end", theme["muted"], font)
             )
         count = len(block["values"])
         label_width = max(48, (end - start) / max(1, count - 1) * 0.85)
         label_lines = 1
+        label_start, line_height = bottom + font + 16, font + 4
         for index, (label, value) in enumerate(zip(block["labels"], block["values"])):
             x = start + index / max(1, count - 1) * (end - start)
             y = bottom - (value - low) / (high - low) * (bottom - top)
@@ -280,10 +284,19 @@ def chart_geometry(block, theme, domain=None, label_size=30):
             wrapped = wrap_label(label, label_width, size=font)
             label_lines = max(label_lines, len(wrapped))
             texts.extend(
-                (x, 322 + offset * 34, line, "middle", theme["ink"], font)
+                (
+                    x,
+                    label_start + offset * line_height,
+                    line,
+                    "middle",
+                    theme["ink"],
+                    font,
+                )
                 for offset, line in enumerate(wrapped)
             )
-        height = max(350, 334 + (label_lines - 1) * 34)
+        height = max(
+            350, label_start + (label_lines - 1) * line_height + font * 0.4 + 8
+        )
     return {
         "width": width,
         "height": height,

@@ -20,6 +20,19 @@ from render import (
     numeric_cell,
 )
 
+# Keep the readable context with its visual mark. Prose and data tables still
+# flow normally, while a figure/metric/quotation is one editorial unit.
+NATIVE_UNITS = GRAPHICS | {
+    "bar-chart",
+    "line-chart",
+    "big-number",
+    "change-indicator",
+    "pull-quote",
+    "figure",
+    "callout",
+    "source-note",
+}
+
 
 def all_blocks(report):
     return [block for section in report["sections"] for block in section["blocks"]]
@@ -262,6 +275,15 @@ def render_word(report, output, source_dir, office_dir):
         note(container, block)
 
     def draw_block(container, block, width):
+        before = len(container.paragraphs)
+        draw_block_content(container, block, width)
+        if block["type"] in NATIVE_UNITS:
+            group = container.paragraphs[before:]
+            for index, p in enumerate(group):
+                p.paragraph_format.keep_together = True
+                p.paragraph_format.keep_with_next = index < len(group) - 1
+
+    def draw_block_content(container, block, width):
         kind = block["type"]
         if kind == "heading":
             paragraph(container, block["text"], f"Heading {block.get('level', 2) - 1}")
@@ -592,6 +614,12 @@ def render_pdf(report, output, source_dir, office_dir):
         )
 
     def draw_block(block, width=available):
+        content = draw_block_content(block, width)
+        if block["type"] in NATIVE_UNITS:
+            return "#layout-unit[\n" + content + "\n]"
+        return content
+
+    def draw_block_content(block, width=available):
         kind = block["type"]
         if kind == "heading":
             return (
@@ -802,6 +830,12 @@ def render_pdf(report, output, source_dir, office_dir):
     # Typst columns fill the remaining page height by default. Balance short
     # groups using their measured height; keep long groups in normal page flow.
     preamble += """
+#let layout-unit(body) = context layout(size => {
+  let measured = measure(block(width: size.width, body))
+  // Keep ordinary units together; let content taller than a full A4 text
+  // area flow instead of overflowing an unbreakable box.
+  block(width: 100%, breakable: measured.height > 261mm, body)
+})
 #let balanced-columns(body) = context layout(size => {
   let measured = measure(block(width: (size.width - 18pt) / 2, body))
   let target = measured.height / 2 + 24pt
