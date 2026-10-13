@@ -3,7 +3,7 @@
   const M = window.PresentationMetrics;
   const config = window.PRESENTATION_QA_CONFIG || {};
   const MIN_FONT_SIZE_PX = 11;
-  const report = {pages: 0, navigableSlides: 0, decks: 0, minFontSizePx: MIN_FONT_SIZE_PX, status: "BLOCKED", hardGateFailures: 0, blocking: {}, failures: [], reviewRequired: []};
+  const report = {pages: 0, navigableSlides: 0, decks: 0, minFontSizePx: MIN_FONT_SIZE_PX, status: "BLOCKED", hardGateFailures: 0, blocking: {}, failures: [], reviewRequired: [], advisories: []};
   const fail = (code, page, element, message) => {
     report.hardGateFailures++;
     report.blocking[code] = (report.blocking[code] || 0) + 1;
@@ -60,6 +60,94 @@
     }
     if (fit.report.status !== "READY" && !fit.report.errors.length && !fit.report.regions.some(region => !["unchanged", "fitted"].includes(region.status))) fail("fitReadiness", 0, null, "Fit report is not ready");
   }
+  // Readability advice only: measure final typography without changing the fitter,
+  // content or publish gates. Group inline runs by their flow container so spans
+  // on one line are not mistaken for separate lines or reported more than once.
+  const compactLineSpacing = (root, page) => {
+    if (!root) return [];
+    const excluded = 'script,style,noscript,svg,[data-chrome],[data-decoration],[data-deco],[data-ornament],h1,h2,h3,h4,h5,h6,[role="heading"],[data-title],[data-text-role="title"],[data-text-role="heading"],[data-text-role="metric"],.h1,.h2,.h3,.display,.stat';
+    const groups = new Map();
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let node; (node = walker.nextNode());) {
+      const parent = node.parentElement;
+      if (!node.textContent.trim() || !parent || parent.closest(excluded)) continue;
+      let shown = true;
+      for (let element = parent; element; element = element.parentElement) {
+        const style = getComputedStyle(element);
+        if (style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0) {
+          shown = false;
+          break;
+        }
+      }
+      if (!shown) continue;
+      let block = parent;
+      while (block !== root && /^(inline|contents)$/.test(getComputedStyle(block).display)) block = block.parentElement;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const rects = [...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0);
+      if (!rects.length) continue;
+      if (!groups.has(block)) groups.set(block, []);
+      groups.get(block).push({parent, text: node.textContent, rects});
+    }
+    const findings = [];
+    for (const [block, runs] of groups) {
+      const blockStyle = getComputedStyle(block);
+      const firstStyle = getComputedStyle(runs[0].parent);
+      const uniform = runs.every(run => {
+        const inline = getComputedStyle(run.parent);
+        return inline.fontSize === firstStyle.fontSize && inline.fontFamily === firstStyle.fontFamily &&
+          inline.lineHeight === firstStyle.lineHeight && inline.verticalAlign === firstStyle.verticalAlign;
+      });
+      const style = uniform ? firstStyle : blockStyle;
+      if (style.writingMode !== "horizontal-tb") continue;
+      const rows = [];
+      for (const rect of runs.flatMap(run => run.rects).sort((a, b) => a.top - b.top)) {
+        const center = (rect.top + rect.bottom) / 2;
+        const row = rows.find(row => Math.abs(row.center - center) < Math.max(row.height, rect.height) * 0.5);
+        if (!row) rows.push({center, height: rect.height});
+      }
+      if (rows.length < 2) continue;
+      const fontSizePx = parseFloat(style.fontSize);
+      let lineHeightPx = parseFloat(style.lineHeight);
+      let measurement = "computed";
+      if (style.lineHeight === "normal") {
+        // normal has no computed pixel value. Homogeneous runs let us measure
+        // actual baseline spacing; undo transforms/zoom, not font metrics.
+        if (runs.some(run => {
+          const inline = getComputedStyle(run.parent);
+          return inline.fontSize !== style.fontSize || inline.fontFamily !== style.fontFamily ||
+            inline.lineHeight !== "normal" || inline.verticalAlign !== "baseline";
+        })) continue;
+        let matrix = new DOMMatrix(), zoom = 1;
+        for (let element = block; element; element = element.parentElement) {
+          const ancestor = getComputedStyle(element);
+          if (ancestor.transform !== "none") matrix = new DOMMatrix(ancestor.transform).multiply(matrix);
+          zoom *= parseFloat(ancestor.zoom) || 1;
+        }
+        if (Math.abs(matrix.b) > 1e-6 || Math.abs(matrix.c) > 1e-6) continue;
+        const scale = Math.abs(matrix.d) * zoom;
+        const gaps = rows.slice(1).map((row, index) => row.center - rows[index].center).sort((a, b) => a - b);
+        lineHeightPx = gaps[Math.floor(gaps.length / 2)] / scale;
+        measurement = "rendered-normal";
+      }
+      const ratio = lineHeightPx / fontSizePx;
+      if (!Number.isFinite(ratio) || !(fontSizePx > 0) || ratio >= 1.33 - 1e-6) continue;
+      const parts = [];
+      for (let element = block; element && element !== root; element = element.parentElement) {
+        if (element.id) { parts.unshift(`#${CSS.escape(element.id)}`); break; }
+        const siblings = [...element.parentElement.children].filter(sibling => sibling.tagName === element.tagName);
+        parts.unshift(`${element.tagName.toLowerCase()}:nth-of-type(${siblings.indexOf(element) + 1})`);
+      }
+      findings.push({
+        code: "compactLineSpacing", page, element: parts.join(" > ") || ".fit",
+        text: runs.map(run => run.text).join("").trim().replace(/\s+/g, " ").slice(0, 100),
+        fontSizePx, lineHeightPx, ratio, minRatio: 1.33, measurement,
+        message: `Line-height ratio ${Number(ratio.toFixed(4))} is below 1.33; this multiline text layout is too compact. Reorganize the content or layout (for example, widen the text column or redistribute blocks) to give lines more room. Preserve all source information and any fixed page-count requirement; do not squeeze typography further.`,
+      });
+    }
+    return findings;
+  };
+
   const context = document.createElement("canvas").getContext("2d", {willReadFrequently: true});
   const color = value => {
     if (value === "none") return [0, 0, 0, 0];
@@ -143,6 +231,7 @@
       left: rect.left + rect.width * safe.left, right: rect.right - rect.width * safe.right,
       top: rect.top + rect.height * safe.top, bottom: rect.bottom - rect.height * safe.bottom,
     } : M.innerBox(content);
+    report.advisories.push(...compactLineSpacing(content, page));
     const allText = M.leaves(stage);
     const contents = allText.filter(M.visible);
     const pageFit = fit?.report?.regions.find(region => region.page === page && region.region === "content");
