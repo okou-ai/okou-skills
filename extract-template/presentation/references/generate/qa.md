@@ -29,16 +29,18 @@ the web directory. No manual renaming or directory cleanup is needed.
   below the 11px logical minimum. Preserve the shared black, centered viewer when
   resolving `viewportBackground` or `viewportFrame`.
 - **`NEEDS_VISUAL_REVIEW`:** follow step 3.
-- **`READY_TO_PUBLISH` with zero `hardGateFailures`:** deliver. No receipt, repeated
-  QA or separate interaction check is needed on an unchanged deck; see the
+- **`READY_TO_PUBLISH` with zero `hardGateFailures`:** content QA passed; continue
+  to step 4 for cover and delivery. No receipt, repeated content QA or separate
+  interaction check is needed on an unchanged deck; see the
   [interaction scope](runtime-contract.md#interaction-check-scope) for uncovered behavior.
 
 ## 3. Review only when required
 
 Read the report's `captures`: QA has already captured `reviewRequired` pages in its
 rendered browser, after fitting, navigation and asset loading. Filenames retain
-original page numbers. No separate screenshot command or single-page HTML copies
-are needed. Add `--capture-all` only for a requested full review or PPTX comparison.
+original page numbers. No separate layout-QA screenshot command or single-page HTML
+copies are needed. Add `--capture-all` only for a requested full review or PPTX
+comparison. These limits do not prohibit the publication cover and its inspection.
 
 Compare those pages with the source. `unknownTextGround` asks whether text remains
 readable over textures, imagery or gradients. Overlap and transparent image margins
@@ -52,8 +54,19 @@ recapturing unchanged pages. Changed HTML or assets return to step 1 and require
 
 ## 4. Deliver
 
-For HTML, publish the passing web directory directly. Its asset filenames already
-meet the host's content-hash rule. No prepared copy, cleanup or extra QA pass is needed.
+For HTML, use the passing web directory. Its asset filenames already meet the host's
+content-hash rule. No prepared copy, cleanup or extra content-QA pass is needed.
+Follow the platform's publishing instructions for the final bundle's cover and
+delivery; this also applies to redeployments and later edits without reattaching
+the template. When artifact previews are enabled, capture and inspect a cover of
+that final directory, keep the image and receipt outside it, and publish with
+`--preview <cover.png> --json`. A user-selected local PNG/JPEG can replace capture.
+When a cover is required, confirm `previewImageUrl` in the publication result before
+returning the exact artifact URL, preserving the user's visibility. Fix capture
+failures or report the blocker; do not omit the cover to bypass a failure. Re-capture
+after bundle edits.
+QA page captures and contact sheets do not replace this cover. A file-only deliverable
+does not require HTML hosting or a hosted cover.
 
 Only for a requested PPTX, add `--prepared <web-dir>/index.ready.html` to the final
 QA command (the copy must be beside the input). Move this capture-only copy to a

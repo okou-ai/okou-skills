@@ -39,3 +39,9 @@ need no separate manual preflight. Use its JSON result: fix reported causes toge
 and rerun after edits; review only QA-designated pages unless a full review was
 requested. Record any required receipt and pass final QA. Follow the same guide
 for capture staging, requested PPTX checks and one final publication/upload.
+
+The template owns content, visual style and content QA. The platform's publishing
+instructions own covers and delivery, including edits made in later turns.
+`READY_TO_PUBLISH` means content QA passed; complete the cover and publication
+steps before returning the artifact. Limits on repeated QA screenshots do not
+prohibit the publication cover or its visual inspection.
