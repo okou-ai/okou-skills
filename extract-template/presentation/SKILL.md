@@ -126,6 +126,8 @@ links to `design-system.md` and `layouts/source-index.json`, and a Markdown link
 contains the generation steps and routes to the other guides; no need to duplicate
 them. Keep `layouts/README.md` a short path map linking back to the package's `SKILL.md`.
 When refreshing an older package, update its entrypoint links to `references/generate/`.
+After `READY_TO_PUBLISH`, direct future runs to the platform publishing and delivery
+instructions. Keep QA restrictions scoped to content QA.
 
 ## 4. Check the package
 

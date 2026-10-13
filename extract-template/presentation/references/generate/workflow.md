@@ -39,3 +39,6 @@ need no separate manual preflight. Use its JSON result: fix reported causes toge
 and rerun after edits; review only QA-designated pages unless a full review was
 requested. Record any required receipt and pass final QA. Follow the same guide
 for capture staging, requested PPTX checks and one final publication/upload.
+
+After content QA passes, continue with the platform publishing and delivery
+instructions. QA screenshot limits apply only to content QA.
