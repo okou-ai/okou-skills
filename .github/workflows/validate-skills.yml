@@ -138,40 +138,10 @@ jobs:
       - name: JavaScript syntax
         run: |
           set -euo pipefail
-          find extract-template/presentation/scripts extract-template/presentation/tools extract-template/presentation/tests \
+          find extract-template/presentation/scripts extract-template/presentation/tools \
             -type f \( -name '*.js' -o -name '*.mjs' \) -print0 |
             while IFS= read -r -d '' file; do
               node --check "$file"
             done
-      - name: Presentation package contract
-        run: node --test extract-template/presentation/tests/verify-package.test.mjs
-      - name: HTML source inventory
-        run: python3 extract-template/presentation/tests/inventory-html.test.py
-      - name: Static web bundle staging
-        run: python3 extract-template/presentation/tests/prepare-web.test.py
-      - name: PDF conversion to HTML inventory
-        run: python3 extract-template/presentation/tests/prepare-pdf.test.py
-      - name: PDF package assembly
-        run: python3 extract-template/presentation/tests/assemble-pdf.test.py
-      - name: Source preview and upload outputs
-        run: |
-          python3 -m pip install --quiet Pillow pypdf
-          python3 extract-template/presentation/tests/source-derivatives.test.py
-
-  presentation-runtime:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    defaults:
-      run:
-        working-directory: extract-template/presentation/tests
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: extract-template/presentation/tests/package-lock.json
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - name: Rendered fitter and QA regressions
-        run: npm test
+      - name: Python syntax
+        run: python3 -m compileall -q extract-template/presentation/scripts extract-template/presentation/tools

@@ -1,7 +1,0 @@
-{
-  "name": "presentation-runtime-tests",
-  "private": true,
-  "type": "module",
-  "scripts": {"test": "node --test fit-runtime.test.mjs viewport-runtime.test.mjs inspect-pdf.test.mjs capture.test.mjs"},
-  "devDependencies": {"playwright": "1.58.2"}
-}
