@@ -19,7 +19,7 @@ mkdirSync(path.join(target, "scripts"), {recursive: true});
 mkdirSync(path.join(target, "tools"), {recursive: true});
 const runtimeFiles = ["dom-metrics.js", "viewport.js", "fit-text.js", "navigation.js"];
 for (const name of runtimeFiles) copyFileSync(path.join(here, name), path.join(target, "scripts", name));
-for (const name of ["audit.js", "qa.mjs", "run.sh"]) copyFileSync(path.join(here, "../tools", name), path.join(target, "tools", name));
+for (const name of ["audit.js", "qa.mjs", "capture.mjs", "prepare-web.py", "run.sh"]) copyFileSync(path.join(here, "../tools", name), path.join(target, "tools", name));
 rmSync(path.join(target, "tools/verify-package.mjs"), {force: true});
 writeFileSync(path.join(target, "tools/qa-config.json"), JSON.stringify(config, null, 2) + "\n");
 cpSync(path.join(here, "../library"), path.join(target, "library"), {recursive: true});

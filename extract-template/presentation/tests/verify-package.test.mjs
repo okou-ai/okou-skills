@@ -143,7 +143,7 @@ test("structure ignores comments and script strings and accepts unquoted classes
   assert.deepEqual(verify(), {code: 0, status: "PACKAGE_VALID", errors: []});
 });
 
-for (const file of ["references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/layout-reuse.md", "references/generate/typography-fit.md", "scripts/viewport.js", "scripts/navigation.js", "library/README.md", "library/styles/geometry.css"]) {
+for (const file of ["references/generate/workflow.md", "references/generate/qa.md", "references/generate/runtime-contract.md", "references/generate/layout-reuse.md", "references/generate/typography-fit.md", "scripts/viewport.js", "scripts/navigation.js", "tools/capture.mjs", "tools/prepare-web.py", "library/README.md", "library/styles/geometry.css"]) {
   test(`required package file cannot be missing: ${file}`, t => {
     const {root, verify} = fixture(t);
     rmSync(path.join(root, file));

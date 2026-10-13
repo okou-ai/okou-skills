@@ -147,6 +147,8 @@ jobs:
         run: node --test extract-template/presentation/tests/verify-package.test.mjs
       - name: HTML source inventory
         run: python3 extract-template/presentation/tests/inventory-html.test.py
+      - name: Static web bundle staging
+        run: python3 extract-template/presentation/tests/prepare-web.test.py
       - name: PDF conversion to HTML inventory
         run: python3 extract-template/presentation/tests/prepare-pdf.test.py
       - name: PDF package assembly
