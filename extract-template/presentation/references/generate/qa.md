@@ -39,8 +39,8 @@ the web directory. No manual renaming or directory cleanup is needed.
 Read the report's `captures`: QA has already captured `reviewRequired` pages in its
 rendered browser, after fitting, navigation and asset loading. Filenames retain
 original page numbers. No separate layout-QA screenshot command or single-page HTML
-copies are needed. Add `--capture-all` only for a requested full review or PPTX
-comparison. These limits apply only to content QA.
+copies are needed. Add `--capture-all` only for a requested full visual review or
+to investigate conversion diagnostics. These limits apply only to content QA.
 
 Compare those pages with the source. `unknownTextGround` asks whether text remains
 readable over textures, imagery or gradients. Overlap and transparent image margins
@@ -54,21 +54,29 @@ recapturing unchanged pages. Changed HTML or assets return to step 1 and require
 
 ## 4. Deliver
 
+After authoring the HTML deck, choose the delivery format from the current prompt's
+explicit request, otherwise the user's remembered presentation-format preference,
+otherwise HTML. Deliver one format unless the user requests multiple formats.
+Template authoring and content QA apply to both delivery paths; follow the platform's
+publishing and conversion instructions for the selected format.
+
 For HTML, use the passing web directory. Its asset filenames already meet the host's
 content-hash rule. No prepared copy, cleanup or extra content-QA pass is needed.
-Continue with the platform publishing and delivery instructions.
+Publish once and return the hosted HTML URL.
 
-Only for a requested PPTX, add `--prepared <web-dir>/index.ready.html` to the final
+When PPTX is selected, add `--prepared <web-dir>/index.ready.html` to the final
 QA command (the copy must be beside the input). Move this capture-only copy to a
 separate conversion directory and copy its relative asset tree unchanged. Preserve
-the passing interactive HTML and assets. Then convert and render the actual PPTX:
+the passing interactive HTML and assets as local source files. Convert the prepared
+HTML directly:
 
 ```bash
 okou presentation convert --input <conversion-dir>/index.ready.html --verify --out <output-dir>/deck.pptx
-okou presentation screenshot --input <output-dir>/deck.pptx --out <qa-dir>/pptx-pages
 ```
 
-Compare page count, fonts, crop, reflow, geometry and rasterised SVG labels with
-QA's HTML captures; `--verify` covers text only. Resolve conversion issues before
-delivery. Keep conversion files and captures outside the web directory. After all
-required checks pass, publish once, upload the requested file once and reuse the links.
+Upload the successfully converted PPTX once and return its file link. Do not also
+publish or deliver the HTML unless the user requests it. Successful conversion needs
+no additional AI review or rendered-page comparison; `--verify` checks text coverage.
+Investigate reported conversion failures or unsupported content before delivery.
+Use `okou presentation screenshot` only for a requested visual check or to investigate
+conversion diagnostics. Keep conversion files and any captures outside the web directory.

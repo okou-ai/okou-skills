@@ -2,6 +2,7 @@
 
 Follow the template's `SKILL.md` for its identity and language rules.
 The package is ready to use; no need to extract, install or save the template again.
+Author the deck as HTML first, including when the selected delivery format is PPTX.
 
 ## 1. Decide the story and layouts
 
@@ -38,7 +39,7 @@ Follow [qa.md](qa.md) with the chosen page count. Checks covered by the supplied
 need no separate manual preflight. Use its JSON result: fix reported causes together
 and rerun after edits; review only QA-designated pages unless a full review was
 requested. Record any required receipt and pass final QA. Follow the same guide
-for capture staging, requested PPTX checks and one final publication/upload.
+for format selection and a single final delivery: hosted HTML or a converted PPTX.
 
 After content QA passes, continue with the platform publishing and delivery
 instructions. QA screenshot limits apply only to content QA.
