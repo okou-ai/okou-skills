@@ -34,6 +34,10 @@ the web directory. No manual renaming or directory cleanup is needed.
   interaction check is needed on an unchanged deck; see the
   [interaction scope](runtime-contract.md#interaction-check-scope) for uncovered behavior.
 
+`advisories` includes non-blocking `compactLineSpacing` warnings when multiline
+body text has line-height/font-size < `1.33`, even on passing reports. Recommend
+reorganizing content or layout while preserving all information and any fixed page count.
+
 ## 3. Review only when required
 
 Read the report's `captures`: QA has already captured `reviewRequired` pages in its
