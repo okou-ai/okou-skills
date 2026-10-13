@@ -4,7 +4,10 @@ Record font families, sizes, weights, leading, tracking and mixed-run relationsh
 as initial styles. For HTML, read computed CSS, including inherited styles and
 transforms. Resolve effective PPTX styles through runs, paragraphs,
 placeholders, layouts, masters, themes and existing source autofit, then compare
-with rendered source pages. Label PDF/image estimates as inferred.
+with rendered source pages. For PDF, reuse the converted HTML's CSS/fonts and
+transforms, checking against the original PDF; label missing-font fallbacks and
+visual estimates as inferred. See [pdf-source.md](pdf-source.md) for flattened text.
+Label image-based estimates as inferred.
 
 Map typography and geometry with the same uniform source-to-canvas transform.
 A 24pt font on a 960pt-wide slide becomes 40px on a 1600px-wide canvas. Record

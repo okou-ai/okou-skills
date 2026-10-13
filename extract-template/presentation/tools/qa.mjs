@@ -1,23 +1,27 @@
 #!/usr/bin/env node
 import {execFileSync} from "node:child_process";
 import {createHash} from "node:crypto";
-import {readFileSync, writeFileSync, existsSync} from "node:fs";
+import {readFileSync, writeFileSync, existsSync, mkdirSync} from "node:fs";
 import path from "node:path";
 import {fileURLToPath, pathToFileURL} from "node:url";
+import {capturePages} from "./capture.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+const startedAt = new Date().toISOString(), started = performance.now();
 const args = process.argv.slice(2);
 const options = {};
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--final") continue;
+  if (args[i] === "--capture-all") { options.captureAll = true; continue; }
   if (args[i].startsWith("--")) options[args[i].slice(2)] = args[++i];
   else if (!options.input) options.input = args[i];
   else throw new Error(`Unexpected argument: ${args[i]}`);
 }
 if (!options.input || !/^[1-9]\d*$/.test(options["expected-pages"] || "")) {
-  console.error("Usage: node tools/qa.mjs --final <deck.html> --expected-pages <n> [--config <json>] [--report <json>] [--review <json>] [--prepared <capture-copy.html>]");
+  console.error("Usage: node tools/qa.mjs --final <deck.html> --expected-pages <n> [--config <json>] [--report <json>] [--review <json>] [--capture-dir <outside-web-dir>] [--capture-all] [--prepared <capture-copy.html>]");
   process.exit(2);
 }
+if (options.captureAll && !options["capture-dir"]) throw new Error("--capture-all needs --capture-dir");
 const config = JSON.parse(readFileSync(options.config || path.join(here, "qa-config.json"), "utf8"));
 config.expectedPages = Number(options["expected-pages"]);
 if (config.minFontSizePx !== 11) throw new Error("qa-config.json must set minFontSizePx to 11");
@@ -58,12 +62,22 @@ try {
     writeFileSync(target, "<!doctype html>\n" + html);
     report.prepared = target;
   }
+  if (options["capture-dir"] && !report.hardGateFailures && !report.visualReview) {
+    const pages = options.captureAll ? Array.from({length: config.expectedPages}, (_, i) => i + 1)
+      : [...new Set(report.reviewRequired.map(item => item.page))];
+    if (pages.length) report.captures = capturePages({browser, parse, input: options.input,
+      directory: options["capture-dir"], pages});
+  }
 } catch (error) {
   report = {status: "BLOCKED", hardGateFailures: 1, blocking: {qaExecution: 1}, failures: [{code: "qaExecution", message: error.message}]};
 } finally {
   try { browser("close"); } catch {}
 }
 report.target = options.input;
-if (options.report) writeFileSync(options.report, JSON.stringify(report, null, 2) + "\n");
+report.timing = {startedAt, finishedAt: new Date().toISOString(), durationSeconds: (performance.now() - started) / 1000};
+if (options.report) {
+  mkdirSync(path.dirname(path.resolve(options.report)), {recursive: true});
+  writeFileSync(options.report, JSON.stringify(report, null, 2) + "\n");
+}
 console.log(JSON.stringify(report, null, 2));
 process.exitCode = report.status === "READY_TO_PUBLISH" ? 0 : 1;

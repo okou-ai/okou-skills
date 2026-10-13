@@ -5,4 +5,3 @@ tmp/
 
 __pycache__/
 *.py[cod]
-extract-template/presentation/tests/node_modules/

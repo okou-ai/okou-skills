@@ -25,8 +25,9 @@ extraction guides or QA/runtime implementation files, or reread unchanged files.
 
 ## 3. Assemble and author once
 
-Copy `layouts/_shell.html` into the final web directory, resolve final asset paths
-and adapt the selected fragments to the supplied material. Preserve the source
+Copy `layouts/_shell.html` into a draft directory and adapt the selected fragments
+to the supplied material. The staging helper in [qa.md](qa.md) resolves final asset
+paths before the first QA. Preserve the source
 styling, required chrome and [11px floor](typography-fit.md), with shared CSS and
 runtime included once. Keep the stored template and library originals unchanged.
 Make content and layout decisions autonomously while authoring.
