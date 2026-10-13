@@ -34,17 +34,9 @@ the web directory. No manual renaming or directory cleanup is needed.
   interaction check is needed on an unchanged deck; see the
   [interaction scope](runtime-contract.md#interaction-check-scope) for uncovered behavior.
 
-`advisories` is non-blocking guidance and remains visible on passing reports.
-`compactLineSpacing` identifies the page, element, text, final font size, line height
-and their ratio when visible multiline body text is below `1.33`. Recommend
-reorganizing the content or layout (for example, widening columns or redistributing
-blocks) to give lines more room, preserving all source information and any fixed
-page count. Do not squeeze typography further. QA does not change font size or line
-height. These advisories do not require screenshots or a visual-review receipt.
-Single-line text, headings, display metrics and chrome are excluded. `normal` line
-height is measured from homogeneous horizontal text runs when geometry permits.
-If an advisory leads to an edit, stage the updated draft and rerun QA; do not rerun
-unchanged content just to clear an advisory.
+`advisories` includes non-blocking `compactLineSpacing` warnings when multiline
+body text has line-height/font-size < `1.33`, even on passing reports. Recommend
+reorganizing content or layout while preserving all information and any fixed page count.
 
 ## 3. Review only when required
 
