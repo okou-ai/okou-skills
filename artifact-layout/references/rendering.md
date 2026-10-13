@@ -52,7 +52,9 @@ fit the current column or span both columns.
 Native metric, quotation, figure and chart units retain their associated
 labels, attributions, captions and supplied source notes at page/column breaks.
 PDF units taller than a full text area remain breakable; long prose and tables
-continue in normal document flow. Line-chart gutters and wrapped label spacing
+continue in normal document flow. Balanced PDF columns reserve enough height
+for their largest intact unit before placing the following section.
+Line-chart gutters and wrapped label spacing
 adapt to the placed label size rather than clipping labels in narrow grids.
 
 Word's sidebar, metric-strip, and modular layouts use editable layout tables.

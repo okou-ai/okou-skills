@@ -793,9 +793,18 @@ def render_pdf(report, output, source_dir, office_dir):
             if not group:
                 return
             if layout == "two-column":
+                rendered = [draw_block(b, (available - 18) / 2) for b in group]
+                units = [
+                    "[\n" + content + "\n]"
+                    for b, content in zip(group, rendered)
+                    if b["type"] in NATIVE_UNITS
+                ]
+                arguments = "(" + ",".join(units) + (",)" if units else ")")
                 result.append(
-                    "#balanced-columns[\n"
-                    + "\n\n".join(draw_block(b, (available - 18) / 2) for b in group)
+                    "#balanced-columns(units: "
+                    + arguments
+                    + ")[\n"
+                    + "\n\n".join(rendered)
                     + "\n]"
                 )
             elif layout == "sidebar":
@@ -836,9 +845,14 @@ def render_pdf(report, output, source_dir, office_dir):
   // area flow instead of overflowing an unbreakable box.
   block(width: 100%, breakable: measured.height > 261mm, body)
 })
-#let balanced-columns(body) = context layout(size => {
-  let measured = measure(block(width: (size.width - 18pt) / 2, body))
-  let target = measured.height / 2 + 24pt
+#let balanced-columns(body, units: ()) = context layout(size => {
+  let column-width = (size.width - 18pt) / 2
+  let measured = measure(block(width: column-width, body))
+  let tallest = 0pt
+  for unit in units {
+    tallest = calc.max(tallest, measure(block(width: column-width, unit)).height)
+  }
+  let target = calc.max(measured.height / 2 + 24pt, tallest + 4pt)
   if target < size.height {
     block(height: target, breakable: false)[#columns(2, gutter: 18pt, body)]
   } else {

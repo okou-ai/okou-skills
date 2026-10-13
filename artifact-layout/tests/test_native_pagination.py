@@ -176,3 +176,50 @@ class NativePaginationTests(unittest.TestCase):
                     self.assertGreaterEqual(bounds[1], 0, text)
                     self.assertLessEqual(bounds[2], geometry["width"], text)
                     self.assertLessEqual(bounds[3], geometry["height"], text)
+
+    def test_short_columns_allow_an_intact_metric_before_the_next_section(self):
+        from pypdf import PdfReader
+
+        self.report["sections"] = [
+            {
+                "layout": "two-column",
+                "blocks": [
+                    {
+                        "type": "big-number",
+                        "value": "24",
+                        "label": "METRIC_LABEL",
+                        "period": "PERIOD_2026",
+                        "note": "CONTEXT stays near its metric value and must remain readable.",
+                        "source": "END_METRIC",
+                    }
+                ],
+            },
+            {
+                "layout": "single",
+                "title": "AFTER_BLOCK",
+                "blocks": [
+                    {
+                        "type": "prose",
+                        "paragraphs": [
+                            "Next content must appear below the intact unit."
+                        ],
+                    }
+                ],
+            },
+        ]
+        pdf = PdfReader(self.render("short-column-unit", ("pdf",))["pdf"])
+        positions = {}
+
+        def observe(text, transform, text_matrix, _font, _size):
+            for marker in ["END_METRIC", "AFTER_BLOCK"]:
+                if marker in text:
+                    positions[marker] = (
+                        text_matrix[4] * transform[1]
+                        + text_matrix[5] * transform[3]
+                        + transform[5]
+                    )
+
+        pdf.pages[0].extract_text(visitor_text=observe)
+        self.assertEqual(set(positions), {"END_METRIC", "AFTER_BLOCK"})
+        # PDF page coordinates rise upward: the next section must be lower.
+        self.assertGreater(positions["END_METRIC"], positions["AFTER_BLOCK"] + 4)
