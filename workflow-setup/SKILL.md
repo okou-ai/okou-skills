@@ -344,12 +344,9 @@ Default final response:
 - Mention enabled/paused status.
 - For a newly created automation, proactively state the model it will use.
 - Mention important safety behavior, such as "draft only, never sends".
-- After creating or updating a workflow, send a complete Mermaid or Excalidraw
-  flowchart based on the verified saved definition, showing inputs, steps,
-  key decisions, and outputs. Default to inline Mermaid in Web Chat; for
-  Excalidraw or channels such as Slack without inline rendering, attach a
-  rendered PNG. Diagram generation belongs to setup completion, not the
-  workflow's reusable instructions.
+- After creating or updating a workflow, send a complete Mermaid flowchart or Excalidraw
+  image based on the verified saved definition, showing inputs, steps,
+  key decisions, and outputs.
 - Tell the user the natural next action, such as applying a Gmail label or using
   the webhook URL.
 
