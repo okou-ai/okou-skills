@@ -344,6 +344,9 @@ Default final response:
 - Mention enabled/paused status.
 - For a newly created automation, proactively state the model it will use.
 - Mention important safety behavior, such as "draft only, never sends".
+- After creating or updating a workflow, send a complete Mermaid flowchart or Excalidraw
+  image based on the verified saved definition, showing inputs, steps,
+  key decisions, and outputs.
 - Tell the user the natural next action, such as applying a Gmail label or using
   the webhook URL.
 
