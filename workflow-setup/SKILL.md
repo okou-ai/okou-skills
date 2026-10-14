@@ -108,9 +108,7 @@ When a user says "save these steps", "create a workflow", "make a reusable SOP",
    update operations.
 7. Report the result in plain language, including what will happen next and any
    safety limits. After creating a new automation, proactively name the model it
-   will use. After creating or updating a workflow, include the
-   [completion diagram](#completion-diagram). Keep technical IDs out of the
-   normal response.
+   will use. Keep technical IDs out of the normal response.
 
 Do not inspect connector authorization or request permissions as part of the
 default setup path. If the command reports connector authorization or permission
@@ -337,33 +335,6 @@ chat thread before replying to the user.
 
 Keep verification output internal unless the user needs technical detail.
 
-## Completion Diagram
-
-After every successful workflow creation or update, send the user a Mermaid or
-Excalidraw flowchart with the completion summary. Build it from the saved
-workflow returned by `workflow view` after verification. For an update,
-regenerate the full current flow, not only the changed steps.
-
-Show the inputs or sources, main steps, key decisions and approval gates, and
-final outputs or destinations. Use concise labels in the user's language. If
-showing an automation, reflect its saved trigger and enabled/paused status; a
-draft without an automation must not appear scheduled or enabled.
-
-Use Mermaid by default and honor a user preference for Excalidraw. Deliver a
-diagram the user can view in the current conversation:
-
-- For Mermaid in Web Chat, include a fenced `mermaid` flowchart in the
-  completion reply so it renders inline.
-- For Excalidraw, Slack, or another surface without inline diagram rendering,
-  render the diagram to PNG, inspect it for legibility, and attach it using the
-  current channel's file-delivery tools. Include editable source when the user
-  asks for it. Raw source or an inaccessible artifact link alone is not a
-  delivered diagram.
-
-The diagram is a setup deliverable, not an extra step to insert into the
-workflow's reusable instructions or execute on every run. If diagram rendering
-or delivery fails, report that separately from the verified workflow save.
-
 ## Final Response Defaults
 
 Default final response:
@@ -373,8 +344,12 @@ Default final response:
 - Mention enabled/paused status.
 - For a newly created automation, proactively state the model it will use.
 - Mention important safety behavior, such as "draft only, never sends".
-- After creating or updating a workflow, include its
-  [completion diagram](#completion-diagram).
+- After creating or updating a workflow, send a complete Mermaid or Excalidraw
+  flowchart based on the verified saved definition, showing inputs, steps,
+  key decisions, and outputs. Default to inline Mermaid in Web Chat; for
+  Excalidraw or channels such as Slack without inline rendering, attach a
+  rendered PNG. Diagram generation belongs to setup completion, not the
+  workflow's reusable instructions.
 - Tell the user the natural next action, such as applying a Gmail label or using
   the webhook URL.
 
