@@ -104,33 +104,24 @@ else
     esac
 fi
 
-# --- Optional: LibreOffice ---
-if command -v soffice &>/dev/null; then
+# --- Optional: LibreOffice Writer / DOCX rendering ---
+# Probe the Writer conversion path and verify the output PDF.
+writer_check_output=""
+if writer_check_output=$(python3 "$SCRIPT_DIR/render_docx.py" --check 2>&1); then
     soffice_ver=$(soffice --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || echo "?")
-    printf "[OK]      %-14s %s (.doc conversion)\n" "soffice" "$soffice_ver"
+    printf "[OK]      %-14s %s (DOCX-to-PDF probe passed)\n" "Writer" "$soffice_ver"
 else
-    # Check common paths
-    soffice_found=false
-    for p in \
-        "/Applications/LibreOffice.app/Contents/MacOS/soffice" \
-        "/usr/lib/libreoffice/program/soffice" \
-        "/snap/bin/libreoffice" \
-        "/opt/libreoffice/program/soffice"; do
-        if [ -x "$p" ]; then
-            printf "[OK]      %-14s found at %s (.doc conversion)\n" "soffice" "$p"
-            soffice_found=true
-            break
-        fi
-    done
-    if ! $soffice_found; then
-        printf "[WARN]    %-14s not found — .doc files cannot be converted\n" "soffice"
-        WARNINGS=$((WARNINGS + 1))
-        case "$OS" in
-            macos)        echo "           Install: brew install --cask libreoffice" ;;
-            linux|wsl)    echo "           Install: sudo apt-get install libreoffice-writer" ;;
-            windows-shell) echo "           Install: winget install TheDocumentFoundation.LibreOffice" ;;
-        esac
+    printf "[WARN]    %-14s DOCX-to-PDF probe failed\n" "Writer"
+    if [ -n "$writer_check_output" ]; then
+        printf '%s\n' "$writer_check_output" | sed 's/^/           /'
     fi
+    WARNINGS=$((WARNINGS + 1))
+    case "$OS" in
+        macos)        echo "           Install: brew install --cask libreoffice" ;;
+        linux|wsl)    echo "           Install: sudo apt-get install libreoffice-writer" ;;
+        windows-shell) echo "           Install: winget install TheDocumentFoundation.LibreOffice" ;;
+    esac
+    echo "           Then run: bash \"$SCRIPT_DIR/setup.sh\""
 fi
 
 # --- Optional: zip/unzip ---
