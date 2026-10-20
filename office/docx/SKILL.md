@@ -42,11 +42,15 @@ Paths below are relative to this skill directory. Set `SKILL_DIR` to the absolut
 directory containing this file; do not assume the task's working directory.
 
 **First operation in session:** `bash "$SKILL_DIR/scripts/env_check.sh"`.
-If dependencies are missing, run `bash "$SKILL_DIR/scripts/setup.sh"` (Windows:
+This checks Writer by converting a minimal DOCX to PDF and verifying that a real
+PDF was produced; a working `soffice --version` alone is insufficient. If the
+Writer probe or other dependencies are missing, run
+`bash "$SKILL_DIR/scripts/setup.sh"` (Windows:
 `powershell -File "$SKILL_DIR/scripts/setup.ps1"`). `--minimal` skips rendering
-dependencies. Reuse the installed SDK and built CLI for subsequent operations.
-Before visual QA, run `python3 "$SKILL_DIR/scripts/render_docx.py" --check` once.
-This tests an actual DOCX conversion; a working `soffice --version` alone is insufficient.
+dependencies, so visual QA will remain unavailable until Writer is installed.
+Reuse the installed SDK and built CLI for subsequent operations. Before visual QA,
+rerun `python3 "$SKILL_DIR/scripts/render_docx.py" --check` only if the environment
+may have changed since the successful environment check.
 
 ## Quick Start: Direct C# Path
 

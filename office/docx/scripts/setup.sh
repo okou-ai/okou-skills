@@ -216,7 +216,7 @@ install_soffice() {
     info "Installing LibreOffice (this may take a while)..."
     case "$PKG_MGR" in
         brew)   brew install --cask libreoffice ;;
-        apt)    sudo apt-get install -y -qq libreoffice-writer python3 poppler-utils ;;
+        apt)    sudo apt-get update && sudo apt-get install -y -qq libreoffice-writer python3 poppler-utils ;;
         dnf)    sudo dnf install -y libreoffice-writer python3 poppler-utils ;;
         pacman) sudo pacman -S --noconfirm libreoffice-still ;;
         zypper) sudo zypper install -y libreoffice ;;
