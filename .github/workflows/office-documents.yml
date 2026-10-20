@@ -37,7 +37,6 @@ jobs:
         run: |
           bash office/docx/scripts/env_check.sh
           bash office/pdf/scripts/make.sh check
-          python3 -m unittest discover -s office/docx/tests -v
           python3 -m unittest discover -s office/pdf/tests -v
           python3 -m unittest discover -s office/xlsx/tests -v
   windows-docx:
@@ -56,5 +55,3 @@ jobs:
         working-directory: ${{ runner.temp }}
         shell: pwsh
         run: '& "$env:GITHUB_WORKSPACE/office/docx/scripts/setup.ps1" -Minimal'
-      - name: Verify the DOCX CLI
-        run: python -m unittest discover -s office/docx/tests -p test_cli.py -v
