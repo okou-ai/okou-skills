@@ -105,8 +105,7 @@ else
 fi
 
 # --- Optional: LibreOffice Writer / DOCX rendering ---
-# A soffice binary/version check is insufficient: LibreOffice Core can be installed
-# without the Writer component, and conversion may return exit 0 without a PDF.
+# Probe the Writer conversion path and verify the output PDF.
 writer_check_output=""
 if writer_check_output=$(python3 "$SCRIPT_DIR/render_docx.py" --check 2>&1); then
     soffice_ver=$(soffice --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || echo "?")

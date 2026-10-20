@@ -42,9 +42,8 @@ Paths below are relative to this skill directory. Set `SKILL_DIR` to the absolut
 directory containing this file; do not assume the task's working directory.
 
 **First operation in session:** `bash "$SKILL_DIR/scripts/env_check.sh"`.
-This checks Writer by converting a minimal DOCX to PDF and verifying that a real
-PDF was produced; a working `soffice --version` alone is insufficient. If the
-Writer probe or other dependencies are missing, run
+This checks Writer by converting a minimal DOCX to PDF and verifying the output.
+If the Writer probe or other dependencies are missing, run
 `bash "$SKILL_DIR/scripts/setup.sh"` (Windows:
 `powershell -File "$SKILL_DIR/scripts/setup.ps1"`). `--minimal` skips rendering
 dependencies, so visual QA will remain unavailable until Writer is installed.
