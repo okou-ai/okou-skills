@@ -72,7 +72,11 @@ copies of the upstream skill collection.
 /plugin install business-skill-index@vm0-skills
 ```
 
-## MiniMax Office skills
+## Office skills
+
+The [office](office/SKILL.md) entry point bundles the three format-specific
+skills below. Runtime discovery loads the top-level package with all its nested
+files; the individual directories are not separate default skills.
 
 The following skills are redistributed from
 [MiniMax-AI/skills](https://github.com/MiniMax-AI/skills) at commit
@@ -83,12 +87,15 @@ Each directory includes its MIT license, original copyright notice, and
 
 | Skill | Capability |
 | --- | --- |
-| [minimax-docx](minimax-docx/SKILL.md) | Create, edit, and format Word documents with .NET OpenXML. |
-| [minimax-pdf](minimax-pdf/SKILL.md) | Create designed PDFs, fill forms, and reformat documents. |
-| [minimax-xlsx](minimax-xlsx/SKILL.md) | Read, create, edit, and validate spreadsheets. |
+| [docx](office/docx/SKILL.md) | Create, edit, and format Word documents with .NET OpenXML. |
+| [pdf](office/pdf/SKILL.md) | Create designed PDFs, fill forms, and reformat documents. |
+| [xlsx](office/xlsx/SKILL.md) | Read, create, edit, and validate spreadsheets. |
 
-The initial import preserves the upstream files unchanged. Runtime fixes and
-changes to Okou's default document tooling are separate changes.
+The initial import in [PR #407](https://github.com/okou-ai/okou-skills/pull/407)
+preserved the upstream files unchanged. This distribution renames the packages
+and records local runtime fixes in Git history and each `UPSTREAM.md`.
+The platform switches its default from `office-files` to `office` after this
+package is published. Remove the legacy package only after that API rollout.
 
 ## Resources
 
