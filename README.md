@@ -72,6 +72,24 @@ copies of the upstream skill collection.
 /plugin install business-skill-index@vm0-skills
 ```
 
+## MiniMax Office skills
+
+The following skills are redistributed from
+[MiniMax-AI/skills](https://github.com/MiniMax-AI/skills) at commit
+[`60aaae52bb2af8162732751a4332f62a5fef518b`](https://github.com/MiniMax-AI/skills/commit/60aaae52bb2af8162732751a4332f62a5fef518b).
+Credit for the upstream implementation belongs to MiniMax and its contributors.
+Each directory includes its MIT license, original copyright notice, and
+`UPSTREAM.md` with the pinned source and distribution history.
+
+| Skill | Capability |
+| --- | --- |
+| [minimax-docx](minimax-docx/SKILL.md) | Create, edit, and format Word documents with .NET OpenXML. |
+| [minimax-pdf](minimax-pdf/SKILL.md) | Create designed PDFs, fill forms, and reformat documents. |
+| [minimax-xlsx](minimax-xlsx/SKILL.md) | Read, create, edit, and validate spreadsheets. |
+
+The initial import preserves the upstream files unchanged. Runtime fixes and
+changes to Okou's default document tooling are separate changes.
+
 ## Resources
 
 - [Agent Skills Specification](https://agentskills.io/specification)
