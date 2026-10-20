@@ -94,8 +94,9 @@ Each directory includes its MIT license, original copyright notice, and
 The initial import in [PR #407](https://github.com/okou-ai/okou-skills/pull/407)
 preserved the upstream files unchanged. This distribution renames the packages
 and records local runtime fixes in Git history and each `UPSTREAM.md`.
-The platform switches its default from `office-files` to `office` after this
-package is published. Remove the legacy package only after that API rollout.
+The platform uses `office` as its default document skill following the production
+API rollout of [PR #41735](https://github.com/okou-ai/okou/pull/41735). The legacy
+package and its dedicated CI workflow have been retired.
 
 ## Resources
 
