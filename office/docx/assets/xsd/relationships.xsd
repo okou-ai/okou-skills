@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- MIT. Local declarations used by the WordprocessingML subset. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <xs:attribute name="id" type="xs:string"/>
+</xs:schema>

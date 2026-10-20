@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Docx.Cli/Docx.Cli.csproj" />
+  <Project Path="Docx.Core/Docx.Core.csproj" />
+</Solution>

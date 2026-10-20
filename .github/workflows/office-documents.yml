@@ -1,0 +1,60 @@
+name: Office documents
+
+on:
+  pull_request:
+    paths: ["office/**", ".github/workflows/office-documents.yml"]
+  push:
+    branches: [main]
+    paths: ["office/**", ".github/workflows/office-documents.yml"]
+
+jobs:
+  native-files:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Select the .NET 8 SDK for regression coverage
+        run: dotnet new globaljson --sdk-version 8.0.100 --roll-forward latestFeature
+      - name: Install native dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libreoffice-writer libreoffice-calc poppler-utils fonts-liberation fonts-noto-cjk
+          python3 -m pip install reportlab pypdf matplotlib
+          npm install -g playwright
+          npx --no-install playwright install --with-deps chromium
+      - name: Set up DOCX from outside the skill directory
+        working-directory: ${{ runner.temp }}
+        run: bash "$GITHUB_WORKSPACE/office/docx/scripts/setup.sh" --minimal
+      - name: Verify DOCX, PDF and spreadsheet behavior
+        run: |
+          bash office/docx/scripts/env_check.sh
+          bash office/pdf/scripts/make.sh check
+          python3 -m unittest discover -s office/docx/tests -v
+          python3 -m unittest discover -s office/pdf/tests -v
+          python3 -m unittest discover -s office/xlsx/tests -v
+  windows-docx:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Select the .NET 8 SDK for regression coverage
+        run: dotnet new globaljson --sdk-version 8.0.100 --roll-forward latestFeature
+      - name: Set up DOCX from outside the skill directory
+        working-directory: ${{ runner.temp }}
+        shell: pwsh
+        run: '& "$env:GITHUB_WORKSPACE/office/docx/scripts/setup.ps1" -Minimal'
+      - name: Verify the DOCX CLI
+        run: python -m unittest discover -s office/docx/tests -p test_cli.py -v
