@@ -370,11 +370,12 @@ check_fonts() {
         # Check for key font packages
         local missing_fonts=()
 
-        if ! fc-list 2>/dev/null | grep -qi "liberation\|times new roman\|calibri"; then
+        # Read the full font list: grep -q can cause an upstream SIGPIPE under pipefail.
+        if ! fc-list 2>/dev/null | grep -i "liberation\|times new roman\|calibri" >/dev/null; then
             missing_fonts+=("Western: liberation-fonts or msttcorefonts")
         fi
 
-        if ! fc-list 2>/dev/null | grep -qi "noto.*cjk\|wqy\|simsun\|pingfang"; then
+        if ! fc-list 2>/dev/null | grep -i "noto.*cjk\|wqy\|simsun\|pingfang" >/dev/null; then
             missing_fonts+=("CJK: noto-fonts-cjk or wqy-microhei")
         fi
 
