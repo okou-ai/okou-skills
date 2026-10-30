@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Xml.Linq;
+using Docx.Core.OpenXml;
 
 namespace Docx.Core.Validation;
 
@@ -38,6 +39,7 @@ public class BusinessRuleValidator
         ValidateHeadingHierarchy(body, result);
         ValidateTableColumnWidths(body, result);
         ValidateRelationships(zip, doc, result);
+        ValidateNumbering(docxPath, doc, result);
         ValidateComments(zip, result);
 
         return result;
@@ -176,6 +178,30 @@ public class BusinessRuleValidator
         // explicit ID in document.xml. Check only references that are present.
         foreach (var id in referencedIds.Except(definedIds))
             result.Errors.Add(Error($"Reference r:id='{id}' has no matching relationship"));
+    }
+
+    private static void ValidateNumbering(string path, XDocument doc, ValidationResult result)
+    {
+        var referencedIds = doc.Descendants(W + "numId")
+            .Select(e => (string?)e.Attribute(W + "val"))
+            .Where(id => id != null && id != "0").ToHashSet();
+        if (referencedIds.Count == 0) return;
+
+        var numbering = DocumentParts.ReadNumbering(path);
+        foreach (var id in referencedIds)
+        {
+            var definition = numbering?.Root?.Elements(W + "num")
+                .FirstOrDefault(e => (string?)e.Attribute(W + "numId") == id);
+            if (definition == null)
+            {
+                result.Errors.Add(Error($"Numbering reference w:numId='{id}' has no matching definition"));
+                continue;
+            }
+            var abstractId = (string?)definition.Element(W + "abstractNumId")?.Attribute(W + "val");
+            if (abstractId == null || !numbering!.Root!.Elements(W + "abstractNum")
+                .Any(e => (string?)e.Attribute(W + "abstractNumId") == abstractId))
+                result.Errors.Add(Error($"Numbering definition '{id}' has no matching abstract numbering definition"));
+        }
     }
 
     private void ValidateComments(ZipArchive zip, ValidationResult result)

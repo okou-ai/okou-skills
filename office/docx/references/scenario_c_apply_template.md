@@ -15,14 +15,17 @@ Do NOT use when: the user wants to edit content (→ Scenario B) or create from 
 ## Workflow
 
 ```
-1. Analyze source    → CLI: analyze source.docx      (list styles, fonts, structure)
-2. Analyze template  → CLI: analyze template.docx     (list styles, fonts, structure)
+1. Analyze source    → CLI: analyze --input source.docx      (list styles, fonts, structure)
+2. Analyze template  → CLI: analyze --input template.docx    (list styles, fonts, structure)
 3. Map styles        → Create mapping plan (source style → template style)
-4. Apply template    → CLI: apply-template source.docx --template template.docx --output result.docx
-5. Validate (XSD)    → CLI: validate result.docx --xsd wml-subset.xsd
-6. GATE-CHECK        → CLI: validate result.docx --xsd business-rules.xsd   ← MUST PASS
-7. Diff verify       → CLI: diff source.docx result.docx --text-only   (content must be identical)
+4. Apply template    → CLI: apply-template --input source.docx --template template.docx --output result.docx
+5. Validate          → CLI: validate --input result.docx --business
+6. GATE-CHECK        → CLI: validate --input result.docx --gate-check template.docx   ← MUST PASS
+7. Diff verify       → CLI: diff --before source.docx --after result.docx   (review text changes for content preservation)
 ```
+
+Follow the [validation pipeline](../SKILL.md#validation-pipeline) for package/business
+validation and the conditions for optional subset XSD checks.
 
 ---
 
@@ -32,9 +35,9 @@ Do NOT use when: the user wants to edit content (→ Scenario B) or create from 
 |------|------|-------------|
 | Styles | `word/styles.xml` | All style definitions (paragraph, character, table, numbering) |
 | Theme | `word/theme/theme1.xml` | Color scheme, font scheme, format scheme |
-| Numbering | `word/numbering.xml` | List and numbering definitions |
-| Headers | `word/header*.xml` | Header content and formatting |
-| Footers | `word/footer*.xml` | Footer content and formatting |
+| Numbering | `word/numbering*.xml` | Merge template definitions with fresh IDs while retaining source lists |
+| Headers | `word/header*.xml` | Copy header content and formatting with `--apply-headers-footers` |
+| Footers | `word/footer*.xml` | Copy footer content and formatting with `--apply-headers-footers` |
 | Section props | `w:sectPr` | Margins, page size, orientation, columns |
 
 ## What Does NOT Get Copied
@@ -358,36 +361,41 @@ The corresponding text in document.xml references this rId:
 
 ---
 
-## XSD Gate-Check
+## Template Gate-Check
 
 ### What It Is
 
-After template application, the output document **MUST** pass `business-rules.xsd` validation. This is a **hard gate** — if it fails, the document is **NOT deliverable**.
+After template application, run the template gate-check and resolve any reported
+violations before delivery:
 
-### What business-rules.xsd Checks
+```bash
+bash "$SKILL_DIR/scripts/docx.sh" validate --input result.docx --gate-check template.docx
+```
+
+### Checks
 
 | Rule | What It Validates |
 |------|-------------------|
-| Template styles exist | All styles referenced by content paragraphs are defined in `styles.xml` |
-| Margins match | Page margins match template specification |
-| Fonts correct | `w:docDefaults` fonts match template's font scheme |
-| Heading hierarchy | Heading levels are sequential (no H1 → H3 without H2) |
-| Required styles present | `Normal`, `Heading1`-`Heading3`, `TableGrid` exist |
-| Page size | Matches template's declared page size |
+| Template styles exist | Every style ID defined in the template is present in the output |
+| Margins match | Top, bottom, left, and right margins of the final section match those specified in the template |
+| Default font matches | The default paragraph style's `w:rFonts/@w:ascii` matches the font specified in the template |
+| Heading font sizes | Sizes defined for `HeadingN` styles do not increase at deeper levels |
+| Page size | Width and height of the final section match the template |
 
 ### Handling Failures
 
 ```
-GATE-CHECK FAILED:
-  - Style 'CustomStyle1' referenced in paragraph 14 but not defined in styles.xml
-  - Margin w:left=1080 does not match template requirement 1440
+GATE CHECK: FAILED
+  - Missing style: 'CustomStyle1' defined in template but absent from output
+  - Page margins mismatch: template=(1440,1440,1440,1440) output=(1440,1440,1080,1440)
 ```
 
 Fix each failure:
-1. **Missing style**: Add the style definition to `styles.xml`, or remap the paragraph to an existing style
-2. **Margin mismatch**: Update `w:sectPr` margins to match template
-3. **Font mismatch**: Update `w:docDefaults` to match template font scheme
-4. **Heading hierarchy gap**: Insert intermediate heading levels or adjust existing levels
+1. **Missing style**: Restore the missing template style definition in `styles.xml`
+2. **Margin mismatch**: Update the final section's margins to match the template
+3. **Font mismatch**: Restore the template's default paragraph style font
+4. **Heading size violation**: Adjust heading style sizes so deeper levels are no larger than higher levels
+5. **Page size mismatch**: Update the final section's width and height to match the template
 
 Re-validate after every fix until gate-check passes.
 
@@ -447,7 +455,7 @@ Re-validate after every fix until gate-check passes.
 After template application, verify:
 
 1. **Content preserved** — text diff shows zero content changes
-2. **Gate-check passed** — `validate --gate-check template.docx` succeeds
+2. **Gate-check passed** — `validate --input result.docx --gate-check template.docx` succeeds
 3. **Styles applied** — headings, body text, tables use template formatting
 4. **Images intact** — image relationship IDs and referenced media are valid
 5. **Lists** — numbering definitions and paragraph references are preserved

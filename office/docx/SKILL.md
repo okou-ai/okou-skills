@@ -13,7 +13,7 @@ metadata:
 description: >
   Professional DOCX document creation, editing, and formatting using OpenXML SDK (.NET).
   Three pipelines: (A) create new documents from scratch, (B) fill/edit content in existing
-  documents, (C) apply template formatting with XSD validation gate-check.
+  documents, (C) apply template formatting with template gate-check.
   MUST use this skill whenever the user wants to produce, modify, or format a Word document —
   including when they say "write a report", "draft a proposal", "make a contract",
   "fill in this form", "reformat to match this template", or any task whose final output
