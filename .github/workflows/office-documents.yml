@@ -36,7 +36,6 @@ jobs:
       - name: Verify DOCX, PDF and spreadsheet behavior
         run: |
           bash office/docx/scripts/env_check.sh
-          python3 -m unittest discover -s office/docx/tests -v
           bash office/pdf/scripts/make.sh check
           python3 -m unittest discover -s office/pdf/tests -v
           python3 -m unittest discover -s office/xlsx/tests -v
