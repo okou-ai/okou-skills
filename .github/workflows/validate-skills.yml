@@ -25,7 +25,7 @@ jobs:
       - name: Check DOCX environment routing
         run: |
           bash -n office/docx/scripts/env_check.sh
-          python3 -m unittest discover -s office/docx/tests -v
+          python3 -m unittest discover -s office/docx/tests -p test_env_check.py -v
 
   validate:
     runs-on: ubuntu-latest

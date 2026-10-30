@@ -172,11 +172,10 @@ public class BusinessRuleValidator
             if (rid != null) referencedIds.Add(rid);
         }
 
+        // Implicit relationships (styles, numbering, settings, etc.) need no
+        // explicit ID in document.xml. Check only references that are present.
         foreach (var id in referencedIds.Except(definedIds))
             result.Errors.Add(Error($"Reference r:id='{id}' has no matching relationship"));
-
-        foreach (var id in definedIds.Except(referencedIds))
-            result.Warnings.Add(Warning($"Orphaned relationship: Id='{id}' is defined but never referenced"));
     }
 
     private void ValidateComments(ZipArchive zip, ValidationResult result)

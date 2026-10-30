@@ -261,8 +261,7 @@ Add a header part with a shape behind the text:
 
 ## Post-Creation Checklist
 
-1. **Validate** against `wml-subset.xsd` — all elements in correct order, required attributes present
-2. **Merge adjacent runs** with identical formatting to keep XML clean
-3. **Verify relationships** — every `r:id` in document.xml has a matching entry in `document.xml.rels`
-4. **Check content types** — every part in the package is registered in `[Content_Types].xml`
-5. **File size** — confirm images are reasonably sized (compress if > 2MB each)
+1. **Validate** — follow the [validation pipeline](../SKILL.md#validation-pipeline): `validate --input output.docx --business` runs OpenXML SDK validation on all package parts and the business checks.
+2. **Optional subset validation** — add `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` only for documents intentionally restricted to that subset. Do not remove valid document features to satisfy the subset schema.
+3. **Repair as needed** — use `fix-order` only for diagnosed ordering errors and `merge-runs` only when consolidation is needed. Revalidate after repairs.
+4. **File size** — confirm images are reasonably sized (compress if > 2MB each)
