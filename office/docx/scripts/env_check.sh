@@ -9,6 +9,23 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DOTNET_DIR="$SCRIPT_DIR/dotnet"
 CLI_PROJECT="$DOTNET_DIR/Docx.Cli/Docx.Cli.csproj"
 
+WITH_RENDERING=false
+for arg in "$@"; do
+    case "$arg" in
+        --with-rendering) WITH_RENDERING=true ;;
+        --help|-h)
+            echo "Usage: env_check.sh [--with-rendering]"
+            echo "  --with-rendering  Also probe Writer for conversion or requested visual review"
+            exit 0
+            ;;
+        *) echo "Unknown option: $arg" >&2; exit 2 ;;
+    esac
+done
+SETUP_COMMAND="bash \"$SCRIPT_DIR/setup.sh\" --minimal"
+if $WITH_RENDERING; then
+    SETUP_COMMAND="bash \"$SCRIPT_DIR/setup.sh\""
+fi
+
 # Force English output for dotnet CLI
 export DOTNET_CLI_UI_LANGUAGE=en
 
@@ -46,7 +63,7 @@ if ! command -v dotnet &>/dev/null; then
         *) echo "    https://dotnet.microsoft.com/download" ;;
     esac
     echo ""
-    echo "  Or run the full setup: bash scripts/setup.sh"
+    echo "  Or run setup: $SETUP_COMMAND"
     echo ""
     STATUS="NOT READY"
 else
@@ -104,24 +121,25 @@ else
     esac
 fi
 
-# --- Optional: LibreOffice Writer / DOCX rendering ---
-# Probe the Writer conversion path and verify the output PDF.
-writer_check_output=""
-if writer_check_output=$(python3 "$SCRIPT_DIR/render_docx.py" --check 2>&1); then
-    soffice_ver=$(soffice --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || echo "?")
-    printf "[OK]      %-14s %s (DOCX-to-PDF probe passed)\n" "Writer" "$soffice_ver"
-else
-    printf "[WARN]    %-14s DOCX-to-PDF probe failed\n" "Writer"
-    if [ -n "$writer_check_output" ]; then
-        printf '%s\n' "$writer_check_output" | sed 's/^/           /'
+# --- Opt-in: LibreOffice Writer / DOCX rendering ---
+if $WITH_RENDERING; then
+    writer_check_output=""
+    if writer_check_output=$(python3 "$SCRIPT_DIR/render_docx.py" --check 2>&1); then
+        soffice_ver=$(soffice --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || echo "?")
+        printf "[OK]      %-14s %s (DOCX-to-PDF probe passed)\n" "Writer" "$soffice_ver"
+    else
+        printf "[WARN]    %-14s DOCX-to-PDF probe failed\n" "Writer"
+        if [ -n "$writer_check_output" ]; then
+            printf '%s\n' "$writer_check_output" | sed 's/^/           /'
+        fi
+        WARNINGS=$((WARNINGS + 1))
+        case "$OS" in
+            macos)        echo "           Install: brew install --cask libreoffice" ;;
+            linux|wsl)    echo "           Install: sudo apt-get install libreoffice-writer" ;;
+            windows-shell) echo "           Install: winget install TheDocumentFoundation.LibreOffice" ;;
+        esac
+        echo "           Then run: $SETUP_COMMAND"
     fi
-    WARNINGS=$((WARNINGS + 1))
-    case "$OS" in
-        macos)        echo "           Install: brew install --cask libreoffice" ;;
-        linux|wsl)    echo "           Install: sudo apt-get install libreoffice-writer" ;;
-        windows-shell) echo "           Install: winget install TheDocumentFoundation.LibreOffice" ;;
-    esac
-    echo "           Then run: bash \"$SCRIPT_DIR/setup.sh\""
 fi
 
 # --- Optional: zip/unzip ---
@@ -180,8 +198,12 @@ if [ "$STATUS" = "READY" ]; then
 else
     echo "Status: NOT READY"
     echo ""
-    echo "Critical dependencies missing. Run the full setup:"
-    echo "  bash scripts/setup.sh          # macOS / Linux / WSL"
-    echo "  powershell scripts/setup.ps1   # Windows PowerShell"
+    echo "Critical dependencies missing. Run setup:"
+    echo "  $SETUP_COMMAND"
+    if $WITH_RENDERING; then
+        echo "  powershell scripts/setup.ps1           # Windows PowerShell"
+    else
+        echo "  powershell scripts/setup.ps1 -Minimal  # Windows PowerShell"
+    fi
     exit 1
 fi

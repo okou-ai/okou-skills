@@ -36,10 +36,14 @@ FILL and read-only inspection need Python and `pypdf`, not the browser pipeline.
 Read only the guide and scripts relevant to the selected route. Explicit user
 or template formatting takes precedence over the design defaults.
 
-Before delivery, inspect rendered page images and extracted text. For a static
-PDF, use `pdftoppm -png -r 120 output.pdf preview/page`; create `preview/` first.
-Check clipping, tables, unexpected blank pages, and factual content. Do not
-regenerate an unchanged PDF just to repeat QA.
+Before delivery, verify the PDF can be parsed and required content is present
+in extracted text. Default QA does not generate page images, inspect layout,
+or repeat generation for cosmetic fixes. Chromium rendering in CREATE/REFORMAT
+produces the requested PDF and remains part of generation.
+
+Only when the user explicitly requests rendered previews or visual review,
+use `pdftoppm -png -r 120 output.pdf preview/page` (create `preview/` first) and
+inspect the images. Do not regenerate an unchanged PDF just to repeat QA.
 
 ## Read `design/design.md` before any CREATE or REFORMAT work.
 

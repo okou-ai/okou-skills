@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "**/SKILL.md"
+      - "office/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
   push:
@@ -11,10 +12,21 @@ on:
       - main
     paths:
       - "**/SKILL.md"
+      - "office/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
 
 jobs:
+  docx-environment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check DOCX environment routing
+        run: |
+          bash -n office/docx/scripts/env_check.sh
+          python3 -m unittest discover -s office/docx/tests -v
+
   validate:
     runs-on: ubuntu-latest
     steps:

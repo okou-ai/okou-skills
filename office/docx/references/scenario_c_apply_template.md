@@ -444,13 +444,14 @@ Re-validate after every fix until gate-check passes.
 
 ## Verification Checklist
 
-After template application, verify:
+After template application, verify content and package structure. Rendered-page
+review is opt-in as described in `SKILL.md`.
 
 1. **Content preserved** — text diff shows zero content changes
-2. **Gate-check passed** — `business-rules.xsd` validation succeeds
+2. **Gate-check passed** — `validate --gate-check template.docx` succeeds
 3. **Styles applied** — headings, body text, tables use template formatting
-4. **Images intact** — all images render correctly (relationship IDs valid)
-5. **Lists working** — numbered and bulleted lists display correctly
-6. **Headers/footers** — template headers/footers appear on all pages
+4. **Images intact** — image relationship IDs and referenced media are valid
+5. **Lists** — numbering definitions and paragraph references are preserved
+6. **Headers/footers** — template parts and section references are preserved
 7. **Page layout** — margins, page size, orientation match template
-8. **No corruption** — file opens without errors in Word
+8. **No corruption** — package validation succeeds

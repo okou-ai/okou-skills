@@ -93,8 +93,10 @@ See the Complex Elements Guide section below.
 ```bash
 bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --business
 bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --gate-check template.docx  # when applying a template
-python3 "$SKILL_DIR/scripts/render_docx.py" output.docx --out preview/output.pdf --pages preview/pages
 ```
+
+Deliver after content and structural validation. Follow `SKILL.md` for requested
+PDF output or explicitly requested visual review; default QA does not render pages.
 
 ---
 
@@ -281,5 +283,5 @@ Add a header part with a shape behind the text:
 2. **Merge adjacent runs** with identical formatting to keep XML clean
 3. **Verify relationships** — every `r:id` in document.xml has a matching entry in `document.xml.rels`
 4. **Check content types** — every part in the package is registered in `[Content_Types].xml`
-5. **Preview** — open in Word or LibreOffice to visually confirm layout
+5. **Content** — use text extraction to confirm the requested content is present
 6. **File size** — confirm images are reasonably sized (compress if > 2MB each)
