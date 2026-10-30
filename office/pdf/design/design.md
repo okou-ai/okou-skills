@@ -270,10 +270,7 @@ Footer: author name (left, 7.5pt, muted) + page number (right, 7.5pt, muted) + l
 
 ---
 
-## Quality bar
-
-A PDF passes if a designer would not be embarrassed to hand it to a client.
-Concretely:
+## Design targets
 
 - Cover has a clear visual identity that is not "generic AI output"
 - Body text is readable at arm's length without squinting

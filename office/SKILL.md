@@ -24,7 +24,7 @@ Honor the user's format and supplied template. The selected template's styles
 take precedence over generic typography defaults. For a DOCX and its PDF
 companion, author once and render the DOCX so content and layout remain aligned.
 Use each route's setup and validation commands; reuse a working environment
-within the session. Structural checks do not replace content or visual review.
+within the session.
 
 The implementations are adapted from MiniMax's MIT-licensed skills. Original
 licenses and pinned-source attribution are preserved in each subdirectory's

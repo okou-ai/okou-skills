@@ -502,5 +502,5 @@ $CLI unpack --input broken.docx --output unpacked/
 $CLI validate --input broken.docx --xsd assets/xsd/wml-subset.xsd  # find all errors
 $CLI fix-order --input broken.docx                                   # fix element ordering
 $CLI validate --input broken.docx --business                         # check business rules
-scripts/docx_preview.sh broken.docx                                  # visual check
+scripts/docx_preview.sh broken.docx                                  # text/content check
 ```

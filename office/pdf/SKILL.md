@@ -36,10 +36,9 @@ FILL and read-only inspection need Python and `pypdf`, not the browser pipeline.
 Read only the guide and scripts relevant to the selected route. Explicit user
 or template formatting takes precedence over the design defaults.
 
-Before delivery, inspect rendered page images and extracted text. For a static
-PDF, use `pdftoppm -png -r 120 output.pdf preview/page`; create `preview/` first.
-Check clipping, tables, unexpected blank pages, and factual content. Do not
-regenerate an unchanged PDF just to repeat QA.
+For a user-requested rendered preview or visual review,
+use `pdftoppm -png -r 120 output.pdf preview/page` (create `preview/` first) and
+inspect the images.
 
 ## Read `design/design.md` before any CREATE or REFORMAT work.
 

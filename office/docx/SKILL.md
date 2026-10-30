@@ -42,14 +42,16 @@ Paths below are relative to this skill directory. Set `SKILL_DIR` to the absolut
 directory containing this file; do not assume the task's working directory.
 
 **First operation in session:** `bash "$SKILL_DIR/scripts/env_check.sh"`.
-This checks Writer by converting a minimal DOCX to PDF and verifying the output.
-If the Writer probe or other dependencies are missing, run
-`bash "$SKILL_DIR/scripts/setup.sh"` (Windows:
-`powershell -File "$SKILL_DIR/scripts/setup.ps1"`). `--minimal` skips rendering
-dependencies, so visual QA will remain unavailable until Writer is installed.
-Reuse the installed SDK and built CLI for subsequent operations. Before visual QA,
-rerun `python3 "$SKILL_DIR/scripts/render_docx.py" --check` only if the environment
-may have changed since the successful environment check.
+This checks DOCX authoring dependencies.
+If required dependencies are missing, run
+`bash "$SKILL_DIR/scripts/setup.sh" --minimal` (Windows:
+`powershell -File "$SKILL_DIR/scripts/setup.ps1" -Minimal`).
+Reuse the installed SDK and built CLI for subsequent operations.
+
+For PDF output, `.doc` conversion, or a user-requested rendered preview or visual
+review, run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`. This probes
+Writer by converting a minimal DOCX to PDF. If that probe fails, run the full
+`setup.sh` (Windows: `setup.ps1`) without the minimal flag.
 
 ## Quick Start: Direct C# Path
 
@@ -182,29 +184,33 @@ Also diff to verify content preservation: `bash "$SKILL_DIR/scripts/docx.sh" dif
 ## Validation pipeline
 
 Run on the completed document, and again after changes that affect it.
-This pipeline supersedes older XSD-first/fallback examples in the reference guides.
-Structure, content preservation, and visual review are separate checks.
 
 ```bash
 bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
-python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out preview/doc.pdf --pages preview/pages
 ```
 
 `validate` always runs the OpenXML SDK validator on all package parts. It checks
 structure and relationships without forcing a particular font size or recipe.
-Inspect the page images for clipping, unexpected blanks, tables, headers,
-footers, and content accuracy. `docx_preview.sh` is a text preview, not visual QA.
 
 The bundled `wml-subset.xsd` is an optional check of a curated subset, not full
 OOXML coverage. Use `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` only for documents
 intentionally restricted to that subset. A schema limitation is not permission
 to remove valid document features. Do not replace a failed package check with
-a text preview. Repair the reported defect, then rerun validation and rendering.
+a text preview. Repair the reported defect, then rerun the affected validation.
 
 Use `fix-order` only for diagnosed ordering errors and `merge-runs` only when
 consolidation is needed; do not mutate a document as a routine validation step.
-When delivering a PDF version of a Word document, use the same rendered PDF
-instead of rebuilding its content through a separate PDF authoring pipeline.
+
+### PDF export and visual review
+
+When delivering a PDF version of a Word document, export that DOCX once:
+
+```bash
+python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf
+```
+
+For a user-requested rendered preview or visual review, add
+`--pages preview/pages` and inspect the images.
 
 ## Critical rules
 
