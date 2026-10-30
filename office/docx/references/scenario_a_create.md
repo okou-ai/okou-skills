@@ -144,51 +144,36 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --gate-check temp
 
 ## Content Configuration JSON Format
 
-The CLI `create` command accepts a JSON config:
+The CLI `create --content-json` option reads an array of content blocks. Save
+this example as `content.json`:
 
 ```json
-{
-  "type": "report",
-  "title": "Quarterly Revenue Analysis",
-  "subtitle": "Q1 2026",
-  "author": "Finance Team",
-  "pageSize": "A4",
-  "margins": { "top": 1440, "right": 1440, "bottom": 1440, "left": 1440 },
-  "sections": [
-    {
-      "heading": "Executive Summary",
-      "level": 1,
-      "content": [
-        { "type": "paragraph", "text": "Revenue grew 12% year-over-year..." },
-        {
-          "type": "table",
-          "headers": ["Region", "Revenue", "Growth"],
-          "rows": [
-            ["North America", "$4.2M", "+15%"],
-            ["Europe", "$2.8M", "+8%"],
-            ["Asia Pacific", "$1.9M", "+18%"]
-          ]
-        },
-        { "type": "image", "path": "charts/revenue.png", "width": "5in", "alt": "Revenue chart" }
-      ]
-    },
-    {
-      "heading": "Detailed Analysis",
-      "level": 1,
-      "content": [
-        { "type": "paragraph", "text": "Breaking down by product line..." }
-      ]
-    }
-  ]
-}
+[
+  { "type": "heading", "text": "Executive Summary", "level": 1 },
+  { "type": "paragraph", "text": "Revenue grew 12% year-over-year." },
+  { "type": "pagebreak", "text": "" },
+  { "type": "heading", "text": "Detailed Analysis", "level": 1 },
+  { "type": "paragraph", "text": "North America revenue reached $4.2M, up 15%." }
+]
 ```
 
-Supported content types:
-- `paragraph` — body text (applies Normal style)
-- `table` — headers + rows (applies TableGrid style)
-- `image` — inline image with width/height control
-- `list` — bulleted or numbered list items
-- `pageBreak` — forces a page break
+Each block requires `type` and `text`. Supported types are case-sensitive:
+
+- `heading` — heading text; optional `level` from 1 to 6 (default: 1).
+- `paragraph` — body text.
+- `pagebreak` — a page break; set `text` to an empty string.
+
+Set the document type, title, author, page size, and margins with CLI options:
+
+```bash
+bash "$SKILL_DIR/scripts/docx.sh" create \
+  --type report --title "Quarterly Revenue Analysis" --author "Finance Team" \
+  --page-size a4 --margins standard \
+  --content-json content.json --output report.docx
+```
+
+For tables, images, or lists, use the [direct C# path](../SKILL.md#quick-start-direct-c-path)
+and the relevant `Samples/*.cs` files listed there.
 
 ---
 
