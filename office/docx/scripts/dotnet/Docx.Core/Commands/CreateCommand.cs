@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Text.Json;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -50,6 +51,17 @@ public static class CreateCommand
             var pageNumbers = parseResult.GetValue(pageNumbersOption);
             var tocPlaceholder = parseResult.GetValue(tocOption);
             var contentJson = parseResult.GetValue(contentJsonOption);
+
+            List<ContentBlock> content;
+            try
+            {
+                content = string.IsNullOrEmpty(contentJson) ? new() : ReadContent(contentJson);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+            {
+                Console.Error.WriteLine($"Could not read content JSON: {ex.Message}");
+                return 1;
+            }
 
             var fontConfig = GetFontConfig(docType);
             var pageSize = GetPageSizeConfig(pageSizeName);
@@ -166,11 +178,7 @@ public static class CreateCommand
             }
 
             // Content from JSON (if provided)
-            if (!string.IsNullOrEmpty(contentJson) && File.Exists(contentJson))
-            {
-                var jsonContent = File.ReadAllText(contentJson);
-                AddContentFromJson(body, jsonContent, fontConfig);
-            }
+            AddContent(body, content);
 
             // Ensure body has at least one paragraph
             if (!body.Elements<Paragraph>().Any())
@@ -183,6 +191,7 @@ public static class CreateCommand
 
             mainPart.Document.Save();
             Console.WriteLine($"Created {docType} document: {output}");
+            return 0;
         });
 
         return cmd;
@@ -286,41 +295,56 @@ public static class CreateCommand
         stylesPart.Styles.Save();
     }
 
-    private static void AddContentFromJson(Body body, string jsonContent, FontConfig fontConfig)
+    private record ContentBlock(string Type, string Text, int Level);
+
+    private static List<ContentBlock> ReadContent(string path)
     {
-        // Simple JSON content format: array of {type, text, level?}
-        // e.g. [{"type":"heading","text":"Introduction","level":1},{"type":"paragraph","text":"..."}]
-        try
+        using var json = JsonDocument.Parse(File.ReadAllText(path));
+        if (json.RootElement.ValueKind != JsonValueKind.Array)
+            throw new JsonException("Content must be an array of blocks.");
+
+        var content = new List<ContentBlock>();
+        foreach (var element in json.RootElement.EnumerateArray())
         {
-            using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonContent);
-            foreach (var element in jsonDoc.RootElement.EnumerateArray())
-            {
-                var type = element.GetProperty("type").GetString() ?? "paragraph";
-                var text = element.GetProperty("text").GetString() ?? "";
+            var index = content.Count + 1;
+            if (element.ValueKind != JsonValueKind.Object
+                || !element.TryGetProperty("type", out var typeElement) || typeElement.ValueKind != JsonValueKind.String
+                || !element.TryGetProperty("text", out var textElement) || textElement.ValueKind != JsonValueKind.String)
+                throw new JsonException($"Content block {index} requires string 'type' and 'text' fields.");
 
-                switch (type)
-                {
-                    case "heading":
-                        var level = element.TryGetProperty("level", out var lvl) ? lvl.GetInt32() : 1;
-                        level = Math.Clamp(level, 1, 6);
-                        body.Append(new Paragraph(
-                            new ParagraphProperties(new ParagraphStyleId { Val = $"Heading{level}" }),
-                            new Run(new Text(text))));
-                        break;
+            var type = typeElement.GetString()!;
+            var text = textElement.GetString()!;
+            if (type is not ("heading" or "paragraph" or "pagebreak"))
+                throw new JsonException($"Unsupported content type '{type}' in block {index}.");
 
-                    case "paragraph":
-                        body.Append(new Paragraph(new Run(new Text(text))));
-                        break;
+            var level = 1;
+            if (type == "heading" && element.TryGetProperty("level", out var levelElement)
+                && (levelElement.ValueKind != JsonValueKind.Number || !levelElement.TryGetInt32(out level)))
+                throw new JsonException($"Heading level in block {index} must be an integer.");
 
-                    case "pagebreak":
-                        body.Append(new Paragraph(new Run(new Break { Type = BreakValues.Page })));
-                        break;
-                }
-            }
+            content.Add(new ContentBlock(type, text, Math.Clamp(level, 1, 6)));
         }
-        catch (System.Text.Json.JsonException ex)
+        return content;
+    }
+
+    private static void AddContent(Body body, IEnumerable<ContentBlock> content)
+    {
+        foreach (var block in content)
         {
-            Console.Error.WriteLine($"Warning: could not parse content JSON: {ex.Message}");
+            switch (block.Type)
+            {
+                case "heading":
+                    body.Append(new Paragraph(
+                        new ParagraphProperties(new ParagraphStyleId { Val = $"Heading{block.Level}" }),
+                        new Run(new Text(block.Text))));
+                    break;
+                case "paragraph":
+                    body.Append(new Paragraph(new Run(new Text(block.Text))));
+                    break;
+                case "pagebreak":
+                    body.Append(new Paragraph(new Run(new Break { Type = BreakValues.Page })));
+                    break;
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 using System.CommandLine;
-using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
+using Docx.Core.OpenXml;
 
 namespace Docx.Core.Commands;
 
@@ -26,8 +26,8 @@ public static class DiffCommand
             var after = parseResult.GetValue(afterOption)!;
             var asJson = parseResult.GetValue(jsonOption);
 
-            if (!File.Exists(before)) { Console.Error.WriteLine($"File not found: {before}"); return; }
-            if (!File.Exists(after)) { Console.Error.WriteLine($"File not found: {after}"); return; }
+            if (!File.Exists(before)) { Console.Error.WriteLine($"File not found: {before}"); return 1; }
+            if (!File.Exists(after)) { Console.Error.WriteLine($"File not found: {after}"); return 1; }
 
             var beforeParas = ExtractParagraphs(before);
             var afterParas = ExtractParagraphs(after);
@@ -104,6 +104,7 @@ public static class DiffCommand
                 foreach (var sc in structureChanges)
                     Console.WriteLine($"Structure: {sc}");
             }
+            return 0;
         });
 
         return cmd;
@@ -111,12 +112,8 @@ public static class DiffCommand
 
     private static List<string> ExtractParagraphs(string docxPath)
     {
-        using var zip = ZipFile.OpenRead(docxPath);
-        var entry = zip.GetEntry("word/document.xml");
-        if (entry == null) return new();
-
-        using var stream = entry.Open();
-        var doc = XDocument.Load(stream);
+        var doc = DocumentParts.ReadDocument(docxPath);
+        if (doc == null) return new();
         return doc.Descendants(W + "p")
             .Select(p => string.Concat(p.Descendants(W + "t").Select(t => t.Value)))
             .ToList();
@@ -124,12 +121,8 @@ public static class DiffCommand
 
     private static HashSet<string> ExtractStyleIds(string docxPath)
     {
-        using var zip = ZipFile.OpenRead(docxPath);
-        var entry = zip.GetEntry("word/styles.xml");
-        if (entry == null) return new();
-
-        using var stream = entry.Open();
-        var doc = XDocument.Load(stream);
+        var doc = DocumentParts.ReadStyles(docxPath);
+        if (doc == null) return new();
         return doc.Descendants(W + "style")
             .Select(s => (string?)s.Attribute(W + "styleId"))
             .Where(id => id != null)
@@ -140,12 +133,8 @@ public static class DiffCommand
 
     private static StructureInfo ExtractStructure(string docxPath)
     {
-        using var zip = ZipFile.OpenRead(docxPath);
-        var entry = zip.GetEntry("word/document.xml");
-        if (entry == null) return new(0, 0, 0);
-
-        using var stream = entry.Open();
-        var doc = XDocument.Load(stream);
+        var doc = DocumentParts.ReadDocument(docxPath);
+        if (doc == null) return new(0, 0, 0);
         return new(
             doc.Descendants(W + "sectPr").Count(),
             doc.Descendants(W + "tbl").Count(),

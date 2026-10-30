@@ -2,6 +2,7 @@ using System.CommandLine;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
+using Docx.Core.OpenXml;
 
 namespace Docx.Core.Commands;
 
@@ -28,23 +29,19 @@ public static class AnalyzeCommand
             if (!File.Exists(input))
             {
                 Console.Error.WriteLine($"File not found: {input}");
-                return;
+                return 1;
             }
 
             using var zip = ZipFile.OpenRead(input);
-            var docEntry = zip.GetEntry("word/document.xml");
-            if (docEntry == null)
+            var doc = DocumentParts.ReadDocument(input);
+            if (doc == null)
             {
                 Console.Error.WriteLine("Not a valid DOCX");
-                return;
+                return 1;
             }
 
-            XDocument doc;
-            using (var stream = docEntry.Open())
-                doc = XDocument.Load(stream);
-
             var body = doc.Root?.Element(W + "body");
-            if (body == null) return;
+            if (body == null) return 1;
 
             // Sections
             var sections = body.Descendants(W + "sectPr").ToList();
@@ -90,13 +87,11 @@ public static class AnalyzeCommand
 
             // Styles
             var styleNames = new List<string>();
-            var stylesEntry = zip.GetEntry("word/styles.xml");
-            if (stylesEntry != null)
+            var stylesDoc = DocumentParts.ReadStyles(input);
+            if (stylesDoc != null)
             {
-                using var stream = stylesEntry.Open();
-                var stylesDoc = XDocument.Load(stream);
                 styleNames = stylesDoc.Descendants(W + "style")
-                    .Where(s => (string?)s.Attribute(W + "customStyle") == "1")
+                    .Where(s => (string?)s.Attribute(W + "customStyle") is "1" or "true" or "on")
                     .Select(s => (string?)s.Attribute(W + "styleId") ?? "")
                     .Where(s => s != "")
                     .ToList();
@@ -140,6 +135,7 @@ public static class AnalyzeCommand
                 foreach (var f in fileSizes)
                     Console.WriteLine($"  {f.file}: {f.size:N0} bytes");
             }
+            return 0;
         });
 
         return cmd;

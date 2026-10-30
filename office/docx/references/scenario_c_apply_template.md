@@ -35,9 +35,9 @@ validation and the conditions for optional subset XSD checks.
 |------|------|-------------|
 | Styles | `word/styles.xml` | All style definitions (paragraph, character, table, numbering) |
 | Theme | `word/theme/theme1.xml` | Color scheme, font scheme, format scheme |
-| Numbering | `word/numbering.xml` | List and numbering definitions |
-| Headers | `word/header*.xml` | Header content and formatting |
-| Footers | `word/footer*.xml` | Footer content and formatting |
+| Numbering | `word/numbering*.xml` | Merge template definitions with fresh IDs while retaining source lists |
+| Headers | `word/header*.xml` | Copy header content and formatting with `--apply-headers-footers` |
+| Footers | `word/footer*.xml` | Copy footer content and formatting with `--apply-headers-footers` |
 | Section props | `w:sectPr` | Margins, page size, orientation, columns |
 
 ## What Does NOT Get Copied
@@ -377,8 +377,8 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input result.docx --gate-check temp
 | Rule | What It Validates |
 |------|-------------------|
 | Template styles exist | Every style ID defined in the template is present in the output |
-| Margins match | Top, bottom, left, and right margins of the final section match when present in both documents |
-| Default font matches | The default paragraph style's `w:rFonts/@w:ascii` matches when present in both documents |
+| Margins match | Top, bottom, left, and right margins of the final section match those specified in the template |
+| Default font matches | The default paragraph style's `w:rFonts/@w:ascii` matches the font specified in the template |
 | Heading font sizes | Sizes defined for `HeadingN` styles do not increase at deeper levels |
 | Page size | Width and height of the final section match the template |
 

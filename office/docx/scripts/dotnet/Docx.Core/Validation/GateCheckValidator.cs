@@ -1,5 +1,5 @@
-using System.IO.Compression;
 using System.Xml.Linq;
+using Docx.Core.OpenXml;
 
 namespace Docx.Core.Validation;
 
@@ -30,7 +30,9 @@ public class GateCheckValidator
         }
 
         // Page margins must match
-        if (templateSectPr.Margins != null && outputSectPr.Margins != null)
+        if (templateSectPr.Margins != null && outputSectPr.Margins == null)
+            result.Violations.Add("Page margins missing from output but specified in template");
+        else if (templateSectPr.Margins != null && outputSectPr.Margins != null)
         {
             var tm = templateSectPr.Margins;
             var om = outputSectPr.Margins;
@@ -45,8 +47,8 @@ public class GateCheckValidator
         // Default font must match
         var templateFont = ExtractDefaultFont(templateDocxPath);
         var outputFont = ExtractDefaultFont(outputDocxPath);
-        if (templateFont != null && outputFont != null && templateFont != outputFont)
-            result.Violations.Add($"Default font mismatch: template='{templateFont}' output='{outputFont}'");
+        if (templateFont != null && templateFont != outputFont)
+            result.Violations.Add($"Default font mismatch: template='{templateFont}' output='{outputFont ?? "(unspecified)"}'");
 
         // Heading font hierarchy consistency
         ValidateHeadingFontHierarchy(outputDocxPath, result);
@@ -56,12 +58,8 @@ public class GateCheckValidator
 
     private HashSet<string> ExtractStyles(string docxPath)
     {
-        using var zip = ZipFile.OpenRead(docxPath);
-        var entry = zip.GetEntry("word/styles.xml");
-        if (entry == null) return new();
-
-        using var stream = entry.Open();
-        var doc = XDocument.Load(stream);
+        var doc = DocumentParts.ReadStyles(docxPath);
+        if (doc == null) return new();
         return doc.Descendants(W + "style")
             .Select(s => (string?)s.Attribute(W + "styleId"))
             .Where(id => id != null)
@@ -73,12 +71,8 @@ public class GateCheckValidator
 
     private SectionProps ExtractSectionProperties(string docxPath)
     {
-        using var zip = ZipFile.OpenRead(docxPath);
-        var entry = zip.GetEntry("word/document.xml")!;
-        using var stream = entry.Open();
-        var doc = XDocument.Load(stream);
-
-        var sectPr = doc.Descendants(W + "sectPr").LastOrDefault();
+        var doc = DocumentParts.ReadDocument(docxPath);
+        var sectPr = doc?.Descendants(W + "sectPr").LastOrDefault();
         if (sectPr == null) return new(0, 0, null);
 
         int.TryParse((string?)sectPr.Element(W + "pgSz")?.Attribute(W + "w"), out var pw);
@@ -100,28 +94,20 @@ public class GateCheckValidator
 
     private string? ExtractDefaultFont(string docxPath)
     {
-        using var zip = ZipFile.OpenRead(docxPath);
-        var entry = zip.GetEntry("word/styles.xml");
-        if (entry == null) return null;
-
-        using var stream = entry.Open();
-        var doc = XDocument.Load(stream);
+        var doc = DocumentParts.ReadStyles(docxPath);
+        if (doc == null) return null;
 
         var defaultStyle = doc.Descendants(W + "style")
             .FirstOrDefault(s => (string?)s.Attribute(W + "type") == "paragraph"
-                && (string?)s.Attribute(W + "default") == "1");
+                && (string?)s.Attribute(W + "default") is "1" or "true" or "on");
 
         return (string?)defaultStyle?.Descendants(W + "rFonts").FirstOrDefault()?.Attribute(W + "ascii");
     }
 
     private void ValidateHeadingFontHierarchy(string docxPath, GateCheckResult result)
     {
-        using var zip = ZipFile.OpenRead(docxPath);
-        var entry = zip.GetEntry("word/styles.xml");
-        if (entry == null) return;
-
-        using var stream = entry.Open();
-        var doc = XDocument.Load(stream);
+        var doc = DocumentParts.ReadStyles(docxPath);
+        if (doc == null) return;
 
         var headingSizes = new SortedDictionary<int, int>();
         foreach (var style in doc.Descendants(W + "style"))

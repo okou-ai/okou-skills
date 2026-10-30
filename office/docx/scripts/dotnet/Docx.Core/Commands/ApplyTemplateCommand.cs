@@ -44,8 +44,8 @@ public static class ApplyTemplateCommand
             var applyHeadersFooters = parseResult.GetValue(applyHeadersFootersOpt);
             var applySections = parseResult.GetValue(applySectionsOpt);
 
-            if (!File.Exists(inputPath)) { Console.Error.WriteLine($"Input file not found: {inputPath}"); return; }
-            if (!File.Exists(templatePath)) { Console.Error.WriteLine($"Template file not found: {templatePath}"); return; }
+            if (!File.Exists(inputPath)) { Console.Error.WriteLine($"Input file not found: {inputPath}"); return 1; }
+            if (!File.Exists(templatePath)) { Console.Error.WriteLine($"Template file not found: {templatePath}"); return 1; }
 
             // Create output as a copy of the source
             File.Copy(inputPath, outputPath, overwrite: true);
@@ -55,10 +55,10 @@ public static class ApplyTemplateCommand
 
             var outputMain = output.MainDocumentPart;
             var templateMain = template.MainDocumentPart;
-            if (outputMain == null || templateMain == null)
+            if (outputMain?.Document?.Body == null || templateMain?.Document?.Body == null)
             {
                 Console.Error.WriteLine("Invalid document: missing main document part.");
-                return;
+                return 1;
             }
 
             int appliedCount = 0;
@@ -77,16 +77,19 @@ public static class ApplyTemplateCommand
                 Console.WriteLine("  Applied: theme");
             }
 
+            var templateNumberingIds = new Dictionary<int, int>();
             if (applyNumbering)
             {
-                CopyNumbering(templateMain, outputMain);
+                templateNumberingIds = CopyNumbering(templateMain, outputMain);
+                if (applyStyles && outputMain.StyleDefinitionsPart?.Styles is { } styles)
+                    RemapNumberingReferences(styles, templateNumberingIds);
                 appliedCount++;
                 Console.WriteLine("  Applied: numbering");
             }
 
             if (applyHeadersFooters)
             {
-                CopyHeadersAndFooters(templateMain, outputMain);
+                CopyHeadersAndFooters(templateMain, outputMain, templateNumberingIds);
                 appliedCount++;
                 Console.WriteLine("  Applied: headers/footers");
             }
@@ -100,6 +103,7 @@ public static class ApplyTemplateCommand
 
             outputMain.Document.Save();
             Console.WriteLine($"Applied {appliedCount} formatting component(s) from template to {outputPath}");
+            return 0;
         });
 
         return cmd;
@@ -140,45 +144,105 @@ public static class ApplyTemplateCommand
     }
 
     /// <summary>
-    /// Copies numbering definitions from template, remapping numbering IDs
-    /// referenced in the output document's paragraphs.
+    /// Imports template numbering with fresh IDs, preserving the source's lists.
     /// </summary>
-    private static void CopyNumbering(MainDocumentPart template, MainDocumentPart output)
+    private static Dictionary<int, int> CopyNumbering(MainDocumentPart template, MainDocumentPart output)
     {
         var templateNumbering = template.NumberingDefinitionsPart;
-        if (templateNumbering == null) return;
+        if (templateNumbering?.Numbering == null) return new();
 
-        var referencedNumIds = new HashSet<string>();
-        var body = output.Document.Body;
-        if (body != null)
+        var outputNumbering = output.NumberingDefinitionsPart;
+        if (outputNumbering == null)
         {
-            foreach (var numId in body.Descendants<NumberingId>())
+            output.AddPart(templateNumbering);
+            return new();
+        }
+
+        outputNumbering.Numbering ??= new Numbering();
+        var imported = (Numbering)templateNumbering.Numbering.CloneNode(true);
+        var pictureIds = RemapDefinitionIds(imported, outputNumbering.Numbering, "numPicBullet", "numPicBulletId");
+        var abstractIds = RemapDefinitionIds(imported, outputNumbering.Numbering, "abstractNum", "abstractNumId");
+        var numberIds = RemapDefinitionIds(imported, outputNumbering.Numbering, "num", "numId");
+        foreach (var id in imported.Descendants<AbstractNumId>())
+            if (id.Val?.Value is int value && abstractIds.TryGetValue(value, out var mapped))
+                id.Val = mapped;
+        foreach (var id in imported.Descendants().Where(e => e.LocalName == "lvlPicBulletId"))
+        {
+            var attribute = id.GetAttribute("val", W);
+            if (int.TryParse(attribute.Value, out var value) && pictureIds.TryGetValue(value, out var mapped))
+                id.SetAttribute(new OpenXmlAttribute("w", "val", W, mapped.ToString()));
+        }
+
+        var relationshipIds = new Dictionary<string, string>();
+        foreach (var child in templateNumbering.Parts)
+            relationshipIds[child.RelationshipId] = outputNumbering.GetIdOfPart(outputNumbering.AddPart(child.OpenXmlPart));
+        foreach (var rel in templateNumbering.ExternalRelationships)
+            relationshipIds[rel.Id] = outputNumbering.AddExternalRelationship(rel.RelationshipType, rel.Uri).Id;
+        foreach (var rel in templateNumbering.HyperlinkRelationships)
+            relationshipIds[rel.Id] = outputNumbering.AddHyperlinkRelationship(rel.Uri, rel.IsExternal).Id;
+        foreach (var element in imported.Descendants())
+        {
+            foreach (var attribute in element.GetAttributes())
             {
-                if (numId.Val?.Value != null)
-                    referencedNumIds.Add(numId.Val.Value.ToString());
+                if ((attribute.NamespaceUri == "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+                    || (attribute.NamespaceUri == "urn:schemas-microsoft-com:office:office" && attribute.LocalName == "relid"))
+                    && attribute.Value is { } value && relationshipIds.TryGetValue(value, out var mapped))
+                    element.SetAttribute(new OpenXmlAttribute(attribute.Prefix, attribute.LocalName, attribute.NamespaceUri, mapped));
             }
         }
 
-        if (output.NumberingDefinitionsPart != null)
-            output.DeletePart(output.NumberingDefinitionsPart);
-
-        var newNumberingPart = output.AddNewPart<NumberingDefinitionsPart>();
-
-        using var stream = templateNumbering.GetStream(FileMode.Open, FileAccess.Read);
-        newNumberingPart.FeedData(stream);
-
-        if (referencedNumIds.Count > 0)
+        foreach (var definition in imported.Elements().Where(e => e.LocalName != "numIdMac"))
         {
-            Console.WriteLine($"  Note: {referencedNumIds.Count} numbering reference(s) in document content mapped to template definitions.");
+            var following = definition.LocalName switch
+            {
+                "numPicBullet" => outputNumbering.Numbering.Elements().FirstOrDefault(e => e.LocalName != "numPicBullet"),
+                "abstractNum" => outputNumbering.Numbering.Elements().FirstOrDefault(e => e.LocalName is "num" or "numIdMac"),
+                "num" => outputNumbering.Numbering.Elements().FirstOrDefault(e => e.LocalName == "numIdMac"),
+                _ => null
+            };
+            if (following == null)
+                outputNumbering.Numbering.Append(definition.CloneNode(true));
+            else
+                outputNumbering.Numbering.InsertBefore(definition.CloneNode(true), following);
         }
+        outputNumbering.Numbering.Save();
+        return numberIds;
+    }
+
+    private const string W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
+    private static Dictionary<int, int> RemapDefinitionIds(Numbering imported, Numbering existing, string elementName, string attributeName)
+    {
+        var nextId = existing.Elements().Where(e => e.LocalName == elementName)
+            .Select(e => GetDefinitionId(e, attributeName)).DefaultIfEmpty(0).Max() + 1;
+        var mapping = new Dictionary<int, int>();
+        foreach (var element in imported.Elements().Where(e => e.LocalName == elementName))
+        {
+            var oldId = GetDefinitionId(element, attributeName);
+            mapping[oldId] = nextId;
+            element.SetAttribute(new OpenXmlAttribute("w", attributeName, W, (nextId++).ToString()));
+        }
+        return mapping;
+    }
+
+    private static int GetDefinitionId(OpenXmlElement element, string attributeName) =>
+        int.TryParse(element.GetAttribute(attributeName, W).Value, out var id)
+            ? id : throw new InvalidDataException($"Invalid {attributeName} in numbering definition {element.LocalName}");
+
+    private static void RemapNumberingReferences(OpenXmlElement? root, IReadOnlyDictionary<int, int> mapping)
+    {
+        if (root == null) return;
+        foreach (var id in root.Descendants<NumberingId>())
+            if (id.Val?.Value is int value && mapping.TryGetValue(value, out var mapped))
+                id.Val = mapped;
     }
 
     /// <summary>
     /// Copies headers and footers from the template, remapping relationship IDs.
     /// </summary>
-    private static void CopyHeadersAndFooters(MainDocumentPart template, MainDocumentPart output)
+    private static void CopyHeadersAndFooters(MainDocumentPart template, MainDocumentPart output, IReadOnlyDictionary<int, int> numberingIds)
     {
-        var outputBody = output.Document.Body;
+        var outputBody = output.Document?.Body;
         if (outputBody == null) return;
 
         // Remove existing header/footer parts from output
@@ -222,6 +286,7 @@ public static class ApplyTemplateCommand
             }
 
             CopyPartRelationships(templateHeaderPart, newHeaderPart);
+            RemapNumberingReferences(newHeaderPart.Header, numberingIds);
 
             var newRefId = output.GetIdOfPart(newHeaderPart);
             outputFinalSectPr.InsertAt(new HeaderReference
@@ -244,6 +309,7 @@ public static class ApplyTemplateCommand
             }
 
             CopyPartRelationships(templateFooterPart, newFooterPart);
+            RemapNumberingReferences(newFooterPart.Footer, numberingIds);
 
             var newRefId = output.GetIdOfPart(newFooterPart);
             var lastHeaderRef = outputFinalSectPr.Elements<HeaderReference>().LastOrDefault();
@@ -264,22 +330,12 @@ public static class ApplyTemplateCommand
             target.AddExternalRelationship(rel.RelationshipType, rel.Uri, rel.Id);
         }
 
+        foreach (var rel in source.HyperlinkRelationships)
+            target.AddHyperlinkRelationship(rel.Uri, rel.IsExternal, rel.Id);
+
         foreach (var childPart in source.Parts)
         {
-            try
-            {
-                var contentType = childPart.OpenXmlPart.ContentType;
-                if (contentType.StartsWith("image/"))
-                {
-                    var newChild = target.AddNewPart<ImagePart>(contentType, childPart.RelationshipId);
-                    using var stream = childPart.OpenXmlPart.GetStream(FileMode.Open, FileAccess.Read);
-                    newChild.FeedData(stream);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[WARN] Skipped non-image embedded part: {ex.Message}");
-            }
+            target.AddPart(childPart.OpenXmlPart, childPart.RelationshipId);
         }
     }
 
@@ -317,6 +373,6 @@ public static class ApplyTemplateCommand
         var existing = target.GetFirstChild<T>();
         existing?.Remove();
 
-        target.Append((T)sourceElement.CloneNode(true));
+        target.AddChild((T)sourceElement.CloneNode(true), true);
     }
 }
