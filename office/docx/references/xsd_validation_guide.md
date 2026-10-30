@@ -56,16 +56,3 @@ gate and their XSD 1.1 assertions are not supported by .NET's XSD 1.0 engine.
 - A schema compilation error is a validator/schema problem, not evidence that
   the document content is corrupt. Fix the schema or use the full SDK check.
 - After fixes, rerun the affected structural or content validation.
-
-## Visual review (only on request)
-
-Only when the user explicitly requests rendered previews or visual review:
-
-```bash
-python3 "$SKILL_DIR/scripts/render_docx.py" output.docx \
-  --out preview/output.pdf --pages preview/pages
-```
-
-Inspect the resulting page images for the requested review. Default delivery
-uses content and structural checks without rendering pages. For PDF output
-without visual review, export with `--out` and omit `--pages`.

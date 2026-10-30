@@ -26,12 +26,7 @@ companion, author once and render the DOCX so content and layout remain aligned.
 Use each route's setup and validation commands; reuse a working environment
 within the session.
 
-For DOCX and PDF, deliver promptly after content and structural checks. Visual
-QA is opt-in: render preview pages, inspect screenshots, or iterate on layout
-only when the user explicitly requests a rendered preview or visual review.
-Do not create PDF/image intermediates or install rendering dependencies solely
-for default QA. Rendering needed to produce a requested PDF remains part of
-generation.
+For DOCX and PDF, deliver after content and structural checks.
 
 The implementations are adapted from MiniMax's MIT-licensed skills. Original
 licenses and pinned-source attribution are preserved in each subdirectory's

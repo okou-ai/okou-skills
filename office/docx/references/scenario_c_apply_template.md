@@ -444,8 +444,7 @@ Re-validate after every fix until gate-check passes.
 
 ## Verification Checklist
 
-After template application, verify content and package structure. Rendered-page
-review is opt-in as described in `SKILL.md`.
+After template application, verify content and package structure:
 
 1. **Content preserved** — text diff shows zero content changes
 2. **Gate-check passed** — `validate --gate-check template.docx` succeeds

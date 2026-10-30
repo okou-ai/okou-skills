@@ -272,9 +272,7 @@ Footer: author name (left, 7.5pt, muted) + page number (right, 7.5pt, muted) + l
 
 ## Design targets
 
-Apply these targets during authoring. Page-image inspection is only required
-when the user explicitly requests rendered previews or visual review, as
-described in `SKILL.md`.
+Apply these targets during authoring.
 
 - Cover has a clear visual identity that is not "generic AI output"
 - Body text is readable at arm's length without squinting

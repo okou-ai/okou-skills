@@ -95,8 +95,7 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --business
 bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --gate-check template.docx  # when applying a template
 ```
 
-Deliver after content and structural validation. Follow `SKILL.md` for requested
-PDF output or explicitly requested visual review; default QA does not render pages.
+Deliver after content and structural validation.
 
 ---
 

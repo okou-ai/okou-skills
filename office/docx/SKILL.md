@@ -42,14 +42,14 @@ Paths below are relative to this skill directory. Set `SKILL_DIR` to the absolut
 directory containing this file; do not assume the task's working directory.
 
 **First operation in session:** `bash "$SKILL_DIR/scripts/env_check.sh"`.
-The default checks DOCX authoring dependencies without running a Writer conversion.
+This checks DOCX authoring dependencies.
 If required dependencies are missing, run
 `bash "$SKILL_DIR/scripts/setup.sh" --minimal` (Windows:
 `powershell -File "$SKILL_DIR/scripts/setup.ps1" -Minimal`).
 Reuse the installed SDK and built CLI for subsequent operations.
 
-For requested PDF output, `.doc` conversion, or explicitly requested visual QA,
-run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`. This also probes
+For PDF output, `.doc` conversion, or a user-requested rendered preview or visual
+review, run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`. This probes
 Writer by converting a minimal DOCX to PDF. If that probe fails, run the full
 `setup.sh` (Windows: `setup.ps1`) without the minimal flag.
 
@@ -184,9 +184,6 @@ Also diff to verify content preservation: `bash "$SKILL_DIR/scripts/docx.sh" dif
 ## Validation pipeline
 
 Run on the completed document, and again after changes that affect it.
-This pipeline supersedes older XSD-first/fallback examples in the reference guides.
-Default validation covers structure and content preservation; visual QA is opt-in,
-including when applying a template.
 
 ```bash
 bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
@@ -195,7 +192,7 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
 `validate` always runs the OpenXML SDK validator on all package parts. It checks
 structure and relationships without forcing a particular font size or recipe.
 Use text extraction and diffs to check content accuracy and preservation.
-`docx_preview.sh` provides a text preview without rendering pages.
+`docx_preview.sh` provides a text preview.
 
 The bundled `wml-subset.xsd` is an optional check of a curated subset, not full
 OOXML coverage. Use `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` only for documents
@@ -206,7 +203,7 @@ a text preview. Repair the reported defect, then rerun the affected validation.
 Use `fix-order` only for diagnosed ordering errors and `merge-runs` only when
 consolidation is needed; do not mutate a document as a routine validation step.
 
-### Requested PDF output or visual review
+### PDF export and visual review
 
 When delivering a PDF version of a Word document, export that DOCX once:
 
@@ -214,9 +211,8 @@ When delivering a PDF version of a Word document, export that DOCX once:
 python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf
 ```
 
-Only when the user explicitly requests rendered previews or visual review, add
-`--pages preview/pages` and inspect the images. Otherwise, skip page images,
-visual layout checks, and cosmetic repair loops; deliver after default validation.
+For a user-requested rendered preview or visual review, add
+`--pages preview/pages` and inspect the images.
 
 ## Critical rules
 
