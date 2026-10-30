@@ -26,8 +26,6 @@ companion, author once and render the DOCX so content and layout remain aligned.
 Use each route's setup and validation commands; reuse a working environment
 within the session.
 
-For DOCX and PDF, deliver after content and structural checks.
-
 The implementations are adapted from MiniMax's MIT-licensed skills. Original
 licenses and pinned-source attribution are preserved in each subdirectory's
 `LICENSE` and `UPSTREAM.md`.

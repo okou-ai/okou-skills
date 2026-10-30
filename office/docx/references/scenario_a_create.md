@@ -95,8 +95,6 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --business
 bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --gate-check template.docx  # when applying a template
 ```
 
-Deliver after content and structural validation.
-
 ---
 
 ## Document Type Defaults
@@ -282,5 +280,4 @@ Add a header part with a shape behind the text:
 2. **Merge adjacent runs** with identical formatting to keep XML clean
 3. **Verify relationships** — every `r:id` in document.xml has a matching entry in `document.xml.rels`
 4. **Check content types** — every part in the package is registered in `[Content_Types].xml`
-5. **Content** — use text extraction to confirm the requested content is present
-6. **File size** — confirm images are reasonably sized (compress if > 2MB each)
+5. **File size** — confirm images are reasonably sized (compress if > 2MB each)

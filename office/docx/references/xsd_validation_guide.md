@@ -55,4 +55,4 @@ gate and their XSD 1.1 assertions are not supported by .NET's XSD 1.0 engine.
 - For missing relationships, inspect the affected part's `.rels` file and target.
 - A schema compilation error is a validator/schema problem, not evidence that
   the document content is corrupt. Fix the schema or use the full SDK check.
-- After fixes, rerun the affected structural or content validation.
+- After fixes, rerun validation.

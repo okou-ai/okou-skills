@@ -36,9 +36,6 @@ FILL and read-only inspection need Python and `pypdf`, not the browser pipeline.
 Read only the guide and scripts relevant to the selected route. Explicit user
 or template formatting takes precedence over the design defaults.
 
-Before delivery, verify the PDF can be parsed and required content is present
-in extracted text.
-
 For a user-requested rendered preview or visual review,
 use `pdftoppm -png -r 120 output.pdf preview/page` (create `preview/` first) and
 inspect the images.

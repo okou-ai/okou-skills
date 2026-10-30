@@ -191,8 +191,6 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
 
 `validate` always runs the OpenXML SDK validator on all package parts. It checks
 structure and relationships without forcing a particular font size or recipe.
-Use text extraction and diffs to check content accuracy and preservation.
-`docx_preview.sh` provides a text preview.
 
 The bundled `wml-subset.xsd` is an optional check of a curated subset, not full
 OOXML coverage. Use `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` only for documents

@@ -272,8 +272,6 @@ Footer: author name (left, 7.5pt, muted) + page number (right, 7.5pt, muted) + l
 
 ## Design targets
 
-Apply these targets during authoring.
-
 - Cover has a clear visual identity that is not "generic AI output"
 - Body text is readable at arm's length without squinting
 - Every page looks like it belongs to the same document

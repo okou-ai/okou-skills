@@ -444,7 +444,7 @@ Re-validate after every fix until gate-check passes.
 
 ## Verification Checklist
 
-After template application, verify content and package structure:
+After template application, verify:
 
 1. **Content preserved** — text diff shows zero content changes
 2. **Gate-check passed** — `validate --gate-check template.docx` succeeds
