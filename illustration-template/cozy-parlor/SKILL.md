@@ -30,7 +30,7 @@ Bundled reference imagery — four canonical outputs that demonstrate the framew
 | **Palette lead** | Cool/neutral — sage, slate-blue, cornflower, lavender, dove-gray, mint, chalk-white. **Never lead with cream, butter, peach, amber, terracotta.** |
 | **Accent** | Exactly ONE hot pop (cherry-red, mustard, magenta-pink, terracotta) on a SINGLE OBJECT — a lamp, book, tulip, towel, etc. Never a wash, never a wall color. |
 | **Staging** | Object-rich personality props — books, plants, dishes, lamps, jars, tools of the activity. Lived-in feel. |
-| **Canvas** | Portrait 1024x1536 (2:3) via `gpt-image-1.5`, `--quality high` |
+| **Canvas** | Portrait 1024x1536 (2:3), high quality when supported by the selected model |
 
 ### The chill-face rule (critical)
 
@@ -77,7 +77,7 @@ SCENE: {CAST_DESCRIPTION} {ACTIVITY_DESCRIPTION}, in a {SETTING}. PATTERN MOTIFS
 
 ## Model guidance
 
-This style is designed for narrative scene compositions with multiple props, patterned surfaces, and a single anthropomorphic character — the kind of scene a strong text-to-image model can compose in one pass from a detailed prompt. Recommended pairing: `gpt-image-1.5` at `high` quality, portrait `1024x1536`, with prompt enhancement disabled so the locked-fundamentals language reaches the model verbatim.
+This style needs strong long-prompt adherence for narrative scenes with multiple props, patterned surfaces, and a single anthropomorphic character. For Okou built-in generation, use the image model selected in the user's Settings › Built-in tools; the model is not a CLI option. Do not switch models or providers just to satisfy this style. Check `okou generate image -h` for the selected model's supported size and quality controls; use portrait `1024x1536` at `high` quality when supported, with prompt enhancement disabled when that control is available so the locked-fundamentals language reaches the model verbatim.
 
 The bundled reference images (`ref-frog-letters.jpg`, `ref-mouse-baker.jpg`, `ref-hedgehog-records.jpg`, `ref-otter-painter.jpg`) are canonical outputs of this framework — provided for *human* style study and prompt authoring. They are not required as image inputs at generation time — the style transfers entirely through the detailed prompt language.
 

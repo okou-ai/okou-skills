@@ -98,7 +98,7 @@ NO CREAM, BACKGROUND MUST BE WHITE. No text. No logo.
 
 ## Model guidance
 
-- Use a high-fidelity instruction-following image model with image-to-image input (the anchor reference is the seed). Strong matches in practice: `gpt-image-1.5` at landscape (1536×1024) with high input fidelity.
+- Use a currently supported instruction-following image model with image-to-image input (the anchor reference is the seed). For Okou built-in generation, use the model selected in the user's Settings › Built-in tools, not a model override in the command. Check `okou generate image -h` for reference-image support and enable high input fidelity only when the selected model supports that control. If a different model or provider is needed, ask the user rather than silently switching.
 - If text-to-image is the only option, expect the model to drift toward cream / off-white backgrounds. Re-emphasize "pure white" in the prompt and accept that the line weight may feel cleaner than the anchor.
 - Default canvas is **landscape 1536×1024** for blog covers and marketing. Portrait 1024×1536 is acceptable when explicitly briefed.
 - Per-piece variation comes from the dials, not from sampling parameters — keep the dials explicit in the prompt rather than relying on temperature/seed variance.
