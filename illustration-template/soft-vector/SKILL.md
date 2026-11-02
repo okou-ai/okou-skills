@@ -100,7 +100,7 @@ Open-line spots:   <2-3 specific outlines that will be unclosed, named explicitl
 
 ## Generation guidance
 
-Models with strong flat-vector handling and crisp uniform stroke output (e.g. `gpt-image-1.5`, `nano-banana-2`, or `gpt-image-2`) produce the most reliable output here. When briefing the model:
+Use a currently supported image model with strong flat-vector handling and crisp uniform stroke output. For Okou built-in generation, use the model selected in the user's Settings › Built-in tools, not a model override in the command; check `okou generate image -h` for supported controls. If another model or provider is needed, ask the user rather than silently switching, and inspect the result against the locked style rules below. When briefing the model:
 
 - State **explicitly** that the canvas is square 1:1 and the background is a single flat pale-blue `#EEF1F5` field with no gradient, no border, no horizon.
 - State **explicitly** the stroke style — thin (~1.5–2px), uniform, dark navy `#1F2A44`, rounded caps, NOT chunky.

@@ -226,6 +226,7 @@ If any check fails, regenerate with a tightened prompt before sharing.
 ## Portability notes
 
 - The locked style and 6 dials describe **what to produce**, not which endpoint to call. The resource is provider-agnostic at the semantic level.
-- The reference set in this folder was produced with a GPT Image-family model at 1024×1536, high quality. Models with weak in-image text rendering will tend to garble the serif headline; if you see broken lettering, switch to a model that handles in-image text well (e.g., GPT Image 1 / 1.5).
+- The reference set in this folder was produced with a GPT Image-family model at 1024×1536, high quality.
+- Models with weak in-image text rendering can garble the serif headline. For Okou built-in generation, use the model selected in the user's Settings › Built-in tools; the model is not a CLI option. If broken lettering requires a different model or provider, ask the user to choose a currently supported option with strong in-image text rendering, then inspect the lettering and locked style rules again rather than assuming visual equivalence.
 - The chunky white sneakers are the most under-prompted detail. If a model is dropping them, lean harder in the prompt ("two thin black stick legs ending in chunky white sneakers with visible black laces, toe caps, and outsole").
 - Series consistency: keep the sneakers + serif type + flat color as the through-line; vary palette, hero, action, density, and layout. Never repeat a palette across a single series.

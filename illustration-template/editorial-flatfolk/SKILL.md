@@ -9,19 +9,18 @@ This skill produces one square editorial illustration in a locked hand-drawn nai
 
 The aesthetic sits in the contemporary editorial / picture-book / pop-folk space — flat saturated color blocks with loose hand-drawn ink line work sitting ON TOP of the color, subtle paper grain across the canvas, and a charming slightly imperfect hand. Adjacent to Pol Mara, Klaus Haapaniemi, and Carson Ellis editorial work. Not anime, not vector, not photoreal, not soft watercolor wash, not flat-vector poster.
 
-## Required model
+## Generation requirements
 
-This style is locked to **`gpt-image-1.5`** (OpenAI image generation through whichever provider the executing tool routes to). The combination of flat saturated color, loose hand-drawn ink overlay, paper grain, and naive architectural depth requires this specific model; it does not survive on harder-line vector models or softer painterly models.
+This style is locked to its visual rules and the `ref-harbor.png` style anchor, not to a model ID. Use a currently supported instruction-following image-edit model with reference-image input. For Okou built-in generation, use the image model selected in the user's Settings › Built-in tools; the model is not a CLI option. If the selected model cannot accept the required reference, ask the user to choose a suitable model or provider rather than silently switching or dropping the reference.
 
-Required generation parameters:
+Generation parameters:
 
-- **Model:** `gpt-image-1.5`
 - **Size:** `1024x1024` (square)
-- **Quality:** `high` — the paper grain and ink hatching need resolution to read
+- **Quality:** `high` when supported — the paper grain and ink hatching need resolution to read
 - **Mode:** **image-to-image** with `ref-harbor.png` (the locked style anchor that lives next to this SKILL.md) passed as the style reference
-- **Style:** caller must opt out of stacked style injection (the executing tool should pass `--skip-style` or its equivalent — the SKILL itself is the style)
+- **Style:** use this SKILL as the complete style specification without stacking another style. With Okou, compile the brief with `--style image-style:editorial-flatfolk --prompt "<brief>" --compile`, then generate the final prompt with `--compiled-prompt` and the reference supplied through `--image-url`.
 
-These are semantic parameters. The executing tool decides the invocation mechanics (CLI command, REST call, gateway, local runtime).
+Check the executing tool's current help for invocation mechanics and supported parameters (`okou generate image -h` for Okou). For an explicitly requested connector, verify the provider's current model availability, account access, and reference-image capabilities before invoking it. Inspect the result against the locked style axes; switching model families does not guarantee visual equivalence.
 
 ## Reference anchors
 

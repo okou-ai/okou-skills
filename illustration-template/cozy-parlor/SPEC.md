@@ -12,7 +12,7 @@ A hand-painted watercolor + ink-line illustration style — one anthropomorphic 
 - **Patterned surfaces**: at least 2 surfaces in frame carry decorative pattern (wallpaper, upholstery, rug, curtain, tile, textile, ceramic, smock, cushion). This is non-negotiable.
 - **Palette structure**: cool/neutral lead (sage, slate-blue, cornflower, lavender, dove-gray, mint, chalk-white) + ONE hot accent pop (cherry-red, mustard, magenta-pink, terracotta — single object only). **No warm cream/butter/peach/amber overlay.** Hot accent is a single object, not a wash.
 - **Object-rich staging**: personality props placed throughout — books, jars, records, plants, dishes, lamps, paintings, tools of the activity. The space feels lived-in.
-- **Canvas**: portrait 1024x1536 (2:3 portrait), gpt-image-1.5, quality high.
+- **Canvas**: portrait 1024x1536 (2:3 portrait), high quality when supported by the selected model.
 
 ## Dials (vary per piece)
 
@@ -43,12 +43,19 @@ PALETTE (cool/neutral): {PALETTE_LEAD}, one HOT {ACCENT_COLOR} accent on {ACCENT
 SCENE: {CAST_DESCRIPTION} {ACTIVITY_DESCRIPTION}, in a {SETTING}. PATTERN MOTIFS: {PATTERN_1}, {PATTERN_2}, {PATTERN_3}. PROPS: {PROP_LIST}. COMPLEXITY: {L1 | L2 | L3 description}.
 ```
 
-Generation command:
+Generation workflow (inspect `okou generate image -h` for current capabilities first):
 
 ```bash
-okou generate image --provider built-in --skip-style --model gpt-image-1.5 \
-  --size 1024x1536 --quality high --prompt "<filled template>"
+# Compile the brief with this registered style; this does not generate an image.
+okou generate image --style image-style:cozy-parlor --prompt "<scene brief>" \
+  --size 1024x1536 --quality high --compile
+
+# Follow the returned packet to fill the template, then generate the final prompt.
+okou generate image --provider built-in --compiled-prompt "<filled template>" \
+  --size 1024x1536 --quality high --wait
 ```
+
+Built-in generation uses the image model selected in the user's Settings › Built-in tools, not a model specified by this style or a CLI option. Use size and quality controls supported by that model; if a different model or provider is needed, ask the user rather than silently switching. The compiled prompt already carries this style — do not stack another style on top.
 
 ## Reference pieces
 
