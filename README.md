@@ -64,8 +64,9 @@ To add a new skill or improve an existing one:
 [people-search](people-search/SKILL.md) finds and verifies professional candidates
 across public profiles, data tools, organizations, and original work sources.
 It covers multi-channel discovery, original-source checking, deduplication,
-and task-appropriate expansion and stopping. [Tool examples](people-search/references/examples.md)
-show how to inspect and call available data tools.
+and task-appropriate expansion and stopping. Read the
+[data-tool reference](people-search/references/data-tools.md) when selecting or
+calling managed data tools.
 
 ```bash
 /plugin install people-search@vm0-skills
