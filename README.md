@@ -63,10 +63,11 @@ To add a new skill or improve an existing one:
 
 [people-search](people-search/SKILL.md) finds and verifies professional candidates
 across public profiles, data tools, organizations, and original work sources.
-It separates eligibility from ranking preferences and supports open-ended
-searches without imposing an arbitrary shortlist or weakening requirements.
+It covers multi-channel discovery, original-source checking, deduplication,
+and useful follow-up research, adapting to the user's question rather than
+imposing a fixed evaluation framework or answer format.
 [Examples](people-search/references/examples.md) cover tool usage, evidence gaps,
-deduplication, and stopping decisions.
+deduplication, expansion, and stopping decisions.
 
 ```bash
 /plugin install people-search@vm0-skills

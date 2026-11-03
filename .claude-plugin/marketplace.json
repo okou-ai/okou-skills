@@ -154,7 +154,7 @@
     },
     {
       "name": "people-search",
-      "description": "Find and verify professional candidates across discovery channels, preserve hard requirements, and deliver complete, deduplicated recommendations for high-recall searches.",
+      "description": "Research people through multiple discovery channels and data tools, check original sources, deduplicate findings, and follow up on useful leads.",
       "source": "./",
       "strict": false,
       "skills": [
