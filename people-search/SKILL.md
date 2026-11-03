@@ -16,14 +16,13 @@ and unresolved questions.
 
 ## 2. Discover across channels
 
-Continue discovering people across relevant channels; do not narrow the search
-merely because the first few names have surfaced.
+Continue discovering people across relevant channels.
 Combine people/profile search, web search, and source rosters. Expand broad
 roles and topics with related terms, platforms, and newly discovered names;
 split over-constrained queries without changing the user's scope.
 
-For managed people or web data, read [Data tools](references/data-tools.md)
-before selecting tools or making calls.
+Use `okou data tools` to discover available tools and `okou data describe <tool-name>`
+to read the current schema before calling.
 
 ## 3. Resolve important evidence gaps
 
