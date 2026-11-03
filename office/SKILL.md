@@ -1,6 +1,6 @@
 ---
 name: office
-description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, and document formatting or conversion.
+description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets, including financial models, budgets, forecasts, and scenario reports in Excel. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, and document formatting or conversion.
 license: MIT
 ---
 
@@ -18,7 +18,7 @@ directory is the skill directory.
 | --- | --- | --- |
 | Word creation, editing, formatting, or DOCX-to-PDF | [docx/SKILL.md](docx/SKILL.md) | `SKILL_DIR="$OFFICE_DIR/docx"` |
 | Standalone PDF creation, reading, forms, or reformatting | [pdf/SKILL.md](pdf/SKILL.md) | `SKILL_DIR="$OFFICE_DIR/pdf"` |
-| Excel creation, reading, editing, formulas, or validation | [xlsx/SKILL.md](xlsx/SKILL.md) | `SKILL_DIR="$OFFICE_DIR/xlsx"` |
+| Excel creation, reading, editing, formulas, or validation, including financial budgets and forecasts | [xlsx/SKILL.md](xlsx/SKILL.md) — select its common and business-scenario layers before authoring | `SKILL_DIR="$OFFICE_DIR/xlsx"` |
 
 Honor the user's format and supplied template. The selected template's styles
 take precedence over generic typography defaults. For a DOCX and its PDF

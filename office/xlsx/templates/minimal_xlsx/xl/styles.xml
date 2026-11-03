@@ -32,7 +32,7 @@
   CRITICAL RULES:
   - fills[0] and fills[1] are REQUIRED BY SPEC — never remove them
   - Do NOT modify existing <xf> entries — only append new ones
-  - AARRGGBB color format: first 2 hex digits = Alpha (00 = opaque)
+  - Colors use eight-digit ARGB; preserve valid existing encodings
 -->
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
 

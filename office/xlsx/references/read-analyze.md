@@ -1,97 +1,47 @@
-# Data Reading & Analysis Guide
+# Read and analyze spreadsheet data
 
-> Reference for the READ path. Use `xlsx_reader.py` for structure discovery and data quality auditing,
-> then pandas for custom analysis. **Never modify the source file.**
+Use for extraction or analysis without changing the source. Do not save,
+restyle or recalculate the original. A request for an output file is a separate
+CREATE/EDIT operation; return the requested format, not a mandatory report.
 
----
-
-## When to Use This Path
-
-The user asks to read, analyze, view, summarize, extract, or answer questions about an Excel/CSV file's contents,
-without requiring file modification. If modification is needed, hand off to `edit.md`.
-
----
-
-## Workflow
-
-### Step 1 — Structure Discovery
-
-Run `xlsx_reader.py` first. It handles format detection, encoding fallback, structure exploration, and data quality audit:
+## Discover the data
 
 ```bash
-python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx                 # full report
-python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --sheet Sales   # single sheet
-python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --quality       # quality audit only
-python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --json          # machine-readable
+python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx
+python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --sheet Sales --json
 ```
 
-Supported formats: `.xlsx`, `.xlsm`, `.csv`, `.tsv`. The script tries multiple encodings for CSV (utf-8-sig, gbk, utf-8, latin-1).
+The reader handles XLSX/XLSM/CSV/TSV through pandas and supports `--quality`.
+Check actual sheet names, headers, extent, units, periods and data types before
+analysis. CSV encoding detection can be ambiguous; confirm text and delimiters
+rather than silently accepting garbled data. Read macros as data, never execute
+them as part of inspection.
 
-### Step 2 — Custom Analysis with pandas
+For custom analysis, use pandas or another appropriate deterministic tool.
+Read only needed sheets/columns for large files. Account for header offsets,
+merged or multi-row headers, and whether identifiers are text rather than
+quantities. Aggregate actual source columns rather than inferring totals from
+rounded summaries.
 
-Load data and perform the analysis the user requests:
+## Interpret values carefully
 
-```python
-import pandas as pd
-df = pd.read_excel("input.xlsx", sheet_name=None)  # dict of all sheets
-# For CSV: pd.read_csv("input.csv")
-```
+- Missing formula caches are uncalculated/unknown values, not zeros. Reading
+  with `data_only=True` can inspect existing caches but does not calculate
+  formulas; never save that values-only workbook over the formula source.
+- When results require recalculation, use an authorized disposable copy and
+  the VALIDATE workflow. Do not silently alter the original during analysis.
+- Preserve missing, invalid and unavailable states. If coercing mixed types,
+  identify rejected values rather than silently deleting them.
+- Distinguish source records from calculated findings, estimates and proposals.
+  Explain material limits instead of inventing causes or unsupported facts.
+- Report Excel cell/row locations, not pandas indices. Account for the actual
+  header/skip offset rather than assuming a universal index-to-row formula.
+- Match requested decimal precision, currency, units and locale in displayed
+  results. Numeric display is not permission to round intermediate arithmetic.
 
-**Header handling** (when the default `header=0` doesn't work):
+## Answer the actual request
 
-| Situation | Code |
-|-----------|------|
-| Header on row 3 | `pd.read_excel(path, header=2)` |
-| Multi-level merged header | `pd.read_excel(path, header=[0, 1])` |
-| No header | `pd.read_excel(path, header=None)` |
-
-**Analysis quick reference:**
-
-| Scenario | Pattern |
-|----------|---------|
-| Descriptive stats | `df.describe()` or `df['Col'].agg(['sum', 'mean', 'min', 'max'])` |
-| Group aggregation | `df.groupby('Region')['Revenue'].agg(Total='sum', Avg='mean')` |
-| Top N | `df.groupby('Region')['Revenue'].sum().sort_values(ascending=False).head(5)` |
-| Pivot table | `df.pivot_table(values='Revenue', index='Region', columns='Quarter', aggfunc='sum', margins=True)` |
-| Time series | `df.set_index(pd.to_datetime(df['Date'])).resample('ME')['Revenue'].sum()` |
-| Cross-sheet merge | `pd.merge(sales, customers, on='CustomerID', how='left', validate='m:1')` |
-| Stack sheets | `pd.concat([df.assign(Source=name) for name, df in sheets.items()], ignore_index=True)` |
-| Large files (>50MB) | `pd.read_excel(path, usecols=['Date', 'Revenue'])` or `pd.read_csv(path, chunksize=10000)` |
-
-### Step 3 — Output
-
-If the user specifies an output file path, write results to it (highest priority). Format the report as:
-
-```
-## Analysis Report: {filename}
-### File Overview     — format, sheets, row counts
-### Data Quality      — nulls, duplicates, mixed types (or "no issues")
-### Key Findings      — direct answer to the user's question
-### Additional Notes  — formula NaN, encoding issues, caveats
-```
-
-**Numeric display**: monetary `1,234,567.89`, percentage `12.3%`, multiples `8.5x`, counts as integers.
-
----
-
-## Common Pitfalls
-
-| Pitfall | Cause | Fix |
-|---------|-------|-----|
-| Formula cells read as NaN | `<v>` cache empty in freshly generated files | Inform user; suggest opening in Excel and re-saving; or use `libreoffice_recalc.py` |
-| CSV encoding errors | Chinese Windows exports use GBK | `xlsx_reader.py` auto-tries multiple encodings; manually specify if all fail |
-| Mixed types in column | Column has both numbers and text (e.g., "N/A") | `pd.to_numeric(df['Col'], errors='coerce')` — report unconvertible rows |
-| Year shows as 2,024 | Thousands separator format applied to year | `df['Year'].astype(int).astype(str)` |
-| Multi-level headers | Two-row header merged | `pd.read_excel(path, header=[0, 1])`, then flatten with `' - '.join()` |
-| Row number mismatch | pandas 0-indexed vs Excel 1-indexed | `excel_row = pandas_index + 2` (+1 for 1-index, +1 for header) |
-
-**Critical**: Never open with `data_only=True` then `save()` — this permanently destroys all formulas.
-
----
-
-## Prohibitions
-
-- Never modify the source file (no `save()`, no XML edits)
-- Never report formula NaN as "data is zero" — explain it's a formula cache issue
-- Never report pandas indices as Excel row numbers
-- Never make speculative conclusions unsupported by the data
+Present the requested findings or extracted records with enough source
+locations and calculation detail to make material results checkable. Include
+relevant quality issues and missing-evidence caveats; do not impose unrelated
+financial metrics, a fixed section template, or an extra file on every task.
