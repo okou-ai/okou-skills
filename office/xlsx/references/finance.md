@@ -1,9 +1,8 @@
 # Finance workbooks
 
-Read for financial models, budgets, forecasts, valuations, statements, and
-financial scenario or management reports in Excel. Apply this layer together
-with common workbook rules. A template or explicit house style overrides the
-default layout and colors; a narrow edit does not authorize a redesign.
+Use for financial models, budgets, forecasts, valuations, statements and
+financial management reports in Excel, together with common workbook rules.
+Preserve supplied templates/house styles; narrow edits do not authorize redesign.
 
 ## Plan the reading and calculation paths
 
@@ -20,6 +19,20 @@ default layout and colors; a narrow edit does not authorize a redesign.
 4. Keep detail and source evidence traceable without making the reader search
    through raw data to find the requested answer. Include only relevant
    scenarios, sensitivities, and charts; do not build an unrequested full model.
+
+## Apply the fixed green theme
+
+Unless the supplied style overrides it, use this palette across financial
+report/model sheets; do not choose a different accent for each workbook.
+
+| Use | Fill/accent | Text |
+| --- | --- | --- |
+| Title/label bands and primary chart accents | Deep green `#135B44` | White `#FFFFFF` on title/label bands |
+| Section/header labels | Pale green `#CFE9E0` | Dark green `#0B3D2C` |
+| Period dividers and sensitivity baseline | Light gray `#E7E5E4` | Neutral text |
+
+Use white (`#FFFFFF`) for data grids. Theme fills and chart accents must not
+override the font roles below or imply positive/negative performance.
 
 ## Apply financial font roles
 
@@ -39,9 +52,8 @@ Examples: an editable `Inputs!B4 = 0.05` is blue;
 Never color a formula as an editable input. Use fills for sections, periods, or
 explicit review flags, not as a substitute for the font-role convention.
 
-These are modeling defaults, not universal accounting standards. Colors do not
-prove correctness or provide edit permissions. Do not copy template style
-numbers without inspecting their actual font and number-format definitions.
+These are modeling defaults, not accounting standards, edit permissions, or
+proof of correctness. Inspect fonts/number formats, not copied style indices.
 
 ## Make the report readable
 
@@ -56,9 +68,9 @@ numbers without inspecting their actual font and number-format definitions.
   a consistent separator or light neutral fill as a second cue; labels must
   work without color. Do not imply that forecast values are observed actuals.
 - Establish title → section → table header → detail hierarchy. Emphasize key
-  results and subtotals with bold text and appropriate rules; keep explanation
-  text distinct from dense numeric rows. Use whitespace and one restrained
-  accent rather than arbitrary full-sheet fills or fixed row numbers.
+  results/subtotals with bold type and appropriate rules; distinguish explanation
+  text from numeric rows. Use whitespace and the fixed green theme rather than
+  full-sheet fills or fixed row numbers.
 - Keep explanations consistent with formulas. Make input-dependent narrative
   dynamic or label it as applying to the stated baseline. Do not infer causes
   or motives merely because two numbers move together.

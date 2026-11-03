@@ -57,9 +57,21 @@ class SkillDocumentationTests(unittest.TestCase):
     def test_non_financial_presentation_does_not_impose_finance_palette(self):
         common = (SKILL / "references/format.md").read_text()
         finance = (SKILL / "references/finance.md").read_text()
-        for color in ("#0000FF", "#008000", "#FF0000"):
+        for color in ("#0000FF", "#008000", "#FF0000", "#135B44", "#CFE9E0", "#E7E5E4"):
             self.assertNotIn(color, common)
             self.assertIn(color, finance)
+
+    def test_finance_theme_is_fixed_and_separate_from_formula_font_roles(self):
+        finance = (SKILL / "references/finance.md").read_text()
+        theme = finance.split("## Apply the fixed green theme\n", 1)[1].split("\n## ", 1)[0]
+        self.assertEqual(
+            set(re.findall(r"#[0-9A-F]{6}\b", theme)),
+            {"#135B44", "#CFE9E0", "#0B3D2C", "#E7E5E4", "#FFFFFF"},
+        )
+        roles = finance.split("## Apply financial font roles\n", 1)[1].split("\n## ", 1)[0]
+        for color in ("#0000FF", "#000000", "#008000", "#FF0000"):
+            self.assertIn(color, roles)
+        self.assertIn("must not\noverride the font roles", theme)
 
     def test_starter_style_roles_and_relationship_ids_remain_valid(self):
         template = SKILL / "templates/minimal_xlsx"
