@@ -153,6 +153,15 @@
       ]
     },
     {
+      "name": "people-search",
+      "description": "Find and verify professional candidates across discovery channels, preserve hard requirements, and deliver complete, deduplicated recommendations for high-recall searches.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./people-search"
+      ]
+    },
+    {
       "name": "user-research",
       "description": "User research toolkit — customer intelligence gathering with confidence scoring, and research synthesis for personas, themes, and opportunity prioritization.",
       "source": "./",
