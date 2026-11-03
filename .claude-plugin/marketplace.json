@@ -153,6 +153,15 @@
       ]
     },
     {
+      "name": "people-search",
+      "description": "Research people through multiple discovery channels and data tools, check original sources, deduplicate findings, and follow up on useful leads.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./people-search"
+      ]
+    },
+    {
       "name": "user-research",
       "description": "User research toolkit — customer intelligence gathering with confidence scoring, and research synthesis for personas, themes, and opportunity prioritization.",
       "source": "./",

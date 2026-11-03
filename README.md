@@ -59,6 +59,17 @@ To add a new skill or improve an existing one:
 3. Include a `SKILL.md` file with tested usage examples.
 4. Submit a pull request.
 
+## People search
+
+[people-search](people-search/SKILL.md) finds and verifies professional candidates
+across public profiles, data tools, organizations, and original work sources.
+It covers multi-channel discovery, original-source checking, deduplication,
+and task-appropriate expansion and stopping.
+
+```bash
+/plugin install people-search@vm0-skills
+```
+
 ## Business document reference index
 
 [business-skill-index](business-skill-index/SKILL.md) provides a
