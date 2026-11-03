@@ -16,7 +16,8 @@ and unresolved questions.
 
 ## 2. Discover across channels
 
-Search the relevant channels before concentrating on the first few names.
+Continue discovering people across relevant channels; do not narrow the search
+merely because the first few names have surfaced.
 Combine people/profile search, web search, and source rosters. Expand broad
 roles and topics with related terms, platforms, and newly discovered names;
 split over-constrained queries without changing the user's scope.
