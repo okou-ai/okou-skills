@@ -1,7 +1,32 @@
 # Design System
 
-The aesthetic layer. Read this before touching any script.
-This file answers "what should it look like and why."
+The appearance, tokens, and visual QA layer for CREATE/REFORMAT. Read this after
+common requirements and manuscript/preset selection in [SKILL.md](../SKILL.md).
+For block fields, mathematics, charts, figures/captions, bibliography, code, and
+flowcharts, read [the content reference directly](../references/content.md).
+
+## Contents
+
+- [Appearance priority](#appearance-priority)
+- [Palette logic](#palette-logic)
+- [Visual presets and overrides](#visual-presets-and-overrides)
+- [Typography system](#typography-system)
+- [Cover design](#cover-design)
+- [Inner page rules](#inner-page-rules)
+- [Design targets](#design-targets)
+- [Content conventions](#content-conventions)
+
+## Appearance priority
+
+Explicit user instructions and supplied template typography, colors, cover/no-cover
+layout, spacing, and numbering supersede every visual default below, including
+"always", "never", font-pair limits, and aesthetic anti-patterns. A strict APA/IEEE
+manuscript is not implemented by `--type academic`. Do not impose the default cover
+or 10.5pt business-body scale on a named manuscript; select a capable authoring
+route per SKILL.md and disclose unavailable actual fonts or standard capabilities.
+A preset is not academic research, finance, legal, or medical expertise.
+
+These are design targets, not proof of automatic enforcement or output compliance.
 
 ---
 
@@ -16,8 +41,11 @@ because it seems safe.
 
 ## Palette logic
 
-`palette.py` takes a short content description and outputs `tokens.json`.
-Here is the reasoning it applies:
+`palette.py` selects a named `--type` preset and caller overrides to output
+`tokens.json`; it does not infer an industry from prose. The agent makes the
+content-sensitive selection. The following mood table is design inspiration,
+not an exact listing of current script defaults; retain the script's preset
+values unless an explicit override is selected.
 
 ### Mood → base palette
 
@@ -55,6 +83,54 @@ Here is the reasoning it applies:
 
 ---
 
+## Visual presets and overrides
+
+Retain these existing CLI names; all are appearance choices, not domain workflows.
+
+| Type | Cover pattern | Visual identity |
+|---|---|---|
+| `report` | `fullbleed` | Dark bg, dot grid, Playfair Display |
+| `proposal` | `split` | Left panel + right geometric, Syne |
+| `resume` | `typographic` | Oversized first-word, DM Serif Display |
+| `portfolio` | `atmospheric` | Near-black, radial glow, Fraunces |
+| `academic` | `typographic` | Light bg, classical serif, EB Garamond |
+| `general` | `fullbleed` | Dark slate, Outfit |
+| `minimal` | `minimal` | White + single 8px accent bar, Cormorant Garamond |
+| `stripe` | `stripe` | 3 bold horizontal color bands, Barlow Condensed |
+| `diagonal` | `diagonal` | SVG angled cut, dark/light halves, Montserrat |
+| `frame` | `frame` | Inset border, corner ornaments, Cormorant |
+| `editorial` | `editorial` | Ghost letter, all-caps title, Bebas Neue |
+| `magazine` | `magazine` | Warm cream bg, centered stack, hero image, Playfair Display |
+| `darkroom` | `darkroom` | Navy bg, centered stack, grayscale image, Playfair Display |
+| `terminal` | `terminal` | Near-black, grid lines, monospace, neon green |
+| `poster` | `poster` | White bg, thick sidebar, oversized title, Barlow Condensed |
+
+Existing `make.sh run` overrides:
+- `--accent "#HEX"` sets accent; `accent_lt` is auto-derived toward white.
+- `--cover-bg "#HEX"` sets cover background.
+- `--abstract "text"` adds cover abstract text (magazine/darkroom).
+- `--cover-image "url"` supplies a hero image URL/path (magazine/darkroom/poster).
+
+Absent explicit user/template colors, choose accent from title, purpose, audience,
+and context rather than blindly using the preset. It appears on section rules,
+callout bars, table headers, and cover. Suggested ranges (not domain expertise):
+
+| Context | Suggested accent range |
+|---|---|
+| Legal / compliance / finance | Deep navy `#1C3A5E`, charcoal `#2E3440`, slate `#3D4C5E` |
+| Healthcare / medical | Teal-green `#2A6B5A`, cool green `#3A7D6A` |
+| Technology / engineering | Steel blue `#2D5F8A`, indigo `#3D4F8A` |
+| Environmental / sustainability | Forest `#2E5E3A`, olive `#4A5E2A` |
+| Creative / arts / culture | Burgundy `#6B2A35`, plum `#5A2A6B`, terracotta `#8A3A2A` |
+| Academic / research | Deep teal `#2A5A6B`, library blue `#2A4A6B` |
+| Corporate / neutral | Slate `#3D4A5A`, graphite `#444C56` |
+| Luxury / premium | Warm black `#1A1208`, deep bronze `#4A3820` |
+
+Prefer muted, desaturated tones to vivid primaries when free to choose; when in
+doubt choose darker and neutral. This preference never overrides requested colors.
+
+---
+
 ## Typography system
 
 ### Font pairing logic
@@ -67,10 +143,13 @@ Two typefaces maximum. Always.
 | Text (body, captions, UI) | Highly readable at 10–11pt | Helvetica, Arial (sans) |
 
 Cover fonts are loaded live via `@import url(...)` in the cover HTML — Playwright
-fetches them at render time, no local caching. Body pages always use system fonts
-(Times-Bold / Helvetica) via ReportLab — consistent and offline-safe.
+fetches them at render time, no local caching. Fetch availability is not proof of
+actual font use: inspect the rendered PDF and disclose fallbacks. Body defaults
+use ReportLab system fonts (Times-Bold / Helvetica), not the cover web fonts.
+Token font paths can register available local fonts, but `--type academic` does
+not supply a requested manuscript font and there is no new font-selection CLI.
 
-Pairs by mood (cover HTML only — body always uses system fonts):
+Pairs by mood (cover HTML only — body defaults use system fonts):
 - Authoritative: `Playfair Display` / `IBM Plex Sans`
 - Confident: `Syne` / `Nunito Sans`
 - Expressive: `Fraunces` / `Inter`
@@ -272,7 +351,14 @@ Footer: author name (left, 7.5pt, muted) + page number (right, 7.5pt, muted) + l
 
 ## Design targets
 
-- Cover has a clear visual identity that is not "generic AI output"
+Agent acceptance checks: inspect actual rendered pages, not only tokens or a
+successful merge receipt. Record checks not executed as unverified. Verify actual
+fonts/glyphs (including web-font fallbacks), colors/contrast, page dimensions,
+margins, cover treatment, readable type, and page sequence against requirements.
+These are QA instructions, not new renderer checks or accessibility certification.
+For feature-specific output QA use [content QA](../references/content.md#feature-specific-rendering-qa).
+
+- Cover, when requested, has a clear visual identity that is not "generic AI output"
 - Body text is readable at arm's length without squinting
 - Every page looks like it belongs to the same document
 - No element bleeds off the edge or overlaps another
@@ -281,98 +367,9 @@ Footer: author name (left, 7.5pt, muted) + page number (right, 7.5pt, muted) + l
 
 ---
 
-## Block type reference
+## Content conventions
 
-All body blocks use the same token system — colors and fonts come from `tokens.json`, never hardcoded.
-
-| Block | Rendering | Design notes |
-|---|---|---|
-| `h1` | 22pt heading + full-width accent rule below | KeepTogether with rule — heading never orphaned |
-| `h2` | 15pt heading, dark text | No rule, no accent — visual hierarchy through size only |
-| `h3` | 11.5pt bold, dark text | **No accent color** — accent on body headings violates the one-accent-location rule |
-| `body` | 10.5pt justified, 17pt leading | Supports `<b>` `<i>` `<font>` markup |
-| `bullet` | Body size with `•` prefix, 14pt indent | Use for unordered lists |
-| `numbered` | Body size with `N.` prefix, hanging indent | Counter auto-resets on any non-numbered block — no manual numbering needed |
-| `callout` | Accent left-border (4px) + light tint background | Max one callout per section — overuse kills impact |
-| `table` | Accent header row, alternating row tint, outer box only | Supports `col_widths` (fractions, e.g. `[0.3, 0.5, 0.2]`) for custom column widths |
-| `image` | Scaled to column width, preserving aspect ratio | Use `path` or `src`; always provide a `caption` |
-| `figure` | Same as image, but caption auto-prefixed "Figure N:" | Figure counter increments across all `figure`, `chart`, `flowchart` blocks |
-| `code` | Courier 8.5pt, accent left-border, light tint background | Supports optional `language` label (rendered above block) |
-| `math` | Formula centered, optional right-aligned equation label | LaTeX syntax; matplotlib mathtext renderer |
-| `chart` | Bar / line / pie chart rendered via matplotlib | Color palette derived from document accent; figure auto-numbered |
-| `flowchart` | Process diagram with labeled arrows | Supports 4 node shapes; back-edges drawn as curved arcs |
-| `bibliography` | Numbered reference list with hanging indent | Heading rendered as h2 + accent rule; items as `[N] text` |
-| `divider` | Accent-colored 1.2pt rule with padding | Use sparingly — only for major thematic breaks |
-| `caption` | 8.5pt muted text, centered | Appears below images/tables via field or explicit block |
-| `pagebreak` | Force page break | — |
-| `spacer` | Vertical whitespace | `pt` field (default 12) |
-
-### Math formula guidance
-
-**Input syntax:** standard LaTeX math notation — `\frac{}{}`, `\int`, `\sum`, `\alpha`, `^`, `_`, etc.
-**Rendering engine:** matplotlib mathtext — pure Python, no LaTeX compiler, no browser required.
-
-| Syntax example | Rendered as |
-|---|---|
-| `E = mc^2` | Inline expression |
-| `\frac{\sqrt{\pi}}{2}` | Fraction |
-| `\int_0^\infty e^{-x^2} dx` | Integral |
-| `\sum_{i=1}^{n} x_i` | Summation |
-| `\alpha + \beta = \gamma` | Greek letters |
-
-**Limitations:** matplotlib mathtext covers most common expressions but not advanced LaTeX environments (`align`, `cases`, `matrix`). Split complex multi-line proofs into multiple `math` blocks.
-
-**Fallback:** if matplotlib is not installed, renders as `expression` in code style. Run `make.sh fix` to install.
-
-**Equation labels:** `"label": "(1)"` — rendered right-aligned beside the formula.
-
-### Chart guidance
-
-**Rendered entirely in Python** — no external chart services, image files, or internet required.
-
-| chart_type | Use case | Required fields |
-|---|---|---|
-| `bar` | Comparing discrete categories | `labels`, `datasets` |
-| `line` | Trends over time or ordered categories | `labels`, `datasets` |
-| `pie` | Part-to-whole composition | `labels`, `datasets[0].values` |
-
-- Colors are derived from the document accent for visual consistency — do not set custom colors.
-- Multi-series: add multiple objects to `datasets`, each with a `label` and `values` array.
-- Figure auto-numbering: set `"figure": true` (default) or `"figure": false` to suppress.
-
-### Flowchart guidance
-
-**Node shapes:**
-
-| shape | Use for |
-|---|---|
-| `rect` (default) | Process step |
-| `diamond` | Decision / condition |
-| `oval` or `terminal` | Start / End |
-| `parallelogram` | Input / Output |
-
-- Nodes are placed in input order (top to bottom). This controls the layout.
-- Forward edges draw straight arrows; back-edges (to earlier nodes) draw curved arcs.
-- Keep labels short (3–5 words max) — the diagram is A4-column-width at 78% scale.
-- Figure auto-numbering applies same as chart.
-
-### Bibliography guidance
-
-- `id` field is the reference label — use numbers ("1", "2") or alphanumeric ("Smith23").
-- Text should be in a consistent citation style (APA, Chicago, etc.) — the renderer does not enforce style.
-- The `title` field defaults to "References". Set `"title": ""` to suppress the heading.
-- A `bibliography` block always starts with a new section heading + accent rule.
-
-### Image / figure guidance
-
-- Preferred formats: PNG, JPEG
-- Scaled down if wider than the text column; never scaled up
-- `figure` blocks auto-number; `image` blocks do not — use `figure` for numbered figures
-- If the file does not exist at render time, a `[Image not found]` placeholder is substituted
-
-### Code block guidance
-
-- Preserves whitespace exactly — do not indent code in the JSON value
-- Optional `language` field renders a small language label above the block (e.g., `"language": "python"`)
-- No syntax highlighting (by design) — consistent with restraint principle
-- Keep lines under ~90 characters for A4 column width
+Read [the single content contract](../references/content.md) for all block fields,
+defaults, numbering, mathtext limits/fallbacks, and chart, caption, bibliography,
+code, and flowchart conventions. Do not infer content requirements from a cover
+pattern or a palette mood.

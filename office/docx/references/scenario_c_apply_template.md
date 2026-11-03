@@ -8,7 +8,10 @@ Use Scenario C when:
 - The user provides a template DOCX and wants its look applied to a content document
 - The user wants consistent formatting across multiple documents
 
-Do NOT use when: the user wants to edit content (→ Scenario B) or create from scratch (→ Scenario A).
+Use B for a narrow content edit or simple placeholder fill, and A for new creation
+without a structured template. New content placed into a supplied structured
+template uses C-2 Base-Replace: preserve the template's structure, not its example
+identities or findings.
 
 ---
 
@@ -19,8 +22,8 @@ Do NOT use when: the user wants to edit content (→ Scenario B) or create from 
 2. Analyze template  → CLI: analyze template.docx     (list styles, fonts, structure)
 3. Map styles        → Create mapping plan (source style → template style)
 4. Apply template    → CLI: apply-template source.docx --template template.docx --output result.docx
-5. Validate (XSD)    → CLI: validate result.docx --xsd wml-subset.xsd
-6. GATE-CHECK        → CLI: validate result.docx --xsd business-rules.xsd   ← MUST PASS
+5. Validate package  → CLI: validate --input result.docx --business
+6. GATE-CHECK        → CLI: validate --input result.docx --gate-check template.docx ← MUST PASS
 7. Diff verify       → CLI: diff source.docx result.docx --text-only   (content must be identical)
 ```
 
@@ -66,11 +69,13 @@ scripts/docx_preview.sh template.docx
 Identify these zones in the template:
 ```
 Zone A: Front matter (cover page, declaration, abstract, TOC)
-        → These are KEPT from template, never replaced
+        → KEEP structural containers/fields; replace supplied-content placeholders,
+          example identities and findings as authorized; do not retain sample facts
 Zone B: Example/placeholder body content ("第1章 XXX", sample paragraphs)
         → This is REPLACED with user's actual content
 Zone C: Back matter (appendices, acknowledgments, blank pages)
-        → These are KEPT from template or removed
+        → KEEP required structure or remove as authorized; update sample content
+          from supplied evidence rather than retaining example references/identities
 Zone D: Final sectPr
         → ALWAYS kept from template
 ```
@@ -358,36 +363,47 @@ The corresponding text in document.xml references this rId:
 
 ---
 
-## XSD Gate-Check
+## Template Gate-Check
 
 ### What It Is
 
-After template application, the output document **MUST** pass `business-rules.xsd` validation. This is a **hard gate** — if it fails, the document is **NOT deliverable**.
+After template application, run `validate --input result.docx --gate-check template.docx`.
+The argument is a **template DOCX**, not an XSD. This remains a hard delivery
+gate: diagnose and repair failures, then rerun. See the
+[validation guide](xsd_validation_guide.md) for the actual selectors.
 
-### What business-rules.xsd Checks
+`--xsd` adds optional curated-subset XML checking, not full OOXML validation.
+The retained `business-rules.xsd` uses unsupported XSD 1.1 assertions and is not
+an executable gate. `--business` adds general checks, not domain certification.
 
-| Rule | What It Validates |
+### What the Current Template Gate Checks
+
+| Rule | Actual comparison |
 |------|-------------------|
-| Template styles exist | All styles referenced by content paragraphs are defined in `styles.xml` |
-| Margins match | Page margins match template specification |
-| Fonts correct | `w:docDefaults` fonts match template's font scheme |
-| Heading hierarchy | Heading levels are sequential (no H1 → H3 without H2) |
-| Required styles present | `Normal`, `Heading1`-`Heading3`, `TableGrid` exist |
-| Page size | Matches template's declared page size |
+| Template styles exist | Every template style ID is present in output |
+| Margins | Top/bottom/left/right of the last section, when both define margins |
+| Page size | Width/height of the last section |
+| Default font | Default paragraph style's explicit ASCII font, when both define it |
+| Heading size hierarchy | Explicit sizes on `HeadingN` styles do not increase at deeper levels |
+
+It does not inspect every section/header/footer, resolve all effective fonts,
+recognize numeric CJK heading IDs as `HeadingN`, or certify GB/T, APA or
+university compliance. Review the selected profile/template requirements separately.
 
 ### Handling Failures
 
 ```
 GATE-CHECK FAILED:
-  - Style 'CustomStyle1' referenced in paragraph 14 but not defined in styles.xml
-  - Margin w:left=1080 does not match template requirement 1440
+  - Missing style: 'CustomStyle1' defined in template but absent from output
+  - Page margins mismatch: template=(1440,1440,1440,1440) output=(1440,1440,1080,1440)
 ```
 
 Fix each failure:
-1. **Missing style**: Add the style definition to `styles.xml`, or remap the paragraph to an existing style
-2. **Margin mismatch**: Update `w:sectPr` margins to match template
-3. **Font mismatch**: Update `w:docDefaults` to match template font scheme
-4. **Heading hierarchy gap**: Insert intermediate heading levels or adjust existing levels
+1. **Missing template style**: Preserve/import its definition in `styles.xml`.
+2. **Margin/page-size mismatch**: Compare the final `w:sectPr` with the template.
+3. **Font mismatch**: Inspect the default paragraph style's explicit ASCII font.
+4. **Heading size increase**: Compare `HeadingN` sizes with the intended hierarchy;
+   do not add content or change a named format merely to satisfy generic assumptions.
 
 Re-validate after every fix until gate-check passes.
 

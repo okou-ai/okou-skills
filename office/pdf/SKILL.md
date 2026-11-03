@@ -1,60 +1,107 @@
 ---
 name: pdf
 description: >
-  Create, read, edit, fill, or reformat PDF files. Use this skill for PDF output.
-  CREATE (generate from scratch): "make a PDF", "generate a report", "write a proposal",
-  "create a resume", "beautiful PDF", "professional document", "cover page",
-  "polished PDF", "client-ready document".
-  FILL (complete form fields): "fill in the form", "fill out this PDF",
-  "complete the form fields", "write values into PDF", "what fields does this PDF have".
-  REFORMAT (apply design to an existing doc): "reformat this document", "apply our style",
-  "convert this Markdown/text to PDF", "make this doc look good", "re-style this PDF".
-  This skill uses a token-based design system: color, typography, and spacing are derived
-  from the document type and flow through every page. The output is print-ready.
-  For a PDF companion to a Word document, render that DOCX through ../docx/SKILL.md
-  so both deliverables retain the same content and layout.
+  Create, fill, or reformat PDF files, including research and technical reports with
+  tables, charts, equations, citations, figures, code, and flowcharts. Use for
+  "make a PDF", "write a proposal", "professional document", "cover page",
+  "fill in this PDF form", "what fields does this PDF have", "reformat this
+  document", or "convert this Markdown/text to PDF". Distinguish named manuscript
+  requirements (APA, IEEE, journal/institution templates) from visual presets:
+  --type academic is appearance, not standards compliance or research expertise.
+  For a PDF companion to Word, render the DOCX through ../docx/SKILL.md so both
+  requested deliverables retain the same content and layout.
 license: MIT
 metadata:
   version: "1.0"
   category: document-generation
 ---
 
-# pdf
+# PDF
 
-Three tasks. One skill.
-
-## Environment and delivery
+## 1. Common requirements
 
 Set `SKILL_DIR` to the absolute directory containing this file (the `pdf/`
 subdirectory of the Office package). Resolve reference paths relative to it.
+Identify the requested output format(s), source, content features, and formatting
+requirements before choosing an operation. Deliver only the requested format(s);
+a DOCX used internally to author a PDF is not an additional deliverable.
 
-Run `bash "$SKILL_DIR/scripts/make.sh" check` once per session before CREATE/REFORMAT.
-It verifies an actual Chromium launch. If needed, install dependencies with
-`bash "$SKILL_DIR/scripts/make.sh" fix` in an activated Python virtual environment; on Linux,
-Chromium may also need `npx playwright install-deps chromium`.
-FILL and read-only inspection need Python and `pypdf`, not the browser pipeline.
-Read only the guide and scripts relevant to the selected route. Explicit user
-or template formatting takes precedence over the design defaults.
+Honor explicit user instructions and supplied templates before visual defaults,
+including typography, colors, cover/no-cover layout, spacing, and numbering.
+Do not silently replace a requirement with a preset. Verify actual capabilities;
+disclose unavailable fonts or unsupported standard/layout requirements rather
+than claiming compliance. Presets do not provide complete academic research or
+finance, legal, or medical expertise.
 
-For a user-requested rendered preview or visual review,
-use `pdftoppm -png -r 120 output.pdf preview/page` (create `preview/` first) and
-inspect the images.
+## 2. Named manuscript requirement or visual preset
 
-## Read `design/design.md` before any CREATE or REFORMAT work.
+- **Named manuscript requirements:** for strict APA, IEEE, or journal/institution
+  formatting, read the supplied requirements and select a capable authoring
+  route that can actually implement them. `--type academic` does **not** implement APA/IEEE.
+  The default cover and 10.5pt business-body scale must not override an explicit
+  manuscript. When suitable, author via [DOCX](../docx/SKILL.md) and export to PDF;
+  verify that route's actual fonts and layout capabilities too. If no available
+  route can meet a constraint, disclose it and agree an alternative, not a false
+  standards-compliant PDF. This is authoring selection, not a new PDF engine mode.
+- **Visual-only request:** for a generic, nonstandard academic-looking PDF or
+  business/technical report, select a `--type` visual preset and relevant content
+  features independently. Read [design/design.md](design/design.md) for preset
+  names, cover patterns, tokens, override flags, and appearance QA before CREATE
+  or REFORMAT. Agent reasoning selects the preset; `palette.py` does not analyze
+  the document's domain or validate its substance.
+- **DOCX companion control:** if Word and PDF are requested together, render the
+  authored DOCX through [the DOCX route](../docx/SKILL.md); do not independently
+  redesign the PDF with this cover/body pipeline.
 
----
-
-## Route table
+## 3. Select the operation
 
 | User intent | Route | Scripts used |
 |---|---|---|
-| Generate a new PDF from scratch | **CREATE** | `palette.py` → `cover.py` → `render_cover.js` → `render_body.py` → `merge.py` |
+| Generate a new PDF with this cover/body pipeline | **CREATE** | `palette.py` → `cover.py` → `render_cover.js` → `render_body.py` → `merge.py` |
 | Fill / complete form fields in an existing PDF | **FILL** | `fill_inspect.py` → `fill_write.py` |
 | Reformat / re-style an existing document | **REFORMAT** | `reformat_parse.py` → then full CREATE pipeline |
 
-**Rule:** when in doubt between CREATE and REFORMAT, ask whether the user has an existing document to start from. If yes → REFORMAT. If no → CREATE.
+For a creation/redesign request, ask whether there is an existing document if
+unclear: yes → REFORMAT, no → CREATE. FILL stays separate; an existing input alone
+does not authorize redesign. These remain the three implemented operations.
+Read-only field inspection is covered by FILL; no new general READ, OCR, scans,
+signature, or exact-layout editing workflow is provided here. PDF text parsing is
+best-effort, not a claim of lossless layout preservation or source reconstruction.
 
----
+### Load content features directly
+
+Read the [block contract](references/content.md#block-contract) for every CREATE
+or REFORMAT using this pipeline, then only the relevant feature sections below.
+The content reference is the single authority for block fields and conventions;
+the design guide owns appearance, not duplicate schemas.
+
+| Required feature | Read directly |
+|---|---|
+| Headings, prose, lists, tables, breaks, spacing | [Common blocks and tables](references/content.md#common-blocks-and-tables) |
+| Equations, labels, mathtext limits | [Mathematics](references/content.md#mathematics) |
+| Bar / line / pie, datasets, chart defaults | [Charts](references/content.md#charts) |
+| Images, figures, captions, shared numbering | [Figures and captions](references/content.md#figures-and-captions) |
+| Citations and references | [Bibliography](references/content.md#bibliography) |
+| Code whitespace and language labels | [Code](references/content.md#code) |
+| Process nodes, arrows, back-edges | [Flowcharts](references/content.md#flowcharts) |
+| Any of these features in delivered PDF | [Feature-specific rendering QA](references/content.md#feature-specific-rendering-qa) |
+
+### Environment and delivery
+
+For this cover/body pipeline, run `bash "$SKILL_DIR/scripts/make.sh" check`
+once per session before this pipeline's CREATE/REFORMAT. It verifies an actual
+Chromium launch. A named manuscript using another authoring route follows that
+route's setup and validation instead; DOCX-to-PDF does not require Chromium
+unless it also invokes this pipeline. If needed, install dependencies with
+`bash "$SKILL_DIR/scripts/make.sh" fix` in an activated Python virtual environment;
+on Linux, Chromium may also need `npx playwright install-deps chromium`.
+FILL and read-only inspection need Python and `pypdf`, not the browser pipeline;
+do not make them install Chromium. Read only the guide and scripts for the route.
+
+For a user-requested rendered preview or visual review, create `preview/`, run
+`pdftoppm -png -r 120 output.pdf preview/page`, and inspect the images. Apply the
+linked appearance and feature QA to actual output; a merge success alone is not
+proof of correct rendering or compliance. Report unexecuted checks as unverified.
 
 ## Route A: CREATE
 
@@ -68,97 +115,14 @@ bash "$SKILL_DIR/scripts/make.sh" run \
   --content content.json --out report.pdf
 ```
 
-**Doc types:** `report` · `proposal` · `resume` · `portfolio` · `academic` · `general` · `minimal` · `stripe` · `diagonal` · `frame` · `editorial` · `magazine` · `darkroom` · `terminal` · `poster`
-
-| Type | Cover pattern | Visual identity |
-|---|---|---|
-| `report` | `fullbleed` | Dark bg, dot grid, Playfair Display |
-| `proposal` | `split` | Left panel + right geometric, Syne |
-| `resume` | `typographic` | Oversized first-word, DM Serif Display |
-| `portfolio` | `atmospheric` | Near-black, radial glow, Fraunces |
-| `academic` | `typographic` | Light bg, classical serif, EB Garamond |
-| `general` | `fullbleed` | Dark slate, Outfit |
-| `minimal` | `minimal` | White + single 8px accent bar, Cormorant Garamond |
-| `stripe` | `stripe` | 3 bold horizontal color bands, Barlow Condensed |
-| `diagonal` | `diagonal` | SVG angled cut, dark/light halves, Montserrat |
-| `frame` | `frame` | Inset border, corner ornaments, Cormorant |
-| `editorial` | `editorial` | Ghost letter, all-caps title, Bebas Neue |
-| `magazine` | `magazine` | Warm cream bg, centered stack, hero image, Playfair Display |
-| `darkroom` | `darkroom` | Navy bg, centered stack, grayscale image, Playfair Display |
-| `terminal` | `terminal` | Near-black, grid lines, monospace, neon green |
-| `poster` | `poster` | White bg, thick sidebar, oversized title, Barlow Condensed |
-
-Cover extras (inject into tokens via `--abstract`, `--cover-image`):
-- `--abstract "text"` — abstract text block on the cover (magazine/darkroom)
-- `--cover-image "url"` — hero image URL/path (magazine, darkroom, poster)
-
-**Color overrides — always choose these based on document content:**
-- `--accent "#HEX"` — override the accent color; `accent_lt` is auto-derived by lightening toward white
-- `--cover-bg "#HEX"` — override the cover background color
-
-**Accent color selection guidance:**
-
-You have creative authority over the accent color. Pick it from the document's semantic context — title, industry, purpose, audience — not from generic "safe" choices. The accent appears on section rules, callout bars, table headers, and the cover: it carries the document's visual identity.
-
-| Context | Suggested accent range |
-|---|---|
-| Legal / compliance / finance | Deep navy `#1C3A5E`, charcoal `#2E3440`, slate `#3D4C5E` |
-| Healthcare / medical | Teal-green `#2A6B5A`, cool green `#3A7D6A` |
-| Technology / engineering | Steel blue `#2D5F8A`, indigo `#3D4F8A` |
-| Environmental / sustainability | Forest `#2E5E3A`, olive `#4A5E2A` |
-| Creative / arts / culture | Burgundy `#6B2A35`, plum `#5A2A6B`, terracotta `#8A3A2A` |
-| Academic / research | Deep teal `#2A5A6B`, library blue `#2A4A6B` |
-| Corporate / neutral | Slate `#3D4A5A`, graphite `#444C56` |
-| Luxury / premium | Warm black `#1A1208`, deep bronze `#4A3820` |
-
-**Rule:** choose a color that a thoughtful designer would select for this specific document — not the type's default. Muted, desaturated tones work best; avoid vivid primaries. When in doubt, go darker and more neutral.
-
-**content.json block types:**
-
-| Block | Usage | Key fields |
-|---|---|---|
-| `h1` | Section heading + accent rule | `text` |
-| `h2` | Subsection heading | `text` |
-| `h3` | Sub-subsection (bold) | `text` |
-| `body` | Justified paragraph; supports `<b>` `<i>` markup | `text` |
-| `bullet` | Unordered list item (• prefix) | `text` |
-| `numbered` | Ordered list item — counter auto-resets on non-numbered blocks | `text` |
-| `callout` | Highlighted insight box with accent left bar | `text` |
-| `table` | Data table — accent header, alternating row tints | `headers`, `rows`, `col_widths`?, `caption`? |
-| `image` | Embedded image scaled to column width | `path`/`src`, `caption`? |
-| `figure` | Image with auto-numbered "Figure N:" caption | `path`/`src`, `caption`? |
-| `code` | Monospace code block with accent left border | `text`, `language`? |
-| `math` | Display math — LaTeX syntax via matplotlib mathtext | `text`, `label`?, `caption`? |
-| `chart` | Bar / line / pie chart rendered with matplotlib | `chart_type`, `labels`, `datasets`, `title`?, `x_label`?, `y_label`?, `caption`?, `figure`? |
-| `flowchart` | Process diagram with nodes + edges via matplotlib | `nodes`, `edges`, `caption`?, `figure`? |
-| `bibliography` | Numbered reference list with hanging indent | `items` [{id, text}], `title`? |
-| `divider` | Accent-colored full-width rule | — |
-| `caption` | Small muted label | `text` |
-| `pagebreak` | Force a new page | — |
-| `spacer` | Vertical whitespace | `pt` (default 12) |
-
-**chart / flowchart schemas:**
-```json
-{"type":"chart","chart_type":"bar","labels":["Q1","Q2","Q3","Q4"],
- "datasets":[{"label":"Revenue","values":[120,145,132,178]}],"caption":"Q results"}
-
-{"type":"flowchart",
- "nodes":[{"id":"s","label":"Start","shape":"oval"},
-          {"id":"p","label":"Process","shape":"rect"},
-          {"id":"d","label":"Valid?","shape":"diamond"},
-          {"id":"e","label":"End","shape":"oval"}],
- "edges":[{"from":"s","to":"p"},{"from":"p","to":"d"},
-          {"from":"d","to":"e","label":"Yes"},{"from":"d","to":"p","label":"No"}]}
-
-{"type":"bibliography","items":[
-  {"id":"1","text":"Author (Year). Title. Publisher."}]}
-```
-
----
+Prepare `content.json` using the linked contract and feature guidance. Preset and
+color options are in [Visual presets and overrides](design/design.md#visual-presets-and-overrides).
+Do not treat sample/default content as a finished user document.
 
 ## Route B: FILL
 
 Fill form fields in an existing PDF without altering layout or design.
+Always run `fill_inspect.py` first to get exact field names.
 
 ```bash
 # Step 1: inspect
@@ -176,10 +140,6 @@ python3 "$SKILL_DIR/scripts/fill_write.py" --input form.pdf --out filled.pdf \
 | `dropdown` | Must match a choice value from inspect output |
 | `radio` | Must match a radio value (often starts with `/`) |
 
-Always run `fill_inspect.py` first to get exact field names.
-
----
-
 ## Route C: REFORMAT
 
 Parse an existing document → content.json → CREATE pipeline.
@@ -190,13 +150,15 @@ bash "$SKILL_DIR/scripts/make.sh" reformat \
 ```
 
 **Supported input formats:** `.md` `.txt` `.pdf` `.json`
+For structured Markdown, select content guidance by the actual features, not by
+filename or preset. The wrapper parses then renders; it does not enforce the
+feature QA or guarantee preservation of every source structure. No new parser,
+PDF-source reconstruction safeguards, or engine semantics are introduced here.
 
----
-
-## Environment
+## Environment reference
 
 ```bash
-bash "$SKILL_DIR/scripts/make.sh" check   # verify all deps
+bash "$SKILL_DIR/scripts/make.sh" check   # verify all deps, including browser launch
 bash "$SKILL_DIR/scripts/make.sh" fix     # auto-install missing deps
 bash "$SKILL_DIR/scripts/make.sh" demo    # build a sample PDF
 ```
@@ -208,3 +170,4 @@ bash "$SKILL_DIR/scripts/make.sh" demo    # build a sample PDF
 | `pypdf` | fill, merge, reformat | `pip install pypdf` |
 | Node.js 18+ | `render_cover.js` | system |
 | `playwright` + Chromium | `render_cover.js` | `npm install -g playwright && npx playwright install chromium` |
+| `matplotlib` | math, charts, flowcharts | `pip install matplotlib` |

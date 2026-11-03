@@ -11,25 +11,16 @@ metadata:
     - "IEEE / ACM / APA / MLA / Chicago / Turabian Style Guides"
     - "Springer LNCS / Nature / HBR Document Templates"
 description: >
-  Professional DOCX document creation, editing, and formatting using OpenXML SDK (.NET).
-  Three pipelines: (A) create new documents from scratch, (B) fill/edit content in existing
-  documents, (C) apply template formatting with XSD validation gate-check.
-  MUST use this skill whenever the user wants to produce, modify, or format a Word document —
-  including when they say "write a report", "draft a proposal", "make a contract",
-  "fill in this form", "reformat to match this template", or any task whose final output
-  is a .docx file. Even if the user doesn't mention "docx" explicitly, if the task
-  implies an editable Word document, use this skill. Use ../pdf/SKILL.md for a standalone PDF.
-triggers:
-  - Word
-  - docx
-  - document
-  - 文档
-  - Word文档
-  - 报告
-  - 合同
-  - 公文
-  - 排版
-  - 套模板
+  Create, read, edit, fill, and format editable Word documents (.docx / Word文档 / 文档)
+  using OpenXML SDK (.NET). Use for reports/报告, proposals, memos, forms, contract
+  formatting/合同, Chinese government documents/公文 (GB/T 9704), academic papers
+  (IEEE, ACM, APA 7 professional, MLA 9, Chicago/Turabian, Springer LNCS, Nature),
+  theses/学位论文 and supplied university templates, business/editorial formats
+  (Modern Corporate, Executive Brief, HBR), 排版 and 套模板. Route creation,
+  narrow content edits, or template application without assuming a restyle.
+  Provides document structure and presentation guidance, not government-policy,
+  research, or legal expertise or official certification. Use ../pdf/SKILL.md
+  for a standalone PDF.
 ---
 
 # docx
@@ -52,6 +43,32 @@ For PDF output, `.doc` conversion, or a user-requested rendered preview or visua
 review, run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`. This probes
 Writer by converting a minimal DOCX to PDF. If that probe fails, run the full
 `setup.sh` (Windows: `setup.ps1`) without the minimal flag.
+
+## Routing order: common → applicable profile → operation
+
+1. Respect the requested scope first. For a **narrow EDIT** or **read-only** task,
+   preserve existing presentation: use B for edits, preview/analyze for reading;
+   never recreate or restyle merely because the text mentions APA, 公文, or HBR.
+2. Treat explicit user requirements and the supplied template as authoritative.
+   If they conflict, clarify rather than silently replacing either with a recipe.
+3. For **new creation or explicitly requested restyling**, select only the
+   applicable domain/presentation profile below. Named-format rules override
+   generic academic/business defaults, not the user's requirements or template.
+4. Then choose operation A/B/C below. New content in a supplied structured
+   template uses C-2 Base-Replace; a simple fill remains B.
+
+| Condition (within the authorized scope) | Read directly |
+|---|---|
+| Chinese government / 公文 / GB/T 9704 layout | [Government profile](references/domains/government.md) |
+| Named academic paper: IEEE, ACM, APA, MLA, Chicago/Turabian, LNCS, Nature | [Academic profile](references/domains/academic.md) |
+| Thesis/dissertation, especially a supplied Chinese university template | [Thesis/template profile](references/domains/thesis-template.md) |
+| Corporate report, executive brief, HBR or other editorial presentation | [Business/editorial profile](references/domains/business-editorial.md) |
+| Generic memo, letter or unspecified layout; narrow edit/read | No domain recipe required; proceed to the operation |
+
+Use profiles for formatting/structure only, not substantive government, research,
+legal or business advice. Do not promise official certification or publisher acceptance.
+Adapt sample layout code to the user's content; never copy sample findings, references,
+agency identities or business data. Samples are not CLI recipe selectors.
 
 ## Quick Start: Direct C# Path
 
@@ -124,12 +141,11 @@ Analyze structure for editing scenarios: `bash "$SKILL_DIR/scripts/docx.sh" anal
 
 ## Scenario A: Create
 
-Read `references/scenario_a_create.md`, then the selected recipe and the samples
-needed for this document. Read typography/design references when making those
-decisions, and `references/cjk_typography.md` for CJK. Load relevant sections,
-not the entire sample library. User-supplied templates and explicit style choices
-take precedence over recipe defaults; HBR's 11 pt body text must not be changed
-to satisfy an unrelated 12 pt default.
+After selecting the applicable profile, read `references/scenario_a_create.md`
+and only the relevant sample methods. Read typography/design references when
+making those decisions, and `references/cjk_typography.md` for CJK.
+`--type academic` selects generic CLI defaults, not APA/IEEE or another named
+publication format. Use adapted direct C# for named recipes; do not invent CLI flags.
 
 **Choose your path:**
 - **Simple** (plain text, minimal formatting): use CLI — `bash "$SKILL_DIR/scripts/docx.sh" create --type report --output out.docx --content-json content.json`
@@ -192,6 +208,10 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
 `validate` always runs the OpenXML SDK validator on all package parts. It checks
 structure and relationships without forcing a particular font size or recipe.
 
+`--business` adds general document checks, not domain certification. Compare the
+selected profile/template requirements separately; a passing check does not certify
+GB/T, APA or publisher compliance. See [validation details](references/xsd_validation_guide.md).
+
 The bundled `wml-subset.xsd` is an optional check of a curated subset, not full
 OOXML coverage. Use `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` only for documents
 intentionally restricted to that subset. A schema limitation is not permission
@@ -227,7 +247,7 @@ These prevent file corruption — OpenXML is strict about element ordering.
 | `w:tc` | `tcPr` → `p` (min 1 `<w:p/>`) |
 | `w:body` | block content → `sectPr` (LAST child) |
 
-**Direct format contamination:** When copying content from a source document, inline `rPr` (fonts, color) and `pPr` (borders, shading, spacing) override template styles. Always strip direct formatting — keep only `pStyle` reference and `t` text. Clean tables too (including `pPr/rPr` inside cells).
+**Direct format contamination:** Remove only unwanted source overrides when applying a template, including inside table cells. Retain necessary `w:eastAsia` declarations (or transfer them into the mapped styles), semantic emphasis, numbering, fields, relationships and intentional section structure. Do not flatten content to text. Follow [selective cleanup](references/scenario_c_apply_template.md#direct-formatting-cleanup-rules-detailed) and the [Chinese university template guide](references/cjk_university_template_guide.md).
 
 **Track changes:** `<w:del>` uses `<w:delText>`, never `<w:t>`. `<w:ins>` uses `<w:t>`, never `<w:delText>`.
 
@@ -254,7 +274,7 @@ These prevent file corruption — OpenXML is strict about element ordering.
 
 Load as needed — don't load all at once. Pick the most relevant files for the task.
 
-**The C# samples and design references below are the project's knowledge base ("encyclopedia").** When writing OpenXML code, ALWAYS read the relevant sample file first — it contains compilable, SDK-version-verified patterns that prevent common errors. When making aesthetic decisions, read the design principles and recipe files — they encode tested, harmonious parameter sets from authoritative sources (IEEE, ACM, APA, Nature, etc.), not guesses.
+**Use the C# samples as implementation references.** Read the relevant methods before writing OpenXML code. Recipe comments describe their sources and assumptions; they are not independently verified publication requirements. Check the user's supplied instructions/template before submission. HBR is an analysis-derived published-format approximation, not an official template.
 
 ### Scenario guides (read first for each pipeline)
 
@@ -279,7 +299,11 @@ Load as needed — don't load all at once. Pick the most relevant files for the 
 | `Samples/FieldAndTocSamples.cs` | Fields: TOC, SimpleField vs complex field, DATE/PAGE/REF/SEQ/MERGEFIELD/IF/STYLEREF, TOC styles |
 | `Samples/FootnoteAndCommentSamples.cs` | Footnotes, endnotes, comments (4-file system), bookmarks, hyperlinks (internal + external) |
 | `Samples/TrackChangesSamples.cs` | Revisions: insertions (w:t), deletions (w:delText!), formatting changes, accept/reject all, move tracking |
-| `Samples/AestheticRecipeSamples.cs` | 13 aesthetic recipes from authoritative sources: ModernCorporate, AcademicThesis, ExecutiveBrief, ChineseGovernment (GB/T 9704), MinimalModern, IEEE Conference, ACM sigconf, APA 7th, MLA 9th, Chicago/Turabian, Springer LNCS, Nature, HBR — each with exact values from official style guides |
+| `Samples/AestheticRecipeSamples.cs` | Base recipes: Modern Corporate, Academic Thesis, Executive Brief, Chinese Government, Minimal Modern; exact method selection is in the profiles above |
+| `Samples/AestheticRecipeSamples_Batch1.cs` | IEEE Conference and ACM Conference recipes |
+| `Samples/AestheticRecipeSamples_Batch2.cs` | APA 7 professional paper and MLA 9 recipes |
+| `Samples/AestheticRecipeSamples_Batch3.cs` | Chicago/Turabian and Springer LNCS recipes |
+| `Samples/AestheticRecipeSamples_Batch4.cs` | Nature Journal and analysis-derived HBR published-format recipes |
 
 Note: `Samples/` path is relative to `scripts/dotnet/Docx.Core/`.
 
@@ -293,7 +317,7 @@ Note: `Samples/` path is relative to `scripts/dotnet/Docx.Core/`.
 | `references/openxml_encyclopedia_part2.md` | Detailed C# encyclopedia: page setup, tables, headers/footers, sections, doc properties |
 | `references/openxml_encyclopedia_part3.md` | Detailed C# encyclopedia: TOC, footnotes, fields, track changes, comments, images, math, numbering, protection |
 | `references/typography_guide.md` | Font pairing, sizes, spacing, page layout, table design, color schemes |
-| `references/cjk_typography.md` | CJK fonts, 字号 sizes, RunFonts mapping, GB/T 9704 公文 standard |
+| [CJK typography](references/cjk_typography.md) | CJK fonts, 字号 sizes, RunFonts mapping, GB/T 9704 layout; apply the government profile's letterhead scope |
 | `references/cjk_university_template_guide.md` | Chinese university thesis templates: numeric styleIds (1/2/3 vs Heading1), document zone structure (cover→abstract→TOC→body→references), font expectations, common mistakes |
 | `references/design_principles.md` | **Aesthetic foundations**: 6 design principles (white space, contrast/scale, proximity, alignment, repetition, hierarchy) — teaches WHY, not just WHAT |
 | `references/design_good_bad_examples.md` | **Good vs Bad comparisons**: 10 categories of typography mistakes with OpenXML values, ASCII mockups, and fixes |

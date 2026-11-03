@@ -1,6 +1,6 @@
 ---
 name: office
-description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets, including financial models, budgets, forecasts, and scenario reports in Excel. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, and document formatting or conversion.
+description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets. Includes Chinese government-style documents, named academic papers, thesis templates and business/editorial formatting in Word; research and technical PDF features; and financial models, budgets, forecasts and scenarios in Excel. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, document formatting or conversion.
 license: MIT
 ---
 
@@ -16,15 +16,17 @@ directory is the skill directory.
 
 | Output or task | Read | Set |
 | --- | --- | --- |
-| Word creation, editing, formatting, or DOCX-to-PDF | [docx/SKILL.md](docx/SKILL.md) | `SKILL_DIR="$OFFICE_DIR/docx"` |
-| Standalone PDF creation, reading, forms, or reformatting | [pdf/SKILL.md](pdf/SKILL.md) | `SKILL_DIR="$OFFICE_DIR/pdf"` |
+| Word creation, editing, formatting, or DOCX-to-PDF, including government-style, named academic, thesis-template and business/editorial documents | [docx/SKILL.md](docx/SKILL.md) — select the applicable presentation profile as well as the operation | `SKILL_DIR="$OFFICE_DIR/docx"` |
+| Standalone PDF creation, reading, forms, or reformatting, including research/technical content | [pdf/SKILL.md](pdf/SKILL.md) — distinguish named manuscript requirements from visual presets | `SKILL_DIR="$OFFICE_DIR/pdf"` |
 | Excel creation, reading, editing, formulas, or validation, including financial budgets and forecasts | [xlsx/SKILL.md](xlsx/SKILL.md) — select its common and business-scenario layers before authoring | `SKILL_DIR="$OFFICE_DIR/xlsx"` |
 
 Honor the user's format and supplied template. The selected template's styles
 take precedence over generic typography defaults. For a DOCX and its PDF
 companion, author once and render the DOCX so content and layout remain aligned.
 Use each route's setup and validation commands; reuse a working environment
-within the session.
+within the session. Presentation profiles are formatting guidance, not substantive
+research, policy, medical or legal expertise. Package checks do not certify
+compliance with a publication or government standard.
 
 The implementations are adapted from MiniMax's MIT-licensed skills. Original
 licenses and pinned-source attribution are preserved in each subdirectory's

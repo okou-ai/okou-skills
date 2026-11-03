@@ -15,14 +15,18 @@ Do NOT use when: the user already has a DOCX they want to modify (→ Scenario B
 
 ### 1. Determine Document Type
 
-Ask or infer the document type from the user's request:
+First apply the [entry routing order](../SKILL.md#routing-order-common--applicable-profile--operation):
+resolve the user's requirements/template and select an applicable presentation
+profile before using generic defaults here. A structured supplied template goes
+to C-2 even when its body content is new. Then infer a generic type if needed:
 
 | Type | Typical Signals |
 |------|----------------|
 | Report | "report", "analysis", "whitepaper", sections with headings |
 | Letter | "letter", "dear", address block, salutation |
 | Memo | "memo", "memorandum", To/From/Subject fields |
-| Academic | "paper", "essay", "thesis", APA/MLA/Chicago mention |
+| Academic (generic only) | "paper", "essay" without a named format or supplied template |
+| Named format / thesis template | Use the entry's academic or thesis/template profile, not generic defaults |
 | Custom | None of the above, or user specifies exact formatting |
 
 ### 2. Gather Content Requirements
@@ -38,14 +42,21 @@ Collect from the user:
 
 ### 3. Select Style Set
 
-Based on document type, load the matching styles XML asset:
+For generic direct-C# authoring only, these XML assets are optional starting points:
 - Report → `assets/styles/default_styles.xml` or `assets/styles/corporate_styles.xml`
 - Academic → `assets/styles/academic_styles.xml`
 - Letter / Memo / Custom → `assets/styles/default_styles.xml` (with overrides)
 
+The CLI does **not** load these assets. `--type academic` chooses generic font
+defaults, not APA/IEEE selection; no named-format CLI flag exists. For a named
+profile, read its actual sample file/method and adapt task-specific C# instead.
+Do not copy sample findings, citations, agency details or business data.
+
 ### 4. Configure Page Setup
 
-Set `w:sectPr` values based on document type defaults (see below) or user overrides.
+Set `w:sectPr` from the selected profile/template or explicit user requirements;
+use the generic suggestions below only when none applies. CLI page size defaults
+to Letter, not A4; pass `--page-size a4` explicitly when A4 is selected.
 
 ```xml
 <w:sectPr>
@@ -98,6 +109,14 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --gate-check temp
 ---
 
 ## Document Type Defaults
+
+These are generic authoring suggestions, **not** exact CLI/asset specifications
+or named-format requirements. CLI font/heading defaults and XML assets differ;
+inspect effective styles when exact values matter. Do not impose generic
+14/13/12 pt academic headings on APA's all-12-pt hierarchy or a 12 pt body on
+HBR's 11 pt recipe. For a generic memo, use A without a domain recipe;
+the CLI's `--type memo` alone does not construct To/From fields or 0.75-inch
+margins. Build those explicitly if required.
 
 ### Report
 | Property | Value |
