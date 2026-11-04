@@ -18,17 +18,6 @@ recipe. Failures return a nonzero exit code.
 heading hierarchy, table widths, relationships and comments. It does not require
 12 pt body text or replace the selected template's typography.
 
-## Template comparison
-
-```bash
-bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --gate-check template.docx
-bash "$SKILL_DIR/scripts/docx.sh" diff --before source.docx --after output.docx
-```
-
-`--gate-check` takes a **template DOCX**, not an XSD. Use it after applying a
-template; investigate failures before delivery. Review the diff for unintended
-content or structure changes.
-
 ## Optional subset XSD
 
 ```bash
@@ -45,8 +34,8 @@ It does not provide full OOXML coverage. Drawing internals, math, vendor
 extensions, markup compatibility and other package parts need the SDK validator.
 Do not remove valid features merely because the subset does not describe them.
 The retained `business-rules.xsd` and `aesthetic-rules.xsd` are upstream design
-references; they are not executable replacements for `--business` or a template
-gate and their XSD 1.1 assertions are not supported by .NET's XSD 1.0 engine.
+references; they are not executable replacements for `--business`, and their
+XSD 1.1 assertions are not supported by .NET's XSD 1.0 engine.
 
 ## Diagnose and review
 

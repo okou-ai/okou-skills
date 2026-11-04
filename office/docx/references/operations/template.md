@@ -9,9 +9,7 @@
 - [Template Structure Analysis (REQUIRED)](#template-structure-analysis-required)
 - [Style Mapping Strategy](#style-mapping-strategy)
 - [Relationship ID Remapping](#relationship-id-remapping)
-- [Template Gate-Check](#template-gate-check)
 - [Common Pitfalls](#common-pitfalls)
-- [Verification Checklist](#verification-checklist)
 
 ## When to Use
 
@@ -36,8 +34,8 @@ identities or findings.
 3. Map styles        → Create mapping plan (source style → template style)
 4. Apply template    → CLI: apply-template source.docx --template template.docx --output result.docx
 5. Validate package  → CLI: validate --input result.docx --business
-6. GATE-CHECK        → CLI: validate --input result.docx --gate-check template.docx ← MUST PASS
-7. Diff verify       → CLI: diff source.docx result.docx --text-only   (content must be identical)
+6. Review edit diff  → CLI: diff --before source.docx --after result.docx --text-only
+                       (changes must stay within the authorized operation)
 ```
 
 ---
@@ -376,52 +374,6 @@ The corresponding text in document.xml references this rId:
 
 ---
 
-## Template Gate-Check
-
-### What It Is
-
-After template application, run `validate --input result.docx --gate-check template.docx`.
-The argument is a **template DOCX**, not an XSD. This remains a hard delivery
-gate: diagnose and repair failures, then rerun. See the
-[validation guide](../implementation/validation.md) for the actual selectors.
-
-`--xsd` adds optional curated-subset XML checking, not full OOXML validation.
-The retained `business-rules.xsd` uses unsupported XSD 1.1 assertions and is not
-an executable gate. `--business` adds general checks, not domain certification.
-
-### What the Current Template Gate Checks
-
-| Rule | Actual comparison |
-|------|-------------------|
-| Template styles exist | Every template style ID is present in output |
-| Margins | Top/bottom/left/right of the last section, when both define margins |
-| Page size | Width/height of the last section |
-| Default font | Default paragraph style's explicit ASCII font, when both define it |
-| Heading size hierarchy | Explicit sizes on `HeadingN` styles do not increase at deeper levels |
-
-It does not inspect every section/header/footer, resolve all effective fonts,
-recognize numeric CJK heading IDs as `HeadingN`, or certify GB/T, APA or
-university compliance. Review the selected profile/template requirements separately.
-
-### Handling Failures
-
-```
-GATE-CHECK FAILED:
-  - Missing style: 'CustomStyle1' defined in template but absent from output
-  - Page margins mismatch: template=(1440,1440,1440,1440) output=(1440,1440,1080,1440)
-```
-
-Fix each failure:
-1. **Missing template style**: Preserve/import its definition in `styles.xml`.
-2. **Margin/page-size mismatch**: Compare the final `w:sectPr` with the template.
-3. **Font mismatch**: Inspect the default paragraph style's explicit ASCII font.
-4. **Heading size increase**: Compare `HeadingN` sizes with the intended hierarchy;
-   do not add content or change a named format merely to satisfy generic assumptions.
-
-Re-validate after every fix until gate-check passes.
-
----
-
 ## Common Pitfalls
 
 ### 1. Orphaned Numbering References
@@ -468,18 +420,3 @@ Re-validate after every fix until gate-check passes.
 **Problem**: Template has `Heading1` based on `Normal`, but after applying template, `Normal` has different properties, cascading unwanted changes to headings.
 
 **Fix**: Verify the `w:basedOn` chain for all critical styles. Ensure base styles are also correctly transferred from template.
-
----
-
-## Verification Checklist
-
-After template application, verify:
-
-1. **Content preserved** — text diff shows zero content changes
-2. **Gate-check passed** — `validate --gate-check template.docx` succeeds
-3. **Styles applied** — headings, body text, tables use template formatting
-4. **Images intact** — image relationship IDs and referenced media are valid
-5. **Lists** — numbering definitions and paragraph references are preserved
-6. **Headers/footers** — template parts and section references are preserved
-7. **Page layout** — margins, page size, orientation match template
-8. **No corruption** — package validation succeeds

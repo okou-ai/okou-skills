@@ -112,7 +112,6 @@ See the Complex Elements Guide section below.
 
 ```bash
 bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --business
-bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --gate-check template.docx  # when applying a template
 ```
 
 ---

@@ -114,7 +114,6 @@ header and page-number footer, and their relationship targets. Review
 [relationship remapping](../operations/template.md#relationship-id-remapping),
 [section-property conflicts](../operations/template.md#3-section-property-conflicts)
 and [university-template details](university-template.md). No dedicated automatic
-header/footer-transfer procedure or all-section template gate is supplied here;
-compare each section and its linked header/footer parts against the template.
-Validate and diff after structural changes; these invariants are not an
-alternative acceptance check.
+header/footer-transfer procedure is supplied here. Adapt the relevant SDK samples
+for section-specific changes, then validate the package and review the authorized
+edit diff.

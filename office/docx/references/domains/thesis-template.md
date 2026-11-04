@@ -30,11 +30,3 @@ fallback long-form layout example. It is APA-style with a binding margin, not
 a university compliance template or a substitute for the named APA professional
 paper route. Adapt it in task-specific C#; do not copy its sample content.
 Request university requirements if an institutional submission format is needed.
-
-## Check
-
-Compare template style IDs and effective EastAsia fonts, zone boundaries,
-headers/footers, section geometry, page-number restarts and TOC preservation.
-Run package validation and `--gate-check template.docx` for application, then
-review the content diff. The gate compares only selected properties; it does
-not certify university compliance or inspect every section/header/SDT.

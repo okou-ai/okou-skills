@@ -12,8 +12,8 @@ bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
 
 `validate` always runs the OpenXML SDK validator on all package parts, including
 structure and relationships. `--business` adds general document checks; it is not
-domain certification. Check the selected profile/template separately: neither a
-package pass nor a business pass certifies GB/T, APA or publisher compliance.
+domain certification. Neither a package pass nor a business pass certifies
+GB/T, APA or publisher compliance.
 Read [validation details](../implementation/validation.md) for actual coverage.
 
 The optional `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` checks a curated
@@ -23,25 +23,13 @@ Diagnose a package failure and rerun after repair; text preview is no substitute
 Use `fix-order` only for diagnosed ordering errors and `merge-runs` only when
 needed, not as routine validation mutations.
 
-## Content and template preservation
+## Review authorized content changes
 
 For EDIT, compare the original and completed document:
 
 ```bash
 bash "$SKILL_DIR/scripts/docx.sh" diff --before in.docx --after out.docx
 ```
-
-For TEMPLATE, also run the required gate-check against the actual template:
-
-```bash
-bash "$SKILL_DIR/scripts/docx.sh" validate --input out.docx --gate-check template.docx
-```
-
-Do not deliver a template operation with a failed gate; diagnose, repair and
-rerun it. The gate is limited to implemented style/section checks, not full
-OOXML, visual or domain validation. See [TEMPLATE](template.md) and the linked
-validation implementation guide for limitations; also diff source versus output
-to verify authorized content preservation.
 
 ## Rendering and delivery
 

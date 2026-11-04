@@ -73,7 +73,7 @@ data. Samples are not CLI recipe selectors or publisher acceptance guarantees.
 | Fill placeholders, replace text or edit authorized content | Pipeline B: [EDIT/FILL](references/operations/edit.md) |
 | Authorized restyling with a pure style template | Pipeline C-1: [OVERLAY](references/operations/template.md) |
 | New content within a structured cover/TOC/section template | Pipeline C-2: [BASE-REPLACE](references/operations/template.md) |
-| Completed output or an affected change | [VALIDATE](references/operations/validate.md), including template gate-check when applicable |
+| Completed output or an affected change | [VALIDATE](references/operations/validate.md) |
 
 For existing documents, preview and analyze before editing. Convert legacy `.doc`
 only when needed; these entry points remain unchanged:

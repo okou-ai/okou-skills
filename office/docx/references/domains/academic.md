@@ -49,5 +49,5 @@ when material requirements are unspecified; supplied instructions govern.
 
 Use only supplied or verified reference metadata; report missing sources instead
 of fabricating citations, findings or authors. Compare effective styles/section
-properties separately from package validation; neither `--business` nor a
-successful template gate certifies APA, IEEE or another publication standard.
+properties separately from package validation. Package validation and
+`--business` do not certify APA, IEEE or another publication standard.
