@@ -12,7 +12,9 @@ Follow discovery → source checks → deduplication → useful expansion.
 For a new search, map relevant channels: professional profiles and datasets,
 organization sites, event archives, publications, portfolios, or project pages.
 For a follow-up, reuse existing people and sources; target missing channels
-and unresolved questions.
+and unresolved questions. Record whether the user requests a total count,
+an additional count, or open-ended discovery, and preserve exact versus
+minimum-count wording.
 
 ## 2. Discover across channels
 
@@ -39,22 +41,55 @@ where useful; completing one person's checks does not finish the whole search.
 ## 4. Merge verified findings
 
 Resolve identities through profiles, affiliations, and work, not names alone.
-Merge duplicate records while retaining useful sources. For multi-round work,
-keep brief notes on people, sources, open questions, and channels covered.
+Merge duplicate records while retaining useful sources. Keep a cumulative
+seen-person set for the same search across tools and follow-ups, and separately
+track people whose requested qualifications are verified. Retain sources,
+open questions, and channels covered.
+
+Treat one completed discovery search and its extracted people as a round;
+exclude targeted verification, enrichment, failed searches, and pending calls.
+Deduplicate each round's people, compare them with the previously seen set,
+record total/repeated/new counts, then update that set. Count people, not source
+URLs or provider result IDs. Resolve material identity ambiguities before using
+them to trigger a stop.
+
 Incorporate newly verified people and facts directly into the updated result,
 including on follow-up, rather than merely saying they should be added.
 
 ## 5. Expand or close
 
-Match breadth to the request. If the user wants more people, continue while new
-channels or queries yield relevant people with verifiable supporting claims.
-Check pending leads before treating a round without new verified people as a
-reason to stop.
+Apply explicit user scope, time, budget, and stopping instructions first. Choose
+the branch below; do not relax qualifications or count duplicates to fill a target.
 
-For broad discovery, close when main relevant channels are covered and repeated
-meaningful expansions add little, or an actual scope, time, or budget limit is
-reached. Explain material gaps; do not treat a bounded first page or source
-failure as search saturation, or claim universal completeness.
+**Numeric target:** Prioritize reaching the requested number of distinct,
+verified people. For an additional-person target, count only people new to the
+previous result. While below target, expand useful queries and channels even
+when the duplicate rate reaches 60%; that threshold must not end this branch.
+Stop short only when an explicit limit is reached or meaningful alternatives
+and pending leads have been reasonably checked without enough supported people;
+report the shortfall and evidence gaps. Once the target is met, stop for an exact
+count; for a minimum count or an unnumbered request for further people, continue
+with the open-ended branch rather than treating the minimum as a cap.
+
+**Open-ended discovery or more people without a fixed count:** From the second
+completed discovery round onward, calculate:
+
+`duplicate_rate = people in this round already seen before it / distinct people in this round`
+
+Stop expansion when `duplicate_rate >= 0.60`, including exactly 60%. For example,
+stop if 6 of the round's 10 distinct people were already seen. Use all discovered
+identities for this ratio, not only verified or recommended people; keep target
+progress separate. Do not require another high-duplicate round or complete
+channel coverage before applying this stopping rule.
+
+For a zero-person round, do not divide by zero or invent a duplicate rate.
+Check useful alternative queries, channels, and pending leads before concluding
+that further meaningful discovery is unavailable. Never count a source failure
+as an empty successful search or treat a bounded first page as proof of saturation.
+
+Stopping expansion does not cancel necessary checks on already found people.
+Explain the stopping reason, remaining uncertainty, and material uncovered
+channels; do not claim universal completeness.
 
 ## 6. Deliver
 
