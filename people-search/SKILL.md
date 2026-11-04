@@ -1,6 +1,6 @@
 ---
 name: people-search
-description: Control people-search stopping conditions and review timing. Use for requests with a target number of people or open-ended requests to find more candidates.
+description: Control people-search stopping conditions. Use for requests with a target number of people or open-ended requests to find more candidates.
 ---
 
 # People Search Stopping Policy
@@ -9,7 +9,7 @@ Aim for broad coverage and accurate matches: avoid missing potential candidates,
 and recommend only people verified to meet all requirements.
 
 Prioritize explicit user limits and stopping instructions. Reuse the same task's
-candidate pool, verified results, and round history.
+candidate pool, verified results, and search-call history.
 Use `okou data tools` and `okou data describe <tool-name>` before calling tools.
 
 ## Numeric target
@@ -22,15 +22,16 @@ Use `okou data tools` and `okou data describe <tool-name>` before calling tools.
 
 ## Open-ended / more people
 
-1. Repeat **search → deduplicate**. Between rounds, do only identity checks, not
-   qualification research. Keep all candidates; do not verify qualifications yet.
-2. From round two, compare this round's distinct identities with the cumulative
-   seen set **before adding this round**, regardless of qualification:
+1. For each search call, deduplicate identities within its returned results first.
+   Keep all candidates, regardless of qualification.
+2. Starting with the second call, count how many of those unique identities already
+   exist in the seen set from earlier calls. Compute the duplicate rate **before
+   updating the seen set**:
 
-   `duplicate_rate = this round's repeated people / this round's distinct total`
+   `duplicate_rate = repeated identities from earlier calls / this call's unique identities`
 
-3. **MUST** record total/repeated/new counts; add all newcomers to the seen set and pool.
-   **MUST** stop immediately if the **unrounded** `duplicate_rate > 0.80`.
-   **Exactly 80% means continue.**
-4. After stopping, **MUST** review the **entire unique pool**, including final-round newcomers.
+3. **MUST** record total/repeated/new counts; then add all newcomers to the seen set and pool.
+   **MUST** stop immediately if the **unrounded** `duplicate_rate >= 0.80`.
+   **Exactly 80% means stop.**
+4. **MUST** ensure the **entire unique pool** is reviewed, including final-call newcomers.
    Do not restart discovery solely because few qualify.
