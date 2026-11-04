@@ -1,0 +1,2 @@
+# Optional high-level authoring path; legacy OOXML tools remain standard-library only.
+openpyxl==3.1.5

@@ -102,6 +102,13 @@ Each directory includes its MIT license, original copyright notice, and
 | [pdf](office/pdf/SKILL.md) | Create designed PDFs, fill forms, and reformat documents. |
 | [xlsx](office/xlsx/SKILL.md) | Read, create, edit, and validate spreadsheets. |
 
+Within each format, `references/common/`, `domains/`, `operations/`, and
+`implementation/` separate shared conventions, applicable requirements, task
+workflows, and technical details. Start from the relevant `SKILL.md`; all guides
+are directly discoverable there. Runtime `scripts/`, `assets/`, and `templates/`
+paths remain stable. The PDF package README is an overview, not a second schema
+or preset catalog.
+
 The initial import in [PR #407](https://github.com/okou-ai/okou-skills/pull/407)
 preserved the upstream files unchanged. This distribution renames the packages
 and records local runtime fixes in Git history and each `UPSTREAM.md`.

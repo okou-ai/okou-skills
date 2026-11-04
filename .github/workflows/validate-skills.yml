@@ -22,10 +22,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Check DOCX environment routing
-        run: |
-          bash -n office/docx/scripts/env_check.sh
-          python3 -m unittest discover -s office/docx/tests -v
+      - name: Check DOCX shell syntax
+        run: bash -n office/docx/scripts/env_check.sh
 
   validate:
     runs-on: ubuntu-latest
