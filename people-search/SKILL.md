@@ -15,6 +15,20 @@ Apply this policy to exhaustive searches and numeric targets, not single-person 
 - **Strict verification:** Count or present a candidate as a match only after verifying they meet the user's criteria.
 - **Complete accounting:** Keep every candidate's outcome explicit and preserve the full qualified set through ranking and delivery.
 
+## API selection
+
+Choose by evidence need, using only enabled tools and their current schemas. This is not a mandatory all-tools pipeline.
+
+| Evidence need | API | Best use |
+| --- | --- | --- |
+| Natural-language professional brief | `people_search_semantic` | Discover professional profile pages and source text by meaning. |
+| Exact current title, employer, profile-country or skill filters | `people_search_structured` | Expand a structured candidate pool; current-role filters must not become extra requirements for past-experience searches. |
+| Complementary profile discovery or identity lookup | `people_search` | Find source-backed professional profiles by identity, role, employer, education, skill or location. |
+| Cases, interviews, projects or other experience evidence | `web_search` | Find qualification evidence beyond profile records. |
+| Read known public source pages | `web_contents` or `web_scrape` | Read source text to verify claims; reuse sufficient text already returned. |
+
+For submitted jobs, use `company_contact_get` for people searches and `web_contents_get` for `web_contents`. These reads are not new discovery calls; each explicit structured-search next-page request is.
+
 ## Set up the search run
 
 - Count one candidate-search API request initiated by Okou, such as one `people_search` request, as **one discovery API call**. Provider-internal queries, search directions, steps, and results never count as additional discovery API calls.
