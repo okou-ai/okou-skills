@@ -5,72 +5,66 @@ description: Find professional people through multi-channel discovery, identity 
 
 # People Search
 
-## 1. Plan
+## 1. Prepare
 
-Record qualifications, total/additional targets, and exact/minimum wording.
-Honor explicit user scope, time, budget, and stopping instructions first.
-Reuse the same search's existing people, sources, reviews, and round notes.
-Vary queries across professional profiles, organization sites, events,
-publications, and project pages; do not repeat queries just to trigger a stop.
+Record hard requirements vs preferences, total/additional and exact/minimum targets;
+prioritize explicit limits and stopping instructions. Reuse this search's people,
+evidence, reviews, and round history.
 Use `okou data tools` and `okou data describe <tool-name>` before calling tools.
 
-## 2. Track people and rounds
+## 2. Run a discovery round
 
-Keep cumulative seen identities separate from verified qualifying people.
-Resolve identity through profiles, affiliations, and work—not names alone.
-Count people, not URLs or provider IDs; never guess identity matches.
+1. Vary queries across profiles, organization sites, events, publications, and
+   projects; never repeat queries merely to trigger a stop.
+2. Extract all identifiable people and source URLs, not just provider summaries.
+   Resolve identities through profiles/affiliations/work; never guess matches or
+   count names, URLs, or provider IDs as people.
+3. Deduplicate within the round; log total/repeated/new people against the
+   **prior** seen set, then add all newcomers. Keep seen and verified-qualified
+   people separate.
 
-Count each completed discovery search as a round; exclude verification,
-enrichment, failed searches, and pending calls. Deduplicate each round, compare
-against the **prior** seen set, and record total/repeated/new counts. Retain
-sources and all new people—including those in the stop-triggering round—then
-update the seen set.
+Treat each completed discovery search as one round; exclude verification,
+enrichment, failed searches, and pending calls.
 
-## 3. Numeric target: search and review in rounds
+## 3. Follow the matching loop
 
-**Search → deduplicate → review → count qualified people → repeat if below target.**
+### Numeric target: review each round
 
-Count only distinct, verified people meeting the qualifications; additional-person
-targets exclude previous results. Review new candidates and pending candidates
-with new evidence before searching again. Skip discovery if already at target.
+Repeat **discover → review → count** only while below target:
+- Review newcomers and pending candidates with new evidence; count only distinct
+  people verified against every requirement. Additional targets exclude prior results.
+- Continue despite high duplication; never relax requirements. Stop short only at
+  explicit limits or reasonable exhaustion of useful alternatives and pending leads.
 
-Do not stop below target because of duplication or relax qualifications to fill
-it. Stop short only at user limits or reasonable exhaustion of useful alternatives
-and pending leads. Once met, stop discovery; if the user also asks for unnumbered
-further people, switch to Section 4. Honor exact/minimum delivery wording and
-retain already-verified extras for minimum-count requests.
+At target, skip/stop numeric discovery. Deliver exactly N for exact-count requests;
+retain verified extras for minimum-count requests. Switch to open-ended discovery
+only if further unnumbered expansion was also requested.
 
-## 4. Open-ended / more people: collect, then review
+### Open-ended / more people: collect first
 
-**Search → deduplicate → repeat until duplicates exceed 80% → review the full pool.**
+Repeat discovery; between rounds, do only identity checks, not qualification
+research. Keep all candidates, including unverified or possibly unsuitable people.
+From round two, use **unrounded**, all-candidate round counts:
 
-Between discovery rounds, do only identity checks and source retention—not
-person-by-person qualification research. Keep unverified or possibly unsuitable
-candidates in the pool.
+`duplicate_rate = this round's repeated people / this round's distinct total`
 
-From the second completed discovery round, calculate the unrounded ratio using
-all candidate identities, not only qualifying people:
+Stop immediately at `duplicate_rate > 0.80`; **exactly 80% means continue**.
+For empty rounds, leave the ratio undefined; try useful alternatives or stop on
+reasonable exhaustion. Never treat failed sources as empty results or a bounded
+first page as proof of saturation.
 
-`duplicate_rate = this round's distinct people already seen / this round's distinct people`
+Then review the **entire unique pool**, including final-round newcomers.
+Do not restart discovery solely because few qualify.
 
-Stop immediately when `duplicate_rate > 0.80`; **exactly 80% means continue**.
-Then review every unique pooled candidate, including the final round's newcomers,
-not just a shortlist. Do not restart discovery solely because few qualify.
-For an empty successful round, leave the ratio undefined; try useful alternatives
-or close on reasonable exhaustion. Do not confuse source failure with empty results
-or treat a bounded first page as proof of saturation.
+## 4. Review and deliver
 
-## 5. Review and deliver
-
-At the chosen review point, read original sources to verify qualifications;
-retain evidence URLs and distinguish historical from current facts. Follow
-important gaps until resolved or clearly unavailable after reasonable alternatives.
-Label uncertainty; do not equate titles with experience or announcements with
-completed work.
-Perform contact enrichment only when explicitly requested, at review time.
-
-Recommend supported people only; never pad counts or invent facts or contacts.
-Update the complete result in the requested format, preserving useful verified
-findings. Honor explicit limits and disclose the stopping reason, target shortfall,
-unreviewed candidates, uncertainty, and material uncovered channels. Do not claim
-universal completeness. Provide an accessible file when needed for the full result.
+- Verify every requirement from original sources; resolve material gaps or mark
+  unavailable only after reasonable alternatives. Label uncertainty and separate
+  current/historical facts; do not infer experience from titles or completed work
+  from announcements.
+- Enrich contacts only when explicitly requested, at review time.
+- Rank verified matches by preferences, never use preferences as eligibility gates;
+  separate unverified leads. Deliver complete results with evidence URLs and reasons
+  in the requested format; provide an accessible file if needed.
+- Report stop reason, shortfall, unreviewed people, uncertainty, and uncovered
+  channels. Never pad counts, invent facts/contacts, or claim exhaustive coverage.
