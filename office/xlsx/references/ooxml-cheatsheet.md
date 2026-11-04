@@ -21,6 +21,23 @@ input file uses the starter's filenames or relationship IDs. Keep the sheet
 list, relationship, actual part and content-type declaration synchronized when
 adding sheets. Preserve unrelated charts, controls, objects and dependencies.
 
+## Worksheet element order
+
+Well-formed XML can still violate the worksheet schema. Follow its sequence
+when writing multiple features. For the common elements below, preserve this
+relative order, omitting features that are not used:
+
+`sheetViews` → `cols` → `sheetData` → `autoFilter` → `sortState` → `mergeCells`
+→ `conditionalFormatting` → `dataValidations` → `hyperlinks` → `printOptions`
+→ `pageMargins` → `pageSetup` → `headerFooter`.
+
+In particular, do not append `autoFilter` after `mergeCells`. This is only a
+partial ordering guide, not a complete schema validator. The authoritative
+[Open XML SDK worksheet sequence](https://github.com/dotnet/Open-XML-SDK/blob/431ab05cf160248cc3885a4a766026d4f8243792/data/schemas/schemas_openxmlformats_org_spreadsheetml_2006_main.json)
+includes other permitted elements. Use schema-aware validation when available;
+a tolerant reader opening the file does not establish compatibility elsewhere.
+Check the reopened file for repair warnings or missing worksheet content.
+
 ## Cells and formulas
 
 | Value | XML |

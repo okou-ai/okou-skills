@@ -7,6 +7,7 @@ Preserve supplied templates/house styles; narrow edits do not authorize redesign
 - [Plan](#plan-the-reading-and-calculation-paths)
 - [Theme](#apply-the-fixed-green-theme)
 - [Font roles](#apply-financial-font-roles)
+- [Spacing](#space-new-report-and-model-sheets)
 - [Readability](#make-the-report-readable)
 - [Review](#review-the-financial-work-not-only-the-file)
 
@@ -74,6 +75,25 @@ explicit review flags, not as a substitute for the font-role convention.
 These are modeling defaults, not accounting standards, edit permissions, or
 proof of correctness. Inspect fonts/number formats, not copied style indices.
 
+## Space new report and model sheets
+
+Apply these defaults to new reader-facing layouts, not raw-data-only exports:
+
+- Leave two blank rows above the main title. Leave one blank row after the
+  title band and one before the first content block; keep any subtitle and
+  unit notation together between them. Share a spacer when boundaries coincide.
+- Separate completed sections or standalone tables with one blank row. Keep a
+  section band next to its table's column-header row, and headers next to data;
+  do not scatter blank rows between every label or record.
+- After a margin/ratio line or a completed subtotal block, use a short spacer
+  (about 6 pt high) where needed to distinguish the next group. A full section
+  gap replaces this smaller gap; do not stack both.
+- Keep spacer rows empty and unshaded, outside structured tables, filter ranges
+  and raw-data blocks. Do not fake spacing with hidden rows or blank formulas.
+- Plan the gaps before writing formulas and ranges. Preserve existing layouts
+  during narrow edits; check dependencies if authorized row insertion is needed.
+  Inspect both the worksheet and exported pages for crowded or excessive gaps.
+
 ## Make the report readable
 
 - State currency and scale near the numbers. Use the supplied currency rather
@@ -102,12 +122,15 @@ proof of correctness. Inspect fonts/number formats, not copied style indices.
 Check the applicable items before delivery and correct any discrepancy:
 
 - Summary and scenario results reconcile to detail and supplied inputs. Sum
-  period flows, but do not sum stock balances or average ratios blindly.
+  period flows, but do not sum stock balances. Operating margin is operating
+  income divided by revenue; for a quarter, divide the quarter's total operating
+  income by its total revenue, not the simple average of monthly percentages.
 - Period, currency, tax basis, sign, and unit assumptions are consistent.
   Distinguish operating income, net income and cash flow as the model requires.
 - Adjustable drivers actually propagate. On disposable copies, change a
   material input, recalculate, verify the expected dependencies, then restore
-  the baseline. Do not claim propagation from formula text alone.
+  the baseline. Trace the effect through detail, summary and sensitivity outputs,
+  not just the headline total. Do not claim propagation from formula text alone.
 - Editable inputs, same-sheet calculations, cross-sheet links, and any external
   dependencies follow the selected legend throughout the affected model.
 - Every relevant populated sheet is readable: headings, units, amounts,

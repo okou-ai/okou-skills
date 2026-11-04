@@ -33,7 +33,11 @@ not only a convenient sample or a scanner's formula count.
 For a created/edited formula workbook, test it in a functioning spreadsheet
 application when available. `--check` locates LibreOffice and its version; it
 does not prove Calc works. First verify a minimal independent formula workbook
-and its expected calculated value, then test the candidate copy:
+and its expected calculated value, then test the candidate copy. If the control
+cannot load, inspect the application components: a Linux LibreOffice core install
+without Calc is not a working spreadsheet engine. When dependency setup is
+permitted, install the missing spreadsheet component and rerun the control.
+Respect explicit restrictions on installing or invoking applications.
 
 ```bash
 python3 "$SKILL_DIR/scripts/libreoffice_recalc.py" --check
@@ -55,6 +59,14 @@ Check conversion effects before selecting a recalculated file for delivery.
 Other applications can change formulas, controls, formatting or advanced
 features. If preservation is uncertain, keep the authored/source-preserving
 file and disclose exactly what was checked on the disposable copy.
+
+For a new calculation-driven workbook intended to be ready on delivery, reopen
+the exact final file after saving. Confirm that required detail and summary
+areas display computed values, retain live formulas, and have current cached
+results for critical cells, including ratio denominators. Recalculation flags
+alone do not establish this. If required results remain uncomputed or essential
+sheets fail to load, report the delivery as incomplete, not a ready-to-use model.
+Do not fabricate caches or conceal these defects with blanket error-to-zero fixes.
 
 ## 3. Presentation and scenario review
 

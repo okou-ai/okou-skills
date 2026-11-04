@@ -128,6 +128,65 @@ class SkillDocumentationTests(unittest.TestCase):
             finance,
         )
 
+    def test_new_finance_layouts_have_bounded_blank_row_defaults(self):
+        finance = (SKILL / "references/finance.md").read_text()
+        spacing = " ".join(
+            finance.split("## Space new report and model sheets\n", 1)[1]
+            .split("\n## ", 1)[0].split()
+        )
+        self.assertIn("[Spacing](#space-new-report-and-model-sheets)", finance)
+        for requirement in (
+            "new reader-facing layouts, not raw-data-only exports",
+            "two blank rows above the main title",
+            "one blank row after the title band and one before the first content block",
+            "keep any subtitle and unit notation together",
+            "Separate completed sections or standalone tables with one blank row",
+            "section band next to its table's column-header row",
+            "headers next to data",
+            "about 6 pt high",
+            "do not stack both",
+            "empty and unshaded, outside structured tables, filter ranges and raw-data blocks",
+            "Plan the gaps before writing formulas and ranges",
+            "Preserve existing layouts during narrow edits",
+            "Inspect both the worksheet and exported pages",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, spacing)
+
+    def test_validation_distinguishes_setup_from_ready_to_use_results(self):
+        validation = " ".join((SKILL / "references/validate.md").read_text().split())
+        for requirement in (
+            "a Linux LibreOffice core install without Calc is not a working spreadsheet engine",
+            "When dependency setup is permitted",
+            "Respect explicit restrictions on installing or invoking applications",
+            "For a new calculation-driven workbook intended to be ready on delivery",
+            "reopen the exact final file after saving",
+            "current cached results for critical cells, including ratio denominators",
+            "report the delivery as incomplete, not a ready-to-use model",
+            "Do not fabricate caches",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, validation)
+        finance = " ".join((SKILL / "references/finance.md").read_text().split())
+        self.assertIn("Operating margin is operating income divided by revenue", finance)
+        self.assertIn("not the simple average of monthly percentages", finance)
+        self.assertIn("Trace the effect through detail, summary and sensitivity outputs", finance)
+        self.assertIn("not just the headline total", finance)
+
+    def test_ooxml_reference_explains_relative_worksheet_element_order(self):
+        reference = (SKILL / "references/ooxml-cheatsheet.md").read_text()
+        order = reference.split("## Worksheet element order\n", 1)[1].split("\n## ", 1)[0]
+        tokens = ("`sheetData`", "`autoFilter`", "`mergeCells`", "`dataValidations`", "`pageSetup`")
+        positions = [order.index(token) for token in tokens]
+        self.assertEqual(positions, sorted(positions))
+        for requirement in (
+            "do not append `autoFilter` after `mergeCells`",
+            "not a complete schema validator",
+            "repair warnings or missing worksheet content",
+        ):
+            self.assertIn(requirement, " ".join(order.split()))
+        self.assertIn("github.com/dotnet/Open-XML-SDK/blob/", order)
+
     def test_starter_style_roles_and_relationship_ids_remain_valid(self):
         template = SKILL / "templates/minimal_xlsx"
         styles = ET.parse(template / "xl/styles.xml").getroot()
