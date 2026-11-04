@@ -28,6 +28,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq libreoffice-writer libreoffice-calc poppler-utils fonts-liberation fonts-noto-cjk
           python3 -m pip install reportlab pypdf matplotlib
+          python3 -m pip install -r office/xlsx/requirements-authoring.txt
           npm install -g playwright
           npx --no-install playwright install --with-deps chromium
       - name: Set up DOCX from outside the skill directory

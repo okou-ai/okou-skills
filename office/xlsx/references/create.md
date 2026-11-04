@@ -1,8 +1,10 @@
 # Create a new XLSX
 
 Use for a new workbook, not for filling or changing an existing file. Select
-the business scenario and common presentation before writing. Keep calculated
-outputs as live formulas rather than pasting externally computed answers.
+business scenario and common presentation first. Keep derived outputs as live
+formulas. Follow this order: [plan](#1-plan), [prepare](#2-choose-and-check-the-tools),
+[build](#3-build-in-business-objects), [check](#4-calculate-view-and-revise),
+[raw package fallback](#raw-ooxml-path).
 
 ## 1. Plan
 
@@ -13,67 +15,92 @@ the sheet count; give data and explanations enough space to be inspected. Use
 the finance layer for the structure of budgets, forecasts and financial reports.
 Keep the work within the requested scope.
 
-## 2. Copy the starter
+## 2. Choose and check the tools
+
+Prefer a maintained high-level workbook library, such as openpyxl, when it can
+express the planned new file. Use workbook/cell/range/style/chart objects instead
+of manually maintaining package relationships and numeric style indices. Reuse
+an installed suitable tool; another library or the raw OOXML path is valid when
+needed. Do not rebuild existing files through a library that may drop features.
+
+For the optional Python path, check imports in the chosen interpreter. Reuse a
+working virtual environment; install only missing dependencies when setup is
+allowed. If no suitable environment exists, an isolated example is:
+
+```bash
+AUTHOR_ENV=$(mktemp -d /tmp/xlsx-authoring.XXXXXX)
+python3 -m venv "$AUTHOR_ENV"
+. "$AUTHOR_ENV/bin/activate"
+python -m pip install -r "$SKILL_DIR/requirements-authoring.txt"
+```
+
+Before substantial formula authoring, read VALIDATE's application section and run:
+
+```bash
+python3 "$SKILL_DIR/scripts/libreoffice_recalc.py" --preflight
+```
+
+This tests an independent formula control, not the candidate. A working binary
+or version string is insufficient. Diagnose a failed control before blaming a
+workbook; repair permitted missing components, then rerun the control. If setup
+or application use is forbidden/unavailable, record that limitation and do not
+present uncalculated output as a ready-to-use model.
+
+## 3. Build in business objects
+
+- Populate values/formulas, then assign both semantic role and display format:
+  amount, percentage, date or integer. A ratio formula needs a percentage format;
+  a valid formula alone does not determine its appearance.
+- Store numeric inputs as numbers, rates as decimals and actual dates with date
+  formats. Use library string APIs and named-range/worksheet references; do not
+  invent string, style or relationship indices.
+- Make headings span the planned content width, not just a narrow label column.
+  Set column widths and sufficient row heights for explanations; `wrap_text`
+  alone does not provide a fitted layout. Keep gaps outside data tables.
+- Set a report area and usable page width, leaving long reports free to continue
+  vertically. Keep source tables separate from reader-facing print layouts.
+
+For new financial layouts using the selected defaults, read
+[high-level primitives](authoring.md). Its optional `xlsx_authoring.py` functions
+assign explicit cell roles/formats, full-width bands, gray label headers and
+report-page settings. They are building blocks, not a financial model template,
+formula evaluator or automatic layout/quality checker. Supplied styles override
+them; do not call financial styling helpers for ordinary non-financial tables.
+
+## 4. Calculate, view and revise
+
+Save a first complete draft early. Use VALIDATE to recalculate a copy, compare
+source-based expected results and change relevant inputs. Export the relevant
+sheets and inspect the actual pages; fix clipped headings, cramped notes, split
+columns or chart overlaps, then repeat affected checks. Resolve defects inside
+this authoring attempt rather than returning an unchecked first draft.
+
+Select the final delivery file only after checking conversion effects and live
+formulas. Reopen that exact file with formula and cached-value views. Saving an
+openpyxl workbook again after Calc recalculation can clear its caches: recalculate
+and recheck after any later save. Never synthesize cached answers to bypass this.
+Deliver only the requested file; working scripts, images and checks are not
+mandatory extra user attachments.
+
+## Raw OOXML path
+
+Use when package-level control is needed or a suitable library is unavailable.
+Read [OOXML details](ooxml-cheatsheet.md), then use a fresh working directory:
 
 ```bash
 cp -R "$SKILL_DIR/templates/minimal_xlsx" /tmp/xlsx_work
-```
-
-Use a fresh working directory. The starter is a package skeleton with one
-worksheet, shared strings and styles; its initial sheet count is not a layout
-recommendation. Expand it to match the plan and assign styles to the actual
-model. Edit XML and pack with the bundled tools. Read OOXML details when adding
-package parts or implementing cell/string/style definitions.
-
-When adding a sheet, keep these four points consistent:
-
-| Location | Required change |
-| --- | --- |
-| `xl/workbook.xml` | Add a unique sheet name, stable `sheetId`, and relationship ID |
-| `xl/_rels/workbook.xml.rels` | Map that ID to the new worksheet part |
-| `[Content_Types].xml` | Declare the worksheet part's content type |
-| `xl/worksheets/` | Create the referenced XML file |
-
-Read existing IDs before assigning new ones. In the starter, `rId1` is the
-initial sheet, `rId2` styles, and `rId3` shared strings; additional sheets start
-at an unused ID such as `rId4`. Keep names within Excel's length/character
-limits and quote names with spaces in formulas.
-
-## 3. Populate data and formulas
-
-- Store raw numeric inputs as numbers, rates as decimals, and dates with
-  appropriate date formats. Write text as shared strings or inline strings;
-  XML-escape text and preserve significant whitespace.
-- For shared strings, use zero-based indices and accurate counts: `uniqueCount`
-  is the number of entries, while `count` is total shared-string cell usage.
-  `shared_strings_builder.py --help` describes the bundled construction helper;
-  review counts after repeated strings or later edits.
-- Write formulas in `<f>` without the UI's leading `=`. Keep source inputs,
-  derived results, labels and their styles distinct. Resolve named ranges and
-  cross-sheet references instead of inventing indices or sheet paths.
-
-```xml
-<!-- Numeric input; choose s for its actual role and display format. -->
-<c r="B2"><v>1000</v></c>
-<!-- Formula with an empty cache until an application recalculates it. -->
-<c r="B4"><f>SUM(B2:B3)</f><v/></c>
-<!-- Text may be inline; shared strings use t="s" and an index in v. -->
-<c r="A1" t="inlineStr"><is><t>Amount</t></is></c>
-```
-
-An empty cache is not a successful calculation. Apply final styles, useful
-widths/heights and any requested print settings before checking the result.
-Use ordinary formulas unless shared/array formulas are actually needed; if
-used, preserve their primary range and consumer relationships.
-
-## 4. Pack and check
-
-```bash
 python3 "$SKILL_DIR/scripts/xlsx_pack.py" /tmp/xlsx_work output.xlsx
-python3 "$SKILL_DIR/scripts/formula_check.py" output.xlsx
 ```
 
-Packing checks XML well-formedness, not complete spreadsheet correctness.
-Continue with VALIDATE for recalculation, task/scenario checks and actual
-presentation review. Deliver the requested file only; do not append an
-unrequested validation report or alternate workbook.
+Edit the copied package before packing. Its initial sheet count is not a layout
+recommendation; expand it to match the plan. Adding a sheet requires consistent
+entries in `workbook.xml`, its relationships, `[Content_Types].xml`, and the
+worksheet part. In the starter `rId1` is the sheet, `rId2` styles and `rId3` shared
+strings; select an unused relationship ID. Quote sheet names with spaces.
+
+Use `<f>` without a leading `=`, numeric `<v>` for numbers, and inline/shared
+strings for text. Use `shared_strings_builder.py --help` for shared-string counts.
+Keep valid worksheet element order and workbook-local style references. Empty
+or placeholder formula caches are not successful calculation. Packing checks XML
+well-formedness, not full schema, application behavior or presentation; continue
+with the same VALIDATE workflow, not a weaker raw-package acceptance path.

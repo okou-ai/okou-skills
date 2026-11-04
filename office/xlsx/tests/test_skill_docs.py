@@ -187,6 +187,39 @@ class SkillDocumentationTests(unittest.TestCase):
             self.assertIn(requirement, " ".join(order.split()))
         self.assertIn("github.com/dotnet/Open-XML-SDK/blob/", order)
 
+    def test_new_workbook_route_prefers_objects_without_removing_raw_or_narrow_paths(self):
+        create = " ".join((SKILL / "references/create.md").read_text().split())
+        entry = (SKILL / "SKILL.md").read_text()
+        for requirement in (
+            "Prefer a maintained high-level workbook library",
+            "raw OOXML path is valid when needed",
+            "Do not rebuild existing files through a library that may drop features",
+            "--preflight",
+            "Save a first complete draft early",
+            "fix clipped headings, cramped notes, split columns or chart overlaps",
+            "Saving an openpyxl workbook again after Calc recalculation can clear its caches",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, create)
+        self.assertIn("references/authoring.md", entry)
+        self.assertTrue((SKILL / "scripts/xlsx_authoring.py").is_file())
+        self.assertTrue((SKILL / "requirements-authoring.txt").is_file())
+        authoring = (SKILL / "references/authoring.md").read_text()
+        for operation in ("style_value", "report_band", "table_header", "report_page"):
+            self.assertIn(operation, authoring)
+
+    def test_presentation_feedback_requires_actual_page_review_and_revision(self):
+        validation = " ".join((SKILL / "references/validate.md").read_text().split())
+        for requirement in (
+            "before substantial formula authoring",
+            "A successful control does not validate a candidate",
+            "inspect the rendered pages, not only extracted text",
+            "Verify that the intended sheets and report areas are included",
+            "regenerate and rerender affected pages",
+            "success is not a financial-format certificate",
+        ):
+            self.assertIn(requirement, validation)
+
     def test_starter_style_roles_and_relationship_ids_remain_valid(self):
         template = SKILL / "templates/minimal_xlsx"
         styles = ET.parse(template / "xl/styles.xml").getroot()

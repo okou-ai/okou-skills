@@ -48,12 +48,15 @@ Examples:
 
 | Operation | Read | Tools |
 | --- | --- | --- |
-| Create a new XLSX | [Create](references/create.md) | Copy `templates/minimal_xlsx/`, edit XML, pack |
+| Create a new XLSX | [Create](references/create.md) | Prefer a suitable high-level library; raw OOXML remains available |
 | Edit, fill a template, or repair formulas | [Edit](references/edit.md) | Unpack → targeted XML changes → pack |
 | Read or analyze XLSX/XLSM/CSV/TSV | [Read and analyze](references/read-analyze.md) | `xlsx_reader.py`, then analysis tools as needed |
 | Apply or change formatting | [Common presentation](references/format.md) and [Edit](references/edit.md) for existing files | Append/reuse styles; change only intended cells |
 | Check a created or edited workbook | [Validate](references/validate.md) | Static checks, application checks, and task/scenario review |
 
+For new financial work using openpyxl, read [high-level primitives](references/authoring.md)
+when choosing construction helpers. Check the calculation environment before
+substantial formula authoring, then build, view and revise inside the same attempt.
 Read [OOXML details](references/ooxml-cheatsheet.md) only when directly changing
 package relationships, cell types, strings, or style definitions. Style indices
 are workbook-local; never copy an index from an example into an unrelated file.

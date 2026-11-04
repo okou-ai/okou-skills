@@ -5,6 +5,11 @@ separately. No single scanner proves business accuracy or presentation quality.
 For read-only work, never save or recalculate the original without permission.
 For creation/editing, use disposable copies for application and mutation tests.
 
+- [Static checks](#1-static-package-and-formula-checks)
+- [Application and calculation](#2-application-and-calculation-checks)
+- [Presentation](#3-presentation-and-scenario-review)
+- [Fix and report](#4-fix-and-report-honestly)
+
 ## 1. Static package and formula checks
 
 ```bash
@@ -31,19 +36,26 @@ not only a convenient sample or a scanner's formula count.
 ## 2. Application and calculation checks
 
 For a created/edited formula workbook, test it in a functioning spreadsheet
-application when available. `--check` locates LibreOffice and its version; it
-does not prove Calc works. First verify a minimal independent formula workbook
-and its expected calculated value, then test the candidate copy. If the control
-cannot load, inspect the application components: a Linux LibreOffice core install
-without Calc is not a working spreadsheet engine. When dependency setup is
-permitted, install the missing spreadsheet component and rerun the control.
-Respect explicit restrictions on installing or invoking applications.
+application when available. Run the independent control before substantial
+formula authoring, not only after writing the candidate. `--check` locates
+LibreOffice and its version; it does not prove Calc works. `--preflight` creates
+a separate formula control, recalculates it, and checks a retained live formula
+and its expected nonzero cache. A successful control does not validate a candidate.
 
 ```bash
-python3 "$SKILL_DIR/scripts/libreoffice_recalc.py" --check
+python3 "$SKILL_DIR/scripts/libreoffice_recalc.py" --preflight
 python3 "$SKILL_DIR/scripts/libreoffice_recalc.py" output.xlsx /tmp/recalculated.xlsx
 python3 "$SKILL_DIR/scripts/formula_check.py" /tmp/recalculated.xlsx
 ```
+
+If the control cannot load, inspect the application components: a Linux
+LibreOffice core install without Calc is not a working spreadsheet engine.
+When dependency setup is permitted, install the missing spreadsheet component
+and rerun the control. On an apt-based host this may require refreshing the
+package index before installing `libreoffice-calc`; an initial "no installation
+candidate" is not proof that Calc is unsupported. Respect explicit restrictions
+on installing or invoking applications. Do not install software automatically
+from a check, or repeatedly invoke a known failing conversion without diagnosis.
 
 The helper preserves its input and uses an isolated profile. A newly written
 output and usable recalculated values are required; process exit alone is not
@@ -77,11 +89,19 @@ Do not fabricate caches or conceal these defects with blanket error-to-zero fixe
   export. Check clipped/wrapped text, `###`, overlaps, chart boundaries,
   meaningful headers and readable print/export scaling. Rerender after fixes
   that affect layout; a successful export is not itself visual inspection.
+- Export each relevant populated sheet to PDF or another faithful preview and
+  inspect the rendered pages, not only extracted text. Use an isolated application
+  profile and fresh export directory; do not disturb another user's locks/processes.
+  On Okou Harness, read `okou presentation screenshot --help` and use it to render
+  an exported PDF to page images. Verify that the intended sheets and report areas
+  are included. Revise the authoring code/geometry, regenerate and rerender affected
+  pages when you find defects; do not merely describe the defect and stop.
 - `style_audit.py output.xlsx` can help diagnose malformed style indices,
   blue formulas and some numeric-format issues. It does **not** enforce all
   finance font roles, cross-sheet green, input separation, summary hierarchy
-  or print readability. Check those requirements directly; its success message
-  is not a financial-format compliance certificate.
+  or print readability. In particular, a percentage check on a percent-formatted
+  cell cannot detect every ratio accidentally assigned an amount format. Check
+  those requirements directly; success is not a financial-format certificate.
 - For edits, compare the changed file with the source and verify the requested
   operation without treating unrelated existing defects as authorized changes.
 
@@ -91,8 +111,10 @@ Correct diagnosed defects, then rerun the affected checks. Do not mask missing
 inputs, lookup failures or numeric errors with arbitrary zeros/blanks. Review
 warnings against real names, functions and intended business behavior.
 
-Keep only the working evidence needed to support your statements. In the final
-response, identify meaningful checks performed and any unavailable/failed
+Keep concise working notes of observed defects, changes and rechecks; retain
+material failures alongside later successes. Do not create a mandatory receipt
+format or extra attachment. Keep only evidence needed to support your statements.
+In the final response, identify meaningful checks performed and any unavailable/failed
 checks; do not label unperformed work as passed. For example: "Static scan
 completed; Calc unavailable, so recalculation and input propagation remain
 unverified." Tool absence alone is not evidence that the workbook is corrupt.
