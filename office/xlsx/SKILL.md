@@ -24,6 +24,9 @@ common guidance, applicable scenario, and operation needed for the task.
 - For new workbooks or requested formatting, read
   [common presentation](references/format.md). For narrow edits, apply it only
   to changed cells without overriding the supplied layout.
+- For new reader-facing analytical reports/dashboards or authorized chart changes,
+  read [analytical charts](references/charts.md) during planning. Choose charts for
+  the question, not a fixed count; preserve data-only and narrow-edit scope.
 
 ## Layer 2 — Business scenario
 

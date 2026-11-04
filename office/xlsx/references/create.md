@@ -13,7 +13,9 @@ section's purpose and order, the source and input locations, and how calculation
 feed the reported results. Prioritize completeness and readability over reducing
 the sheet count; give data and explanations enough space to be inspected. Use
 the finance layer for the structure of budgets, forecasts and financial reports.
-Keep the work within the requested scope.
+Keep the work within the requested scope. For reader-facing comparisons or
+trends, read [analytical charts](charts.md) before building; plan the question,
+source ranges and chart space alongside the tables.
 
 ## 2. Choose and check the tools
 

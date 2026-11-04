@@ -85,6 +85,9 @@ Do not fabricate caches or conceal these defects with blanket error-to-zero fixe
 - Review the selected scenario's requirements. Financial outputs must satisfy
   the finance layer's reading order, font roles, units, period distinction,
   formula/input separation, reconciliation and baseline-qualified narrative.
+- When charts are included or changed, apply the
+  [saved-chart checks](charts.md#verify-the-saved-chart) for data linkage,
+  input-driven refresh and actual rendered output.
 - Inspect each relevant populated worksheet in an application or rendered
   export. Check clipped/wrapped text, `###`, overlaps, chart boundaries,
   meaningful headers and readable print/export scaling. Rerender after fixes

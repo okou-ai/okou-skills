@@ -220,6 +220,52 @@ class SkillDocumentationTests(unittest.TestCase):
         ):
             self.assertIn(requirement, validation)
 
+    def test_chart_guidance_is_loaded_during_planning_and_validation(self):
+        entry = (SKILL / "SKILL.md").read_text()
+        create = (SKILL / "references/create.md").read_text()
+        validation = (SKILL / "references/validate.md").read_text()
+        self.assertIn("references/charts.md", markdown_targets(entry))
+        plan = create.split("## 1. Plan\n", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("charts.md", markdown_targets(plan))
+        self.assertIn("charts.md#verify-the-saved-chart", markdown_targets(validation))
+        self.assertIn("authorized chart changes", " ".join(entry.split()))
+
+    def test_chart_guidance_is_question_led_and_scope_preserving(self):
+        charts = " ".join((SKILL / "references/charts.md").read_text().split())
+        for requirement in (
+            "Preserve supplied templates and house styles",
+            "not a chart quota",
+            "Omit redundant charts when a small table is clearer",
+            "Do not decorate data-only exports, expand narrow edits",
+            "during read-only analysis just to satisfy this heuristic",
+            "Do not add dashboard tabs solely to meet a chart count",
+            "reconcile the baseline with the main model before charting it",
+            "Bar/column chart",
+            "Line chart",
+            "Waterfall",
+            "matrix/heatmap",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, charts)
+        self.assertNotRegex(charts, r"#[0-9A-Fa-f]{6}\b")
+
+    def test_chart_guidance_requires_live_sources_and_saved_plot_feedback(self):
+        charts = " ".join((SKILL / "references/charts.md").read_text().split())
+        for requirement in (
+            "Prefer native editable charts",
+            "Bind series and categories to worksheet ranges, not pasted results",
+            "Review chart references after row/column insertion or range changes",
+            "never invent chart data caches",
+            "does not prove the chart data cache or rendered plot is current",
+            "verify both dependent cells and the plotted series refresh",
+            "actual previews of every relevant chart-containing sheet",
+            "Revise and rerender within the same authoring attempt",
+            "identify that check as unverified",
+            "Deliver only the requested files",
+        ):
+            with self.subTest(requirement=requirement):
+                self.assertIn(requirement, charts)
+
     def test_starter_style_roles_and_relationship_ids_remain_valid(self):
         template = SKILL / "templates/minimal_xlsx"
         styles = ET.parse(template / "xl/styles.xml").getroot()
