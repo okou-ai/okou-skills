@@ -5,6 +5,9 @@ description: Control people-search stopping conditions and review timing. Use fo
 
 # People Search Stopping Policy
 
+Aim for broad coverage and accurate matches: avoid missing potential candidates,
+and recommend only people verified to meet all requirements.
+
 Prioritize explicit user limits and stopping instructions. Reuse the same task's
 candidate pool, verified results, and round history.
 Use `okou data tools` and `okou data describe <tool-name>` before calling tools.
@@ -26,8 +29,8 @@ Use `okou data tools` and `okou data describe <tool-name>` before calling tools.
 
    `duplicate_rate = this round's repeated people / this round's distinct total`
 
-3. Record total/repeated/new counts; add all newcomers to the seen set and pool.
-   Stop immediately if the **unrounded** `duplicate_rate > 0.80`.
+3. **MUST** record total/repeated/new counts; add all newcomers to the seen set and pool.
+   **MUST** stop immediately if the **unrounded** `duplicate_rate > 0.80`.
    **Exactly 80% means continue.**
-4. After stopping, review the **entire unique pool**, including final-round newcomers.
+4. After stopping, **MUST** review the **entire unique pool**, including final-round newcomers.
    Do not restart discovery solely because few qualify.
