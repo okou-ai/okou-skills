@@ -11,11 +11,9 @@ Apply this policy to exhaustive searches and numeric targets, not single-person 
 
 ## Core principles
 
-**Broad discovery, strict verification, complete accounting (宽发现、严确认、全量记账).**
-
-- **Broad discovery:** Maximize recall across request focuses and sources. Keep plausible candidates even when initial evidence is incomplete; do not narrow discovery to a convenient shortlist.
-- **Strict verification:** Require evidence for every hard requirement before qualifying a person. Missing evidence means unresolved, not qualified; never relax qualification criteria to increase the count.
-- **Complete accounting:** Retain every distinct discovered candidate with their evidence and qualified, rejected, or unresolved status. Record rejection reasons or missing evidence. Never silently drop candidates or replace the full verified set with a top-5 or top-10 selection.
+- **Broad discovery:** Search across focuses and sources; retain plausible candidates for verification.
+- **Strict verification:** Qualify a person only when evidence supports every hard requirement.
+- **Complete accounting:** Track every distinct candidate and their status; never silently discard verified matches.
 
 ## Set up the search run
 
