@@ -4,21 +4,36 @@ Use for financial models, budgets, forecasts, valuations, statements and
 financial management reports in Excel, together with common workbook rules.
 Preserve supplied templates/house styles; narrow edits do not authorize redesign.
 
+- [Plan](#plan-the-reading-and-calculation-paths)
+- [Theme](#apply-the-fixed-green-theme)
+- [Font roles](#apply-financial-font-roles)
+- [Readability](#make-the-report-readable)
+- [Review](#review-the-financial-work-not-only-the-file)
+
 ## Plan the reading and calculation paths
 
 1. Fix the audience, decision, reporting periods, currency, scale, and model
    scope from the request and sources. Distinguish actuals, assumptions and
    estimates; retain source locations for material inputs. Do not invent missing
    data, explanations, or accounting policies.
-2. Give the reader a clear first reading area: key results, comparison/scenario,
-   main drivers, and material limitations. Use a compact block or a summary
-   sheet as the task warrants, not a mandatory extra tab or page count.
-3. Separate source history, editable assumptions, and calculations in labeled
-   blocks or sheets. Link summary values to the model with formulas; link
-   assumptions rather than copying them into calculation areas.
-4. Keep detail and source evidence traceable without making the reader search
-   through raw data to find the requested answer. Include only relevant
-   scenarios, sensitivities, and charts; do not build an unrequested full model.
+2. Start the reader with the answer: key results, period/scenario comparisons,
+   main drivers, and material limitations. Keep detailed workings available
+   behind that overview rather than making raw inputs the entry point.
+3. For new budgets, forecasts or multi-scenario models, normally put the
+   overview, editable assumptions and calculation schedules on distinct sheets.
+   Keep source history and required sensitivity work clearly identifiable.
+   For example, use Overview / Drivers / Model, with linked History or
+   Sensitivity sheets where the task needs them. Adapt names and coverage to
+   the request; this is a functional example, not a required tab count.
+4. Use a single-sheet model for a straightforward task only when its results,
+   inputs, workings and explanations remain distinct and readable. If they
+   compete for space or make review difficult, separate their purposes into
+   sheets instead of shrinking text, crowding blocks or omitting context.
+5. Link summary values to the model with formulas; reference assumptions
+   rather than duplicating them in calculation areas. Keep details and source
+   evidence traceable. Include the scenarios, sensitivities and explanations
+   needed to answer the request, without adding unrelated analyses or an
+   unrequested full model.
 
 ## Apply the fixed green theme
 

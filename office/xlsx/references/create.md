@@ -6,9 +6,12 @@ outputs as live formulas rather than pasting externally computed answers.
 
 ## 1. Plan
 
-Choose the smallest useful sheet/block structure, the intended reading order,
-source/input locations, formula dependencies and styles. Use the finance layer
-for budgets, forecasts and financial reports. Do not add unrelated analyses.
+Plan around the user's reading and editing tasks. Define each worksheet or
+section's purpose and order, the source and input locations, and how calculations
+feed the reported results. Prioritize completeness and readability over reducing
+the sheet count; give data and explanations enough space to be inspected. Use
+the finance layer for the structure of budgets, forecasts and financial reports.
+Keep the work within the requested scope.
 
 ## 2. Copy the starter
 
@@ -17,9 +20,10 @@ cp -R "$SKILL_DIR/templates/minimal_xlsx" /tmp/xlsx_work
 ```
 
 Use a fresh working directory. The starter is a package skeleton with one
-worksheet, shared strings and styles; it does not assign styles to your model.
-Edit XML and pack with the bundled tools. Read OOXML details when adding package
-parts or implementing cell/string/style definitions.
+worksheet, shared strings and styles; its initial sheet count is not a layout
+recommendation. Expand it to match the plan and assign styles to the actual
+model. Edit XML and pack with the bundled tools. Read OOXML details when adding
+package parts or implementing cell/string/style definitions.
 
 When adding a sheet, keep these four points consistent:
 

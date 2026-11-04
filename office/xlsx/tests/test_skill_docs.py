@@ -73,6 +73,44 @@ class SkillDocumentationTests(unittest.TestCase):
             self.assertIn(color, roles)
         self.assertIn("must not\noverride the font roles", theme)
 
+    def test_new_workbook_plan_prioritizes_use_over_sheet_count(self):
+        create = (SKILL / "references/create.md").read_text()
+        plan = " ".join(create.split("## 1. Plan\n", 1)[1].split("\n## ", 1)[0].split())
+        self.assertNotIn("smallest useful", plan)
+        for requirement in (
+            "reading and editing tasks",
+            "Prioritize completeness and readability over reducing the sheet count",
+            "give data and explanations enough space",
+            "within the requested scope",
+        ):
+            self.assertIn(requirement, plan)
+        self.assertIn(
+            "initial sheet count is not a layout recommendation",
+            " ".join(create.split()),
+        )
+
+    def test_finance_model_structure_has_a_default_and_bounded_exception(self):
+        finance = (SKILL / "references/finance.md").read_text()
+        plan = " ".join(
+            finance.split("## Plan the reading and calculation paths\n", 1)[1]
+            .split("\n## ", 1)[0].split()
+        )
+        self.assertNotIn("compact block", plan)
+        for requirement in (
+            "Start the reader with the answer",
+            "For new budgets, forecasts or multi-scenario models, normally",
+            "overview, editable assumptions and calculation schedules on distinct sheets",
+            "functional example, not a required tab count",
+            "single-sheet model for a straightforward task only when",
+            "results, inputs, workings and explanations remain distinct and readable",
+            "instead of shrinking text, crowding blocks or omitting context",
+        ):
+            self.assertIn(requirement, plan)
+        self.assertIn(
+            "Preserve supplied templates/house styles; narrow edits do not authorize redesign",
+            finance,
+        )
+
     def test_starter_style_roles_and_relationship_ids_remain_valid(self):
         template = SKILL / "templates/minimal_xlsx"
         styles = ET.parse(template / "xl/styles.xml").getroot()
