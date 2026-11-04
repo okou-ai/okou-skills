@@ -11,9 +11,9 @@ Apply this policy to exhaustive searches and numeric targets, not single-person 
 
 ## Core principles
 
-- **Broad discovery:** Expand coverage through a deliberate search strategy, not indiscriminate searching.
-- **Strict verification:** Qualify only people who satisfy the user's stated conditions.
-- **Complete accounting:** Account for every discovered candidate so none are silently discarded.
+- **Broad discovery:** Cover complementary candidate pools with targeted searches, adjusting the strategy as gaps emerge.
+- **Strict verification:** Count or present a candidate as a match only after verifying they meet the user's criteria.
+- **Complete accounting:** Keep every candidate's outcome explicit and preserve the full qualified set through ranking and delivery.
 
 ## Set up the search run
 
