@@ -42,10 +42,14 @@ report/model sheets; do not choose a different accent for each workbook.
 
 | Use | Fill/accent | Text |
 | --- | --- | --- |
-| Title/label bands and primary chart accents | Deep green `#135B44` | White `#FFFFFF` on title/label bands |
-| Section/header labels | Pale green `#CFE9E0` | Dark green `#0B3D2C` |
+| Main title bands and primary chart accents | Deep green `#135B44` | White `#FFFFFF` on title bands |
+| Section divider bands | Pale green `#CFE9E0` | Dark green `#0B3D2C` |
+| Table column-header labels | Light gray `#F2F2F2` | Dark gray `#404040`, bold |
 | Period dividers and sensitivity baseline | Light gray `#E7E5E4` | Neutral text |
 
+Use green bands to introduce sections and gray rows to identify table columns;
+keep these levels visually distinct. Neutral header text applies to labels,
+not editable inputs or formula outputs that happen to sit in a header row.
 Use white (`#FFFFFF`) for data grids. Theme fills and chart accents must not
 override the font roles below or imply positive/negative performance.
 

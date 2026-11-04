@@ -57,7 +57,7 @@ class SkillDocumentationTests(unittest.TestCase):
     def test_non_financial_presentation_does_not_impose_finance_palette(self):
         common = (SKILL / "references/format.md").read_text()
         finance = (SKILL / "references/finance.md").read_text()
-        for color in ("#0000FF", "#008000", "#FF0000", "#135B44", "#CFE9E0", "#E7E5E4"):
+        for color in ("#0000FF", "#008000", "#FF0000", "#135B44", "#CFE9E0", "#E7E5E4", "#F2F2F2", "#404040"):
             self.assertNotIn(color, common)
             self.assertIn(color, finance)
 
@@ -66,12 +66,29 @@ class SkillDocumentationTests(unittest.TestCase):
         theme = finance.split("## Apply the fixed green theme\n", 1)[1].split("\n## ", 1)[0]
         self.assertEqual(
             set(re.findall(r"#[0-9A-F]{6}\b", theme)),
-            {"#135B44", "#CFE9E0", "#0B3D2C", "#E7E5E4", "#FFFFFF"},
+            {"#135B44", "#CFE9E0", "#0B3D2C", "#E7E5E4", "#F2F2F2", "#404040", "#FFFFFF"},
         )
         roles = finance.split("## Apply financial font roles\n", 1)[1].split("\n## ", 1)[0]
         for color in ("#0000FF", "#000000", "#008000", "#FF0000"):
             self.assertIn(color, roles)
         self.assertIn("must not\noverride the font roles", theme)
+
+    def test_table_headers_are_distinct_from_finance_section_bands(self):
+        finance = (SKILL / "references/finance.md").read_text()
+        theme = finance.split("## Apply the fixed green theme\n", 1)[1].split("\n## ", 1)[0]
+        rows = {}
+        for line in theme.splitlines():
+            if line.startswith("|"):
+                cells = [cell.strip() for cell in line.strip("|").split("|")]
+                rows[cells[0]] = cells[1:]
+        self.assertIn("#135B44", rows["Main title bands and primary chart accents"][0])
+        self.assertIn("#CFE9E0", rows["Section divider bands"][0])
+        self.assertEqual(
+            rows["Table column-header labels"],
+            ["Light gray `#F2F2F2`", "Dark gray `#404040`, bold"],
+        )
+        self.assertIn("keep these levels visually distinct", " ".join(theme.split()))
+        self.assertIn("not editable inputs or formula outputs", " ".join(theme.split()))
 
     def test_new_workbook_plan_prioritizes_use_over_sheet_count(self):
         create = (SKILL / "references/create.md").read_text()
