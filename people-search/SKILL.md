@@ -42,7 +42,7 @@ retain already-verified extras for minimum-count requests.
 
 ## 4. Open-ended / more people: collect, then review
 
-**Search → deduplicate → repeat until duplicates exceed 60% → review the full pool.**
+**Search → deduplicate → repeat until duplicates exceed 80% → review the full pool.**
 
 Between discovery rounds, do only identity checks and source retention—not
 person-by-person qualification research. Keep unverified or possibly unsuitable
@@ -53,7 +53,7 @@ all candidate identities, not only qualifying people:
 
 `duplicate_rate = this round's distinct people already seen / this round's distinct people`
 
-Stop immediately when `duplicate_rate > 0.60`; **exactly 60% means continue**.
+Stop immediately when `duplicate_rate > 0.80`; **exactly 80% means continue**.
 Then review every unique pooled candidate, including the final round's newcomers,
 not just a shortlist. Do not restart discovery solely because few qualify.
 For an empty successful round, leave the ratio undefined; try useful alternatives
