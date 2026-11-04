@@ -1,9 +1,9 @@
 # Design System
 
 The appearance, tokens, and visual QA layer for CREATE/REFORMAT. Read this after
-common requirements and manuscript/preset selection in [SKILL.md](../SKILL.md).
+common requirements and manuscript/preset selection in [SKILL.md](../../SKILL.md).
 For block fields, mathematics, charts, figures/captions, bibliography, code, and
-flowcharts, read [the content reference directly](../references/content.md).
+flowcharts, read [the content reference directly](../implementation/content.md).
 
 ## Contents
 
@@ -356,7 +356,7 @@ successful merge receipt. Record checks not executed as unverified. Verify actua
 fonts/glyphs (including web-font fallbacks), colors/contrast, page dimensions,
 margins, cover treatment, readable type, and page sequence against requirements.
 These are QA instructions, not new renderer checks or accessibility certification.
-For feature-specific output QA use [content QA](../references/content.md#feature-specific-rendering-qa).
+For feature-specific output QA use [content QA](../implementation/content.md#feature-specific-rendering-qa).
 
 - Cover, when requested, has a clear visual identity that is not "generic AI output"
 - Body text is readable at arm's length without squinting
@@ -369,7 +369,7 @@ For feature-specific output QA use [content QA](../references/content.md#feature
 
 ## Content conventions
 
-Read [the single content contract](../references/content.md) for all block fields,
+Read [the single content contract](../implementation/content.md) for all block fields,
 defaults, numbering, mathtext limits/fallbacks, and chart, caption, bibliography,
 code, and flowchart conventions. Do not infer content requirements from a cover
 pattern or a palette mood.

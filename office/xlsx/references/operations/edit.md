@@ -42,7 +42,9 @@ type rather than blindly removing every `t` attribute.
 Read the OOXML reference when changing cell types, string indices or style
 components. For template filling, change only designated inputs; keep formulas,
 layout, existing conventions and the file type. Do not infer an input solely
-because a cell is blank or colored.
+because a cell is blank or colored. For authorized input changes, check the
+[data/input contract](../common/data-and-inputs.md) without adding unrelated
+restrictions or rebuilding the file.
 
 ## 3. Review structural dependencies
 

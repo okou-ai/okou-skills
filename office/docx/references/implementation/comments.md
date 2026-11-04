@@ -1,5 +1,17 @@
 # Comments System Guide (4-File Architecture)
 
+## Contents
+
+- [Overview](#overview)
+- [The Four Comment Files](#the-four-comment-files)
+- [Document.xml References](#documentxml-references)
+- [Content Types Registration](#content-types-registration)
+- [Relationship Registration](#relationship-registration)
+- [Step-by-Step: Adding a New Comment](#step-by-step-adding-a-new-comment)
+- [Step-by-Step: Adding a Reply](#step-by-step-adding-a-reply)
+- [Step-by-Step: Resolving a Comment](#step-by-step-resolving-a-comment)
+- [Minimum Viable Comment](#minimum-viable-comment)
+
 ## Overview
 
 Word comments require coordination across **four XML files** plus references in `document.xml`, `[Content_Types].xml`, and `document.xml.rels`.

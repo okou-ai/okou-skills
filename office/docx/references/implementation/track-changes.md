@@ -1,5 +1,17 @@
 # Track Changes Guide
 
+## Contents
+
+- [Overview](#overview)
+- [Insertion: `<w:ins>`](#insertion-wins)
+- [Deletion: `<w:del>`](#deletion-wdel)
+- [Formatting Change: `<w:rPrChange>`](#formatting-change-wrprchange)
+- [Paragraph Property Change: `<w:pPrChange>`](#paragraph-property-change-wpprchange)
+- [Revision ID Management](#revision-id-management)
+- [Author and Date](#author-and-date)
+- [Operations](#operations)
+- [Cross-Paragraph Operations](#cross-paragraph-operations)
+
 ## Overview
 
 Track Changes in OpenXML uses revision markup elements to record insertions, deletions, and formatting changes. Each revision has a unique ID, author, and timestamp.

@@ -1,5 +1,23 @@
 # Troubleshooting Guide — Symptom-Driven
 
+## Contents
+
+- [How to Use This Guide](#how-to-use-this-guide)
+- [1. "All headings look like body text" (Heading Styles Not Applied)](#1-all-headings-look-like-body-text-heading-styles-not-applied)
+- [2. "Document opens with repair warnings" (XML Corruption)](#2-document-opens-with-repair-warnings-xml-corruption)
+- [3. "All text is in wrong font" (Font Contamination)](#3-all-text-is-in-wrong-font-font-contamination)
+- [4. "Tables are missing" (Tables Lost During Copy)](#4-tables-are-missing-tables-lost-during-copy)
+- [5. "Images are missing or show broken icon"](#5-images-are-missing-or-show-broken-icon)
+- [6. "TOC shows stale/wrong entries" or "Update Table doesn't work"](#6-toc-shows-stalewrong-entries-or-update-table-doesnt-work)
+- [7. "Chapters don't start on new pages" (Missing Section Breaks)](#7-chapters-dont-start-on-new-pages-missing-section-breaks)
+- [8. "Hyperlinks don't work" (Broken Links)](#8-hyperlinks-dont-work-broken-links)
+- [9. "Numbered lists show wrong numbers" or "Bullets disappeared"](#9-numbered-lists-show-wrong-numbers-or-bullets-disappeared)
+- [10. "Page margins/size are wrong"](#10-page-marginssize-are-wrong)
+- [11. "Chinese text renders as boxes/tofu"](#11-chinese-text-renders-as-boxestofu)
+- [12. "Template's cover page / declaration page is missing"](#12-templates-cover-page--declaration-page-is-missing)
+- [13. "Track changes markers appear unexpectedly"](#13-track-changes-markers-appear-unexpectedly)
+- [Recovery Strategy — When Multiple Issues Exist](#recovery-strategy--when-multiple-issues-exist)
+
 ## How to Use This Guide
 
 Search by the **SYMPTOM** you observe, not the technical concept. Each entry follows:
@@ -96,7 +114,7 @@ $CLI unpack --input doc.docx --output unpacked/
 $CLI pack --input unpacked/ --output fixed.docx
 ```
 
-**Prevention:** Read `references/openxml_element_order.md` before writing any XML manipulation code. Always append properties elements first, then content elements.
+**Prevention:** Read `references/implementation/element-order.md` before writing any XML manipulation code. Always append properties elements first, then content elements.
 
 ---
 
@@ -408,7 +426,7 @@ static bool ContainsCjk(string text)
 
 Common safe CJK fonts: 宋体 (SimSun), 黑体 (SimHei), 仿宋 (FangSong), 楷体 (KaiTi).
 
-**Prevention:** When cleaning `rPr` formatting, ALWAYS preserve `w:eastAsia` font declarations. See also `references/cjk_typography.md`.
+**Prevention:** When cleaning `rPr` formatting, ALWAYS preserve `w:eastAsia` font declarations. See also `references/common/cjk-typography.md`.
 
 ---
 
@@ -435,7 +453,7 @@ $CLI analyze --input template.docx
 $CLI apply-template --input source.docx --template template.docx --output out.docx --strategy base-replace
 ```
 
-**Prevention:** Analyze template structure FIRST. If template has structural content (cover, TOC, declaration sections), always use C-2 (Base-Replace). Read `references/scenario_c_apply_template.md` for detailed decision criteria.
+**Prevention:** Analyze template structure FIRST. If template has structural content (cover, TOC, declaration sections), always use C-2 (Base-Replace). Read `references/operations/template.md` for detailed decision criteria.
 
 ---
 

@@ -433,7 +433,7 @@ cmd_demo() {
     "text":"# Design token pipeline\ntokens = palette.build_tokens(\n    title=\"Annual Report\",\n    doc_type=\"report\",\n    author=\"J. Smith\",\n    date=\"March 2026\",\n)\nhtml = cover.render(tokens)\npdf  = render_cover(html)"},
 
   {"type":"h1",      "text":"Design Principles"},
-  {"type":"body",    "text":"The aesthetic system is documented in design/design.md. The core rule: every design decision must be rooted in the document content and purpose. A color chosen because it fits the content will always outperform a color chosen because it seems safe."},
+  {"type":"body",    "text":"The aesthetic system is documented in references/common/presentation.md. The core rule: every design decision must be rooted in the document content and purpose. A color chosen because it fits the content will always outperform a color chosen because it seems safe."},
   {"type":"h2",      "text":"Restraint over decoration"},
   {"type":"body",    "text":"The page is done when there is nothing left to remove. Accent color appears on section rules only — not on headings, not on bullets. No card components, no drop shadows."},
   {"type":"callout", "text":"A PDF passes the quality bar when a designer would not be embarrassed to hand it to a client."},

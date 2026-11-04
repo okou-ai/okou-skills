@@ -1,5 +1,16 @@
 # Chinese University Thesis Template Guide (中国高校论文模板指南)
 
+## Contents
+
+- [Why This Guide Exists](#why-this-guide-exists)
+- [Common StyleId Patterns](#common-styleid-patterns)
+- [Standard Thesis Structure](#standard-thesis-structure)
+- [Identifying Zone Boundaries in Templates](#identifying-zone-boundaries-in-templates)
+- [Font Expectations in Chinese Thesis Templates](#font-expectations-in-chinese-thesis-templates)
+- [RunFonts for CJK Body Text](#runfonts-for-cjk-body-text)
+- [Common Mistakes with Chinese Templates](#common-mistakes-with-chinese-templates)
+- [Style Mapping Quick Reference](#style-mapping-quick-reference)
+
 ## Why This Guide Exists
 
 Chinese university thesis templates (.docx) have structural patterns that differ significantly

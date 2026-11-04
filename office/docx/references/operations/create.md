@@ -1,5 +1,14 @@
 # Scenario A: Creating a New DOCX from Scratch
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Step-by-Step Workflow](#step-by-step-workflow)
+- [Document Type Defaults](#document-type-defaults)
+- [Content Configuration JSON Format](#content-configuration-json-format)
+- [Complex Elements Guide](#complex-elements-guide)
+- [Post-Creation Checklist](#post-creation-checklist)
+
 ## When to Use
 
 Use Scenario A when:
@@ -15,7 +24,7 @@ Do NOT use when: the user already has a DOCX they want to modify (→ Scenario B
 
 ### 1. Determine Document Type
 
-First apply the [entry routing order](../SKILL.md#routing-order-common--applicable-profile--operation):
+First apply the [entry routing order](../../SKILL.md#routing-order-common--applicable-profile--operation):
 resolve the user's requirements/template and select an applicable presentation
 profile before using generic defaults here. A structured supplied template goes
 to C-2 even when its body content is new. Then infer a generic type if needed:
@@ -191,7 +200,7 @@ bash "$SKILL_DIR/scripts/docx.sh" create \
   --content-json content.json --output report.docx
 ```
 
-For tables, images, or lists, use the [direct C# path](../SKILL.md#quick-start-direct-c-path)
+For tables, images, or lists, use the [direct C# path](../implementation/authoring.md#project-scaffold)
 and the relevant `Samples/*.cs` files listed there.
 
 ---
@@ -280,7 +289,7 @@ Add a header part with a shape behind the text:
 
 ## Post-Creation Checklist
 
-1. **Validate** — follow the [validation pipeline](../SKILL.md#validation-pipeline): `validate --input output.docx --business` runs OpenXML SDK validation on all package parts and the business checks.
+1. **Validate** — follow the [validation pipeline](validate.md): `validate --input output.docx --business` runs OpenXML SDK validation on all package parts and the business checks.
 2. **Optional subset validation** — add `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` only for documents intentionally restricted to that subset. Do not remove valid document features to satisfy the subset schema.
 3. **Repair as needed** — use `fix-order` only for diagnosed ordering errors and `merge-runs` only when consolidation is needed. Revalidate after repairs.
 4. **File size** — confirm images are reasonably sized (compress if > 2MB each)

@@ -5,7 +5,7 @@ for policy drafting expertise. Apply the entry's scope and precedence rules firs
 
 ## Read and adapt
 
-- Read [CJK typography](../cjk_typography.md), especially `GB/T 9704`.
+- Read [CJK typography](../common/cjk-typography.md), especially `GB/T 9704`.
 - Read [AestheticRecipeSamples.cs](../../scripts/dotnet/Docx.Core/Samples/AestheticRecipeSamples.cs),
   method `CreateChineseGovernmentDocument` in `AestheticRecipeSamples`.
 - Adapt that method's layout in task-specific C#; it creates demonstration content,

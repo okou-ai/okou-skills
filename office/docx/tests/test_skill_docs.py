@@ -11,8 +11,10 @@ ROOT = SKILL.parents[1]
 CORE = SKILL / "scripts/dotnet/Docx.Core"
 ENTRY = SKILL / "SKILL.md"
 DOMAINS = SKILL / "references/domains"
-OWNED_DOCS = [ENTRY, SKILL / "references/scenario_a_create.md",
-              SKILL / "references/scenario_c_apply_template.md", *sorted(DOMAINS.glob("*.md"))]
+AUTHORING = SKILL / "references/implementation/authoring.md"
+OWNED_DOCS = [ENTRY, AUTHORING, SKILL / "references/operations/create.md",
+              SKILL / "references/operations/template.md",
+              SKILL / "references/operations/validate.md", *sorted(DOMAINS.glob("*.md"))]
 
 
 def read(path):
@@ -68,8 +70,8 @@ class DocxDocumentationContracts(unittest.TestCase):
                          {"government.md", "academic.md", "thesis-template.md", "business-editorial.md"})
         for path in DOMAINS.glob("*.md"):
             self.assertIn(path.relative_to(SKILL).as_posix(), targets)
-        for target in ("references/cjk_typography.md", "references/cjk_university_template_guide.md",
-                       "references/xsd_validation_guide.md"):
+        for target in ("references/common/cjk-typography.md", "references/implementation/university-template.md",
+                       "references/implementation/validation.md"):
             self.assertIn(target, targets)
         self.assertLess(text.index("## Routing order"), text.index("## Pipeline routing"))
         self.assertIn("Condition (within the authorized scope)", text)
@@ -119,9 +121,10 @@ class DocxDocumentationContracts(unittest.TestCase):
                         self.assertIn(actual[method].resolve(), row_sources)
             advertised.update(methods)
         self.assertEqual(advertised, set(actual))
-        entry = read(ENTRY)
+        self.assertIn("references/implementation/authoring.md", links(read(ENTRY)))
+        sample_index = read(AUTHORING)
         for path in source_files:
-            self.assertIn("Samples/" + path.name, entry)
+            self.assertIn("Samples/" + path.name, sample_index)
 
     def test_model_case_written_contracts(self):
         entry = flat(read(ENTRY))
@@ -144,10 +147,27 @@ class DocxDocumentationContracts(unittest.TestCase):
         self.assertIn("new creation or explicitly requested restyling", entry)
         self.assertIn("a simple fill remains B", entry)
         self.assertNotIn("Always strip direct formatting", entry)
+        self.assertIn("references/implementation/authoring.md", links(read(ENTRY)))
+        authoring = flat(read(AUTHORING))
         for token in ("necessary `w:eastAsia`", "semantic emphasis", "numbering", "fields", "relationships",
                       "intentional section structure", "selective cleanup"):
-            self.assertIn(token, entry)
-        self.assertIn("**KEEP in `<w:rPr>`:**", read(SKILL / "references/scenario_c_apply_template.md"))
+            self.assertIn(token, authoring)
+        self.assertIn("**KEEP in `<w:rPr>`:**", read(SKILL / "references/operations/template.md"))
+
+    def test_authoring_referrals_use_real_sections_and_disclose_procedure_limits(self):
+        text = read(AUTHORING)
+        direct = set(links(text))
+        for target in ("../operations/template.md#workflow",
+                       "../operations/template.md#template-structure-analysis-required",
+                       "../operations/template.md#relationship-id-remapping",
+                       "../operations/template.md#3-section-property-conflicts"):
+            self.assertIn(target, direct)
+        contract = flat(text)
+        self.assertIn("not a bundled end-to-end multi-template merge procedure", contract)
+        self.assertIn("No dedicated automatic header/footer-transfer procedure or all-section template gate", contract)
+        self.assertIn("compare each section and its linked header/footer parts", contract)
+        self.assertNotIn("Multi-Template Merge section", text)
+        self.assertNotIn("Multi-Section Header/Footer Transfer guidance", text)
 
     def test_government_and_hbr_source_conflicts_are_scoped(self):
         government = flat(read(DOMAINS / "government.md"))
@@ -169,7 +189,7 @@ class DocxDocumentationContracts(unittest.TestCase):
         self.assertIn('pageSizeOption.DefaultValueFactory = _ => "letter"', source)
         self.assertNotIn("AestheticRecipeSamples", source)
         self.assertNotIn("academic_styles.xml", source)
-        a = flat(read(SKILL / "references/scenario_a_create.md"))
+        a = flat(read(SKILL / "references/operations/create.md"))
         for token in ("CLI does **not** load these assets", "not APA/IEEE selection", "no named-format CLI flag",
                       "--page-size a4", "not** exact CLI/asset specifications", "CLI's `--type memo` alone"):
             self.assertIn(token, a)
@@ -196,7 +216,7 @@ class DocxDocumentationContracts(unittest.TestCase):
                       'new PackageValidator().Validate(input)', 'if (xsd != null)', 'if (business)',
                       'gateValidator.Validate(input, gateCheck)'):
             self.assertIn(token, source)
-        c = flat(read(SKILL / "references/scenario_c_apply_template.md"))
+        c = flat(read(SKILL / "references/operations/template.md"))
         for token in ("--gate-check template.docx", "template DOCX", "not an XSD", "not full OOXML validation",
                       "not domain certification", "last section", "explicit ASCII font", "Every template style ID"):
             self.assertIn(token, c)
@@ -205,7 +225,7 @@ class DocxDocumentationContracts(unittest.TestCase):
         for token in ('LastOrDefault()', 'Attribute(W + "ascii")', 'foreach (var style in templateStyles)',
                       'StartsWith("Heading", StringComparison.OrdinalIgnoreCase)'):
             self.assertIn(token, gate)
-        guide = read(SKILL / "references/xsd_validation_guide.md")
+        guide = read(SKILL / "references/implementation/validation.md")
         self.assertIn("not executable replacements", guide)
         self.assertIn("curated subset", guide)
 

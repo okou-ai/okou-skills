@@ -3,9 +3,9 @@
 """
 libreoffice_recalc.py — Tier 2 dynamic formula recalculation via LibreOffice headless.
 
-Opens the xlsx file with the LibreOffice Calc engine, executes all formulas, writes
-the computed values into the <v> cache elements, and saves the result. This is the
-closest server-side equivalent of "open in Excel and save."
+Loads and exports xlsx files with the LibreOffice Calc engine to refresh formula
+caches. Calculation behavior and workbook fidelity are engine-specific; writing
+an output file alone does not establish formula correctness or Excel compatibility.
 
 After recalculation, run formula_check.py on the output file to detect runtime errors
 (#DIV/0!, #N/A, etc.) that only surface after actual computation.
@@ -13,12 +13,16 @@ After recalculation, run formula_check.py on the output file to detect runtime e
 Usage:
     python3 libreoffice_recalc.py input.xlsx output.xlsx
     python3 libreoffice_recalc.py input.xlsx output.xlsx --timeout 90
-    python3 libreoffice_recalc.py --check          # check LibreOffice availability only
+    python3 libreoffice_recalc.py --check          # binary/version availability only
+    python3 libreoffice_recalc.py --preflight      # independent synthetic formula control
 
 Exit codes:
-    0 — recalculation succeeded, output file written
-    2 — LibreOffice not found (Tier 2 unavailable — not a hard failure, note in report)
-    1 — LibreOffice found but recalculation failed (timeout, crash, bad file)
+    0 — output written, availability check passed, or synthetic control actually passed
+    2 — LibreOffice binary not found (Tier 2 unavailable; note in report)
+    1 — recalculation or synthetic control failed (including missing Calc)
+
+A passing preflight tests only its own small control, not a candidate workbook or
+full Excel compatibility. No mode installs software or retries a failed conversion.
 """
 
 import subprocess
@@ -27,7 +31,12 @@ import shutil
 import os
 import tempfile
 import argparse
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
+import posixpath
+import signal
+import xml.etree.ElementTree as ET
+import zipfile
 
 
 # ── LibreOffice discovery ───────────────────────────────────────────────────
@@ -56,17 +65,73 @@ def find_soffice() -> str | None:
     return None
 
 
-def get_libreoffice_version(soffice: str) -> str:
-    """Return LibreOffice version string, or 'unknown' on failure."""
+def _run_soffice(cmd: list[str], timeout: int) -> subprocess.CompletedProcess:
+    """Run once; reap the child and stop only this invocation's POSIX process group.
+
+    A separate session prevents a timeout from leaving soffice.bin using a profile
+    about to be deleted. Never scan for or kill other LibreOffice instances. On
+    non-POSIX systems only the directly owned child can be killed with the stdlib.
+    """
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=(os.name == "posix"),
+    )
     try:
-        result = subprocess.run(
-            [soffice, "--version"],
-            capture_output=True,
-            timeout=10,
-        )
+        stdout, stderr = process.communicate(timeout=timeout)
+        return subprocess.CompletedProcess(cmd, process.returncode, stdout, stderr)
+    finally:
+        try:
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass  # The owned group already exited.
+            elif process.poll() is None:
+                process.kill()
+        finally:
+            process.wait()
+            if process.stdout is not None:
+                process.stdout.close()
+            if process.stderr is not None:
+                process.stderr.close()
+
+
+def get_libreoffice_version(soffice: str) -> str:
+    """Return the version, or 'unknown'; this is not a formula evaluation test."""
+    try:
+        with tempfile.TemporaryDirectory(prefix="xlsx_lo_version_") as tmpdir:
+            profile = (Path(tmpdir) / "profile").as_uri()
+            result = _run_soffice(
+                [soffice, f"-env:UserInstallation={profile}", "--headless", "--version"],
+                timeout=10,
+            )
         return result.stdout.decode(errors="replace").strip()
     except Exception:
         return "unknown"
+
+
+def calc_component_diagnostic(soffice: str) -> str:
+    """Give a read-only hint for a recognized split-package installation layout.
+
+    Missing registry evidence is a diagnostic, not an alternative to the actual
+    formula control. Unknown layouts make no claim about Calc availability.
+    """
+    program = Path(soffice).resolve().parent
+    registry = program.parent / "share" / "registry"
+    if (program.name == "program"
+            and (registry / "main.xcd").is_file()
+            and not (registry / "calc.xcd").is_file()):
+        return (
+            f"Calc component appears missing: {registry / 'calc.xcd'} is absent "
+            "in this LibreOffice registry layout. Core/Writer/Impress alone cannot "
+            "recalculate XLSX formulas. On Debian/Ubuntu the component is packaged "
+            "as libreoffice-calc (or libreoffice-calc-nogui). No installation was "
+            "attempted; obtain authorization under the environment's software policy "
+            "before adding components."
+        )
+    return ""
 
 
 # ── Recalculation ───────────────────────────────────────────────────────────
@@ -88,9 +153,8 @@ def recalculate(
     if not soffice:
         return False, (
             "LibreOffice not found. Tier 2 validation is unavailable in this environment. "
-            "Install LibreOffice to enable dynamic formula recalculation.\n"
-            "  macOS:  brew install --cask libreoffice\n"
-            "  Linux:  sudo apt-get install -y libreoffice"
+            "LibreOffice with the Calc component is required. No installation was attempted; "
+            "obtain authorization under the environment's software policy before adding software."
         )
 
     version = get_libreoffice_version(soffice)
@@ -129,11 +193,7 @@ def recalculate(
         ]
 
         try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                timeout=timeout,
-            )
+            result = _run_soffice(cmd, timeout=timeout)
         except subprocess.TimeoutExpired:
             return False, (
                 f"LibreOffice timed out after {timeout}s. "
@@ -146,10 +206,12 @@ def recalculate(
         if result.returncode != 0:
             stderr = result.stderr.decode(errors="replace").strip()
             stdout = result.stdout.decode(errors="replace").strip()
+            diagnostic = calc_component_diagnostic(soffice)
             return False, (
                 f"LibreOffice exited with code {result.returncode}.\n"
                 f"stderr: {stderr}\n"
                 f"stdout: {stdout}"
+                + (f"\n{diagnostic}" if diagnostic else "")
             )
 
         # Only a newly created output in the separate output directory is success.
@@ -159,10 +221,13 @@ def recalculate(
         if not os.path.isfile(tmp_output):
             stdout = result.stdout.decode(errors="replace").strip()
             stderr = result.stderr.decode(errors="replace").strip()
+            diagnostic = calc_component_diagnostic(soffice)
             return False, (
                 "LibreOffice exited 0 but produced no recalculated workbook. "
-                "Ensure LibreOffice Calc is installed.\n"
+                "LibreOffice Calc and its XLSX filters are required, not just the core binary. "
+                "No installation was attempted.\n"
                 f"stdout: {stdout}\nstderr: {stderr}"
+                + (f"\n{diagnostic}" if diagnostic else "")
             )
 
         # Copy recalculated file to final destination
@@ -170,6 +235,158 @@ def recalculate(
         shutil.copy(tmp_output, output_path)
 
     return True, f"Recalculation complete. LibreOffice {version}. Output: {output_path}"
+
+
+# ── Independent synthetic control ──────────────────────────────────────────
+
+S = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+P = "{http://schemas.openxmlformats.org/package/2006/relationships}"
+CONTROL_FORMULA = "SUM(A1:B1)"
+CONTROL_EXPECTED = Decimal(42)
+
+
+def _write_preflight_workbook(path: Path) -> None:
+    """Build a complete minimal package from scratch, without starters or libraries.
+
+    The only formula cache is EMPTY. Copying this input can never satisfy the
+    expected nonzero result; an engine must compute 19 + 23 and retain the formula.
+    """
+    content_types = ET.Element(
+        "Types", xmlns="http://schemas.openxmlformats.org/package/2006/content-types",
+    )
+    ET.SubElement(content_types, "Default", Extension="rels",
+                  ContentType="application/vnd.openxmlformats-package.relationships+xml")
+    ET.SubElement(content_types, "Default", Extension="xml", ContentType="application/xml")
+    for part, kind in (
+        ("/xl/workbook.xml", "sheet.main"),
+        ("/xl/worksheets/sheet1.xml", "worksheet"),
+    ):
+        ET.SubElement(content_types, "Override", PartName=part,
+                      ContentType=f"application/vnd.openxmlformats-officedocument.spreadsheetml.{kind}+xml")
+
+    root_rels = ET.Element(f"{P}Relationships")
+    ET.SubElement(root_rels, f"{P}Relationship", Id="rId1",
+                  Type=f"{R[1:-1]}/officeDocument", Target="xl/workbook.xml")
+    workbook = ET.Element(f"{S}workbook")
+    sheets = ET.SubElement(workbook, f"{S}sheets")
+    ET.SubElement(sheets, f"{S}sheet", name="Preflight", sheetId="1", attrib={f"{R}id": "rId1"})
+    ET.SubElement(workbook, f"{S}calcPr", calcMode="auto", fullCalcOnLoad="1", forceFullCalc="1")
+    workbook_rels = ET.Element(f"{P}Relationships")
+    ET.SubElement(workbook_rels, f"{P}Relationship", Id="rId1",
+                  Type=f"{R[1:-1]}/worksheet", Target="worksheets/sheet1.xml")
+    worksheet = ET.Element(f"{S}worksheet")
+    data = ET.SubElement(worksheet, f"{S}sheetData")
+    row = ET.SubElement(data, f"{S}row", r="1")
+    for address, value in (("A1", "19"), ("B1", "23")):
+        cell = ET.SubElement(row, f"{S}c", r=address)
+        ET.SubElement(cell, f"{S}v").text = value
+    formula_cell = ET.SubElement(row, f"{S}c", r="C1")
+    ET.SubElement(formula_cell, f"{S}f").text = CONTROL_FORMULA
+    ET.SubElement(formula_cell, f"{S}v")  # intentionally no cached answer
+
+    parts = {
+        "[Content_Types].xml": content_types,
+        "_rels/.rels": root_rels,
+        "xl/workbook.xml": workbook,
+        "xl/_rels/workbook.xml.rels": workbook_rels,
+        "xl/worksheets/sheet1.xml": worksheet,
+    }
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as package:
+        for name, root in parts.items():
+            package.writestr(name, ET.tostring(root, encoding="utf-8", xml_declaration=True))
+
+
+def _verify_preflight_output(path: Path) -> None:
+    """Reopen the produced OOXML; require the expected live formula AND its cache."""
+    with zipfile.ZipFile(path) as package:
+        types_namespace = "{http://schemas.openxmlformats.org/package/2006/content-types}"
+        content_types = ET.fromstring(package.read("[Content_Types].xml"))
+        if content_types.tag != f"{types_namespace}Types":
+            raise ValueError("Output has no OOXML content types")
+        overrides = {item.get("PartName"): item.get("ContentType")
+                     for item in content_types.findall(f"{types_namespace}Override")}
+        prefix = "application/vnd.openxmlformats-officedocument.spreadsheetml."
+        if overrides.get("/xl/workbook.xml") != f"{prefix}sheet.main+xml":
+            raise ValueError("Output lost the XLSX workbook content type")
+        root_rels = ET.fromstring(package.read("_rels/.rels"))
+        if root_rels.tag != f"{P}Relationships" or not any(
+            rel.get("Type") == f"{R[1:-1]}/officeDocument"
+            and rel.get("TargetMode") != "External"
+            and rel.get("Target", "").lstrip("/") == "xl/workbook.xml"
+            for rel in root_rels.findall(f"{P}Relationship")
+        ):
+            raise ValueError("Output lost the internal OOXML workbook relationship")
+        workbook = ET.fromstring(package.read("xl/workbook.xml"))
+        if workbook.tag != f"{S}workbook":
+            raise ValueError("Output has no OOXML workbook root")
+        sheet = workbook.find(f"{S}sheets/{S}sheet[@name='Preflight']")
+        if sheet is None:
+            raise ValueError("Output lost the Preflight worksheet")
+        rels = ET.fromstring(package.read("xl/_rels/workbook.xml.rels"))
+        if rels.tag != f"{P}Relationships":
+            raise ValueError("Output has no OOXML workbook relationships")
+        relationship = next((rel for rel in rels.findall(f"{P}Relationship")
+                             if rel.get("Id") == sheet.get(f"{R}id")), None)
+        if (relationship is None or relationship.get("TargetMode") == "External"
+                or relationship.get("Type") != f"{R[1:-1]}/worksheet"):
+            raise ValueError("Output lost the internal Preflight worksheet relationship")
+        target = relationship.get("Target", "")
+        part = posixpath.normpath(target.lstrip("/") if target.startswith("/")
+                                  else posixpath.join("xl", target))
+        if not target or part.startswith("../") or "\\" in part:
+            raise ValueError("Output has an invalid Preflight worksheet target")
+        if overrides.get(f"/{part}") != f"{prefix}worksheet+xml":
+            raise ValueError("Output lost the Preflight worksheet content type")
+        worksheet = ET.fromstring(package.read(part))
+        if worksheet.tag != f"{S}worksheet":
+            raise ValueError("Output has no OOXML worksheet root")
+        cell = worksheet.find(f"{S}sheetData/{S}row/{S}c[@r='C1']")
+        if cell is None:
+            raise ValueError("Output lost Preflight!C1")
+        formula = cell.find(f"{S}f")
+        if formula is None or (formula.text or "").strip() != CONTROL_FORMULA:
+            raise ValueError(f"Output lost the live formula {CONTROL_FORMULA!r} at Preflight!C1")
+        cache = cell.find(f"{S}v")
+        text = "" if cache is None else (cache.text or "").strip()
+        if cell.get("t", "n") != "n" or not text:
+            raise ValueError(f"Preflight!C1 needs a numeric cache of {CONTROL_EXPECTED}; "
+                             f"found type={cell.get('t', 'n')!r}, cache={text!r}")
+        try:
+            value = Decimal(text)
+        except InvalidOperation as exc:
+            raise ValueError(f"Preflight!C1 has a nonnumeric cache: {text!r}") from exc
+        if not value.is_finite() or value != CONTROL_EXPECTED:
+            raise ValueError(f"Preflight!C1 expected cache {CONTROL_EXPECTED}, found {text!r}")
+
+
+def preflight(timeout: int = 60) -> tuple[int, str]:
+    """Run one independent control through recalculate(), never a candidate workbook.
+
+    Returns CLI status 0 only after reopening the new output and checking its live
+    formula and nonzero numeric cache, 2 for no binary, or 1 for a failed control.
+    """
+    if not find_soffice():
+        return 2, ("Preflight unavailable: LibreOffice binary not found. Calc is required. "
+                   "No installation or conversion was attempted.")
+    try:
+        with tempfile.TemporaryDirectory(prefix="xlsx_preflight_") as tmpdir:
+            source = Path(tmpdir) / "control.xlsx"
+            output = Path(tmpdir) / "recalculated.xlsx"
+            _write_preflight_workbook(source)
+            before = source.read_bytes()
+            success, message = recalculate(str(source), str(output), timeout=timeout)
+            if not success:
+                return 1, f"Preflight FAILED: independent formula control failed.\n{message}"
+            if source.read_bytes() != before:
+                raise ValueError("The synthetic source workbook was modified")
+            _verify_preflight_output(output)
+    except (OSError, ValueError, KeyError, ET.ParseError, zipfile.BadZipFile, RuntimeError) as exc:
+        return 1, f"Preflight FAILED: independent formula control could not be verified: {exc}"
+    return 0, (f"Preflight PASSED: reopened synthetic output; Preflight!C1 retains "
+               f"{CONTROL_FORMULA} with numeric cached value {CONTROL_EXPECTED} "
+               "(input cache was empty). Only this independent control passed; "
+               "no candidate workbook was validated.")
 
 
 # ── CLI ─────────────────────────────────────────────────────────────────────
@@ -186,10 +403,13 @@ Examples:
   # With extended timeout for large files
   python3 libreoffice_recalc.py big_model.xlsx big_model_recalc.xlsx --timeout 120
 
-  # Check if LibreOffice is available (useful in CI)
+  # Binary/version availability only; does not test formula calculation
   python3 libreoffice_recalc.py --check
 
-  # Full validation pipeline
+  # Independent synthetic formula control, with no candidate input
+  python3 libreoffice_recalc.py --preflight --timeout 60
+
+  # Candidate recalculation followed by a formula-error scan
   python3 libreoffice_recalc.py input.xlsx /tmp/recalc.xlsx && \\
     python3 formula_check.py /tmp/recalc.xlsx
 """,
@@ -203,10 +423,16 @@ Examples:
         metavar="SECONDS",
         help="Maximum time to wait for LibreOffice (default: 60)",
     )
-    parser.add_argument(
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument(
         "--check",
         action="store_true",
-        help="Only check if LibreOffice is available, then exit",
+        help="Binary/version availability only; does not test Calc or any workbook",
+    )
+    modes.add_argument(
+        "--preflight",
+        action="store_true",
+        help="Run an independent synthetic formula control and verify the new output cache/formula",
     )
 
     args = parser.parse_args()
@@ -218,13 +444,24 @@ Examples:
             version = get_libreoffice_version(soffice)
             print(f"LibreOffice available: {soffice}")
             print(f"Version: {version}")
+            print("Availability-only: no formula or workbook was tested. Use --preflight for a control.")
+            diagnostic = calc_component_diagnostic(soffice)
+            if diagnostic:
+                print(f"WARNING: {diagnostic}")
             sys.exit(0)
         else:
             print("LibreOffice NOT available.")
-            print("Tier 2 dynamic validation requires LibreOffice.")
-            print("  macOS:  brew install --cask libreoffice")
-            print("  Linux:  sudo apt-get install -y libreoffice")
+            print("Availability-only: Tier 2 requires LibreOffice with Calc. No installation was attempted.")
             sys.exit(2)
+
+    # ── --preflight mode ─────────────────────────────────────────────────────
+    if args.preflight:
+        if args.input or args.output:
+            print("ERROR: --preflight accepts no candidate paths; it creates its own synthetic control.")
+            sys.exit(1)
+        code, message = preflight(timeout=args.timeout)
+        print(message)
+        sys.exit(code)
 
     # ── Recalculation mode ────────────────────────────────────────────────────
     if not args.input or not args.output:

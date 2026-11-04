@@ -3026,7 +3026,7 @@ var freshNumInstance = new NumberingInstance(
 
 ### 9.6 Link Numbering to Heading Styles (Outline Numbering)
 
-```句话说，link numbering to heading styles so that Heading1 starts a new numbering sequence, Heading2 is a sub-item, etc.
+Link numbering to heading styles so that Heading1 starts a new numbering sequence, Heading2 is a sub-item, etc.
 
 ```csharp
 // This links styles to numbering levels automatically via StyleLink

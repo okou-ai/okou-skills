@@ -7,8 +7,8 @@ remains B, and narrow edits do not trigger template reconstruction.
 ## Supplied template first
 
 For a Chinese university template, read the
-[Chinese university guide](../cjk_university_template_guide.md) and
-[Scenario C](../scenario_c_apply_template.md). Inspect actual style IDs rather
+[Chinese university guide](../implementation/university-template.md) and
+[Scenario C](../operations/template.md). Inspect actual style IDs rather
 than assuming `Heading1`: numeric `1/2/3/a` and custom names are common.
 
 When creating body content within a template with cover/abstract/SDT-wrapped

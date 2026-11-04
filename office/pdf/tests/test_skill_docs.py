@@ -11,8 +11,14 @@ import unittest
 
 PDF = Path(__file__).resolve().parents[1]
 CORE = (PDF / "SKILL.md").read_text()
-DESIGN = (PDF / "design/design.md").read_text()
-CONTENT = (PDF / "references/content.md").read_text()
+DESIGN = (PDF / "references/common/presentation.md").read_text()
+CONTENT = (PDF / "references/implementation/content.md").read_text()
+ENVIRONMENT = (PDF / "references/implementation/environment.md").read_text()
+CREATE = (PDF / "references/operations/create.md").read_text()
+FILL = (PDF / "references/operations/fill.md").read_text()
+REFORMAT = (PDF / "references/operations/reformat.md").read_text()
+VALIDATE = (PDF / "references/operations/validate.md").read_text()
+PROFILES = (PDF / "references/domains/profiles.md").read_text()
 
 
 def compact(text):
@@ -35,8 +41,8 @@ class PdfSkillDocsTests(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
 
     def test_direct_links_and_anchors_exist(self):
-        for origin in (PDF / "SKILL.md", PDF / "design/design.md",
-                       PDF / "references/content.md"):
+        for origin in (PDF / "SKILL.md", PDF / "references/common/presentation.md",
+                       PDF / "references/implementation/content.md"):
             for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", origin.read_text()):
                 with self.subTest(origin=origin.name, target=target):
                     filename, _, anchor = target.partition("#")
@@ -47,9 +53,9 @@ class PdfSkillDocsTests(unittest.TestCase):
         for anchor in ("block-contract", "common-blocks-and-tables", "mathematics", "charts",
                        "figures-and-captions", "bibliography", "code", "flowcharts",
                        "feature-specific-rendering-qa"):
-            self.assertIn(f"references/content.md#{anchor}", CORE)
+            self.assertIn(f"references/implementation/content.md#{anchor}", CORE)
             self.assertIn(f"](#{anchor})", CONTENT)  # TOC
-        self.assertIn("../references/content.md", DESIGN)
+        self.assertIn("../implementation/content.md", DESIGN)
 
     def test_all_existing_block_types_extracted_once(self):
         expected = {"h1", "h2", "h3", "body", "bullet", "numbered", "callout", "table",
@@ -124,7 +130,10 @@ class PdfSkillDocsTests(unittest.TestCase):
             self.assertIn(flag, DESIGN)
 
     def test_existing_operations_and_setup_gates_preserved(self):
-        text = compact(CORE)
+        text = compact(CORE + ENVIRONMENT + CREATE + FILL + REFORMAT)
+        self.assertIn("references/implementation/environment.md", CORE)
+        for route in ("create", "fill", "reformat", "validate"):
+            self.assertIn(f"references/operations/{route}.md", CORE)
         self.assertIn('bash "$SKILL_DIR/scripts/make.sh" check', CORE)
         self.assertIn("once per session before this pipeline's CREATE/REFORMAT", text)
         self.assertIn("actual Chromium launch", text)
@@ -135,11 +144,11 @@ class PdfSkillDocsTests(unittest.TestCase):
         self.assertIn("do not make them install Chromium", text)
         for command in ('make.sh" run', 'make.sh" reformat', 'fill_inspect.py" --input',
                         'fill_write.py" --input'):
-            self.assertIn(command, CORE)
+            self.assertIn(command, CREATE + FILL + REFORMAT)
         for field in ("`text`", "`checkbox`", "`dropdown`", "`radio`"):
-            self.assertIn(field, CORE)
-        self.assertIn('`"true"` or `"false"`', CORE)
-        self.assertIn("`.md` `.txt` `.pdf` `.json`", CORE)
+            self.assertIn(field, FILL)
+        self.assertIn('`"true"` or `"false"`', FILL)
+        self.assertIn("`.md` `.txt` `.pdf` `.json`", REFORMAT)
         self.assertIn("no new general READ, OCR, scans", text)
         self.assertIn("PDF-source reconstruction safeguards", text)
 
@@ -153,7 +162,7 @@ class PdfSkillDocsTests(unittest.TestCase):
         make = (PDF / "scripts/make.sh").read_text()
         for flag in ("--title", "--type", "--content", "--out", "--accent", "--input"):
             self.assertIn(flag, make)
-        docs = CORE + DESIGN + CONTENT
+        docs = CORE + DESIGN + CONTENT + ENVIRONMENT + CREATE + FILL + REFORMAT + VALIDATE + PROFILES
         for invented in ("--manuscript", "--apa", "--ieee", "--font", "--no-cover",
                          "--validate-citations", "--ocr"):
             self.assertNotIn(invented, docs)
@@ -176,10 +185,10 @@ class PdfSkillDocsTests(unittest.TestCase):
                           "`flowchart`", "shared counter", "Feature-specific rendering QA",
                           "Categories and values match table/source", "All cited IDs resolve"]),
             ("structured_markdown", "Reformat structured Markdown to PDF with tables and citations.",
-             CORE, ["## Route C: REFORMAT", "--input source.md", "For structured Markdown",
+             REFORMAT, ["# REFORMAT", "--input source.md", "For structured Markdown",
                     "does not enforce the feature QA"]),
             ("fill_control", "Fill the fields in this existing PDF; preserve the layout.",
-             CORE, ["## Route B: FILL", "without altering layout or design", "exact field names",
+             FILL, ["# FILL", "without altering layout or design", "exact field names",
                     "not the browser pipeline"]),
             ("docx_companion", "Deliver Word and matching PDF from the same authored document.",
              CORE, ["DOCX companion control", "render the authored DOCX", "do not independently redesign"]),

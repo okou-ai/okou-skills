@@ -50,7 +50,7 @@ gate and their XSD 1.1 assertions are not supported by .NET's XSD 1.0 engine.
 
 ## Diagnose and review
 
-- For element-order failures, consult `references/openxml_element_order.md` and
+- For element-order failures, consult `references/implementation/element-order.md` and
   repair the indicated part. Do not run mutation helpers indiscriminately.
 - For missing relationships, inspect the affected part's `.rels` file and target.
 - A schema compilation error is a validator/schema problem, not evidence that

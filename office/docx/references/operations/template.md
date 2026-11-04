@@ -1,5 +1,18 @@
 # Scenario C: Applying Formatting / Templates
 
+## Contents
+
+- [When to Use](#when-to-use)
+- [Workflow](#workflow)
+- [What Gets Copied from Template](#what-gets-copied-from-template)
+- [What Does NOT Get Copied](#what-does-not-get-copied)
+- [Template Structure Analysis (REQUIRED)](#template-structure-analysis-required)
+- [Style Mapping Strategy](#style-mapping-strategy)
+- [Relationship ID Remapping](#relationship-id-remapping)
+- [Template Gate-Check](#template-gate-check)
+- [Common Pitfalls](#common-pitfalls)
+- [Verification Checklist](#verification-checklist)
+
 ## When to Use
 
 Use Scenario C when:
@@ -370,7 +383,7 @@ The corresponding text in document.xml references this rId:
 After template application, run `validate --input result.docx --gate-check template.docx`.
 The argument is a **template DOCX**, not an XSD. This remains a hard delivery
 gate: diagnose and repair failures, then rerun. See the
-[validation guide](xsd_validation_guide.md) for the actual selectors.
+[validation guide](../implementation/validation.md) for the actual selectors.
 
 `--xsd` adds optional curated-subset XML checking, not full OOXML validation.
 The retained `business-rules.xsd` uses unsupported XSD 1.1 assertions and is not

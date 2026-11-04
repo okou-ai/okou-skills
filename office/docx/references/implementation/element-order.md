@@ -1,5 +1,22 @@
 # OpenXML Child Element Ordering Rules
 
+## Contents
+
+- [w:document](#wdocument)
+- [w:body](#wbody)
+- [w:p (Paragraph)](#wp-paragraph)
+- [w:pPr (Paragraph Properties)](#wppr-paragraph-properties)
+- [w:r (Run)](#wr-run)
+- [w:rPr (Run Properties)](#wrpr-run-properties)
+- [w:tbl (Table)](#wtbl-table)
+- [w:tblPr (Table Properties)](#wtblpr-table-properties)
+- [w:tr (Table Row)](#wtr-table-row)
+- [w:trPr (Table Row Properties)](#wtrpr-table-row-properties)
+- [w:tc (Table Cell)](#wtc-table-cell)
+- [w:tcPr (Table Cell Properties)](#wtcpr-table-cell-properties)
+- [w:sectPr (Section Properties)](#wsectpr-section-properties)
+- [w:hdr (Header) / w:ftr (Footer)](#whdr-header--wftr-footer)
+
 Element ordering in OpenXML is defined by the XSD schema. Incorrect ordering produces invalid documents that Word may refuse to open or silently repair (potentially losing data).
 
 > **Key rule**: Properties elements (`*Pr`) must always be the **first child** of their parent.

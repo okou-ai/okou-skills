@@ -1,5 +1,19 @@
 # GOOD vs BAD Document Design — Concrete OpenXML Examples
 
+## Contents
+
+- [1. Font Size Disasters](#1-font-size-disasters)
+- [2. Spacing Crimes](#2-spacing-crimes)
+- [3. Margin Mistakes](#3-margin-mistakes)
+- [4. Table Ugliness](#4-table-ugliness)
+- [5. Font Pairing Failures](#5-font-pairing-failures)
+- [6. Color Abuse](#6-color-abuse)
+- [7. List Formatting Issues](#7-list-formatting-issues)
+- [8. Header/Footer Problems](#8-headerfooter-problems)
+- [9. CJK-Specific Mistakes](#9-cjk-specific-mistakes)
+- [10. Overall Document Feel](#10-overall-document-feel)
+- [Quick Reference: Safe Defaults](#quick-reference-safe-defaults)
+
 A side-by-side reference showing common design mistakes and their fixes, with exact OpenXML parameter values. Use this to develop an intuitive sense of what makes a document look professional versus amateur.
 
 Format: Each comparison shows the **BAD** version first (the mistake), then the **GOOD** version (the fix), with OpenXML markup and a short explanation.

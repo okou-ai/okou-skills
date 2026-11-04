@@ -22,17 +22,23 @@ common guidance, applicable scenario, and operation needed for the task.
 - Preserve unrelated sheets, formulas, styles, controls, and package features.
   A narrow edit is not permission to rebuild or redesign the workbook.
 - For new workbooks or requested formatting, read
-  [common presentation](references/format.md). For narrow edits, apply it only
+  [common presentation](references/common/presentation.md). For narrow edits, apply it only
   to changed cells without overriding the supplied layout.
+- For imports, new editable inputs or authorized input changes, read
+  [source data and input contracts](references/common/data-and-inputs.md) before
+  populating cells. Keep data types, source assumptions and current narrative coherent.
+- For new reader-facing analytical reports/dashboards or authorized chart changes,
+  read [analytical charts](references/common/charts.md) during planning. Choose charts for
+  the question, not a fixed count; preserve data-only and narrow-edit scope.
 
 ## Layer 2 — Business scenario
 
 | Requested work product | Read before planning the workbook |
 | --- | --- |
-| Financial model, revenue/cost budget, forecast, valuation, financial statements, scenario/sensitivity analysis, or financial management report | [Finance](references/finance.md), even if the request never says "finance" |
+| Financial model, revenue/cost budget, forecast, valuation, financial statements, scenario/sensitivity analysis, or financial management report | [Finance](references/domains/finance.md), even if the request never says "finance" |
 | Operational tracker, inventory, roster, ordinary data table, or other non-financial spreadsheet | Common presentation only; do not impose financial colors or extra model tabs |
 | One-cell update, formula repair, or template filling in an existing financial file | Preserve the existing structure and house style; use only the finance rules relevant to the requested change |
-| Read-only extraction or analysis | [Read and analyze](references/read-analyze.md); do not redesign the source |
+| Read-only extraction or analysis | [Read and analyze](references/operations/read-analyze.md); do not redesign the source |
 
 For mixed workbooks, apply the finance layer to the financial model/report
 areas, not every unrelated table. Finance guidance is bundled here: do not stop
@@ -48,15 +54,26 @@ Examples:
 
 | Operation | Read | Tools |
 | --- | --- | --- |
-| Create a new XLSX | [Create](references/create.md) | Copy `templates/minimal_xlsx/`, edit XML, pack |
-| Edit, fill a template, or repair formulas | [Edit](references/edit.md) | Unpack → targeted XML changes → pack |
-| Read or analyze XLSX/XLSM/CSV/TSV | [Read and analyze](references/read-analyze.md) | `xlsx_reader.py`, then analysis tools as needed |
-| Apply or change formatting | [Common presentation](references/format.md) and [Edit](references/edit.md) for existing files | Append/reuse styles; change only intended cells |
-| Check a created or edited workbook | [Validate](references/validate.md) | Static checks, application checks, and task/scenario review |
+| Create a new XLSX | [Create](references/operations/create.md) | Prefer a suitable high-level library; raw OOXML remains available |
+| Edit, fill a template, or repair formulas | [Edit](references/operations/edit.md) | Unpack → targeted XML changes → pack |
+| Read or analyze XLSX/XLSM/CSV/TSV | [Read and analyze](references/operations/read-analyze.md) | `xlsx_reader.py`, then analysis tools as needed |
+| Apply or change formatting | [Common presentation](references/common/presentation.md) and [Edit](references/operations/edit.md) for existing files | Append/reuse styles; change only intended cells |
+| Check a created or edited workbook | [Validate](references/operations/validate.md) | Static checks, application checks, and task/scenario review |
 
-Read [OOXML details](references/ooxml-cheatsheet.md) only when directly changing
+For new financial work using openpyxl, read [high-level primitives](references/implementation/authoring.md)
+when choosing construction helpers. Check the calculation environment before
+substantial formula authoring, then build, view and revise inside the same attempt.
+Read [OOXML details](references/implementation/ooxml.md) only when directly changing
 package relationships, cell types, strings, or style definitions. Style indices
 are workbook-local; never copy an index from an example into an unrelated file.
+
+## Package organization
+
+`references/common/` owns reusable data and presentation rules; `domains/` owns
+applicable business conventions; `operations/` owns the requested workflow;
+`implementation/` owns library/package details. The links above are direct entry
+points; load only applicable files. Keep `scripts/`, `templates/` and dependency
+paths unchanged when following these guides.
 
 ## Finish
 

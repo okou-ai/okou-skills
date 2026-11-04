@@ -1,7 +1,7 @@
 # PDF content contract and conventions
 
 Use for CREATE/REFORMAT content features, independently of visual preset. This is
-the single block-contract reference; [design](../design/design.md) owns appearance.
+the single block-contract reference; [design](../common/presentation.md) owns appearance.
 Fields marked `?` are optional in the renderer, even where authoring guidance
 requests them (notably captions). Existing rendering behavior is documented below;
 the final QA section adds agent checks, not script-enforced validation.

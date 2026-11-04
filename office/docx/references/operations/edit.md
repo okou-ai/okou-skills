@@ -1,5 +1,18 @@
 # Scenario B: Editing / Filling Content in Existing DOCX
 
+## Contents
+
+- [Core Principle](#core-principle)
+- [When to Use](#when-to-use)
+- [Workflow](#workflow)
+- [When to Use API vs Direct XML](#when-to-use-api-vs-direct-xml)
+- [Placeholder Patterns](#placeholder-patterns)
+- [Text Replacement Strategies](#text-replacement-strategies)
+- [Table Editing](#table-editing)
+- [Track Changes Guidance](#track-changes-guidance)
+- [Common Pitfalls](#common-pitfalls)
+- [Diff Verification](#diff-verification)
+
 ## Core Principle
 
 **"First, do no harm."** When editing an existing document, minimize changes. Touch only what needs to change. Preserve all formatting, styles, relationships, and structure that are not directly involved in the edit.
@@ -181,7 +194,7 @@ Replace the `w:t` content. Do NOT modify `w:tcPr` (cell properties) or `w:tblPr`
 
 ### Adding Tracked Changes
 
-See `references/track_changes_guide.md` for full XML examples.
+See `references/implementation/track-changes.md` for full XML examples.
 
 Quick reference — inserting text with tracking:
 ```xml
