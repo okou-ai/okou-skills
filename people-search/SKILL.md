@@ -13,7 +13,7 @@ Apply this policy to exhaustive searches and numeric targets, not single-person 
 
 - **Broad discovery:** Cover complementary candidate pools with targeted searches, adjusting the strategy as gaps emerge.
 - **Strict verification:** Count or present a candidate as a match only after verifying they meet the user's criteria.
-- **Complete accounting:** Keep every candidate's outcome explicit and preserve the full qualified set through ranking and delivery.
+- **Complete accounting:** Keep every candidate's outcome explicit; return the full qualified set, limited only by the user's requested count.
 
 ## Set up the search run
 
