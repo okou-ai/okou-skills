@@ -60,6 +60,5 @@ For example, reuse a source that explicitly describes someone leading a team's f
 
 - Return all verified, deduplicated matches for the current request, ranked by relevance, unless the user sets a result limit. For long lists, provide a complete deliverable and label any inline shortlist as a preview.
 - Prefer Markdown tables for presenting candidate lists.
-- Keep **evidence-supported matches**, **inferred possible fits**, and **pending verification** visibly separate. Count only people whose hard requirements are supported as verified; explain the material inference or gap for other leads.
 - Share an early batch when useful without waiting for every uncertain lead. Continue the remaining work in the same run and reconcile the complete list at the end; correct earlier claims if later evidence changes them.
 - Include supporting sources and briefly explain material gaps, target shortfalls, or stopping limits. Summarize coverage or counts when useful. Do not describe a budget-limited or low-yield search as exhaustive.
