@@ -15,17 +15,19 @@ Find people who meet the user's requirements, with evidence that supports the re
 
 ## Understand the request and choose tools
 
-Choose tools by evidence need rather than running every available tool:
+Choose tools by evidence need rather than running every available tool. The examples below are recommended uses, not mutually exclusive capability boundaries:
 
-| Need | Useful tools |
+| Example need | Useful tools |
 | --- | --- |
-| Natural-language professional brief | `people_search_semantic` |
-| Exact title, employer, profile-country, or skill filters | `people_search_structured` |
-| Complementary profile discovery or identity lookup | `people_search` |
-| Cases, interviews, projects, or other experience evidence | `web_search` |
-| Additional text from known public pages | `web_contents` or `web_scrape` |
+| Natural-language discovery of professional profile pages | `people_search_semantic` |
+| Exact current title, current employer, profile-country, or skill filters | `people_search_structured` |
+| Public professional profile search by identity, role, employer, education, skill, or location | `people_search` |
+| Discovery of public sources documenting cases, interviews, projects, or experience | `web_search` |
+| Reading source text from known public pages | `web_contents` or `web_scrape` |
 
-Use enabled tools and their current schemas.
+Use enabled tools and their current schemas. Treat search results as leads, not verified qualifications.
+
+For `people_search_structured`, title and employer filters refer to current roles; profile-country is the country in the person's profile location, not nationality or the employer's headquarters country. Do not turn current-role filters into extra eligibility requirements for requests about past experience.
 
 ## Reuse evidence before researching further
 
