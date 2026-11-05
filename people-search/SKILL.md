@@ -25,7 +25,7 @@ Choose tools by evidence need rather than running every available tool:
 | Cases, interviews, projects, or other experience evidence | `web_search` |
 | Additional text from known public pages | `web_contents` or `web_scrape` |
 
-Use enabled tools and their current schemas. Avoid turning current-role filters into extra requirements for past-experience searches. For submitted jobs, read results with `company_contact_get` or `web_contents_get`, as appropriate.
+Use enabled tools and their current schemas.
 
 ## Reuse evidence before researching further
 
@@ -47,8 +47,6 @@ For example, reuse a source that explicitly describes someone leading a team's f
 - Exclude qualification or identity checks, profile lookups, evidence-page reads, tool discovery, and job status/result reads. Also exclude failed, errored, or incomplete attempts; accepted/running jobs count only when successfully completed.
 - Count outer API requests, not provider-internal queries, search directions, steps, or individual results. A valid empty or all-duplicate discovery response still counts; each successful candidate-discovery next-page request counts once.
 - Apply this definition to both the discovery budget and any reported discovery count or “search rounds.” Report failures and verification work separately when useful; never add them to the discovery total.
-
-For example, 3 successful professional searches + 4 successful public-web searches for new candidates + 1 command quoting failure + later evidence-page checks = **7 candidate-discovery calls**, not 8.
 
 ## Expand the search and judge when to stop
 
