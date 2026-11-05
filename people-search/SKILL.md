@@ -1,11 +1,11 @@
 ---
 name: people-search
-description: Find, verify, and rank people using professional profiles and public sources. Use for people-search requests, including numeric targets, additional candidates, or finding as many as possible. Reuse sufficient evidence, research material gaps, and keep inferred leads separate from verified matches.
+description: Find, verify, and rank people or creators using public professional sources. Use for fixed targets, additional candidates, or finding as many as possible. Clarify requirements, plan the search, enrich professional contacts, and deliver ranked interim batches followed by a final table or spreadsheet.
 ---
 
 # People Search
 
-Find people who meet the user's requirements, with evidence that supports the recommendation. Adapt the search depth and approach to the request.
+Understand the user's needs, plan a suitable search, and find evidence-supported matches. Rank qualifying candidates, share useful interim results, and deliver a consolidated final version.
 
 ## Core principles
 
@@ -13,54 +13,37 @@ Find people who meet the user's requirements, with evidence that supports the re
 - **Strict verification:** Count or present a candidate as a match only after verifying they meet the user's criteria.
 - **Complete accounting:** Keep every candidate's outcome explicit and preserve the full qualified set through ranking and delivery.
 
-## Understand the request and choose tools
+## Workflow
 
-Choose tools by evidence need rather than running every available tool. The examples below are recommended uses, not mutually exclusive capability boundaries:
+1. **Clarify the need.** Establish the purpose, required qualifications, relevant scope, result goal, and ranking priorities from the request and context. Ask focused questions only when missing information would materially change the search; do not repeat questions already answered.
 
-| Example need | Useful tools |
+2. **Plan the search.** Select promising candidate pools, complementary sources, query directions, and the checks needed to establish eligibility. Briefly explain the approach before searching. Match the breadth to the user's goal and adjust as evidence or gaps emerge; ranking preferences are not additional eligibility requirements.
+
+3. **Find and verify efficiently.** Use the tools below and their current schemas. Reuse source-linked facts for the right person and timeframe, researching only material gaps or conflicts. Do not repeat whole biographies or require another source when evidence is already sufficient. Use batch or parallel checks where useful and deduplicate identities.
+
+4. **Rank and share interim results.** Rank qualifying candidates by the user's priorities. When useful results are ready, especially when many candidates qualify, share a prioritized subset rather than making the user wait for the entire list. Label it interim, include links and qualification evidence, and continue the remaining work in the same run. Respect final-only requests; do not delay interim results for contact enrichment unless contactability is a required qualification.
+
+5. **Enrich professional contacts.** By default, try to add a work email or public business contact channel for the verified people being delivered. Reuse existing contacts and announce enrichment before making calls. For missing work emails, explicitly select `fields: ["work-email"]` in `contact_enrich` with the person's name and verified current employer domain; default profile lookup alone does not reveal an email. Cite the source or provider and report lookup status honestly. Do not guess addresses, request private-email or phone-number reveals, or start outreach. Missing contacts do not disqualify a match unless required by the user.
+
+6. **Complete the requested scope.** For a fixed target, finish once enough distinct verified matches satisfy the request; previously delivered people do not count toward additional results. For “as many as possible,” continue while meaningful expansions yield qualifying people. High duplication calls for a useful pivot, not automatic completion. Stopping discovery does not finish screening the existing pool: use available evidence and targeted gap checks, without silently discarding unreviewed candidates. Keep unresolved leads separate. Respect explicit scope, time, cost, and call limits; if a real limit prevents completion, explain what remains.
+
+## Tool roles
+
+Choose by evidence need, not as a mandatory all-tools pipeline. These are recommended uses, not exclusive capability boundaries:
+
+| Need | Useful tools |
 | --- | --- |
 | Natural-language discovery of professional profile pages | `people_search_semantic` |
-| Exact current title, current employer, profile-country, or skill filters | `people_search_structured` |
-| Public professional profile search by identity, role, employer, education, skill, or location | `people_search` |
-| Discovery of public sources documenting cases, interviews, projects, or experience | `web_search` |
+| Exact current title, employer, profile-country, or skill filters | `people_search_structured` |
+| Public professional profiles by identity, role, employer, education, skill, or location | `people_search` |
+| Public cases, interviews, projects, or experience evidence | `web_search` |
 | Reading source text from known public pages | `web_contents` or `web_scrape` |
+| Work-email lookup or professional contact enrichment for a known person | `contact_enrich` |
 
-Use enabled tools and their current schemas. Treat search results as leads, not verified qualifications.
+For creators and audience metrics, use enabled tools for the named platform. Structured title/employer filters refer to current roles; profile-country is profile location, not nationality or employer headquarters. Do not turn current-role filters into extra requirements for past-experience searches.
 
-For `people_search_structured`, title and employer filters refer to current roles; profile-country is the country in the person's profile location, not nationality or the employer's headquarters country. Do not turn current-role filters into extra eligibility requirements for requests about past experience.
+## Delivery
 
-## Reuse evidence before researching further
-
-- Start with the source-linked facts and text already returned. When they sufficiently support a requirement for the right person and timeframe, use them directly.
-- Focus follow-up research on material gaps: missing proof, ambiguous identity, conflicting sources, or insufficient freshness. Search for the specific missing fact rather than researching the whole biography again. If one page lacks evidence, consider another relevant source.
-- Stop checking a fact once it is sufficiently supported, clearly contradicted, or the necessary evidence is unavailable from relevant sources. Avoid repeated searches merely for reassurance; keep remaining uncertainty explicit.
-- Exclude clear mismatches early. Treat missing, stale, or conflicting evidence as unresolved rather than proof that someone is ineligible.
-
-For example, reuse a source that explicitly describes someone leading a team's first implementation. A relevant job title alone may suggest that experience, but still leaves the ownership requirement unverified.
-
-## Work efficiently
-
-- Prefer responses with useful profile fields and source text when supported. Assess candidates together against the same requirements, keeping each person's evidence distinct.
-- Use supported batch reads or bounded parallel lookups when they reduce waiting. Reuse existing or in-flight checks where practical instead of fetching the same evidence twice.
-
-## Count candidate-discovery calls
-
-- Count **one successfully completed API request to find additional people** as **one candidate-discovery call**. Classify by purpose, not tool name: a `web_search` for new candidate names counts; the same tool used to verify a known candidate does not.
-- Exclude qualification or identity checks, profile lookups, evidence-page reads, tool discovery, and job status/result reads. Also exclude failed, errored, or incomplete attempts; accepted/running jobs count only when successfully completed.
-- Count outer API requests, not provider-internal queries, search directions, steps, or individual results. A valid empty or all-duplicate discovery response still counts; each successful candidate-discovery next-page request counts once.
-- Apply this definition to both the discovery budget and any reported discovery count or “search rounds.” Report failures and verification work separately when useful; never add them to the discovery total.
-
-## Adapt search depth and decide when to stop
-
-- **Adjust search effort:** For numeric or open-ended searches, use **eight successful candidate-discovery calls** as an adjustable default, **not a hard cap or minimum**. Freely increase or reduce this number based on task complexity, coverage, and the likely value of further search. Explicit user call, time, cost, and stopping limits take priority.
-- **Expand useful coverage:** Explore complementary candidate pools across roles, organizations, communities, and sources. Pivot when results are mostly duplicates or irrelevant; cosmetic query rewrites do not broaden coverage.
-- **Meet numeric targets:** Prioritize promising candidates and decisive checks. Stop expanding when enough distinct, evidence-supported people meet the current request. Previously delivered matches do not satisfy a request for additional people.
-- **Judge open-ended completion:** Continue while meaningful expansions produce additional qualified people. Consider stopping when relevant channels are reasonably covered and further distinct searches add little; weigh actionable unresolved leads before concluding that useful options are exhausted. A duplicate-heavy batch alone is a reason to pivot, not stop.
-- **Build on prior progress:** Reuse the candidate pool, supporting evidence, and unresolved gaps on continuation, and reassess how much further search is useful. Keep lightweight notes and count each person once across duplicate and parallel results.
-
-## Present useful results
-
-- Return all verified, deduplicated matches for the current request, ranked by relevance, unless the user sets a result limit. For long lists, provide a complete deliverable and label any inline shortlist as a preview.
-- Prefer Markdown tables for presenting candidate lists.
-- Share an early batch when useful without waiting for every uncertain lead. Continue the remaining work in the same run and reconcile the complete list at the end; correct earlier claims if later evidence changes them.
-- Include supporting sources and briefly explain material gaps, target shortfalls, or stopping limits. Summarize coverage or counts when useful. Do not describe a budget-limited or low-yield search as exhaustive.
+- Prefer **Markdown tables or a Sheet/spreadsheet**, with columns suited to the request: person/channel and profile link, key qualifications or metrics, ranking rationale, contact details, and sources.
+- After interim batches, deliver a **final consolidated version**, not just a progress summary or references to earlier messages. Reconcile duplicates and corrections, and include all verified matches within the requested scope and result limit. For long lists, provide the complete table or Sheet and label any inline shortlist as a preview.
+- If work remains because of a real limit, label the handoff partial rather than complete and state the remaining gaps. Do not claim exhaustiveness without support.
