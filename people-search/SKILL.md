@@ -48,14 +48,13 @@ For example, reuse a source that explicitly describes someone leading a team's f
 - Count outer API requests, not provider-internal queries, search directions, steps, or individual results. A valid empty or all-duplicate discovery response still counts; each successful candidate-discovery next-page request counts once.
 - Apply this definition to both the discovery budget and any reported discovery count or “search rounds.” Report failures and verification work separately when useful; never add them to the discovery total.
 
-## Expand the search and judge when to stop
+## Adapt search depth and decide when to stop
 
-- Cover complementary candidate pools through meaningful changes in roles, organizations, communities, or sources. Pivot when results are mostly duplicates or irrelevant; cosmetic query rewrites do not broaden coverage.
-- For open-ended requests, continue while meaningful expansions produce additional qualified people. Consider stopping when the relevant channels are reasonably covered and further distinct searches yield little or nothing.
-- For numeric targets, prioritize promising candidates and inexpensive, decisive checks. Stop expanding when enough distinct, evidence-supported people meet the current request. Previously delivered matches do not satisfy a request for additional people.
-- For numeric or open-ended searches without a user-specified budget, use **eight successful candidate-discovery calls** as the default budget, not a quota to consume. Respect any overall time or cost limit even when failures do not consume discovery calls. A single-person lookup or request for a few examples need not use this expansion budget.
-- Reuse the existing pool on continuation. An explicit request to continue can start a fresh discovery budget.
-- Keep lightweight notes on distinct people, supporting sources, and unresolved gaps. Count people once across duplicates and parallel results.
+- **Adjust search effort:** For numeric or open-ended searches, use **eight successful candidate-discovery calls** as an adjustable default, **not a hard cap or minimum**. Freely increase or reduce this number based on task complexity, coverage, and the likely value of further search. Explicit user call, time, cost, and stopping limits take priority.
+- **Expand useful coverage:** Explore complementary candidate pools across roles, organizations, communities, and sources. Pivot when results are mostly duplicates or irrelevant; cosmetic query rewrites do not broaden coverage.
+- **Meet numeric targets:** Prioritize promising candidates and decisive checks. Stop expanding when enough distinct, evidence-supported people meet the current request. Previously delivered matches do not satisfy a request for additional people.
+- **Judge open-ended completion:** Continue while meaningful expansions produce additional qualified people. Consider stopping when relevant channels are reasonably covered and further distinct searches add little; weigh actionable unresolved leads before concluding that useful options are exhausted. A duplicate-heavy batch alone is a reason to pivot, not stop.
+- **Build on prior progress:** Reuse the candidate pool, supporting evidence, and unresolved gaps on continuation, and reassess how much further search is useful. Keep lightweight notes and count each person once across duplicate and parallel results.
 
 ## Present useful results
 
