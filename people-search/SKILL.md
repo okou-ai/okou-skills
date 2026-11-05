@@ -7,6 +7,12 @@ description: Find, verify, and rank people using professional profiles and publi
 
 Find people who meet the user's requirements, with evidence that supports the recommendation. Adapt the search depth and approach to the request.
 
+## Core principles
+
+- **Broad discovery:** Cover complementary candidate pools with targeted searches, adjusting the strategy as gaps emerge.
+- **Strict verification:** Count or present a candidate as a match only after verifying they meet the user's criteria.
+- **Complete accounting:** Keep every candidate's outcome explicit and preserve the full qualified set through ranking and delivery.
+
 ## Understand the request and choose tools
 
 Choose tools by evidence need rather than running every available tool:
