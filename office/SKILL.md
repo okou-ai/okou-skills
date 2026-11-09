@@ -6,26 +6,26 @@ license: MIT
 
 # Office files
 
-Use the format-specific skill below. Read only the selected route and the
-references needed for the task.
+Read the guide for the requested file format and the references relevant to the
+task. Apply the research guidance below when the document requires it.
 
-## Choose the content route
+## Determine whether research is needed
 
-- **Direct drafting:** For a straightforward brief, summary or memo that condenses
-  supplied material or established conclusions, use the format route directly.
-  Also skip deep research for translation, extraction, conversion, styling and
-  narrow edits that require no new analysis.
-- **Deep research:** When the user requests in-depth research, or the task needs
-  substantial investigation or analysis to establish new conclusions, read
-  [deep-research/SKILL.md](deep-research/SKILL.md) before researching or drafting.
+Read [deep-research/SKILL.md](deep-research/SKILL.md) before starting an in-depth
+investigation or a task that requires substantial analysis to explain results,
+evaluate alternatives or assess feasibility.
 
-Choose by the work required, not the document's label, length or file format.
-A short brief can require research, but creating a brief does not itself trigger
-this route. Research must preserve the requested output scope and length; it
-must not add an unrequested research report. Both routes retain the selected
-format's production and validation requirements.
+For briefs, summaries and memos that only consolidate supplied material or
+established findings, follow the DOCX, PDF or XLSX instructions below to prepare
+and validate the file. Do not load the research guide for these tasks or for
+translation, extraction, formatting, conversion and limited edits that require
+no additional analysis.
 
-## Choose the file format
+Decide whether research is needed from the question being answered. A short
+brief may require investigation; in that case, apply the research guidance while
+retaining the requested brief's scope and length.
+
+## Prepare the requested file
 
 Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
 to the selected subdirectory before running its examples; it is a shell variable,
@@ -36,32 +36,31 @@ directory is the skill directory.
 | --- | --- | --- |
 | Word creation, editing, formatting, or DOCX-to-PDF, including government-style, named academic, thesis-template and business/editorial documents | [docx/SKILL.md](docx/SKILL.md) — select the applicable presentation profile as well as the operation | `SKILL_DIR="$OFFICE_DIR/docx"` |
 | Standalone PDF creation, form inspection/filling, or reformatting, including research/technical content | [pdf/SKILL.md](pdf/SKILL.md) — distinguish named manuscript requirements from visual presets | `SKILL_DIR="$OFFICE_DIR/pdf"` |
-| Excel creation, reading, editing, formulas, or validation, including financial budgets and forecasts | [xlsx/SKILL.md](xlsx/SKILL.md) — select its common and business-scenario layers before authoring | `SKILL_DIR="$OFFICE_DIR/xlsx"` |
+| Excel creation, reading, editing, formulas, or validation, including financial budgets and forecasts | [xlsx/SKILL.md](xlsx/SKILL.md) — read its general instructions and applicable business-scenario guidance before authoring | `SKILL_DIR="$OFFICE_DIR/xlsx"` |
 
 Honor the user's format and supplied template. The selected template's styles
 take precedence over generic typography defaults. For a DOCX and its PDF
 companion, author once and render the DOCX so content and layout remain aligned.
-Use each route's setup and validation commands; reuse a working environment
-within the session. Presentation profiles are formatting guidance, not substantive
-research, policy, medical or legal expertise. Package checks do not certify
-compliance with a publication or government standard.
+Complete the setup and validation steps in the selected format guide; reuse a
+working environment within the session. Presentation profiles describe document
+formatting; they do not provide research, policy, medical or legal expertise.
+Package checks do not certify compliance with a publication or government
+standard.
 
 ## Package map
 
-The top-level `office` package is the single discovery entry. The optional
-`deep-research/` content route is loaded only under the conditions above; it is
-not a separate default skill or a fourth file format. Each format's `SKILL.md`
-routes to references grouped by responsibility:
+Start with `office/SKILL.md`. The `deep-research/` guide covers research and
+analytical methods. The `docx/`, `pdf/` and `xlsx/` guides cover file preparation
+and validation. Their references are organized by responsibility:
 
 - `common/`: reusable data/presentation conventions.
 - `domains/`: applicable business or named-format requirements.
 - `operations/`: the authorized create/read/edit/fill/validate workflow.
 - `implementation/`: library, package, schema and environment details.
 
-Format-specific reference guides are linked directly from the relevant format
-entry; load only those needed. Scripts, templates and assets retain their
-existing paths. A format route does not authorize unrelated edits, redesign or
-extra deliverables.
+Each format guide links to its supporting references; read only the relevant
+ones. Scripts, templates and assets retain their existing paths. Using a format
+guide does not authorize unrelated edits, redesign or extra deliverables.
 
 The implementations are adapted from MiniMax's MIT-licensed skills. Original
 licenses and pinned-source attribution are preserved in each subdirectory's

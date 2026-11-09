@@ -1,100 +1,115 @@
 ---
 name: deep-research
 description: >
-  Research questions and develop evidence-based analysis for Office deliverables.
-  Use for requested in-depth research or substantial investigation and analysis
-  needed to establish new conclusions. Skip straightforward briefs, summaries
-  and memos that only condense supplied material or established conclusions,
-  translation, extraction, conversion, styling and narrow edits. A short output
-  can still require research; preserve the user's requested scope and length.
+  Conduct research and substantive analysis for Office reports, assessments and
+  plans. Use when the user requests an in-depth investigation or when answering
+  the question requires substantial evaluation of evidence, calculations or
+  alternatives. Skip briefs and summaries that only consolidate existing
+  material, and translation, extraction, formatting, conversion or limited edits
+  that require no additional analysis. Research may support a short document;
+  keep the requested format and length.
 license: MIT
 ---
 
-# Deep research for Office
+# Research and analysis
 
-Apply this content route alongside the selected Office format route. Select
-methods for the question and evidence; the sections below are working guidance,
-not a mandatory sequence or report outline. Use relevant specialist guidance
-when the analysis depends on professional methods or standards.
+Use this guide to develop the analysis for the requested Office document.
+Choose methods appropriate to the question, available evidence and applicable
+professional standards. These instructions govern the work, not the document's
+section headings.
 
-## Define the question and analytical basis
+## Define the assignment
 
-Identify the questions the deliverable must answer and the judgments or actions
-it must support. Define the analytical objects, evaluation criteria and material
-constraints. Organize the reasoning around those questions while preserving the
-user's required structure.
+Identify the question to answer, the intended reader and the result the document
+must provide. Specify what needs to be established to support that result. Use
+these requirements to decide which evidence to examine and which calculations
+or comparisons to perform.
 
-Check the provenance and meaning of material inputs. Read the underlying sources
-supporting key claims and retain precise source locations; use search snippets
-for discovery. Align definitions, coverage, periods, units and comparison
-baselines before comparing results. Distinguish supplied facts, calculated
-results, estimates, assumptions and interpretations. State consequential
-assumptions and their basis where used.
+Confirm the subject, relevant period, permitted sources and practical
+constraints from the request. Preserve the user's template, required content
+and exclusions. Request clarification when an ambiguity would change the
+analysis or the deliverable.
 
-Use only permitted sources and tools. When facts are restricted to supplied
-materials, conduct the analysis within those materials. Do not fill evidence
-gaps with invented facts or unauthorized external research. Ask for missing
-information when its absence materially changes what can be delivered.
+## Establish a reliable evidence base
 
-## Develop the analysis
+Examine the records, passages and data supporting the analysis. Keep references
+to the relevant document pages, dataset fields or spreadsheet cells. For web
+research, inspect the source content before relying on a search result. Assess
+whether each source is sufficiently reliable, current and relevant for the
+claim it supports.
 
-Identify the relationships connecting material inputs to the outcome. Decompose
-aggregate results when differences among components or their interactions could
-change the interpretation. Calculate material differences, contributions, rates
-or comparisons with an appropriate deterministic tool. Retain the inputs,
-formulas and calculation basis needed to reproduce key results. An arithmetic
-decomposition alone does not establish causation.
+Check that figures being compared describe compatible populations, periods and
+measures. Account for differences in definitions, units and coverage; explain
+any adjustments. Keep reported information separate from estimates and working
+assumptions. Document the basis for assumptions that materially affect results.
 
-For explanatory claims, work through the proposed mechanism and the evidence
-supporting each consequential inference. State the conditions required for the
-explanation to hold. Examine plausible alternatives when the evidence permits
-materially different explanations.
+When information is incomplete, identify which calculations or conclusions it
+prevents. Ask for essential missing inputs or provide the supported portion of
+the work with its limitations. If the user restricts the task to supplied
+materials, use only those materials as factual evidence. Distinguish source
+information from calculated results, inferences and proposed assumptions,
+making their basis clear. Do not invent missing facts or supplement the evidence
+with other sources.
 
-For option evaluations, apply consistent criteria and assumptions across the
-alternatives. Work out benefits, costs and trade-offs against the user's
-objectives and constraints. For plans, examine dependencies, resource demands
-and timing together. Check whether the proposal can be carried out under one
-consistent set of assumptions; identify bottlenecks and the consequences of
-necessary adjustments.
+## Perform the required analysis
 
-## Resolve gaps, disagreements and uncertainty
+Select the applicable work below. Use specialist guidance when the task requires
+a domain-specific calculation, interpretation or standard.
 
-Direct further work toward an unresolved part of the central explanation,
-estimate or feasibility judgment. Add evidence, calculations, mechanism analysis
-or a relevant comparison that resolves that issue, and explain how the result
-affects the conclusion.
+- **Quantitative analysis:** Define the measures, reference values and formulas.
+  Use a suitable calculation tool for significant numerical results. Examine
+  relevant components or segments to explain the aggregate result, and reconcile
+  their contributions where they should add up. Check denominators, signs and
+  the treatment of missing values. Preserve enough calculation detail to
+  reproduce the findings.
+- **Explanatory analysis:** Describe how the proposed cause could produce the
+  observed outcome. Assess the evidence for the important links in that
+  explanation. Distinguish an observed association or arithmetic contribution
+  from an established cause. Consider other explanations that fit the evidence,
+  and identify what information would discriminate between them.
+- **Evaluation of alternatives:** Compare options against the same objectives
+  and criteria. Use consistent assumptions for shared factors and explain any
+  option-specific assumptions. Determine the benefits, costs, risks and
+  constraints of each option. Explain the trade-offs supporting a recommendation;
+  disclose when missing evidence prevents a reliable ranking.
+- **Planning:** Establish the sequence of activities, prerequisites, resource
+  requirements and deadlines. Check shared resource demands and dependencies
+  across the plan. Where feasibility depends on capacity or timing, calculate
+  the requirement and compare it with availability. Identify conflicts and
+  explain the effects of proposed adjustments.
 
-When sources or methods disagree, first reconcile definitions, coverage, timing,
-inputs and methods. Explain the remaining substantive disagreement and its
-implications. Do not average incompatible results or silently discard conflicting
-evidence. Seek evidence or tests that can distinguish competing explanations
-within the permitted sources, tools and budget.
+## Assess the strength of the findings
 
-Examine assumptions whose plausible variation could change the judgment. Trace
-the effect through the analysis and specify the conditions under which different
-conclusions hold. Quantify thresholds or sensitivity ranges when the available
-evidence supports them; label estimated bounds and their basis.
+For each principal conclusion, examine the assumptions and unresolved evidence
+on which it depends. Test changes in key inputs when realistic variation could
+alter the result. Report the conditions that change the judgment, using
+sensitivity calculations, thresholds or scenarios where appropriate. Explain
+the basis for any estimated range.
 
-Continue until the material issue is resolved or the necessary evidence is
-unavailable. Where support remains insufficient, qualify the affected claim,
-leave the result partial or omit it. State the unresolved issue and its impact.
+When findings conflict, determine whether the difference arises from the input
+data, definitions, timing, analytical method or substantive interpretation.
+Assess the competing results against the evidence and the task's requirements.
+Explain the basis for accepting a result or retaining uncertainty.
 
-## Write and check the deliverable
+Use unresolved issues to define further research or calculation. Prioritize
+issues that affect the main answer. If the available evidence cannot settle an
+issue, state what remains unknown and how it limits the conclusion.
 
-Organize content for its intended use. Develop major findings with the evidence,
-reasoning, calculations, comparisons and operational details needed to evaluate
-or apply them. Make causal and conditional relationships explicit, presenting
-one reasoning step at a time. Give necessary explanations adequate space without
-adding repetitive restatements or imposing a length target the user did not set.
-Preserve a requested brief's scope and length even when substantial research was
-needed to prepare it.
+## Prepare and verify the document
 
-Check that the evidence and derivations support the main conclusions. Keep
-conclusions, tables, models, scenarios and proposed actions consistent with the
-same inputs and assumptions. When the analysis changes, update the affected
-results and explanations together. Place material uncertainty beside the claim
-it limits.
+Present findings in an order that supports the reader's intended use. Include
+the reasoning, calculations, comparisons and implementation details needed to
+understand or apply the results. Explain the implications of important findings
+and place qualifications with the conclusions they affect.
 
-Complete the selected [Office format route](../SKILL.md)'s production and
-validation requirements and inspect the actual output. Analytical checks do not
-replace required file, calculation or rendering checks.
+Check that the document accurately represents its sources and calculations.
+Reconcile figures and assumptions across the text, tables, charts and models.
+If an input or finding changes, revise all dependent results and recommendations.
+
+Maintain the requested scope and length. A brief prepared through substantial
+research must remain a brief; retain essential evidence and qualifications
+within that format. Do not add a separate research report unless requested.
+
+Follow the relevant [DOCX, PDF or XLSX instructions](../SKILL.md) to create and
+validate the file. Complete their required calculation and visual checks as
+applicable, and inspect the saved deliverable before reporting completion.
