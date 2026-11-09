@@ -9,6 +9,13 @@ license: MIT
 Use the format-specific skill below. Read only the selected route and the
 references needed for the task.
 
+When the task requires substantive analysis, explanation, evaluation or planning,
+read the [shared content-analysis guidance](references/content-analysis.md)
+before developing the answer or drafting content. Apply it alongside the selected
+format route. Skip it when translation, extraction, conversion, styling or narrow
+edits require no new analysis. It is not a fixed report outline and does not
+replace domain expertise or the route's required validation.
+
 Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
 to the selected subdirectory before running its examples; it is a shell variable,
 not a literal directory named `SKILL_DIR`. Do not assume the current working
@@ -30,17 +37,19 @@ compliance with a publication or government standard.
 
 ## Package map
 
-The top-level `office` package is the single discovery entry. Each format's
-`SKILL.md` routes to references grouped by responsibility:
+The top-level `office` package is the single discovery entry. Shared analysis
+guidance lives in `references/content-analysis.md`. Each format's `SKILL.md`
+routes to references grouped by responsibility:
 
 - `common/`: reusable data/presentation conventions.
 - `domains/`: applicable business or named-format requirements.
 - `operations/`: the authorized create/read/edit/fill/validate workflow.
 - `implementation/`: library, package, schema and environment details.
 
-All reference guides are linked directly from the relevant format entry; load
-only those needed. Scripts, templates and assets retain their existing paths.
-A format route does not authorize unrelated edits, redesign or extra deliverables.
+Format-specific reference guides are linked directly from the relevant format
+entry; load only those needed. Scripts, templates and assets retain their
+existing paths. A format route does not authorize unrelated edits, redesign or
+extra deliverables.
 
 The implementations are adapted from MiniMax's MIT-licensed skills. Original
 licenses and pinned-source attribution are preserved in each subdirectory's
