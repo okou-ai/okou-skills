@@ -484,6 +484,7 @@ main() {
   fi
 
   case "$1" in
+    --help|-h) main ;;
     check)    cmd_check ;;
     fix)      cmd_fix   ;;
     run)      shift; cmd_run      "$@" ;;

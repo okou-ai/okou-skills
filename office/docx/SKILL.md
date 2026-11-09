@@ -30,14 +30,27 @@ description: >
 Set `SKILL_DIR` to the absolute directory containing this file. All command paths
 are relative to this directory, not the task's working directory.
 
-First DOCX operation in the session:
-`bash "$SKILL_DIR/scripts/env_check.sh"`. Reuse the working SDK and CLI afterward.
-For permitted missing dependencies, use `scripts/setup.sh --minimal` (Windows:
-`scripts/setup.ps1 -Minimal`). For PDF output, `.doc` conversion or requested
-rendering, run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`; it probes
-Writer with a real DOCX-to-PDF conversion. If needed and setup is allowed, run the
-full setup script without the minimal flag. Do not equate a binary/version probe
-with successful candidate rendering.
+Use the [unified executable](../scripts/office.py) for supported mechanics:
+
+```bash
+OFFICE="$SKILL_DIR/../scripts/office.py"
+python3 "$OFFICE" list
+python3 "$OFFICE" preflight --format docx --rendering
+python3 "$OFFICE" create --format docx --content content.json --title "Report" --out output.docx
+python3 "$OFFICE" validate --input output.docx --business
+```
+
+Omit `--rendering` when no conversion/preview is needed. Preflight tests the
+**environment**, not the candidate. Actions return JSON receipts, not judgments;
+the executable never invokes recursive AI. The author still owns facts, content
+selection, requirements and final usability. Use `--help` for wrapper parameters;
+`tool-help --tool docx-create|docx-validate|docx-render|docx-env` (one ID at a time)
+exposes underlying tool help. Install missing dependencies only when permitted;
+existing `scripts/setup.sh --minimal` / `scripts/setup.ps1 -Minimal` support SDK
+setup, while rendering requires the full setup.
+
+Never overwrite the source. Application checks use disposable copies and isolated
+profiles, with macros disabled and external-link updates disabled.
 
 ## Routing order: common → applicable profile → operation
 

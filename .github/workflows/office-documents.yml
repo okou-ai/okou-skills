@@ -38,6 +38,13 @@ jobs:
         run: |
           bash office/docx/scripts/env_check.sh
           bash office/pdf/scripts/make.sh check
+      - name: Test shared Office mechanical operations
+        run: python3 -m unittest discover -s office/scripts/tests -v
+      - name: Exercise mechanical operations on synthetic controls
+        run: >-
+          python3 office/scripts/smoke.py
+          --out "$RUNNER_TEMP/office-mechanics-smoke"
+          --with-calc --with-pdf
   windows-docx:
     runs-on: windows-latest
     steps:

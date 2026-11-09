@@ -1,28 +1,26 @@
 # Validate and deliver a PDF
 
-Check the exact completed output, not just intermediate JSON or a successful
-merge. Verify requested content, page count/order, source values and applicable
-[appearance rules](../common/presentation.md). Package or parser success does not
-establish publication compliance or correct visual output.
-
-For a user-requested rendered preview or visual review, create `preview/`, run:
+Check the exact final output, not intermediate JSON or a successful merge.
+Set `SKILL_DIR` and `OFFICE` per [the entry point](../../SKILL.md).
 
 ```bash
-pdftoppm -png -r 120 output.pdf preview/page
+python3 "$OFFICE" validate --input output.pdf
+python3 "$OFFICE" render --input output.pdf --pages preview/pages
 ```
 
-Inspect the actual images. For presentations or slide decks, use the platform's
-presentation page-rendering command instead; this is the ordinary PDF route.
-Text extraction alone cannot establish that charts, math, captions or form
-appearances paint correctly. Apply
-[feature-specific rendering QA](../implementation/content.md#feature-specific-rendering-qa)
-for every content feature used. Check the actual selected fonts and disclose
-fallbacks; preset or requested font names are not proof of embedding/rendering.
+Inspect actual pages when visual QA applies: required content, page count/order,
+source values, [appearance](../common/presentation.md), selected fonts/fallbacks
+and [feature-specific rendering](../implementation/content.md#feature-specific-rendering-qa).
+Parser success or text extraction cannot establish that charts, mathematics,
+captions or widgets paint correctly; font names do not prove embedding. Receipts
+cover executed mechanics, not factual accuracy or publication compliance.
 
-For FILL, reopen stored values and the affected widget appearances. Different
-readers may paint form values differently; state which application/rendering
-was actually checked. Do not call a storage-only inspection a viewer pass.
+For FILL, reopen stored values and affected widget appearances; identify the
+viewer actually checked, since readers can differ. Storage-only inspection is
+not a viewer pass. For REFORMAT, compare against source for omissions and changed
+structure. For Word/PDF pairs, verify export from the authored DOCX rather than
+an independent design. Never overwrite sources; use isolated application checks
+with macros disabled and external-link updates disabled.
 
-For REFORMAT, compare against source for omissions and changed structure. For a
-Word/PDF pair, verify the PDF came from the authored DOCX, not a separate design.
-Deliver only requested formats and report unexecuted or unavailable checks.
+Fix defects and repeat affected checks. Deliver only requested formats and state
+unavailable or unexecuted checks without labeling them passed.

@@ -38,6 +38,11 @@ import signal
 import xml.etree.ElementTree as ET
 import zipfile
 
+# Resolve against this file, never the caller's working directory.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from lo_safety import (SafetyError, configure_lo_profile, prepare_input,
+                       reserve_output, validate_ooxml)
+
 
 # ── LibreOffice discovery ───────────────────────────────────────────────────
 
@@ -50,6 +55,12 @@ def find_soffice() -> str | None:
       2. PATH lookup for 'soffice'
       3. PATH lookup for 'libreoffice' (common on Linux)
     """
+    override = os.environ.get("OFFICE_SOFFICE")
+    if override:
+        path = Path(override).expanduser()
+        if not path.is_absolute() or not path.is_file() or not os.access(path, os.X_OK):
+            raise SafetyError("OFFICE_SOFFICE must name an absolute executable file; no fallback attempted")
+        return str(path)
     candidates = [
         "/Applications/LibreOffice.app/Contents/MacOS/soffice",  # macOS
         "soffice",     # Linux / macOS if on PATH
@@ -102,7 +113,7 @@ def get_libreoffice_version(soffice: str) -> str:
     """Return the version, or 'unknown'; this is not a formula evaluation test."""
     try:
         with tempfile.TemporaryDirectory(prefix="xlsx_lo_version_") as tmpdir:
-            profile = (Path(tmpdir) / "profile").as_uri()
+            profile = configure_lo_profile(Path(tmpdir) / "profile")
             result = _run_soffice(
                 [soffice, f"-env:UserInstallation={profile}", "--headless", "--version"],
                 timeout=10,
@@ -136,10 +147,20 @@ def calc_component_diagnostic(soffice: str) -> str:
 
 # ── Recalculation ───────────────────────────────────────────────────────────
 
-def recalculate(
+def recalculate(input_path: str, output_path: str, timeout: int = 60) -> tuple[bool, str]:
+    """Recalculate a validated private copy into a NEW reserved destination only."""
+    try:
+        with reserve_output(output_path, source=input_path) as reservation:
+            return _recalculate(input_path, output_path, timeout, reservation=reservation)
+    except (SafetyError, OSError) as exc:
+        return False, f"Safety/I/O refusal: {exc}"
+
+
+def _recalculate(
     input_path: str,
     output_path: str,
     timeout: int = 60,
+    *, reservation,
 ) -> tuple[bool, str]:
     """
     Run LibreOffice headless recalculation on input_path, write result to output_path.
@@ -165,25 +186,15 @@ def recalculate(
         # Never convert onto the input: soffice can exit 0 after refusing an overwrite.
         source_dir = Path(tmpdir) / "source"
         output_dir = Path(tmpdir) / "output"
-        source_dir.mkdir()
         output_dir.mkdir()
-        profile = Path(tmpdir) / "profile"
-        (profile / "user").mkdir(parents=True)
-        # Calc otherwise trusts Excel's cached values. RecalcMode 0 = ALWAYS.
-        (profile / "user/registrymodifications.xcu").write_text(
-            '<?xml version="1.0" encoding="UTF-8"?>'
-            '<oor:items xmlns:oor="http://openoffice.org/2001/registry">'
-            '<item oor:path="/org.openoffice.Office.Calc/Formula/Load">'
-            '<prop oor:name="OOXMLRecalcMode" oor:op="fuse"><value>0</value></prop>'
-            '</item></oor:items>',
-            encoding="utf-8",
-        )
-        tmp_input = str(source_dir / os.path.basename(input_path))
-        shutil.copy(input_path, tmp_input)
+        # Validate the exact copied input, not a potentially changed original.
+        tmp_input = str(prepare_input(input_path, source_dir))
+        # Retain Calc's ALWAYS-recalculate setting alongside security controls.
+        profile_uri = configure_lo_profile(Path(tmpdir) / "profile", calc_recalculate=True)
 
         cmd = [
             soffice,
-            f"-env:UserInstallation={profile.as_uri()}",
+            f"-env:UserInstallation={profile_uri}",
             "--headless",
             "--norestore",           # do not attempt to restore crashed sessions
             "--infilter=Calc MS Excel 2007 XML",
@@ -230,9 +241,9 @@ def recalculate(
                 + (f"\n{diagnostic}" if diagnostic else "")
             )
 
-        # Copy recalculated file to final destination
-        os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-        shutil.copy(tmp_output, output_path)
+        # Refuse active output too; never overwrite an existing user file.
+        validate_ooxml(tmp_output)
+        reservation.publish(tmp_output)
 
     return True, f"Recalculation complete. LibreOffice {version}. Output: {output_path}"
 
@@ -393,7 +404,7 @@ def preflight(timeout: int = 60) -> tuple[int, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="LibreOffice headless formula recalculation for xlsx files.",
+        description="LibreOffice headless formula recalculation for xlsx files. Optional OFFICE_SOFFICE selects an absolute executable; TMPDIR selects temporary workspace.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

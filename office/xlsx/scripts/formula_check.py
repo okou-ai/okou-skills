@@ -321,6 +321,9 @@ def build_report(results: dict) -> dict:
 
 
 def main() -> None:
+    if "--help" in sys.argv or "-h" in sys.argv:
+        print(__doc__)
+        return
     use_json = "--json" in sys.argv
     use_report = "--report" in sys.argv
     summary_only = "--summary" in sys.argv

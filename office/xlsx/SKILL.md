@@ -13,10 +13,32 @@ existing template or house style take precedence over these defaults.
 Set `SKILL_DIR` to the absolute directory containing this file. Read only the
 common guidance, applicable scenario, and operation needed for the task.
 
+## Executable mechanics
+
+Use the [unified executable](../scripts/office.py):
+
+```bash
+OFFICE="$SKILL_DIR/../scripts/office.py"
+python3 "$OFFICE" list
+python3 "$OFFICE" preflight --format xlsx
+python3 "$OFFICE" validate --input output.xlsx --styles
+python3 "$OFFICE" recalc --input output.xlsx --out recalculated.xlsx
+```
+
+Actions return JSON receipts; no recursive AI is invoked. Preflight checks an
+independent control, not the candidate. `--help` owns detailed parameters;
+`tool-help --tool xlsx-preflight|xlsx-formulas|xlsx-styles` accepts one tool ID at
+a time. Workbook construction remains author-selected library/package work;
+there is no wrapper XLSX create or native render/export command. Application
+export and actual-page inspection remain required as described in VALIDATE.
+The author owns business judgments, fact boundaries, input semantics and final
+usability; receipts do not certify those decisions.
+
 ## Layer 1 — Common workbook rules
 
 - Preserve the source. Read-only analysis must not save, restyle, or recalculate
-  the original. Perform edits and application checks on separate copies.
+  the original. Perform edits and application checks on separate copies, using
+  an isolated application profile with macros disabled and external links not updated.
 - Use live Excel formulas for derived workbook outputs; keep source records and
   adjustable inputs identifiable. Do not replace formulas with cached answers.
 - Preserve unrelated sheets, formulas, styles, controls, and package features.

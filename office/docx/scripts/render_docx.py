@@ -1,15 +1,31 @@
 #!/usr/bin/env python3
-"""Render DOCX with Writer; --check performs a real conversion, not a version check."""
+"""Render DOCX with Writer; --check performs a real conversion, not a version check.
+Optional OFFICE_SOFFICE selects an absolute executable; TMPDIR selects temporary workspace.
+"""
 import argparse
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import zipfile
+import sys
+import os
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+from lo_safety import configure_lo_profile, prepare_input, reserve_output
 
 
 def render(source: Path, destination: Path, timeout: int = 60) -> None:
-    soffice = shutil.which("soffice") or shutil.which("libreoffice")
+    """Render only a validated private copy; refuse any existing destination."""
+    with reserve_output(destination, source=source) as reservation:
+        _render(Path(source), Path(destination), timeout, reservation)
+
+
+def _render(source: Path, destination: Path, timeout: int, reservation) -> None:
+    soffice = os.environ.get("OFFICE_SOFFICE")
+    if soffice and (not Path(soffice).is_absolute() or not Path(soffice).is_file() or not os.access(soffice, os.X_OK)):
+        raise ValueError("OFFICE_SOFFICE must name an absolute executable file; no fallback attempted")
+    soffice = soffice or shutil.which("soffice") or shutil.which("libreoffice")
     if not soffice:
         mac = Path("/Applications/LibreOffice.app/Contents/MacOS/soffice")
         if mac.is_file():
@@ -18,20 +34,23 @@ def render(source: Path, destination: Path, timeout: int = 60) -> None:
         raise RuntimeError("LibreOffice Writer is missing. Install libreoffice-writer (Linux).")
     with tempfile.TemporaryDirectory(prefix="docx_render_") as directory:
         work = Path(directory)
+        copied = prepare_input(source, work / "source")
+        output_dir = work / "output"
+        output_dir.mkdir()
+        profile_uri = configure_lo_profile(work / "profile")
         completed = subprocess.run(
-            [soffice, f"-env:UserInstallation={(work / 'profile').as_uri()}",
+            [soffice, f"-env:UserInstallation={profile_uri}",
              "--headless", "--norestore", "--convert-to", "pdf:writer_pdf_Export",
-             "--outdir", str(work), str(source.resolve())],
+             "--outdir", str(output_dir), str(copied)],
             capture_output=True, text=True, timeout=timeout,
         )
-        pdf = work / f"{source.stem}.pdf"
+        pdf = output_dir / f"{copied.stem}.pdf"
         if completed.returncode or not pdf.is_file() or not pdf.read_bytes().startswith(b"%PDF-"):
             raise RuntimeError(
                 "Writer did not produce a PDF. Install libreoffice-writer; soffice/core alone "
                 f"is insufficient.\n{completed.stdout}\n{completed.stderr}"
             )
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(pdf, destination)
+        reservation.publish(pdf)
 
 
 def check_writer() -> None:
@@ -68,7 +87,8 @@ def main() -> None:
         parser.error("input and output must be different files")
     render(args.input, args.out, args.timeout)
     if args.pages:
-        args.pages.mkdir(parents=True, exist_ok=True)
+        # Poppler writes many files: only ever target a NEW directory.
+        args.pages.mkdir(parents=True, exist_ok=False)
         subprocess.run(["pdftoppm", "-png", "-r", "120", str(args.out),
                         str(args.pages / "page")], check=True, timeout=args.timeout)
     print(f"Rendered: {args.out}")

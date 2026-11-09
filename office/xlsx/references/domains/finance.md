@@ -41,12 +41,13 @@ Preserve supplied templates/house styles; narrow edits do not authorize redesign
 Unless the supplied style overrides it, use this palette across financial
 report/model sheets; do not choose a different accent for each workbook.
 
-| Use | Fill/accent | Text |
-| --- | --- | --- |
-| Main title bands and primary chart accents | Deep green `#135B44` | White `#FFFFFF` on title bands |
-| Section divider bands | Pale green `#CFE9E0` | Dark green `#0B3D2C` |
-| Table column-header labels | Light gray `#F2F2F2` | Dark gray `#404040`, bold |
-| Period dividers and sensitivity baseline | Light gray `#E7E5E4` | Neutral text |
+Reuse `report_band` and `table_header` from the existing
+[authoring primitives](../implementation/authoring.md) for green title/section
+bands and gray label headers; their code owns exact colors, font sizes and row
+heights. For chart accents reuse `BANDS["title"][0]`; period/baseline dividers may
+use light gray `#E7E5E4`. Direct library calls are normally shortest. The optional
+`python3 "$OFFICE" style --help` discovers the equivalent explicit-plan CLI;
+a JSON plan is **not required** for every workbook or authoring task.
 
 Use green bands to introduce sections and gray rows to identify table columns;
 keep these levels visually distinct. Neutral header text applies to labels,
@@ -58,19 +59,16 @@ override the font roles below or imply positive/negative performance.
 
 Use this precedence for data cells when no supplied convention overrides it:
 
-| Cell role | Default font | Rule |
-| --- | --- | --- |
-| Editable hard-coded assumption/input | Blue `#0000FF` | Include numeric, text, date and scenario-selector inputs; identify editable cells in a legend |
-| Formula depending on another file | Red `#FF0000` | Takes priority over same-workbook links; disclose the external dependency |
-| Formula depending on another sheet in this workbook | Green `#008000` | Includes arithmetic, aggregations, and defined names resolving to another sheet |
-| Formula using only this sheet | Black `#000000` | Keep formulas distinct from editable hardcodes |
-| Labels and retained source records | Neutral text | Do not mark every number or heading as an editable assumption |
-
-Examples: an editable `Inputs!B4 = 0.05` is blue;
-`Model!C6 = Inputs!B4` and `C5*(1+Inputs!$B$4)` are green;
-`Model!C9 = C7-C8` is black. Resolve named-range targets before assigning a role.
-Never color a formula as an editable input. Use fills for sections, periods, or
-explicit review flags, not as a substitute for the font-role convention.
+Assign `style_value(cell, role=..., kind=...)` after populating each affected
+cell; it applies existing font colors and display formats together. Select roles
+semantically: `input` for editable hardcodes (numeric, text, date or selectors),
+`external` for formulas depending on other files, `cross_sheet` for same-workbook
+sheet dependencies, `same_sheet` for local formulas, and `source`/`label` for
+retained records/text. External dependencies take precedence and must be disclosed.
+Resolve named ranges and indirect dependencies before choosing the role; the
+helper checks formula-versus-literal state, not dependency correctness. Identify
+editable cells in a legend; do not classify every number as an editable assumption.
+Use fills for sections, periods or review flags, not instead of font roles.
 
 These are modeling defaults, not accounting standards, edit permissions, or
 proof of correctness. Inspect fonts/number formats, not copied style indices.
@@ -113,9 +111,10 @@ Apply these defaults to new reader-facing layouts, not raw-data-only exports:
 - Keep explanations consistent with formulas. Make input-dependent narrative
   dynamic or label it as applying to the stated baseline. Do not infer causes
   or motives merely because two numbers move together.
-- Make printing/export usable when relevant: set the actual report area, page
-  direction and one-page-wide fit without shrinking an entire long model onto
-  one unreadable page. Do not impose a print layout on a raw-data-only export.
+- Make printing/export usable when relevant: call the existing `report_page`
+  primitive with the actual report area/direction for one-page-wide fit and
+  unrestricted height, then inspect the export. It cannot choose readable column
+  widths or page breaks. Do not impose print layout on a raw-data-only export.
 
 ## Review the financial work, not only the file
 

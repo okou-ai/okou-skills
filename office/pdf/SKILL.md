@@ -25,6 +25,22 @@ working directory. Identify output format(s), source, content features and
 formatting requirements first. Deliver only the requested format(s); an internal
 DOCX authoring file is not automatically an extra deliverable.
 
+Use the [unified executable](../scripts/office.py) for supported mechanics:
+
+```bash
+OFFICE="$SKILL_DIR/../scripts/office.py"
+python3 "$OFFICE" list
+python3 "$OFFICE" preflight --format pdf
+python3 "$OFFICE" create --format pdf --content content.json --title "Report" --out output.pdf
+python3 "$OFFICE" validate --input output.pdf
+```
+
+Actions return JSON receipts and never invoke recursive AI. The author owns
+fact boundaries, content semantics, professional judgments and final usability.
+Use `--help` for wrapper parameters; `tool-help --tool pdf-create|pdf-env|pdf-palette`
+accepts one underlying tool ID at a time. Never overwrite the source; keep
+application checks isolated with macros disabled and external links not updated.
+
 Honor explicit requirements and supplied templates, including typography, colors,
 cover/no-cover layout, spacing, and numbering. Do not silently substitute a
 preset. Verify actual capabilities and disclose unavailable fonts or unsupported
@@ -59,13 +75,11 @@ alone does not authorize redesign. These remain the three implemented operations
 with no new general READ, OCR, scans, signature or exact-layout editing workflow.
 PDF text parsing is best-effort, not lossless layout or source reconstruction.
 
-Read [environment](references/implementation/environment.md) for only the selected
-route. For this cover/body pipeline, run
-`bash "$SKILL_DIR/scripts/make.sh" check` once per session before this pipeline's
-CREATE/REFORMAT; it checks actual Chromium launch. A different authoring route uses
-that route's setup and validation instead. DOCX-to-PDF does not require Chromium;
-FILL and read-only inspection need Python/`pypdf`, not the browser pipeline: do
-not make them install Chromium.
+Read [environment](references/implementation/environment.md) only for the selected
+route. Run `preflight --format pdf` before cover/body CREATE/REFORMAT; this is an
+environment probe, not validation of the output. Other authoring routes use their
+own setup: DOCX export does not require Chromium, and FILL/read-only inspection
+need Python/`pypdf`, not the cover browser. Install dependencies only as permitted.
 
 ## Load content features directly
 

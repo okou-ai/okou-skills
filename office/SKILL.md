@@ -6,6 +6,22 @@ license: MIT
 
 # Office files
 
+## Delivery objective
+
+Complete the user's work, not merely the requested file. Deliver results the
+intended user can understand, use and review. Use your judgment to include the
+professional substance needed for that work; identify missing facts explicitly
+rather than inventing them. Let the task determine the structure and tools.
+Respect the requested scope, format and supplied template; do not add unrelated
+analyses or extra deliverables to make the work look more comprehensive.
+
+Keep responsibility for the reasoning, source interpretation and final usability.
+Delegate repeatable file operations to the bundled tools, and use their actual
+results to revise the work. A successful command certifies only the checks it
+performed, not the professional adequacy of the deliverable.
+
+## Select the format
+
 Use the format-specific skill below. Read only the selected route and the
 references needed for the task.
 
@@ -27,6 +43,20 @@ Use each route's setup and validation commands; reuse a working environment
 within the session. Presentation profiles are formatting guidance, not substantive
 research, policy, medical or legal expertise. Package checks do not certify
 compliance with a publication or government standard.
+
+## Mechanical operations
+
+Use the shared entry point for supported environment, file-checking, recalculation
+and rendering operations; discover the applicable commands with:
+
+```bash
+python3 "$OFFICE_DIR/scripts/office.py" --help
+```
+
+Keep business decisions with the agent. Tool defaults are implementation aids,
+not business templates, permission to overwrite inputs, or proof of correctness.
+Read implementation details only when the selected task or a tool failure needs
+them. Preserve the selected route's native and visual verification boundaries.
 
 ## Package map
 

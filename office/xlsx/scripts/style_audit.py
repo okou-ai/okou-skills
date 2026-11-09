@@ -480,6 +480,9 @@ def _load_from_dir(unpacked_dir: str) -> tuple[bytes, list[tuple[str, bytes]]]:
 
 
 def main() -> None:
+    if "--help" in sys.argv or "-h" in sys.argv:
+        print(__doc__)
+        return
     use_json = "--json" in sys.argv
     summary_only = "--summary" in sys.argv
 

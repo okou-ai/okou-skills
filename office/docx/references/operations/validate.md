@@ -1,50 +1,39 @@
 # Validate a DOCX and its requested PDF companion
 
-Run on the completed document and repeat affected checks after edits. Existing
-files remain untouched unless their modification is authorized. Set `SKILL_DIR`
-as described in [the entry point](../../SKILL.md#setup).
-
-## Package and business checks
+Check the exact final file and repeat affected checks after edits. Set `SKILL_DIR`
+and `OFFICE` per [setup](../../SKILL.md#setup). Never overwrite the source.
 
 ```bash
-bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
+python3 "$OFFICE" validate --input output.docx --business
 ```
 
-`validate` always runs the OpenXML SDK validator on all package parts, including
-structure and relationships. `--business` adds general document checks; it is not
-domain certification. Neither a package pass nor a business pass certifies
-GB/T, APA or publisher compliance.
-Read [validation details](../implementation/validation.md) for actual coverage.
+This runs OpenXML SDK package validation; `--business` adds general document
+checks, not business judgment or GB/T, APA or publisher certification. See
+[actual coverage and subset limits](../implementation/validation.md).
+`tool-help --tool docx-validate` owns detailed options. The underlying optional
+subset XSD is not full OOXML: use it only for intentionally restricted documents,
+never by stripping valid features to force a pass. Diagnose before repair;
+`fix-order` and `merge-runs` are targeted mutations, not routine checks.
 
-The optional `--xsd "$SKILL_DIR/assets/xsd/wml-subset.xsd"` checks a curated
-subset, not full OOXML. Use it only for documents intentionally restricted to
-that subset; do not remove valid features merely to satisfy that schema.
-Diagnose a package failure and rerun after repair; text preview is no substitute.
-Use `fix-order` only for diagnosed ordering errors and `merge-runs` only when
-needed, not as routine validation mutations.
-
-## Review authorized content changes
-
-For EDIT, compare the original and completed document:
+For an edit, compare authorized changes against the original:
 
 ```bash
-bash "$SKILL_DIR/scripts/docx.sh" diff --before in.docx --after out.docx
+bash "$SKILL_DIR/scripts/docx.sh" diff --before input.docx --after output.docx
 ```
 
-## Rendering and delivery
-
-For a requested Word/PDF pair, export the authored DOCX instead of redesigning it:
+For requested PDF output or actual-page review:
 
 ```bash
-python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf
+python3 "$OFFICE" preflight --format docx --rendering
+python3 "$OFFICE" render --input output.docx --out output.pdf --pages preview/pages
 ```
 
-For a user-requested rendered preview or visual review, add `--pages preview/pages`
-and inspect the actual images. Run the rendering environment probe first per
-[setup](../../SKILL.md#setup). Check page breaks, font substitutions, tables,
-headings, fields, headers/footers and content completeness against the chosen
-requirements. Rendering success alone does not verify those properties.
+Omit `--pages` if only PDF export is needed. Render the authored DOCX for a
+Word/PDF pair. Preflight tests the environment, not this candidate; a successful
+render is not visual inspection. Use disposable copies, an isolated application
+profile, macros disabled and no external-link updates.
 
-Deliver only requested formats and state any unexecuted application/visual or
-standards checks. Do not label a structural validator or sample recipe as a
-complete publication/government compliance certificate.
+Inspect actual pages when visual QA applies: content completeness, page breaks,
+font substitutions, tables, hierarchy, fields and headers/footers against the
+chosen requirements. Recheck after fixes. Report structural, business and visual
+coverage separately, including unavailable checks; deliver only requested formats.
