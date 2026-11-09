@@ -106,9 +106,10 @@ Check that the document accurately represents its sources and calculations.
 Reconcile figures and assumptions across the text, tables, charts and models.
 If an input or finding changes, revise all dependent results and recommendations.
 
-Maintain the requested scope and length. A brief prepared through substantial
-research must remain a brief; retain essential evidence and qualifications
-within that format. Do not add a separate research report unless requested.
+Keep the document within the agreed scope, format and length, including when
+substantial research is needed to prepare a brief. Retain the evidence and
+qualifications necessary to support its conclusions. Provide a separate research
+report only if the user requests one.
 
 Follow the relevant [DOCX, PDF or XLSX instructions](../SKILL.md) to create and
 validate the file. Complete their required calculation and visual checks as
