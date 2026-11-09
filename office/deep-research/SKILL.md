@@ -80,9 +80,9 @@ a domain-specific calculation, interpretation or standard.
 
 ## Assess the strength of the findings
 
-For each principal conclusion, examine the assumptions and unresolved evidence
-on which it depends. Test changes in key inputs when realistic variation could
-alter the result. Report the conditions that change the judgment, using
+Identify the assumptions and limitations in the evidence behind each main
+conclusion. Test changes in key inputs when realistic variation could alter the
+result. Report the conditions that change the judgment, using
 sensitivity calculations, thresholds or scenarios where appropriate. Explain
 the basis for any estimated range.
 
