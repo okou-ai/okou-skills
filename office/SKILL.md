@@ -9,12 +9,23 @@ license: MIT
 Use the format-specific skill below. Read only the selected route and the
 references needed for the task.
 
-When the task requires substantive analysis, explanation, evaluation or planning,
-read the [shared content-analysis guidance](references/content-analysis.md)
-before developing the answer or drafting content. Apply it alongside the selected
-format route. Skip it when translation, extraction, conversion, styling or narrow
-edits require no new analysis. It is not a fixed report outline and does not
-replace domain expertise or the route's required validation.
+## Choose the content route
+
+- **Direct drafting:** For a straightforward brief, summary or memo that condenses
+  supplied material or established conclusions, use the format route directly.
+  Also skip deep research for translation, extraction, conversion, styling and
+  narrow edits that require no new analysis.
+- **Deep research:** When the user requests in-depth research, or the task needs
+  substantial investigation or analysis to establish new conclusions, read
+  [deep-research/SKILL.md](deep-research/SKILL.md) before researching or drafting.
+
+Choose by the work required, not the document's label, length or file format.
+A short brief can require research, but creating a brief does not itself trigger
+this route. Research must preserve the requested output scope and length; it
+must not add an unrequested research report. Both routes retain the selected
+format's production and validation requirements.
+
+## Choose the file format
 
 Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
 to the selected subdirectory before running its examples; it is a shell variable,
@@ -37,8 +48,9 @@ compliance with a publication or government standard.
 
 ## Package map
 
-The top-level `office` package is the single discovery entry. Shared analysis
-guidance lives in `references/content-analysis.md`. Each format's `SKILL.md`
+The top-level `office` package is the single discovery entry. The optional
+`deep-research/` content route is loaded only under the conditions above; it is
+not a separate default skill or a fourth file format. Each format's `SKILL.md`
 routes to references grouped by responsibility:
 
 - `common/`: reusable data/presentation conventions.
