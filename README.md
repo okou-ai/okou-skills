@@ -59,6 +59,21 @@ To add a new skill or improve an existing one:
 3. Include a `SKILL.md` file with tested usage examples.
 4. Submit a pull request.
 
+## Product photography
+
+[product-photography](product-photography/SKILL.md) plans or generates a single
+product photograph: studio, lifestyle, macro, flat lay, or brand hero. It separates
+fictional concepts from reference-guided real products, uses an
+[eight-block prompt framework](product-photography/references/prompt-framework.md),
+and checks delivered images without automatic paid retries. The package includes
+structured briefs, worked prompts, offline contract tests, and pinned third-party
+license notices. Image fidelity and quality still require separately authorized
+image evaluation; the offline tests are not a production-readiness claim.
+
+```bash
+/plugin install product-photography@vm0-skills
+```
+
 ## People search
 
 [people-search](people-search/SKILL.md) finds and verifies professional candidates

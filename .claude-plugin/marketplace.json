@@ -153,6 +153,15 @@
       ]
     },
     {
+      "name": "product-photography",
+      "description": "Plan or generate one photorealistic product image with reference-based identity, shot/look selection, structured prompts, and explicit quality checks.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./product-photography"
+      ]
+    },
+    {
       "name": "people-search",
       "description": "Research people through multiple discovery channels and data tools, check original sources, deduplicate findings, and follow up on useful leads.",
       "source": "./",

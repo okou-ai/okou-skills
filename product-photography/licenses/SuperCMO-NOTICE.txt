@@ -1,0 +1,13 @@
+SuperCMO Skills
+Copyright (c) 2026 Kshitiz Kumar
+
+The media client and marketing skills in this
+repository are original work, distributed under the Apache License, Version 2.0.
+
+--------------------------------------------------------------------------------
+Bundled fonts (scripts/supercmo_skills/_assets/fonts/)
+
+Inter (Inter-Regular.ttf, Inter-Bold.ttf)
+Copyright (c) 2016-2020 The Inter Project Authors (https://github.com/rsms/inter)
+Licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
+Used by caption_video to render captions with no system-font dependency.

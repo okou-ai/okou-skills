@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "task": "prompt_only",
+  "product_mode": "concept",
+  "fidelity": "concept",
+  "product": {
+    "summary": "Fictional slim aluminium yuzu-soda can, pale butter-yellow body, plain silver lid and dark-green short label.",
+    "state": "One sealed, upright can with small plausible condensation droplets.",
+    "observed": [],
+    "user_supplied": ["Illustrative delegated fictional summer beverage concept, not a real SKU."],
+    "unknown": ["No actual product, dimensions, ingredients, certifications, or performance claims are supplied."],
+    "identity_lock": ["One slim yellow can", "Plain silver sealed lid and pull tab", "Dark-green fictional YUZU / SODA label"]
+  },
+  "references": [],
+  "shot": {
+    "type": "hero",
+    "purpose": "One photographic lead frame for a fictional summer beverage concept, without promotional layout.",
+    "required_visible": ["Entire sealed can, including silver rim and base"],
+    "required_printing": ["Both exact fictional label strings on the visible can front"]
+  },
+  "look": {
+    "preset": "fresh_natural",
+    "palette": ["Pale yellow can", "Mint-green tile", "Citrus-yellow fruit", "Dark-green fictional label"],
+    "notes": "Sunlit, open midtones, restrained saturation; no blank headline panel."
+  },
+  "scene": {
+    "setting": "Quiet summer beverage still life, with no extra products.",
+    "surface": "Pale mint-green ceramic tile with fine joints.",
+    "props": ["One cut yuzu and one whole yuzu low to the left, only as styling props."]
+  },
+  "camera": {
+    "angle": "Slightly elevated front view with restrained perspective.",
+    "framing": "Portrait 2:3, whole can visible just right of center with natural breathing room.",
+    "focus": "Can label and silver rim sharp; only the far background gently softer."
+  },
+  "lighting": {
+    "key": "Neutral daylight from upper left, moderately directional with slightly softened edges.",
+    "fill_and_separation": "Open shadow detail, smooth aluminium tonal reflection and clean silver-rim highlights.",
+    "shadows": "Defined, slightly soft cast shadow toward lower right, plus a dark contact shadow under the base."
+  },
+  "text": {
+    "mode": "concept_label",
+    "copy": ["YUZU", "SODA"]
+  },
+  "output": {
+    "count": 1,
+    "size": "1024x1536",
+    "format": "png",
+    "quality": "high",
+    "background": "opaque"
+  },
+  "constraints": {
+    "must_include": ["Coherent photographic frame", "Small irregular condensation droplets", "Only the exact fictional label strings"],
+    "must_avoid": ["Duplicate pull tab", "Swollen geometry", "Smeared lettering", "Floating fruit", "Nutrition claims", "Extra badges or words", "Inconsistent shadows"]
+  },
+  "assumptions": ["This is a prompt-only worked example. No image generation is authorized by this file."]
+}
