@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - "**/SKILL.md"
-      - "folio/**"
+      - "brochure-design/**"
       - "office/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
@@ -13,7 +13,7 @@ on:
       - main
     paths:
       - "**/SKILL.md"
-      - "folio/**"
+      - "brochure-design/**"
       - "office/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
@@ -158,7 +158,7 @@ jobs:
       - name: Python syntax
         run: python3 -m compileall -q extract-template/presentation/scripts extract-template/presentation/tools
 
-  folio-offline-tests:
+  brochure-offline-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -172,15 +172,15 @@ jobs:
           python-version: "3.12"
       - name: Install image dependency for inherited doctests
         run: python -m pip install Pillow==12.3.0
-      - name: Folio offline regression suite
-        run: python -B -m unittest discover -s folio/tests -v
-      - name: Folio inherited algorithm doctests
-        run: python -B -m doctest folio/scripts/palette.py folio/scripts/preflight.py
-      - name: Folio Python syntax
+      - name: Brochure offline regression suite
+        run: python -B -m unittest discover -s brochure-design/tests -v
+      - name: Brochure preflight doctests
+        run: python -B -m doctest brochure-design/scripts/preflight.py
+      - name: Brochure Python syntax
         run: |
           python -B - <<'PY'
           import ast
           from pathlib import Path
-          for path in Path("folio").rglob("*.py"):
+          for path in Path("brochure-design").rglob("*.py"):
               ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
           PY

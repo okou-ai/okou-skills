@@ -116,24 +116,22 @@ The platform uses `office` as its default document skill following the productio
 API rollout of [PR #41735](https://github.com/okou-ai/okou/pull/41735). The legacy
 package and its dedicated CI workflow have been retired.
 
-## Editorial print design
+## Brochure design
 
-[folio](folio/SKILL.md) adapts the third-party Folio by
-[stanesjenson11-lgtm](https://github.com/stanesjenson11-lgtm/Folio---Claude-Design-Skill-For-Poster-Brochure-Magazine)
-into a standalone, local-first design skill. It includes three actual A4 book
-layouts (Old-money, Sport Ivory and Sport Night), 23 composition patterns, separately
-licensed local Latin fonts, and HTML-to-PDF/PNG rendering with preflight checks.
-Chinese layouts require an appropriate licensed CJK font. The kits are not
-preimposed trifolds; eight upstream reference-replica kits and unverified demo
-photos/brand logos are excluded. See [provenance and scope](folio/UPSTREAM.md).
+[brochure-design](brochure-design/SKILL.md) includes **two layout families in three
+A4 book variants**: Classic Serif (8 pages), Layered Editorial Light (12) and Dark
+(12). See the [style inventory](brochure-design/kits/INDEX.md). Local licensed Latin
+fonts, HTML-to-PDF/PNG rendering and checks are included; Chinese needs a licensed
+CJK font. No preimposed trifold or Canva/press certification is supplied.
+
+Adapted from third-party Folio by
+[stanesjenson11-lgtm](https://github.com/stanesjenson11-lgtm/Folio---Claude-Design-Skill-For-Poster-Brochure-Magazine),
+not an Anthropic product. See [provenance](brochure-design/UPSTREAM.md).
+Generic pattern cards, industry palette data and build logs are not shipped.
 
 ```bash
-/plugin install folio@vm0-skills
+/plugin install brochure-design@vm0-skills
 ```
-
-The package creates no saved-client/taste history, plugin commands or implicit
-network downloads. Source templates still require real content and asset replacement;
-no Canva or press-production certification is claimed.
 
 ## Resources
 
