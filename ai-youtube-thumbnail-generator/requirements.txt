@@ -1,0 +1,3 @@
+# Prompt compilation uses Python 3.10+ standard library only.
+# Required for raster export, technical checks and offline tests.
+Pillow>=10.4,<13

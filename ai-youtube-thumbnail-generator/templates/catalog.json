@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "templates": [
+    {
+      "id": "tech-after-hours",
+      "name": "Tech / After Hours",
+      "best_for": "AI tools, software tutorials, automation and outcome-led explainers",
+      "source_ids": ["nanothumbnail", "swyxio"],
+      "direction": "Use a large, expressive object or fictional robot on the right half of a believable workspace, with a clear action that communicates the video's promise. Keep the left 43 percent calm and dark for an oversized two-line headline. Combine a warm practical light with deep-navy ambient shadows and one chartreuse accent; render tactile materials and cinematic depth without floating interface clutter. Keep the subject and its main prop readable as one grouped focal point."
+    },
+    {
+      "id": "product-spotlight",
+      "name": "Product Spotlight",
+      "best_for": "Product reviews, unboxings and single-tool demonstrations",
+      "source_ids": ["nanothumbnail", "baoyu"],
+      "direction": "Make one product the visual hero, large on the right two-thirds, at a clear three-quarter angle with its most distinctive silhouette visible. Use a simple saturated color field, a grounded soft shadow and crisp studio lighting; reserve the upper-left or left third for a short, oversized headline. Let one authentic product detail create intrigue rather than adding a busy collage. Preserve the shape, material and markings of any supplied product reference; without a reference, create an explicitly generic, unbranded concept object."
+    },
+    {
+      "id": "versus",
+      "name": "Versus / Two Choices",
+      "best_for": "Tool comparisons, purchasing decisions and opposing approaches",
+      "source_ids": ["nanothumbnail"],
+      "direction": "Build one balanced comparison group: option A large on the left and option B equally large on the right, using matched camera angle, scale and lighting. Separate the two halves with a clean vertical division and contrasting background colors, not explosive effects. Reserve the upper quarter for the short headline, keeping both silhouettes distinct at phone size. Do not add winner badges, numerical scores, labels or a VS word unless those exact characters are explicitly included in the supplied overlay lines; communicate the comparison visually."
+    },
+    {
+      "id": "before-after",
+      "name": "Before / After",
+      "best_for": "Organization, restoration and truthful process transformations",
+      "source_ids": ["nanothumbnail"],
+      "direction": "Show the same subject twice as a single paired transformation: an untidy or unfinished state on the left and a clear, completed state on the right. Lock the viewpoint, object identity and scale across both halves so the change is understandable without extra labels. Use muted warm tones on the left and a cleaner brighter treatment on the right, with one simple division. Reserve the upper quarter for the headline and portray only a transformation supported by the video or clearly identified as a fictional demonstration; never fabricate financial, health or performance results."
+    },
+    {
+      "id": "cinematic-mystery",
+      "name": "Cinematic Mystery",
+      "best_for": "Travel, documentary, storytelling and one-question visual hooks",
+      "source_ids": ["nanothumbnail", "baoyu"],
+      "direction": "Create one atmospheric scene with a single large, unmistakable focal object on the right third and a subtle unanswered visual question. Use deep cool shadows, one warm illuminated focal point, restrained detail and layered depth, keeping the left half quiet for the headline. Preserve enough local contrast that the subject remains visible at 168 pixels wide; cinematic darkness must not bury it. Suggest intrigue through scale, framing or light rather than danger, sensational claims or misleading imagery."
+    },
+    {
+      "id": "bold-editorial",
+      "name": "Bold Editorial / Visual Metaphor",
+      "best_for": "Opinion, productivity, concepts and faceless educational channels",
+      "source_ids": ["baoyu"],
+      "direction": "Translate the video's idea into one concrete, instantly recognizable object metaphor rather than a dashboard or collection of icons. Use a limited three-color screen-print palette, bold silhouette shapes, crisp flat boundaries and restrained halftone texture inside the subject. Place the hero metaphor on the right with generous breathing room on the left; when overlay text is supplied, integrate an oversized clean headline there, otherwise leave that area empty. Favor strong figure-ground separation and essential shapes over fine detail, decorative lettering or a full poster's density."
+    }
+  ]
+}

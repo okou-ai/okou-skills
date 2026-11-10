@@ -59,6 +59,22 @@ To add a new skill or improve an existing one:
 3. Include a `SKILL.md` file with tested usage examples.
 4. Submit a pull request.
 
+## AI YouTube Thumbnail Generator
+
+[ai-youtube-thumbnail-generator](ai-youtube-thumbnail-generator/SKILL.md) generates
+actual video cover images from six curated, adapted open-source template families:
+tech, product, comparison, before/after, cinematic and bold editorial. It includes
+editable example briefs, multilingual text support, prompt compilation, 1280×720
+JPEG export, mobile review and [pinned sources with full MIT notices](ai-youtube-thumbnail-generator/UPSTREAM.md).
+It uses the available image backend rather than requiring an upstream MCP or app.
+
+See the [sample gallery and live validation record](docs/ai-youtube-thumbnail-generator/VALIDATION.md).
+Successful generation and visual QA are not claims of measured CTR improvement.
+
+```bash
+/plugin install ai-youtube-thumbnail-generator@vm0-skills
+```
+
 ## People search
 
 [people-search](people-search/SKILL.md) finds and verifies professional candidates

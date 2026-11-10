@@ -28,6 +28,15 @@
       ]
     },
     {
+      "name": "ai-youtube-thumbnail-generator",
+      "description": "Generate actual YouTube thumbnail images from six curated open-source templates, with multilingual text, mobile QA and exact-size export.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./ai-youtube-thumbnail-generator"
+      ]
+    },
+    {
       "name": "nintendo-play-activity",
       "description": "Nintendo Play Activity API for connected Nintendo Account profile, play history, and playtime. Use this skill to read Nintendo Account profile data, Nintendo Switch play activity, recently played games, and playtime from Nintendo Store / My Nintendo app.",
       "source": "./",

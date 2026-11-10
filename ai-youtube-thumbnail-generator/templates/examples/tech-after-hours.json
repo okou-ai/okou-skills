@@ -1,0 +1,11 @@
+{
+  "template_id": "tech-after-hours",
+  "video_title": "把邮件、表格和日报交给 AI，工作会变成什么样？",
+  "audience": "Chinese-speaking knowledge workers curious about practical AI automation",
+  "visual_hook": "A fictional illustration of a human leaving on time while an AI assistant finishes routine tasks; not a measured productivity claim",
+  "subject": "A charming white-and-graphite fictional robot assistant with a dark glass face and two friendly cyan eyes, large on the right, typing on one unbranded laptop at a wooden desk after dark. Its simple mechanical hands and attentive posture make the work understandable at a glance.",
+  "scene_details": "A small warm desk lamp, subtle blurred office window at night, deep navy negative space on the left. The laptop screen and room contain no readable labels.",
+  "overlay_lines": ["我下班了", "AI还在忙"],
+  "language": "Simplified Chinese",
+  "brand_colors": []
+}

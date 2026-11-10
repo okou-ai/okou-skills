@@ -1,0 +1,15 @@
+Create ONE original raster YouTube video thumbnail, landscape 16:9. Compose for a 1280x720 delivery and immediate readability at 168x94 pixels.
+
+Video title (context only, not extra text to render): "为什么我开始减少工作流里的工具？". Audience: Chinese-speaking knowledge workers interested in focus and simpler workflows. Visual promise / question: One strong visual metaphor for bringing scattered pieces into a clear order; do not suggest numerical performance gains.
+
+Template direction: Translate the video's idea into one concrete, instantly recognizable object metaphor rather than a dashboard or collection of icons. Use a limited three-color screen-print palette, bold silhouette shapes, crisp flat boundaries and restrained halftone texture inside the subject. Integrate an oversized clean headline on the left and place the hero metaphor on the right, leaving generous breathing room. Favor strong figure-ground separation and essential shapes over fine detail, decorative lettering or a full poster's density.
+
+Main subject and action: One oversized cobalt-blue horseshoe magnet on the right, drawing a small scattered group of cream paper clips into a single clean aligned line. Treat the magnet and clips as one graphic metaphor, with recognizable silhouettes rather than many tiny details.
+
+Scene details: Warm cream paper field, deep navy ink and cobalt blue. Flat screen-print shapes with restrained halftone only inside the magnet, crisp edges and generous negative space. Huge dark headline on the left. No border, labels, brands or realistic people.
+
+Override the template's default palette with these brand colors: #F4EBDD, #14273E, #2449D8. Use neutral white/black only as needed for legibility.
+
+Render ONLY the following 1 headline line(s), in this exact order, in Simplified Chinese: "少即是多". Use oversized bold clean sans-serif lettering with strong background contrast, precise spelling and comfortable spacing. Place it in the template's reserved text zone, clear of the subject. Treat the slash above as a line separator, not a printed character. Do not render the video title, extra captions, UI text or a watermark.
+
+Keep the bottom-right 18 percent of width by 15 percent of height low-detail and free of essential text or subject features for the duration badge. Use one focal subject or one clearly grouped comparison, at most three main visual elements, clean margins and separation from both light and dark feed backgrounds. Avoid tiny decoration and unsupported metrics. Use original generic objects unless real reference assets are supplied; do not invent a real person's likeness or distort an existing product's shape or logo. Make the visual promise honest to the supplied context. A demonstration concept is not evidence of real-world results.

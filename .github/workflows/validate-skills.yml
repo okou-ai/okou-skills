@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "**/SKILL.md"
+      - "ai-youtube-thumbnail-generator/**"
       - "office/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
@@ -12,6 +13,7 @@ on:
       - main
     paths:
       - "**/SKILL.md"
+      - "ai-youtube-thumbnail-generator/**"
       - "office/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
@@ -136,6 +138,19 @@ jobs:
           fi
 
           echo "No _ACCESS_TOKEN references found. ✓"
+
+  thumbnail-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install thumbnail export dependencies
+        run: python3 -m pip install -r ai-youtube-thumbnail-generator/requirements.txt
+      - name: Run offline thumbnail tests (no image API calls)
+        run: python3 -m unittest discover -s ai-youtube-thumbnail-generator/scripts -p 'test_*.py' -v
 
   presentation-syntax:
     runs-on: ubuntu-latest

@@ -1,0 +1,15 @@
+Create ONE original raster YouTube video thumbnail, landscape 16:9. Compose for a 1280x720 delivery and immediate readability at 168x94 pixels.
+
+Video title (context only, not extra text to render): "一盏折叠台灯，能怎样改变小书桌？". Audience: Chinese-speaking viewers interested in compact workspace products. Visual promise / question: Show the surprising sculptural silhouette of one compact lamp, without inventing specifications or a real brand.
+
+Template direction: Make one product the visual hero, large on the right two-thirds, at a clear three-quarter angle with its most distinctive silhouette visible. Use a simple saturated color field, a grounded soft shadow and crisp studio lighting; reserve the upper-left or left third for a short, oversized headline. Let one authentic product detail create intrigue rather than adding a busy collage. Preserve the shape, material and markings of any supplied product reference; without a reference, create an explicitly generic, unbranded concept object.
+
+Main subject and action: One original unbranded compact folding desk lamp, sculptural matte-white aluminum with a circular warm-light head and an elegant articulated arm, presented large on the right at a three-quarter angle. This is an explicitly fictional product concept, not a copy of any real product.
+
+Scene details: A clean rich-cobalt studio backdrop, one grounded soft shadow, tactile material and dramatic but accurate studio highlights. White headline and one warm-yellow accent.
+
+Override the template's default palette with these brand colors: #1743CC, #F7F4EC, #FFD24B. Use neutral white/black only as needed for legibility.
+
+Render ONLY the following 2 headline line(s), in this exact order, in Simplified Chinese: "小灯" / "大不同". Use oversized bold clean sans-serif lettering with strong background contrast, precise spelling and comfortable spacing. Place it in the template's reserved text zone, clear of the subject. Treat the slash above as a line separator, not a printed character. Do not render the video title, extra captions, UI text or a watermark.
+
+Composition instruction, not visible artwork: keep the lower-right corner quiet, naturally continuous with the scene, and free of essential text or subject details. The finished image itself contains no added interface badges, corner placeholder boxes, safe-zone guides or layout-measurement annotations. Do not visualize layout instructions. Use one focal subject or one clearly grouped comparison, at most three main visual elements, clean margins and separation from both light and dark feed backgrounds. Avoid tiny decoration and unsupported metrics. Use original generic objects unless real reference assets are supplied; do not invent a real person's likeness or distort an existing product's shape or logo. Make the visual promise honest to the supplied context. A demonstration concept is not evidence of real-world results.

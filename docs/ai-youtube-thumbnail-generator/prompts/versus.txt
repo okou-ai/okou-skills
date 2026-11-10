@@ -1,0 +1,13 @@
+Create ONE original raster YouTube video thumbnail, landscape 16:9. Compose for a 1280x720 delivery and immediate readability at 168x94 pixels.
+
+Video title (context only, not extra text to render): "纸质笔记还是电子笔记？选择适合自己的记录方式". Audience: Chinese-speaking students and professionals comparing note-taking methods. Visual promise / question: A fair side-by-side choice, not a claim that either method is universally better.
+
+Template direction: Build one balanced comparison group: option A large on the left and option B equally large on the right, using matched camera angle, scale and lighting. Separate the two halves with a clean vertical division and contrasting background colors, not explosive effects. Reserve the upper quarter for the short headline, keeping both silhouettes distinct at phone size. Do not add winner badges, numerical scores, labels or a VS word unless those exact characters are explicitly included in the supplied overlay lines; communicate the comparison visually.
+
+Main subject and action: On the left, one open cream-paper notebook with a simple black pen. On the right, one generic graphite e-ink writing tablet with a matching stylus. Both are photographed at the same three-quarter angle and equally prominent; the pages and screen show only broad non-readable abstract strokes.
+
+Scene details: Warm apricot on the notebook half and cool teal on the tablet half, clean vertical division, large objects with no tiny accessories. Reserve the upper quarter as a quiet headline band; keep the bottom-right corner free of the tablet's essential details.
+
+Render ONLY the following 1 headline line(s), in this exact order, in Simplified Chinese: "你会选谁？". Use oversized bold clean sans-serif lettering with strong background contrast, precise spelling and comfortable spacing. Place it in the template's reserved text zone, clear of the subject. Treat the slash above as a line separator, not a printed character. Do not render the video title, extra captions, UI text or a watermark.
+
+Keep the bottom-right 18 percent of width by 15 percent of height low-detail and free of essential text or subject features for the duration badge. Use one focal subject or one clearly grouped comparison, at most three main visual elements, clean margins and separation from both light and dark feed backgrounds. Avoid tiny decoration and unsupported metrics. Use original generic objects unless real reference assets are supplied; do not invent a real person's likeness or distort an existing product's shape or logo. Make the visual promise honest to the supplied context. A demonstration concept is not evidence of real-world results.
