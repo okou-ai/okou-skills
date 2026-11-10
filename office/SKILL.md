@@ -1,6 +1,6 @@
 ---
 name: office
-description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets. Includes Chinese government-style documents, named academic papers, thesis templates and business/editorial formatting in Word; research and technical PDF features; and financial models, budgets, forecasts and scenarios in Excel. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, document formatting or conversion.
+description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets, including research and substantive analysis for reports, assessments and plans delivered in these formats. Includes Chinese government-style documents, named academic papers, thesis templates and business/editorial formatting in Word; research and technical PDF features; and financial models, budgets, forecasts and scenarios in Excel. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, document formatting or conversion.
 license: MIT
 ---
 
@@ -9,11 +9,13 @@ license: MIT
 Read the guide for the requested file format and the references relevant to the
 task. Apply the research guidance below when the document requires it.
 
-## Determine whether research is needed
+## Determine the analytical work
 
-Read [deep-research/SKILL.md](deep-research/SKILL.md) before starting an in-depth
-investigation or a task that requires substantial analysis to explain results,
-evaluate alternatives or assess feasibility.
+Read [deep-research/SKILL.md](deep-research/SKILL.md) when the user requests an
+in-depth investigation or substantial analysis. Also read it when answering the
+question requires evaluating evidence, explaining results, comparing alternatives
+or establishing feasibility beyond reporting supplied facts. Read it before
+developing the analysis, regardless of the file format or requested length.
 
 For briefs, summaries and memos that only consolidate supplied material or
 established findings, follow the DOCX, PDF or XLSX instructions below to prepare
@@ -21,9 +23,12 @@ and validate the file. Do not load the research guide for these tasks or for
 translation, extraction, formatting, conversion and limited edits that require
 no additional analysis.
 
-Decide whether research is needed from the question being answered. A short
-brief may require investigation; in that case, apply the research guidance while
-retaining the requested brief's scope and length.
+Decide from the work needed to answer the question, not the document's title or
+whether sources were supplied. If reading the material reveals a need for
+substantial analysis to answer that question, read the guide before continuing.
+A short brief may require investigation; apply the research guidance while
+retaining the requested brief's scope and length. Do not expand a consolidation
+or editing task into an investigation the user did not request.
 
 ## Prepare the requested file
 

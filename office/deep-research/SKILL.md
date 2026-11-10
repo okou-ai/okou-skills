@@ -18,12 +18,22 @@ Choose methods appropriate to the question, available evidence and applicable
 professional standards. These instructions govern the work, not the document's
 section headings.
 
+## Contents
+
+- [Define the assignment](#define-the-assignment)
+- [Establish a reliable evidence base](#establish-a-reliable-evidence-base)
+- [Perform the required analysis](#perform-the-required-analysis)
+- [Resolve material questions and assess the findings](#resolve-material-questions-and-assess-the-findings)
+- [Prepare and verify the document](#prepare-and-verify-the-document)
+
 ## Define the assignment
 
-Identify the question to answer, the intended reader and the result the document
-must provide. Specify what needs to be established to support that result. Use
-these requirements to decide which evidence to examine and which calculations
-or comparisons to perform.
+Identify the question to answer, the intended reader and the understanding,
+decision or action the document must support. Determine what needs to be
+established for that use, including analytical work the reader would otherwise
+have to complete. Organize the analysis around these questions, rather than the
+order of the source material or the document's headings. Choose the evidence,
+calculations and comparisons needed to answer them within the agreed scope.
 
 Confirm the subject, relevant period, permitted sources and practical
 constraints from the request. Preserve the user's template, required content
@@ -53,8 +63,10 @@ with other sources.
 
 ## Perform the required analysis
 
-Select the applicable work below. Use specialist guidance when the task requires
-a domain-specific calculation, interpretation or standard.
+Select the applicable work below according to the questions that need answers.
+Use specialist guidance when the task requires a domain-specific calculation,
+interpretation or standard. Reconsider the next analytical step as findings
+emerge; do not apply every method as a fixed sequence.
 
 - **Quantitative analysis:** Define the measures, reference values and formulas.
   Use a suitable calculation tool for significant numerical results. Examine
@@ -78,7 +90,19 @@ a domain-specific calculation, interpretation or standard.
   the requirement and compare it with availability. Identify conflicts and
   explain the effects of proposed adjustments.
 
-## Assess the strength of the findings
+## Resolve material questions and assess the findings
+
+Use the findings to identify unresolved questions, contradictions or untested
+assumptions that could change a main conclusion, the comparison of alternatives
+or the feasibility of a recommendation. Prioritize these issues over adding
+background or repeating established findings.
+
+For each issue, determine the evidence, calculation or comparison needed to
+resolve it. Perform that work within the permitted sources, scope and budget;
+listing an issue as a limitation does not replace analysis that can reasonably
+resolve it. Use the result to revise the affected judgment or recommendation.
+When an adjustment changes assumptions, actions or shared resources, reassess
+the dependent results and constraints before accepting it.
 
 Identify the assumptions and limitations in the evidence behind each main
 conclusion. Test changes in key inputs when realistic variation could alter the
@@ -91,9 +115,16 @@ data, definitions, timing, analytical method or substantive interpretation.
 Assess the competing results against the evidence and the task's requirements.
 Explain the basis for accepting a result or retaining uncertainty.
 
-Use unresolved issues to define further research or calculation. Prioritize
-issues that affect the main answer. If the available evidence cannot settle an
-issue, state what remains unknown and how it limits the conclusion.
+If the necessary evidence is unavailable or resolving an issue would exceed the
+permitted scope or budget, state what remains unknown and qualify or withhold
+the affected conclusion. Do not replace missing evidence with an unsupported
+assumption or leave the recommendation unchanged while mentioning the problem
+only in a separate limitations section.
+
+Finish the analysis when it supports the requested use and the material issues
+identified during the work have either been resolved or appropriately limit the
+conclusions. Coverage of the requested topics alone is not sufficient. Do not
+continue solely to add length or exhaust every possible line of inquiry.
 
 ## Prepare and verify the document
 
