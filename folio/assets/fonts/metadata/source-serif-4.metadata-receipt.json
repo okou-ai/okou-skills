@@ -1,0 +1,18 @@
+{
+  "requestedUrl": "https://registry.npmjs.org/%40fontsource%2Fsource-serif-4/latest",
+  "fetchedAtUTC": "2026-11-10T08:21:02.486249+00:00",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Date": "Tue, 10 Nov 2026 08:21:02 GMT",
+    "Content-Type": "application/json",
+    "Content-Length": "2639",
+    "Connection": "close",
+    "CF-Ray": "a583a4321a97d90f-SEA",
+    "CF-Cache-Status": "DYNAMIC",
+    "Access-Control-Allow-Origin": "*",
+    "Server": "cloudflare",
+    "set-cookie": "__cf_bm=18dWcMsNCxuf9JcKol6iMExmipRN12ajZeAFe2Jdm1E-1794298862.4190054-1.0.1.1-.llrY.kVo7_M125Lh6tRq_1sbWxWnzBZfzXKWkawrL5iqMyI3sHt7WF3Ug1WHIrQyZK1jsjAeu_VTOJkIOp05ydI8ifmLs28uy.xqJwWbegE1MyGXh7vxROu4KFPlkOV; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=npmjs.org; Expires=Tue, 10 Nov 2026 08:51:02 GMT"
+  },
+  "metadataFile": "source-serif-4.npm.json",
+  "metadataSha256": "26bac654dacb05e4474144eecd1ca5af9d8ff7101b339cc34772713bfd226cc1"
+}

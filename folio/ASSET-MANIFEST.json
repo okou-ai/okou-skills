@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "upstreamCommit": "6dd90e0019a39539d6ac6543e53c8437a3a8e13f",
+  "scope": "All runtime kit vector/raster assets. Font files have their own complete manifest/notices in assets/fonts/.",
+  "fontManifest": "assets/fonts/manifest.json",
+  "assetCount": 25,
+  "assets": [
+    {
+      "path": "kits/old-money-book/assets/back-divide.svg",
+      "bytes": 856,
+      "sha256": "073c21e1032ccdb208a462567b582ae43a98a56abbc79215cd1b967747c1ae50",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/old-money-book/assets/back-divide.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/old-money-book/assets/band-divide.svg",
+      "bytes": 1621,
+      "sha256": "efc8178f149caaf82a2abbcb39668b7192b849a15974b4fa4585557bd1a7af42",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/old-money-book/assets/band-divide.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/old-money-book/assets/paper-ivory.svg",
+      "bytes": 624,
+      "sha256": "d1527c202444616b094188420b9fb255ff37b14f1f188c7a1d3bc676b0b408ff",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/old-money-book/assets/portrait-rect.svg",
+      "bytes": 324,
+      "sha256": "8a4e98c6c71bef443a9d5296b8fe2d1dcdbeaf719c8729e024ffd856b2114b10",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/old-money-book/assets/portrait-rect.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/old-money-book/assets/slot-photo.svg",
+      "bytes": 327,
+      "sha256": "9f55cf931b6994e6bfa7ce089297f8b57d643758ccf6f28464bebc266e02f3de",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/old-money-book/assets/slot-photo.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-ivory/assets/grain-espresso.svg",
+      "bytes": 619,
+      "sha256": "df90b4d493b3c20f565b0f362e0c2bae9254e365bfc2e19cbb6c64ea7ac3afa2",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-ivory/assets/paper-ivory.svg",
+      "bytes": 624,
+      "sha256": "d1527c202444616b094188420b9fb255ff37b14f1f188c7a1d3bc676b0b408ff",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-ivory/assets/portrait-circle.svg",
+      "bytes": 322,
+      "sha256": "37c422cf5e0a8905bba561b47e273380da261baa3311c99b7f98ec49b38b77f7",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-ivory/assets/portrait-circle.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-ivory/assets/slot-cutout.svg",
+      "bytes": 836,
+      "sha256": "b0d00e20cf9eb457ab3ed478728acbc4643d3c803fc7b239ed65b653444889a2",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-ivory/assets/slot-mark.svg",
+      "bytes": 392,
+      "sha256": "8cf6bba26c7046a94566c2d05f6fff4d1000d1715e8e39836e6545fff2f5a7c6",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-ivory/assets/slot-photo.svg",
+      "bytes": 327,
+      "sha256": "9f55cf931b6994e6bfa7ce089297f8b57d643758ccf6f28464bebc266e02f3de",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-ivory/assets/slot-photo.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-ivory/assets/stars.svg",
+      "bytes": 326,
+      "sha256": "b7093f472a91eb8343dbb8630912e4e73b55f3870d08ff8e694b43155b2bc865",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-ivory/assets/stars.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/band-11.svg",
+      "bytes": 1583,
+      "sha256": "c798a0659b8936f5e40a9fcd385efcca3c5c61412b29b2ada263afd51db73a7b",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/band-11.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/band-45.svg",
+      "bytes": 1621,
+      "sha256": "5c06f8977625ba17030daedcb98c2e3725db7dc3b31faec7ae5019d05f575707",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/band-45.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/glow.svg",
+      "bytes": 650,
+      "sha256": "12d6af53aa9cef4781480ae338fbc719eb48cc2745883e9858ebdb17a004ca07",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/glow.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/light-divide.svg",
+      "bytes": 836,
+      "sha256": "bb4b1409cf8875cb0006798adfb79a27ed4dfe9e89949421681d5e9078be340a",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/light-divide.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/logo-placeholder-w.svg",
+      "bytes": 525,
+      "sha256": "6da63255903cfebe76f7875ed4172173d6e51d48f533ec081724084c7ac7481d",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-night/assets/newsprint.png",
+      "bytes": 262744,
+      "sha256": "151333a2a9f1b554dc1320eef921585f4c1e62eae00b580a5b6b6bb533ea6aae",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-night/assets/portrait-circle.svg",
+      "bytes": 323,
+      "sha256": "f79630ce8fb798e8afc44ec128ddb2a1a08e6725cbfbeeb5a8a44adbaac62348",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/portrait-circle.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/slot-cutout.svg",
+      "bytes": 780,
+      "sha256": "3ec41ca6b945b864e31463840d6b995964d7afde96c45291173fa8598c8291f6",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-night/assets/slot-mark.svg",
+      "bytes": 392,
+      "sha256": "8cf6bba26c7046a94566c2d05f6fff4d1000d1715e8e39836e6545fff2f5a7c6",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Original procedural/neutral asset created for the Okou adaptation",
+      "treatment": "replacement, not upstream preview/photo/brand artwork"
+    },
+    {
+      "path": "kits/sport-night/assets/slot-photo.svg",
+      "bytes": 327,
+      "sha256": "9f55cf931b6994e6bfa7ce089297f8b57d643758ccf6f28464bebc266e02f3de",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/slot-photo.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/spark.svg",
+      "bytes": 1770,
+      "sha256": "8086025b3c352b38d2b1958cc10d245af410a491e26e22bedd03d577bdf1cf07",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/spark.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/stars.svg",
+      "bytes": 300,
+      "sha256": "e676d106903b8e9ebbf3d6b0c54781d01984203f5e4fc6d5f362ae4759bb5822",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/stars.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    },
+    {
+      "path": "kits/sport-night/assets/streak.svg",
+      "bytes": 980,
+      "sha256": "a7b45fae505ee9053d3c5d71e33a0be315bed71170f49e8a07fafe810fb3fb7b",
+      "license": "Apache-2.0 (package LICENSE)",
+      "source": "Pinned Folio skills/folio/kits/sport-night/assets/streak.svg",
+      "treatment": "retained generic vector; no client photo or brand logo"
+    }
+  ],
+  "excludedReplicaKits": [
+    "football-blue",
+    "minimal-ebook",
+    "newsletter",
+    "pop-stripe",
+    "skate-culture",
+    "split-pop",
+    "sport-news",
+    "winter-editorial"
+  ],
+  "excludedAssetClasses": [
+    "upstream preview/gallery",
+    "stock/client photographs",
+    "real technology logos",
+    "undocumented source newsprint bitmap",
+    "example font binaries",
+    "private reference boards"
+  ],
+  "limits": "Source licensing/provenance record, not a warranty of legal clearance or trademark permission. Project assets require separate verification."
+}

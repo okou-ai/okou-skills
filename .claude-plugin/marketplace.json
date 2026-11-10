@@ -162,6 +162,15 @@
       ]
     },
     {
+      "name": "folio",
+      "description": "Editorial brochures, company profiles, magazines and original flyers as paged HTML/PDF/PNG; three curated Folio layouts, local licensed fonts and print-oriented QA.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./folio"
+      ]
+    },
+    {
       "name": "user-research",
       "description": "User research toolkit — customer intelligence gathering with confidence scoring, and research synthesis for personas, themes, and opportunity prioritization.",
       "source": "./",

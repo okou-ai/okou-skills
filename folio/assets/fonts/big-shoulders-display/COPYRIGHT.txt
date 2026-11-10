@@ -1,0 +1,6 @@
+Additional copyright notice(s) transcribed verbatim from bundled font name tables (name ID 0):
+
+Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)
+
+The original Fontsource package LICENSE is preserved separately, without edits.
+All bundled fonts remain byte-for-byte unchanged and are covered by that full SIL OFL 1.1 license.

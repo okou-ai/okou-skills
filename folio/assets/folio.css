@@ -1,0 +1,248 @@
+/* Modified by Okou: font instructions use the bundled local font resources. */
+/* ==========================================================================
+   folio.css — a print page system for paged HTML → PDF
+   --------------------------------------------------------------------------
+   Link this first, then your project's tokens.css, then pages.css.
+   Every value that matters for print is in mm / pt, never px or rem.
+
+   Document skeleton:
+     <html data-size="A4" lang="en">
+       <body>
+         <section class="page">            ← one physical page (trim + bleed)
+           <div class="trim">               ← trimmed page, origin for absolute layout
+             <div class="live"> … </div>    ← margin box, 12-col grid for text
+             <footer class="furniture"> … </footer>
+           </div>
+         </section>
+
+   Page 1 is a recto (right-hand page). Even pages are versos (left-hand).
+   Inner margin (--m-in) sits on the spine side automatically.
+   ========================================================================== */
+
+/* ---------- 1. Trim sizes ------------------------------------------------ */
+:root {
+  --pw: 210mm;          /* trim width  */
+  --ph: 297mm;          /* trim height */
+  --bleed: 0mm;         /* render.py --bleed 3 sets this to 3mm           */
+  --b0: calc(-1 * var(--bleed));   /* use for edges that touch the trim  */
+
+  /* margins: top, bottom, inner (spine), outer */
+  --m-top: 14mm;
+  --m-bot: 18mm;
+  --m-in: 17mm;
+  --m-out: 13mm;
+  --safe: 5mm;          /* text never closer than this to the trim edge   */
+  --safe-spine: 9mm;    /* …or this to the spine (binding swallows it)    */
+
+  /* grid */
+  --cols: 12;
+  --rows: 16;
+  --gut: 4.5mm;         /* column gutter */
+  --rgut: 0mm;          /* row gutter    */
+
+  /* colour roles — override in tokens.css */
+  --paper: #ffffff;
+  --ink: #111316;
+  --ink-2: #3c4046;     /* secondary text: must still pass 4.5:1 on paper */
+  --rule: #d9dce1;
+  --brand: #1f3fb0;
+  --brand-ink: #ffffff; /* text colour on brand fields */
+  --tint: #eef1fa;      /* 5–8% of brand, not a default grey */
+  --accent: #6fd1b0;
+
+  /* type roles — override in project CSS (licensed fonts via fonts/fonts.css) */
+  --font-display: system-ui, sans-serif;
+  --font-body: system-ui, sans-serif;
+  --font-label: var(--font-body);
+
+  --fs-body: 9.25pt;
+  --lh-body: 1.42;
+  --fs-small: 7.5pt;
+  --fs-caption: 7pt;
+  --fs-furniture: 6.5pt;
+  --fs-lead: 12.5pt;
+  --fs-h3: 11pt;
+  --fs-h2: 22pt;
+  --fs-h1: 44pt;
+  --fs-display: 88pt;
+}
+
+html[data-size="A4"]            { --pw: 210mm;   --ph: 297mm; }
+html[data-size="A4-landscape"]  { --pw: 297mm;   --ph: 210mm; }
+html[data-size="A5"]            { --pw: 148mm;   --ph: 210mm;  --m-top: 11mm; --m-bot: 14mm; --m-in: 14mm; --m-out: 10mm; --gut: 3.5mm; --fs-body: 8.75pt; }
+html[data-size="A3"]            { --pw: 297mm;   --ph: 420mm; }
+html[data-size="A2"]            { --pw: 420mm;   --ph: 594mm; }
+html[data-size="Letter"]        { --pw: 215.9mm; --ph: 279.4mm; }
+html[data-size="Letter-landscape"] { --pw: 279.4mm; --ph: 215.9mm; }
+html[data-size="square-210"]    { --pw: 210mm;   --ph: 210mm; }
+html[data-size="DL"]            { --pw: 99mm;    --ph: 210mm;  --m-top: 10mm; --m-bot: 10mm; --m-in: 8mm; --m-out: 8mm; --cols: 6; }
+html[data-size="magazine"]      { --pw: 230mm;   --ph: 300mm; }
+/* custom: <html style="--pw:200mm; --ph:260mm"> */
+
+/* ---------- 2. Reset + screen preview ------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #5d6066; }
+body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+img, svg { display: block; max-width: none; }
+@media print { html, body { background: none; } }
+
+/* ---------- 3. Page, trim, live area ------------------------------------ */
+.page {
+  position: relative;
+  width: calc(var(--pw) + 2 * var(--bleed));
+  height: calc(var(--ph) + 2 * var(--bleed));
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  font-optical-sizing: auto;
+  hyphens: manual;
+  break-after: page;
+  page-break-after: always;
+}
+@media screen {
+  .page { margin: 12mm auto; box-shadow: 0 1.5mm 6mm rgba(0,0,0,.35); }
+}
+
+.trim { position: absolute; inset: var(--bleed); }
+
+/* The margin box. Text blocks live here, placed on the grid:
+   <div style="grid-column: 1 / 7; grid-row: 4 / 12"> */
+.live {
+  position: absolute;
+  top: var(--m-top); bottom: var(--m-bot);
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+  column-gap: var(--gut);
+  row-gap: var(--rgut);
+}
+/* recto (odd) = spine on the left; verso (even) = spine on the right */
+.page:nth-of-type(odd)  .live { left: var(--m-in);  right: var(--m-out); }
+.page:nth-of-type(even) .live { left: var(--m-out); right: var(--m-in); }
+.page.single .live            { left: var(--m-out); right: var(--m-out); } /* posters, flyers */
+
+/* grid children size to content unless told otherwise (tables must not stretch) */
+.live > table, .live > figure, .live > svg:not([style*="height"]) { align-self: start; }
+
+/* Absolutely positioned boxes inside .trim.
+   Use var(--b0) for any edge that touches the trim so it runs into the bleed:
+   <figure class="box" style="inset: var(--b0) var(--b0) 55% 40%"> */
+.box { position: absolute; }
+.fill { position: absolute; inset: var(--b0); }           /* full-bleed layer */
+
+/* ---------- 4. Images ----------------------------------------------------- */
+.ph { position: absolute; overflow: hidden; background: var(--tint); }
+.ph > img, .ph > picture > img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: var(--fx, 50%) var(--fy, 50%);   /* focal point */
+}
+.ph.contain > img { object-fit: contain; background: transparent; }
+.ph.cutout { background: none; overflow: visible; }
+.ph.cutout > img { object-fit: contain; object-position: bottom center; }
+
+/* Masks built from the project's motif */
+.mask-circle  { clip-path: circle(50% at 50% 50%); }
+.mask-ellipse { clip-path: ellipse(50% 50% at 50% 50%); }
+.mask-arc-l   { clip-path: circle(var(--r, 75%) at 100% 50%); }  /* arc bulging left  */
+.mask-arc-r   { clip-path: circle(var(--r, 75%) at 0% 50%); }    /* arc bulging right */
+.mask-slant   { clip-path: polygon(0 0, 100% 0, 100% 100%, 18% 100%); }
+
+/* Image crossing the gutter: put the SAME image on both pages of the spread.
+   <div class="spread-img"><img src="…"></div>  on page N (verso) and N+1 (recto). */
+.spread-img {
+  position: absolute; top: var(--b0); bottom: var(--b0);
+  width: calc(2 * var(--pw) + var(--bleed));
+  overflow: hidden;
+}
+.spread-img > img { width: 100%; height: 100%; object-fit: cover; object-position: var(--fx, 50%) var(--fy, 50%); }
+.page:nth-of-type(even) .spread-img { left: var(--b0); }
+
+/* Anything that crosses the gutter (a sketch, a note box's ground): put the SAME element on both pages
+   of the spread with the same inline position in spread coordinates (0 … 2 × page width, from the left
+   page's trim). The right-hand page shifts it back by one page so the halves meet at the spine.
+   <img class="cross" style="left:150mm; top:60mm; width:110mm"> on page N (verso) and N+1 (recto). */
+.cross { position: absolute; }
+.page:nth-of-type(odd) .cross { margin-left: calc(-1 * var(--pw)); }
+.page:nth-of-type(odd)  .spread-img { right: var(--b0); }
+
+/* ---------- 5. Typography ------------------------------------------------- */
+p { text-wrap: pretty; hanging-punctuation: first; orphans: 2; widows: 2; }
+h1, h2, h3, h4, .display { font-family: var(--font-display); font-weight: 700; line-height: 1.02; text-wrap: balance; }
+h1 { font-size: var(--fs-h1); letter-spacing: -0.02em; }
+h2 { font-size: var(--fs-h2); letter-spacing: -0.012em; line-height: 1.06; }
+h3 { font-size: var(--fs-h3); line-height: 1.2; }
+.display { font-size: var(--fs-display); letter-spacing: -0.03em; line-height: .88; }
+.lead { font-size: var(--fs-lead); line-height: 1.34; }
+.small { font-size: var(--fs-small); line-height: 1.38; }
+.caption { font-size: var(--fs-caption); line-height: 1.32; color: var(--ink-2); }
+.label { font-family: var(--font-label); font-size: var(--fs-small); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.num, table { font-variant-numeric: tabular-nums lining-nums; }
+.justify { text-align: justify; hyphens: auto; }
+.hyphenate { hyphens: auto; }
+.nowrap { white-space: nowrap; }
+
+/* vertical flow inside a text block */
+.flow > * + * { margin-top: var(--flow, 0.62em); }
+.flow > h2 + *, .flow > h3 + * { margin-top: 0.45em; }
+.indent > p + p { margin-top: 0; text-indent: 1.1em; }   /* magazine body style */
+
+/* columns */
+.cols-2 { column-count: 2; column-gap: var(--gut); column-fill: auto; }
+.cols-3 { column-count: 3; column-gap: var(--gut); column-fill: auto; }
+.cols-2 > *, .cols-3 > * { break-inside: avoid-column; }
+.cols-2 > p, .cols-3 > p { break-inside: auto; }
+
+/* drop cap (magazine register only) */
+.dropcap::first-letter { float: left; font-family: var(--font-display); font-size: 3.4em; line-height: .82; padding: .06em .08em 0 0; }
+
+/* rules */
+.hair   { border: 0; border-top: .25pt solid var(--rule); }
+.rule   { border: 0; border-top: .6pt solid currentColor; }
+.rule-b { border: 0; border-top: 2pt solid var(--brand); }
+
+/* vertical type (spine titles, section tabs) */
+.vert    { writing-mode: vertical-rl; transform: rotate(180deg); }
+.vert-dn { writing-mode: vertical-rl; }
+
+/* ghost / outline type behind content */
+.ghost   { color: transparent; -webkit-text-stroke: .5pt var(--ghost, currentColor); }
+.ghost-fill { color: var(--ghost, rgba(0,0,0,.06)); }
+
+/* ---------- 6. Tables ------------------------------------------------------ */
+table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); line-height: 1.3; }
+th { text-align: left; font-weight: 600; padding: 1.4mm 1.5mm; border-bottom: .8pt solid var(--ink); }
+td { padding: 1.3mm 1.5mm; border-bottom: .25pt solid var(--rule); vertical-align: top; }
+td.r, th.r { text-align: right; }
+
+/* ---------- 7. Page furniture ----------------------------------------------
+   <footer class="furniture"><span class="run">Section name</span><span class="folio-num">07</span></footer>
+   Positions mirror on recto/verso so folios sit on the outside edge. */
+.furniture {
+  position: absolute; bottom: 8mm;
+  display: flex; gap: 4mm; align-items: baseline;
+  font-family: var(--font-label); font-size: var(--fs-furniture); line-height: 1; letter-spacing: .02em;
+  color: var(--ink-2);
+}
+.page:nth-of-type(odd)  .furniture { left: var(--m-in);  right: var(--m-out); justify-content: space-between; }
+.page:nth-of-type(even) .furniture { left: var(--m-out); right: var(--m-in);  justify-content: space-between; flex-direction: row-reverse; }
+.furniture.on-dark { color: color-mix(in srgb, var(--brand-ink) 78%, transparent); }
+.folio-num { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* section tab on the outer edge */
+.edge-tab { position: absolute; width: 5mm; background: var(--brand); }
+.page:nth-of-type(odd)  .edge-tab { right: var(--b0); }
+.page:nth-of-type(even) .edge-tab { left: var(--b0); }
+
+/* ---------- 8. Draft aids (remove for final) ------------------------------ */
+html.show-grid .live { background-image:
+  repeating-linear-gradient(to right, rgba(255,0,90,.08) 0 calc((100% - (var(--cols) - 1) * var(--gut)) / var(--cols)), transparent 0 calc((100% - (var(--cols) - 1) * var(--gut)) / var(--cols) + var(--gut))); }
+html.show-grid .trim { outline: .3pt dashed rgba(255,0,90,.6); }
+.fpo { outline: .5pt dashed #e0245e; background: repeating-linear-gradient(45deg, #fbe3ea 0 3mm, #fff 0 6mm); }
+.fpo::after { content: "FPO " attr(data-fpo); position: absolute; left: 2mm; top: 2mm; font: 600 7pt/1 system-ui; color: #e0245e; }
+.tk { background: #fff3a8; }   /* [[TK]] — copy still to come */

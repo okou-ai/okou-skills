@@ -1,0 +1,6 @@
+Additional copyright notice(s) transcribed verbatim from bundled font name tables (name ID 0):
+
+© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’.
+
+The original Fontsource package LICENSE is preserved separately, without edits.
+All bundled fonts remain byte-for-byte unchanged and are covered by that full SIL OFL 1.1 license.

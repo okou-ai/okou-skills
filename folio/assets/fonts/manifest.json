@@ -1,0 +1,871 @@
+{
+  "schemaVersion": 1,
+  "createdAtUTC": "2026-11-10T08:24:40.679866+00:00",
+  "networkScope": "https://registry.npmjs.org only; package metadata and pinned tarballs",
+  "fontFormat": "woff2",
+  "subsets": [
+    "latin",
+    "latin-ext"
+  ],
+  "sourceSerifItalicReason": "Included 400 italic for real editorial/body-copy emphasis without synthesized obliques.",
+  "fontBytesUnmodified": true,
+  "fontFileCount": 22,
+  "faceCount": 11,
+  "fontBytes": 290556,
+  "packages": [
+    {
+      "slug": "bodoni-moda",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "integrity": "sha512-Wt2XBCHivYxkTP3ydq/Ax+7VshwsOh/6ayA5om2t+yClCkGwLPj2Mi6OnyMANjyLcqDUWs4rlOHnc8SBLf6/pA==",
+      "shasum": "00f4593c35b29a1d2b9d47a31cefafbe4a1679f7",
+      "metadataFile": "metadata/bodoni-moda.npm.json",
+      "family": "Bodoni Moda",
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal"
+        },
+        {
+          "weight": 500,
+          "style": "normal"
+        },
+        {
+          "weight": 400,
+          "style": "italic"
+        }
+      ],
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "licenseFile": "bodoni-moda/LICENSE",
+      "copyrightFile": "bodoni-moda/COPYRIGHT.txt",
+      "reservedFontNamesObserved": [],
+      "embeddedFamilyNames": [
+        "Bodoni Moda 11pt",
+        "Bodoni Moda 11pt Medium"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "copyrightNotices": [
+        "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)"
+      ]
+    },
+    {
+      "slug": "familjen-grotesk",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "integrity": "sha512-Kh6DXwAtw+kyvCSpiOI3wss/LvOJtJJRl9NTf9YpYpmcpsZ5BGQLTF9nVm9TUmnpLTe4z3iyAcvnLfsQgQR0lg==",
+      "shasum": "99c35ca2136981c3851fc46e400f4834930914b8",
+      "metadataFile": "metadata/familjen-grotesk.npm.json",
+      "family": "Familjen Grotesk",
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal"
+        },
+        {
+          "weight": 500,
+          "style": "normal"
+        },
+        {
+          "weight": 600,
+          "style": "normal"
+        },
+        {
+          "weight": 700,
+          "style": "normal"
+        }
+      ],
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "reservedFontNamesObserved": [],
+      "embeddedFamilyNames": [
+        "Familjen Grotesk",
+        "Familjen Grotesk Medium",
+        "Familjen Grotesk SemiBold"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "copyrightNotices": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ]
+    },
+    {
+      "slug": "big-shoulders-display",
+      "package": "@fontsource/big-shoulders-display",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/big-shoulders-display/-/big-shoulders-display-5.3.0.tgz",
+      "integrity": "sha512-d4+Tcsq/WfoKeqWfB6wFdeNDsSYYnilJbSNNpf5w53MlWrGHAc9YvkAjC6id6PgFDiGaFKsXfP0RFAQtpt0bog==",
+      "shasum": "2bd25c85e5debf3c7d9fc994c4ac31234421e650",
+      "metadataFile": "metadata/big-shoulders-display.npm.json",
+      "family": "Big Shoulders Display",
+      "faces": [
+        {
+          "weight": 800,
+          "style": "normal"
+        },
+        {
+          "weight": 900,
+          "style": "normal"
+        }
+      ],
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "licenseFile": "big-shoulders-display/LICENSE",
+      "copyrightFile": "big-shoulders-display/COPYRIGHT.txt",
+      "reservedFontNamesObserved": [],
+      "embeddedFamilyNames": [
+        "Big Shoulders Display Thin ExtraBold",
+        "Big Shoulders Display Thin Black"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Big Shoulders Display Thin"
+      ],
+      "copyrightNotices": [
+        "Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)"
+      ]
+    },
+    {
+      "slug": "source-serif-4",
+      "package": "@fontsource/source-serif-4",
+      "version": "5.3.1",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/source-serif-4/-/source-serif-4-5.3.1.tgz",
+      "integrity": "sha512-cWcTCXjYYrgF9A67fThVir1VSc0lPEYmwQ6jA4pPt01s2MSCi/maINUcZoCzaqnU8fyUReDO97eGcBUkHgOeug==",
+      "shasum": "5e18891c59e9ca900020d4c362c1f0a66a3e1fd5",
+      "metadataFile": "metadata/source-serif-4.npm.json",
+      "family": "Source Serif 4",
+      "faces": [
+        {
+          "weight": 400,
+          "style": "normal"
+        },
+        {
+          "weight": 400,
+          "style": "italic"
+        }
+      ],
+      "subsets": [
+        "latin",
+        "latin-ext"
+      ],
+      "licenseFile": "source-serif-4/LICENSE",
+      "copyrightFile": "source-serif-4/COPYRIGHT.txt",
+      "reservedFontNamesObserved": [
+        "Source"
+      ],
+      "embeddedFamilyNames": [
+        "Source Serif 4"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "copyrightNotices": [
+        "© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’."
+      ]
+    }
+  ],
+  "files": [
+    {
+      "file": "bodoni-moda/bodoni-moda-latin-ext-400-normal.woff2",
+      "family": "Bodoni Moda",
+      "weight": 400,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "sourceArchivePath": "package/files/bodoni-moda-latin-ext-400-normal.woff2",
+      "sourceCss": "metadata/bodoni-moda/400.css",
+      "sha256": "a774674421465c1b1d81a47523a5260cbb71cb2194f3a56dbf8d2e37352f167a",
+      "bytes": 8360,
+      "license": "OFL-1.1",
+      "licenseFile": "bodoni-moda/LICENSE",
+      "copyrightFile": "bodoni-moda/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedSubfamilyNames": [
+        "Regular"
+      ],
+      "copyright": [
+        "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)"
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": false
+    },
+    {
+      "file": "bodoni-moda/bodoni-moda-latin-400-normal.woff2",
+      "family": "Bodoni Moda",
+      "weight": 400,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "sourceArchivePath": "package/files/bodoni-moda-latin-400-normal.woff2",
+      "sourceCss": "metadata/bodoni-moda/400.css",
+      "sha256": "e2863d3bbe2e094f1ce98053ee3c6200cfa35f82b9f4cc6fd95fbaead4125d4f",
+      "bytes": 14528,
+      "license": "OFL-1.1",
+      "licenseFile": "bodoni-moda/LICENSE",
+      "copyrightFile": "bodoni-moda/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedSubfamilyNames": [
+        "Regular"
+      ],
+      "copyright": [
+        "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)"
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": false
+    },
+    {
+      "file": "bodoni-moda/bodoni-moda-latin-ext-500-normal.woff2",
+      "family": "Bodoni Moda",
+      "weight": 500,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "sourceArchivePath": "package/files/bodoni-moda-latin-ext-500-normal.woff2",
+      "sourceCss": "metadata/bodoni-moda/500.css",
+      "sha256": "b50625079c130893bf657f92b9a8ef280bfe5069c8d9c81fc4557e2ddf985e7b",
+      "bytes": 8524,
+      "license": "OFL-1.1",
+      "licenseFile": "bodoni-moda/LICENSE",
+      "copyrightFile": "bodoni-moda/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Bodoni Moda 11pt Medium"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedSubfamilyNames": [
+        "Medium"
+      ],
+      "copyright": [
+        "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)"
+      ],
+      "verifiedOS2Weight": 500,
+      "verifiedItalic": false
+    },
+    {
+      "file": "bodoni-moda/bodoni-moda-latin-500-normal.woff2",
+      "family": "Bodoni Moda",
+      "weight": 500,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "sourceArchivePath": "package/files/bodoni-moda-latin-500-normal.woff2",
+      "sourceCss": "metadata/bodoni-moda/500.css",
+      "sha256": "ec5b785abb85d087b5101a74671933b1bab5f96d9d85f868cc33964e69758748",
+      "bytes": 15020,
+      "license": "OFL-1.1",
+      "licenseFile": "bodoni-moda/LICENSE",
+      "copyrightFile": "bodoni-moda/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Bodoni Moda 11pt Medium"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedSubfamilyNames": [
+        "Medium"
+      ],
+      "copyright": [
+        "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)"
+      ],
+      "verifiedOS2Weight": 500,
+      "verifiedItalic": false
+    },
+    {
+      "file": "bodoni-moda/bodoni-moda-latin-ext-400-italic.woff2",
+      "family": "Bodoni Moda",
+      "weight": 400,
+      "style": "italic",
+      "subset": "latin-ext",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "sourceArchivePath": "package/files/bodoni-moda-latin-ext-400-italic.woff2",
+      "sourceCss": "metadata/bodoni-moda/400-italic.css",
+      "sha256": "cb470612c9244bc10d6c514e8573a852864440a627813ef5282c851e7350818e",
+      "bytes": 9196,
+      "license": "OFL-1.1",
+      "licenseFile": "bodoni-moda/LICENSE",
+      "copyrightFile": "bodoni-moda/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedSubfamilyNames": [
+        "Italic"
+      ],
+      "copyright": [
+        "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)"
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": true
+    },
+    {
+      "file": "bodoni-moda/bodoni-moda-latin-400-italic.woff2",
+      "family": "Bodoni Moda",
+      "weight": 400,
+      "style": "italic",
+      "subset": "latin",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "sourceArchivePath": "package/files/bodoni-moda-latin-400-italic.woff2",
+      "sourceCss": "metadata/bodoni-moda/400-italic.css",
+      "sha256": "783fd966b8ebb26034e892767b877c475d375d9227f5f5476d05ad5529d18232",
+      "bytes": 16552,
+      "license": "OFL-1.1",
+      "licenseFile": "bodoni-moda/LICENSE",
+      "copyrightFile": "bodoni-moda/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Bodoni Moda 11pt"
+      ],
+      "embeddedSubfamilyNames": [
+        "Italic"
+      ],
+      "copyright": [
+        "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)"
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": true
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-ext-400-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 400,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-ext-400-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/400.css",
+      "sha256": "ab2fee5640ba8bd1b84438b3f9e28143282f1c2fbbb164f3955502d464970966",
+      "bytes": 9952,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Regular"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": false
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-400-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 400,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-400-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/400.css",
+      "sha256": "3d6a8c01c6c02ddf0978cba8290f58bd44cec83cc6e22af4b906238313073a45",
+      "bytes": 11700,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Regular"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": false
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-ext-500-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 500,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-ext-500-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/500.css",
+      "sha256": "f87841d89023be1b305e90cac3e5a566819dd9f1b441b27dfd8b56791140d280",
+      "bytes": 10176,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk Medium"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedSubfamilyNames": [
+        "Medium"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 500,
+      "verifiedItalic": false
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-500-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 500,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-500-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/500.css",
+      "sha256": "490e3a95d21896ee66c4d7888b1f8e2e4413c1e910a97f197ad1690491ef5f40",
+      "bytes": 12056,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk Medium"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedSubfamilyNames": [
+        "Medium"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 500,
+      "verifiedItalic": false
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-ext-600-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 600,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-ext-600-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/600.css",
+      "sha256": "5585819b723734cc75b8fbb85d26e065eadcd8b4ca5d6cec47a8c724e75e279f",
+      "bytes": 10180,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk SemiBold"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedSubfamilyNames": [
+        "SemiBold"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 600,
+      "verifiedItalic": false
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-600-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 600,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-600-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/600.css",
+      "sha256": "4becdcd6d182685a5bc7f961e49f8991538cd42acabf4ffbba72654f26743620",
+      "bytes": 12108,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk SemiBold"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedSubfamilyNames": [
+        "SemiBold"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 600,
+      "verifiedItalic": false
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-ext-700-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 700,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-ext-700-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/700.css",
+      "sha256": "b5a1d616993b7eaac99b6f37e247069907a5dd5893d806b4a010e879c406aa0a",
+      "bytes": 10080,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Bold"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 700,
+      "verifiedItalic": false
+    },
+    {
+      "file": "familjen-grotesk/familjen-grotesk-latin-700-normal.woff2",
+      "family": "Familjen Grotesk",
+      "weight": 700,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "sourceArchivePath": "package/files/familjen-grotesk-latin-700-normal.woff2",
+      "sourceCss": "metadata/familjen-grotesk/700.css",
+      "sha256": "e1ebaed103ed999431a836736057a12e8e2d2b1e97d79c751cd1cb75776d5bee",
+      "bytes": 11820,
+      "license": "OFL-1.1",
+      "licenseFile": "familjen-grotesk/LICENSE",
+      "copyrightFile": "familjen-grotesk/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Familjen Grotesk"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Bold"
+      ],
+      "copyright": [
+        "Copyright 2021 The Familjen Grotesk Project Authors (https://github.com/Familjen-Sthlm/Familjen-Grotesk)"
+      ],
+      "verifiedOS2Weight": 700,
+      "verifiedItalic": false
+    },
+    {
+      "file": "big-shoulders-display/big-shoulders-display-latin-ext-800-normal.woff2",
+      "family": "Big Shoulders Display",
+      "weight": 800,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/big-shoulders-display",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/big-shoulders-display/-/big-shoulders-display-5.3.0.tgz",
+      "sourceArchivePath": "package/files/big-shoulders-display-latin-ext-800-normal.woff2",
+      "sourceCss": "metadata/big-shoulders-display/800.css",
+      "sha256": "8b17f670d85945c981898a93860de2a2ed4c1b12d6f036e7fbd0ee6154ca6288",
+      "bytes": 12784,
+      "license": "OFL-1.1",
+      "licenseFile": "big-shoulders-display/LICENSE",
+      "copyrightFile": "big-shoulders-display/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Big Shoulders Display Thin ExtraBold"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Big Shoulders Display Thin"
+      ],
+      "embeddedSubfamilyNames": [
+        "ExtraBold"
+      ],
+      "copyright": [
+        "Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)"
+      ],
+      "verifiedOS2Weight": 800,
+      "verifiedItalic": false
+    },
+    {
+      "file": "big-shoulders-display/big-shoulders-display-latin-800-normal.woff2",
+      "family": "Big Shoulders Display",
+      "weight": 800,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/big-shoulders-display",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/big-shoulders-display/-/big-shoulders-display-5.3.0.tgz",
+      "sourceArchivePath": "package/files/big-shoulders-display-latin-800-normal.woff2",
+      "sourceCss": "metadata/big-shoulders-display/800.css",
+      "sha256": "088f423f09136bc96b5a7cc7232d671a1ad06a5ff1cf90cd1e24a8d9809d471c",
+      "bytes": 14556,
+      "license": "OFL-1.1",
+      "licenseFile": "big-shoulders-display/LICENSE",
+      "copyrightFile": "big-shoulders-display/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Big Shoulders Display Thin ExtraBold"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Big Shoulders Display Thin"
+      ],
+      "embeddedSubfamilyNames": [
+        "ExtraBold"
+      ],
+      "copyright": [
+        "Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)"
+      ],
+      "verifiedOS2Weight": 800,
+      "verifiedItalic": false
+    },
+    {
+      "file": "big-shoulders-display/big-shoulders-display-latin-ext-900-normal.woff2",
+      "family": "Big Shoulders Display",
+      "weight": 900,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/big-shoulders-display",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/big-shoulders-display/-/big-shoulders-display-5.3.0.tgz",
+      "sourceArchivePath": "package/files/big-shoulders-display-latin-ext-900-normal.woff2",
+      "sourceCss": "metadata/big-shoulders-display/900.css",
+      "sha256": "1984eb9a8150aede7701d0b37283010e051d87e35e5666397bd27a58018b8b0f",
+      "bytes": 12472,
+      "license": "OFL-1.1",
+      "licenseFile": "big-shoulders-display/LICENSE",
+      "copyrightFile": "big-shoulders-display/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Big Shoulders Display Thin Black"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Big Shoulders Display Thin"
+      ],
+      "embeddedSubfamilyNames": [
+        "Black"
+      ],
+      "copyright": [
+        "Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)"
+      ],
+      "verifiedOS2Weight": 900,
+      "verifiedItalic": false
+    },
+    {
+      "file": "big-shoulders-display/big-shoulders-display-latin-900-normal.woff2",
+      "family": "Big Shoulders Display",
+      "weight": 900,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/big-shoulders-display",
+      "version": "5.3.0",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/big-shoulders-display/-/big-shoulders-display-5.3.0.tgz",
+      "sourceArchivePath": "package/files/big-shoulders-display-latin-900-normal.woff2",
+      "sourceCss": "metadata/big-shoulders-display/900.css",
+      "sha256": "65f2c368034258382e77672f083d9f42e805d23d557432517a1b5a4f75c21f1a",
+      "bytes": 14016,
+      "license": "OFL-1.1",
+      "licenseFile": "big-shoulders-display/LICENSE",
+      "copyrightFile": "big-shoulders-display/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Big Shoulders Display Thin Black"
+      ],
+      "embeddedTypographicFamilyNames": [
+        "Big Shoulders Display Thin"
+      ],
+      "embeddedSubfamilyNames": [
+        "Black"
+      ],
+      "copyright": [
+        "Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)"
+      ],
+      "verifiedOS2Weight": 900,
+      "verifiedItalic": false
+    },
+    {
+      "file": "source-serif-4/source-serif-4-latin-ext-400-normal.woff2",
+      "family": "Source Serif 4",
+      "weight": 400,
+      "style": "normal",
+      "subset": "latin-ext",
+      "package": "@fontsource/source-serif-4",
+      "version": "5.3.1",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/source-serif-4/-/source-serif-4-5.3.1.tgz",
+      "sourceArchivePath": "package/files/source-serif-4-latin-ext-400-normal.woff2",
+      "sourceCss": "metadata/source-serif-4/400.css",
+      "sha256": "78ff74ea29d0cc5594ff9efd5c0a30911691b89e9021e7bcf118b95e285e007f",
+      "bytes": 17844,
+      "license": "OFL-1.1",
+      "licenseFile": "source-serif-4/LICENSE",
+      "copyrightFile": "source-serif-4/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Source Serif 4"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Regular"
+      ],
+      "copyright": [
+        "© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’."
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": false
+    },
+    {
+      "file": "source-serif-4/source-serif-4-latin-400-normal.woff2",
+      "family": "Source Serif 4",
+      "weight": 400,
+      "style": "normal",
+      "subset": "latin",
+      "package": "@fontsource/source-serif-4",
+      "version": "5.3.1",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/source-serif-4/-/source-serif-4-5.3.1.tgz",
+      "sourceArchivePath": "package/files/source-serif-4-latin-400-normal.woff2",
+      "sourceCss": "metadata/source-serif-4/400.css",
+      "sha256": "02194deb92d3975dd30e11a3824a1f1db32b48c93654e60560cb81ce8e7b5f95",
+      "bytes": 20088,
+      "license": "OFL-1.1",
+      "licenseFile": "source-serif-4/LICENSE",
+      "copyrightFile": "source-serif-4/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Source Serif 4"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Regular"
+      ],
+      "copyright": [
+        "© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’."
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": false
+    },
+    {
+      "file": "source-serif-4/source-serif-4-latin-ext-400-italic.woff2",
+      "family": "Source Serif 4",
+      "weight": 400,
+      "style": "italic",
+      "subset": "latin-ext",
+      "package": "@fontsource/source-serif-4",
+      "version": "5.3.1",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/source-serif-4/-/source-serif-4-5.3.1.tgz",
+      "sourceArchivePath": "package/files/source-serif-4-latin-ext-400-italic.woff2",
+      "sourceCss": "metadata/source-serif-4/400-italic.css",
+      "sha256": "d06253118f11f443e5799217c5ecaf55f68a1681115fa3a1d947e8ca288e7b8c",
+      "bytes": 18452,
+      "license": "OFL-1.1",
+      "licenseFile": "source-serif-4/LICENSE",
+      "copyrightFile": "source-serif-4/COPYRIGHT.txt",
+      "unicodeRange": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF",
+      "embeddedFamilyNames": [
+        "Source Serif 4"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Italic"
+      ],
+      "copyright": [
+        "© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’."
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": true
+    },
+    {
+      "file": "source-serif-4/source-serif-4-latin-400-italic.woff2",
+      "family": "Source Serif 4",
+      "weight": 400,
+      "style": "italic",
+      "subset": "latin",
+      "package": "@fontsource/source-serif-4",
+      "version": "5.3.1",
+      "sourceTarball": "https://registry.npmjs.org/@fontsource/source-serif-4/-/source-serif-4-5.3.1.tgz",
+      "sourceArchivePath": "package/files/source-serif-4-latin-400-italic.woff2",
+      "sourceCss": "metadata/source-serif-4/400-italic.css",
+      "sha256": "882b7c150c29f29d4f8daae6b8dcae8662aac7f28ca34b34615305154136ecfd",
+      "bytes": 20092,
+      "license": "OFL-1.1",
+      "licenseFile": "source-serif-4/LICENSE",
+      "copyrightFile": "source-serif-4/COPYRIGHT.txt",
+      "unicodeRange": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD",
+      "embeddedFamilyNames": [
+        "Source Serif 4"
+      ],
+      "embeddedTypographicFamilyNames": [],
+      "embeddedSubfamilyNames": [
+        "Italic"
+      ],
+      "copyright": [
+        "© 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’."
+      ],
+      "verifiedOS2Weight": 400,
+      "verifiedItalic": true
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "pinnedAtUTC": "2026-11-10T08:21:02.486417+00:00",
+  "packages": [
+    {
+      "slug": "bodoni-moda",
+      "package": "@fontsource/bodoni-moda",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/bodoni-moda/-/bodoni-moda-5.3.0.tgz",
+      "integrity": "sha512-Wt2XBCHivYxkTP3ydq/Ax+7VshwsOh/6ayA5om2t+yClCkGwLPj2Mi6OnyMANjyLcqDUWs4rlOHnc8SBLf6/pA==",
+      "shasum": "00f4593c35b29a1d2b9d47a31cefafbe4a1679f7",
+      "metadataFile": "metadata/bodoni-moda.npm.json"
+    },
+    {
+      "slug": "familjen-grotesk",
+      "package": "@fontsource/familjen-grotesk",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/familjen-grotesk/-/familjen-grotesk-5.3.0.tgz",
+      "integrity": "sha512-Kh6DXwAtw+kyvCSpiOI3wss/LvOJtJJRl9NTf9YpYpmcpsZ5BGQLTF9nVm9TUmnpLTe4z3iyAcvnLfsQgQR0lg==",
+      "shasum": "99c35ca2136981c3851fc46e400f4834930914b8",
+      "metadataFile": "metadata/familjen-grotesk.npm.json"
+    },
+    {
+      "slug": "big-shoulders-display",
+      "package": "@fontsource/big-shoulders-display",
+      "version": "5.3.0",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/big-shoulders-display/-/big-shoulders-display-5.3.0.tgz",
+      "integrity": "sha512-d4+Tcsq/WfoKeqWfB6wFdeNDsSYYnilJbSNNpf5w53MlWrGHAc9YvkAjC6id6PgFDiGaFKsXfP0RFAQtpt0bog==",
+      "shasum": "2bd25c85e5debf3c7d9fc994c4ac31234421e650",
+      "metadataFile": "metadata/big-shoulders-display.npm.json"
+    },
+    {
+      "slug": "source-serif-4",
+      "package": "@fontsource/source-serif-4",
+      "version": "5.3.1",
+      "license": "OFL-1.1",
+      "tarball": "https://registry.npmjs.org/@fontsource/source-serif-4/-/source-serif-4-5.3.1.tgz",
+      "integrity": "sha512-cWcTCXjYYrgF9A67fThVir1VSc0lPEYmwQ6jA4pPt01s2MSCi/maINUcZoCzaqnU8fyUReDO97eGcBUkHgOeug==",
+      "shasum": "5e18891c59e9ca900020d4c362c1f0a66a3e1fd5",
+      "metadataFile": "metadata/source-serif-4.npm.json"
+    }
+  ]
+}

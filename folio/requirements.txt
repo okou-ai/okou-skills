@@ -1,0 +1,4 @@
+# Verified with Python 3.12.3. No downloads/installations occur inside the scripts.
+playwright==1.65.0
+pypdfium2==5.15.2
+Pillow==12.3.0

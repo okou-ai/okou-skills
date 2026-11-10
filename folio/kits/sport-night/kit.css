@@ -1,0 +1,139 @@
+/* MODIFIED BY OKOU: sanitized adaptation of Folio at 6dd90e0019a39539d6ac6543e53c8437a3a8e13f; not a statement of legal clearance.
+   Font roles retained; unavailable commercial aliases replaced with kit-recommended free families.
+   Upstream layout rules, dimensions, layering, and palette are otherwise unchanged. */
+
+:root {
+  --paper: #070B14; --ink: #F2F4F8; --ink-2: #AEB8CC; --brand: #2F5BEA; --brand-ink: #FFFFFF; --accent: #FF6A1A; --support: #F2F4F8;
+  --night: #070B14; --dark-ink: #070B14; --dark-ink-2: #4A5368;
+  --mast: 'Big Shoulders Display', sans-serif;
+  --sans: 'Familjen Grotesk', sans-serif;
+  --font-display: var(--mast); --font-label: var(--sans); --font-body: var(--sans);
+  --fs-body: 10pt; --lh-body: 1.55; --fs-furniture: 6.5pt;
+}
+p, ul, ol, h1, h2 { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+.fill > img, .ph > img, .sg > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.night { background: var(--night); }
+.paperlight { background: #F2F4F8; }
+.gr { opacity: .42; } .sg { opacity: .3; } .glow { opacity: .75; } .news { opacity: .06; }
+.sg { left: var(--b0); top: var(--b0); width: calc(2 * var(--pw) + 2 * var(--bleed)); height: calc(var(--ph) + 2 * var(--bleed)); }
+.furniture { top: 8mm; bottom: auto; letter-spacing: .14em; text-transform: uppercase; }
+.device, .streak, .spark, .c-person, .c-phone, .stars, .back-robot, .back-logo, .band11, .lightfield { position: absolute; height: auto; }
+.kicker { position: absolute; font: 700 7.5pt/1 var(--sans); letter-spacing: .26em; text-transform: uppercase; color: var(--accent); }
+.kicker.ink { color: var(--dark-ink-2); }
+.bigword { position: absolute; font: 900 170pt/.8 var(--mast); text-transform: uppercase; letter-spacing: -.005em; color: var(--ink); }
+.bigword.ink { color: var(--dark-ink); }
+.vword { position: absolute; writing-mode: vertical-rl; font: 900 140pt/.82 var(--mast); text-transform: uppercase; letter-spacing: .01em; color: var(--accent); white-space: nowrap; }
+.head { position: absolute; font: 900 60pt/.88 var(--mast); text-transform: uppercase; color: var(--ink); }
+.lead { position: absolute; font: 600 14pt/1.35 var(--sans); color: var(--ink); }
+.body { position: absolute; font: 400 10pt/1.55 var(--sans); color: var(--ink-2); }
+
+/* 01 cover: ground, glow, newsprint, masthead, streak, person, phone, spark, lines */
+.c-top, .c-url { position: absolute; top: 12mm; font: 700 7.5pt/1 var(--sans); letter-spacing: .26em; text-transform: uppercase; color: var(--ink); }
+.c-top { left: 14mm; } .c-url { right: 14mm; }
+.mast { position: absolute; left: 11mm; top: 26mm; font: 900 150pt/.8 var(--mast); text-transform: uppercase; letter-spacing: -.012em; color: var(--ink); }
+.streak { left: 12mm; top: 26mm; width: 156mm; }
+.c-person { left: -40mm; bottom: var(--b0); width: 290mm; }
+.c-phone { left: 163mm; top: 16mm; width: 44mm; }
+.spark { left: 152mm; top: 64mm; width: 26mm; }
+.c-vert { position: absolute; right: 7mm; top: 118mm; writing-mode: vertical-rl; font: 800 26pt/1 var(--mast); letter-spacing: .08em; text-transform: uppercase; color: #FFFFFF; white-space: nowrap; }
+.c-lines { position: absolute; left: 20mm; top: 186mm; width: 30mm; }
+.cl-n { font: 900 84pt/.82 var(--mast); color: var(--accent); }
+.cl-t { font: 700 8pt/1.35 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); margin-top: 2mm; }
+.c-tag { position: absolute; left: var(--b0); width: calc(150mm + var(--bleed)); bottom: 18mm; height: 20mm; background: var(--brand); }
+.c-tag p { position: absolute; left: calc(14mm + var(--bleed)); top: 4.5mm; font: 800 26pt/1 var(--mast); text-transform: uppercase; letter-spacing: .02em; color: #FFFFFF; white-space: nowrap; }
+
+/* gutter boxes: one blue .cross ground per spread, text 9mm+ from the fold */
+.gbox { background: var(--brand); }
+.gb-left, .gb-right { position: absolute; color: #FFFFFF; }
+.gb-k { font: 700 7pt/1 var(--sans); letter-spacing: .26em; text-transform: uppercase; }
+.gb-say { font: 600 13.5pt/1.3 var(--sans); margin-top: 3mm; }
+.gb-small { font: 400 9pt/1.35 var(--sans); margin-top: 1.5mm; }
+.gb-name { font: 800 17pt/1.05 var(--mast); text-transform: uppercase; }
+.gb-23 { left: 96mm; top: 206mm; width: 234mm; height: 62mm; }
+.gbl-23 { left: 106mm; top: 214mm; width: 90mm; }
+.gb-67 { left: 40mm; top: 200mm; width: 290mm; height: 64mm; }
+.gbl-67 { left: 50mm; top: 208mm; width: 146mm; }
+.gb-1011 { left: 30mm; top: 206mm; width: 300mm; height: 66mm; }
+.gbl-1011 { left: 40mm; top: 215mm; width: 150mm; }
+.dir { display: flex; align-items: center; gap: 4mm; margin-top: 3mm; }
+.dir-ph { width: 21mm; height: 21mm; }
+
+/* 02 contents */
+.v-inside { left: 8mm; top: 16mm; font-size: 150pt; }
+.toc { position: absolute; left: 72mm; top: 30mm; width: 125mm; }
+.toc li { display: grid; grid-template-columns: 24mm 1fr; column-gap: 3mm; margin-bottom: 8mm; }
+.toc .n { grid-row: span 2; font: 900 44pt/.85 var(--mast); color: var(--accent); }
+.toc .t { font: 800 24pt/1 var(--mast); text-transform: uppercase; color: var(--ink); }
+.toc .d { font: 400 9pt/1.35 var(--sans); color: var(--ink-2); margin-top: 1.5mm; }
+
+/* 03 studio */
+.h-studio { left: 17mm; top: 22mm; width: 176mm; }
+
+/* 04–05 build: flowing band across the spread */
+.band { left: var(--b0); width: calc(2 * var(--pw) + 2 * var(--bleed)); top: 208mm; height: 84mm; }
+.v-build { left: 186mm; top: 92mm; font-size: 30pt; }
+.times { position: absolute; left: 16mm; top: 223mm; width: 180mm; display: flex; gap: 8mm; }
+.tm { flex: 1; }
+.tm-n { font: 900 50pt/.9 var(--mast); color: #FFFFFF; }
+.tm-t { font: 600 11pt/1.25 var(--sans); color: #FFFFFF; margin-top: 2mm; }
+.seven { position: absolute; left: 17mm; top: 22mm; width: 50mm; }
+.sv-n { font: 900 120pt/.8 var(--mast); color: var(--accent); }
+.sv-t { font: 400 10pt/1.35 var(--sans); color: var(--ink-2); margin-top: 3mm; }
+.svc { position: absolute; }
+.s { margin-bottom: 9mm; }
+.s-name { font: 800 22pt/1 var(--mast); text-transform: uppercase; letter-spacing: .01em; color: var(--ink); }
+.s-text { font: 400 10pt/1.45 var(--sans); color: var(--ink-2); margin-top: 2mm; }
+.lg { display: flex; align-items: center; gap: 5mm; margin-top: 3mm; }
+.lg img { height: 6mm; width: 6mm; }
+.lg img.wide { width: 11mm; }
+.support { position: absolute; left: 30mm; top: 222mm; width: 160mm; display: grid; grid-template-columns: auto 1fr; column-gap: 6mm; row-gap: 4mm; align-items: baseline; }
+.sp-n { font: 900 34pt/.9 var(--mast); text-transform: uppercase; color: #FFFFFF; }
+.sp-t { font: 600 11pt/1.3 var(--sans); color: #FFFFFF; }
+
+/* 06–07 systems */
+.v-sys { left: 8mm; top: 16mm; font-size: 140pt; }
+.stack { position: absolute; left: 17mm; top: 52mm; width: 176mm; }
+.row { display: grid; grid-template-columns: 28mm 1fr; align-items: center; margin-bottom: 6mm; }
+.r-k { font: 700 7.5pt/1 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--dark-ink-2); }
+.r-items { display: flex; flex-wrap: wrap; gap: 3mm 6mm; }
+.it { display: flex; align-items: center; gap: 2mm; }
+.it img { height: 7mm; width: 7mm; }
+.it img.wide { width: 12mm; }
+.it p { font: 800 16pt/1 var(--mast); text-transform: uppercase; color: var(--dark-ink); }
+.ind { position: absolute; left: 17mm; top: 136mm; width: 176mm; columns: 2; column-gap: 8mm; }
+.ind li { font: 500 12pt/1.6 var(--sans); color: var(--dark-ink); }
+.light .gb-right, .light .gb-left { color: #FFFFFF; }
+.light .furniture { color: var(--dark-ink-2); }
+
+/* 08–09 design and media */
+.robo { left: 136mm; top: 98mm; width: 120mm; height: auto; }
+.lightfield { left: var(--b0); width: calc(100% + 2 * var(--bleed)); bottom: var(--b0); height: calc(95mm + var(--bleed)); }
+.pr-list { position: absolute; left: 70mm; top: 222mm; }
+.pr-list li { font: 800 24pt/1.1 var(--mast); text-transform: uppercase; color: var(--dark-ink); }
+
+/* 10–11 proof */
+.huge-n { position: absolute; left: 10mm; top: 22mm; font: 900 420pt/.78 var(--mast); color: var(--accent); }
+.proof-t { position: absolute; left: 13mm; top: 150mm; width: 150mm; font: 800 30pt/1 var(--mast); text-transform: uppercase; color: var(--ink); }
+.stars { left: 13mm; top: 180mm; width: 62mm; }
+.pr-k { position: absolute; left: 17mm; top: 30mm; font: 800 30pt/1 var(--mast); text-transform: uppercase; color: var(--ink); }
+.pr-n { position: absolute; left: 15mm; top: 42mm; font: 900 120pt/.85 var(--mast); color: var(--ink); }
+.band11 { left: var(--b0); width: calc(100% + 2 * var(--bleed)); top: 108mm; height: 92mm; }
+.b11 { position: absolute; left: 17mm; top: 120mm; }
+.sm-a { font: 900 50pt/.9 var(--mast); text-transform: uppercase; color: #FFFFFF; }
+.sm-b { font: 600 16pt/1.2 var(--sans); color: #FFFFFF; margin-top: 3mm; }
+.steps { display: flex; gap: 14mm; margin-top: 7mm; }
+.st-n { font: 900 30pt/.9 var(--mast); color: #FFFFFF; }
+.st-w { font: 800 24pt/1 var(--mast); text-transform: uppercase; color: #FFFFFF; margin-top: 1.5mm; }
+
+/* 12 back cover */
+.back-robot { left: 104mm; top: 58mm; width: 138mm; }
+.back-logo { left: 16mm; top: 20mm; width: 16mm; }
+.back-mast { position: absolute; left: 16mm; top: 42mm; font: 900 60pt/.9 var(--mast); text-transform: uppercase; color: var(--ink); }
+.back-sign { position: absolute; left: 16mm; top: 72mm; font: 900 44pt/.92 var(--mast); text-transform: uppercase; color: var(--accent); }
+.contacts { position: absolute; left: 16mm; top: 128mm; width: 90mm; }
+.contacts .c { margin-bottom: 6mm; }
+.contacts .k { font: 700 6.8pt/1 var(--sans); letter-spacing: .26em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.8mm; }
+.contacts .v { font: 500 11pt/1.35 var(--sans); color: var(--ink); }
+.credits { position: absolute; bottom: 12mm; width: 85mm; font: 400 7.5pt/1.45 var(--sans); color: var(--ink-2); }
+.c1 { left: 16mm; } .c2 { left: 109mm; }

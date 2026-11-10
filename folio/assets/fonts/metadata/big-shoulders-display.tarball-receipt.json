@@ -1,0 +1,97 @@
+{
+  "slug": "big-shoulders-display",
+  "package": "@fontsource/big-shoulders-display",
+  "version": "5.3.0",
+  "license": "OFL-1.1",
+  "tarball": "https://registry.npmjs.org/@fontsource/big-shoulders-display/-/big-shoulders-display-5.3.0.tgz",
+  "integrity": "sha512-d4+Tcsq/WfoKeqWfB6wFdeNDsSYYnilJbSNNpf5w53MlWrGHAc9YvkAjC6id6PgFDiGaFKsXfP0RFAQtpt0bog==",
+  "shasum": "2bd25c85e5debf3c7d9fc994c4ac31234421e650",
+  "metadataFile": "metadata/big-shoulders-display.npm.json",
+  "fetchedAtUTC": "2026-11-10T08:21:54.553746+00:00",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Date": "Tue, 10 Nov 2026 08:21:54 GMT",
+    "Content-Type": "application/octet-stream",
+    "Content-Length": "608282",
+    "Connection": "close",
+    "CF-Ray": "a583a576f86ceb93-SEA",
+    "CF-Cache-Status": "HIT",
+    "Accept-Ranges": "bytes",
+    "Access-Control-Allow-Origin": "*",
+    "Age": "2586083",
+    "Cache-Control": "public, must-revalidate, max-age=31557600",
+    "ETag": "\"92aa84a0b917043ac9c45673228ada60\"",
+    "Last-Modified": "Sun, 19 Jul 2026 03:36:56 GMT",
+    "Server": "cloudflare",
+    "set-cookie": "__cf_bm=vTNioZy.A0QMY_p9zxWY5QtjjbyRRnuCUFn2VjB.Q40-1794298914.3992774-1.0.1.1-r.i2gqy4J7hSEkzT3Wt4aAGZBsT88DVaUso2FHf7DyFnQmYJXGTBRtLWuVT.hsgo.jnQUYp2fjOPCeVdLD1Cn97NmIESHuG32hysoAMfs4Y2WIwm9I.RzmxtecFACWQY; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=npmjs.org; Expires=Tue, 10 Nov 2026 08:51:54 GMT"
+  },
+  "tarballBytes": 608282,
+  "tarballSha256": "2b1193236ad6a1e801780541347a6d1b46bd11e866098edf492a87fdccc8849c",
+  "sha512IntegrityVerified": true,
+  "sha1Verified": true,
+  "archiveReading": "tarfile extractfile only; no filesystem extraction",
+  "retainedFiles": [
+    {
+      "archivePath": "package/package.json",
+      "path": "metadata/big-shoulders-display/package.json",
+      "bytes": 1193,
+      "sha256": "78c947ba87539392af9bf072c96ace63a99eb9b6fcd68c5ff4b5988a22e2d5f9"
+    },
+    {
+      "archivePath": "package/metadata.json",
+      "path": "metadata/big-shoulders-display/metadata.json",
+      "bytes": 585,
+      "sha256": "40b5a3c0236106890467e3bbd9005e1e158019e3e63b3845faf00805e3cfc621"
+    },
+    {
+      "archivePath": "package/unicode.json",
+      "path": "metadata/big-shoulders-display/unicode.json",
+      "bytes": 526,
+      "sha256": "9ab29cea1c9be4e6d675e736782bd827b8311ac4bb29f5ff9cbab921402f7a5e"
+    },
+    {
+      "archivePath": "package/LICENSE",
+      "path": "big-shoulders-display/LICENSE",
+      "bytes": 4314,
+      "sha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3"
+    },
+    {
+      "archivePath": "package/800.css",
+      "path": "metadata/big-shoulders-display/800.css",
+      "bytes": 1512,
+      "sha256": "1ec84ef93bc518942c7cb832d90d7e7c038482dd53bc99c6c0848cbbdc92f291"
+    },
+    {
+      "archivePath": "package/files/big-shoulders-display-latin-800-normal.woff2",
+      "path": "big-shoulders-display/big-shoulders-display-latin-800-normal.woff2",
+      "bytes": 14556,
+      "sha256": "088f423f09136bc96b5a7cc7232d671a1ad06a5ff1cf90cd1e24a8d9809d471c"
+    },
+    {
+      "archivePath": "package/files/big-shoulders-display-latin-ext-800-normal.woff2",
+      "path": "big-shoulders-display/big-shoulders-display-latin-ext-800-normal.woff2",
+      "bytes": 12784,
+      "sha256": "8b17f670d85945c981898a93860de2a2ed4c1b12d6f036e7fbd0ee6154ca6288"
+    },
+    {
+      "archivePath": "package/900.css",
+      "path": "metadata/big-shoulders-display/900.css",
+      "bytes": 1512,
+      "sha256": "0f38c79eb39bcd2a4e570ba24a8c0b2125c666d9ca81c3b05acb3a9faca86b31"
+    },
+    {
+      "archivePath": "package/files/big-shoulders-display-latin-900-normal.woff2",
+      "path": "big-shoulders-display/big-shoulders-display-latin-900-normal.woff2",
+      "bytes": 14016,
+      "sha256": "65f2c368034258382e77672f083d9f42e805d23d557432517a1b5a4f75c21f1a"
+    },
+    {
+      "archivePath": "package/files/big-shoulders-display-latin-ext-900-normal.woff2",
+      "path": "big-shoulders-display/big-shoulders-display-latin-ext-900-normal.woff2",
+      "bytes": 12472,
+      "sha256": "1984eb9a8150aede7701d0b37283010e051d87e35e5666397bd27a58018b8b0f"
+    }
+  ],
+  "archiveMemberCount": 102,
+  "archivePathsValidated": true
+}

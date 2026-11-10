@@ -1,0 +1,18 @@
+{
+  "requestedUrl": "https://registry.npmjs.org/%40fontsource%2Fbig-shoulders-display/latest",
+  "fetchedAtUTC": "2026-11-10T08:21:02.378326+00:00",
+  "httpStatus": 200,
+  "responseHeaders": {
+    "Date": "Tue, 10 Nov 2026 08:21:02 GMT",
+    "Content-Type": "application/json",
+    "Content-Length": "2279",
+    "Connection": "close",
+    "CF-Ray": "a583a430ec2723ab-SEA",
+    "CF-Cache-Status": "DYNAMIC",
+    "Access-Control-Allow-Origin": "*",
+    "Server": "cloudflare",
+    "set-cookie": "__cf_bm=wXgkxgMKcOM9t6y7IJzXWhBF11nTk46lC1pkgZBprY0-1794298862.2253811-1.0.1.1-edMwH9BCTO25V0QRir0Nk243bJz8MyjSxrw7GlFqxjm9JIpJEsZ8PeNG93Qy1ESQLMZePH36EKi.lLm7IuOJMMXrIX3labJ8KTOpqVWDL9rCVGOaMSDE4W2DEma4N9o3; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=npmjs.org; Expires=Tue, 10 Nov 2026 08:51:02 GMT"
+  },
+  "metadataFile": "big-shoulders-display.npm.json",
+  "metadataSha256": "9d938c97201d501ff3509fb3a42c3fef0d6dbf4b08aefc9a5b3ed1a55745bd24"
+}

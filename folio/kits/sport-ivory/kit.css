@@ -1,0 +1,172 @@
+/* MODIFIED BY OKOU: sanitized adaptation of Folio at 6dd90e0019a39539d6ac6543e53c8437a3a8e13f; not a statement of legal clearance.
+   Font roles retained; unavailable commercial aliases replaced with kit-recommended free families.
+   Upstream layout rules, dimensions, layering, and palette are otherwise unchanged. */
+
+:root {
+  --paper: #F6F1E7; --ink: #2B1D16; --ink-2: #5E4E43;
+  --brand: #3B2A20; --brand-ink: #F6F1E7; --tint: #EFE7DA; --accent: #C9A96E; --support: #7D8B6A;
+  --mast: 'Big Shoulders Display', 'Bodoni Moda', sans-serif;
+  --display: 'Bodoni Moda', serif;
+  --label: 'Familjen Grotesk', sans-serif;
+  --body: 'Source Serif 4', serif;
+  --font-display: var(--display); --font-label: var(--label); --font-body: var(--body);
+  --fs-body: 10.5pt; --lh-body: 1.5; --fs-furniture: 6.5pt;
+}
+p, ul, ol, h1, h2 { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+.fill > img, .ph > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.espresso { background: var(--brand); }
+.paper { opacity: .22; }
+.shade { opacity: .2; }
+.shade-l { opacity: .1; }
+.sg { left: var(--b0); top: var(--b0); width: calc(2 * var(--pw) + 2 * var(--bleed)); height: calc(var(--ph) + 2 * var(--bleed)); }
+.sg > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.grain { opacity: .12; }
+.furniture { top: 8mm; bottom: auto; letter-spacing: .14em; text-transform: uppercase; }
+.kicker { position: absolute; font: 600 7.5pt/1 var(--label); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-2); }
+.kicker.on-dark { color: var(--accent); }
+.big-word { position: absolute; font: 900 170pt/.8 var(--mast); text-transform: uppercase; letter-spacing: -.005em; color: var(--ink); }
+.big-word.on-dark { color: var(--accent); }
+.body { font: 400 10.5pt/1.5 var(--body); color: var(--ink); }
+.sk-cross45, .sk-cross89, .st-sketch, .m-sketch, .c-person, .stars { position: absolute; height: auto; }
+
+/* services lists */
+.svc { position: absolute; }
+.s { margin-bottom: 11mm; }
+.s-name { font: 800 24pt/1 var(--mast); text-transform: uppercase; letter-spacing: .01em; color: var(--ink); }
+.s-text { font: 400 11pt/1.45 var(--body); color: var(--ink); margin-top: 2.5mm; }
+
+/* gutter boxes: one champagne .cross ground per spread, text in each page's own blocks, 9mm+ from the fold */
+.gbox { background: var(--accent); }
+.gb-left, .gb-right { position: absolute; color: var(--brand); }
+.gb-k { font: 600 7pt/1 var(--label); letter-spacing: .24em; text-transform: uppercase; }
+.gb-say { font: italic 400 17pt/1.2 var(--display); margin-top: 3mm; }
+.gb-small { font: 400 9pt/1.35 var(--label); margin-top: 1.5mm; }
+.gb-name { font: 400 15pt/1.15 var(--display); margin-top: 3mm; }
+.gb-name:first-child { margin-top: 0; }
+
+/* 01 cover */
+.c-the { position: absolute; left: 14mm; top: 9mm; font: italic 400 24pt/1 var(--display); color: var(--brand-ink); }
+.mast { position: absolute; left: 8mm; right: 8mm; top: 25mm; text-align: center; font: 900 162pt/.8 var(--mast);
+  text-transform: uppercase; letter-spacing: -.01em; color: var(--accent); }
+.c-field { position: absolute; left: 118mm; right: var(--b0); top: 112mm; bottom: var(--b0); background: var(--support); }
+.c-photo { left: 138mm; top: 82mm; width: 64mm; height: 44mm; }
+.c-person { left: 50mm; bottom: var(--b0); height: 262mm; width: auto; }
+.c-lines { position: absolute; left: 14mm; top: 116mm; width: 40mm; color: var(--brand-ink); }
+.cl-n { font: 900 76pt/.85 var(--mast); color: var(--accent); }
+.cl-n2 { margin-top: 9mm; }
+.cl-t { font: 600 7.5pt/1.4 var(--label); letter-spacing: .14em; text-transform: uppercase; margin-top: 2mm; }
+.cl-big { font: 800 28pt/.95 var(--mast); text-transform: uppercase; margin-top: 12mm; }
+.c-foot, .c-url { position: absolute; left: 14mm; font: 600 7.5pt/1 var(--label); letter-spacing: .2em; text-transform: uppercase; color: var(--brand-ink); }
+.c-foot { bottom: 19mm; } .c-url { bottom: 13mm; }
+
+/* 02 contents */
+.p-inside .big-word { left: 13mm; top: 22mm; font-size: 150pt; }
+.toc { position: absolute; left: 13mm; top: 86mm; width: 150mm; }
+.toc li { display: grid; grid-template-columns: 30mm 1fr; column-gap: 4mm; margin-bottom: 7mm; }
+.toc .n { grid-row: span 2; font: 900 40pt/.85 var(--mast); color: var(--support); }
+.toc .t { font: 400 20pt/1.1 var(--display); color: var(--ink); }
+.toc .d { font: 400 8.5pt/1.35 var(--label); letter-spacing: .03em; color: var(--ink-2); margin-top: 1mm; }
+.gb-23 { left: 96mm; top: 212mm; width: 234mm; height: 58mm; }
+.gbl-23 { left: 106mm; top: 221mm; width: 90mm; }
+
+/* 03 the studio */
+.k-studio { left: 17mm; top: 22mm; }
+.h-studio { position: absolute; left: 17mm; top: 30mm; width: 176mm; font: 900 64pt/.86 var(--mast); text-transform: uppercase; color: var(--ink); }
+.studio-text { position: absolute; left: 17mm; top: 86mm; width: 88mm; }
+.lead { font: 400 16pt/1.3 var(--display); color: var(--ink); }
+.studio-text .body { margin-top: 5mm; }
+.st-photo { left: 114mm; top: 86mm; width: 79mm; height: 98mm; }
+.st-sketch { left: 30mm; top: 146mm; width: 64mm; }
+.gbp-23 { left: 12mm; top: 219mm; width: 40mm; height: 44mm; }
+.gbr-23 { left: 58mm; top: 221mm; width: 56mm; }
+
+/* 04–05 build */
+.bw-build { left: 13mm; top: 22mm; font-size: 200pt; }
+.b-photo-a { left: 13mm; top: 90mm; width: 78mm; height: 106mm; }
+.b-photo-b { left: 62mm; top: 160mm; width: 84mm; height: 56mm; }
+.b-lead { position: absolute; left: 102mm; top: 92mm; width: 94mm; font: 400 20pt/1.2 var(--display); color: var(--ink); }
+.b-body { position: absolute; left: 102mm; top: 128mm; width: 80mm; }
+.sk-cross45 { left: 152mm; top: 150mm; width: 120mm; }
+.seven { position: absolute; left: 17mm; top: 22mm; width: 52mm; }
+.sv-n { font: 900 120pt/.8 var(--mast); color: var(--support); }
+.sv-t { font: italic 400 13pt/1.25 var(--display); color: var(--ink); margin-top: 3mm; }
+.svc-build { left: 78mm; top: 22mm; width: 115mm; }
+.svc-build .s { margin-bottom: 8mm; }
+.lg { display: flex; align-items: center; gap: 5mm; margin-top: 3mm; }
+.lg img { height: 6mm; width: 6mm; }
+.sage-band { position: absolute; left: var(--b0); right: var(--b0); top: 236mm; bottom: var(--b0); background: var(--support);
+  display: flex; gap: 6mm; padding: 10mm calc(13mm + var(--bleed)) 0 calc(17mm + var(--bleed)); }
+.tm { flex: 1; }
+.tm-n { font: 900 54pt/.85 var(--mast); color: var(--brand-ink); }
+.tm-t { font: italic 400 18pt/1.1 var(--display); color: var(--ink); margin-top: 2mm; }
+
+/* 06–07 systems (centre spread) */
+.bw-sys { left: 13mm; top: 22mm; font-size: 150pt; }
+.svc-sys { left: 13mm; top: 92mm; width: 120mm; }
+.svc-sys .s-name { color: var(--accent); }
+.svc-sys .s-text { color: var(--brand-ink); }
+.gb-67 { left: 40mm; top: 200mm; width: 290mm; height: 62mm; }
+.gbl-67 { left: 50mm; top: 209mm; width: 146mm; }
+.k-stack { left: 17mm; top: 22mm; }
+.stack { position: absolute; left: 17mm; top: 32mm; width: 176mm; }
+.row { display: grid; grid-template-columns: 28mm 1fr; align-items: center; margin-bottom: 6mm; }
+.r-items { display: flex; flex-wrap: wrap; gap: 3mm 6mm; }
+.it { display: flex; align-items: center; gap: 2mm; }
+.it img { height: 7mm; width: 7mm; }
+.it p { font: 800 17pt/1 var(--mast); text-transform: uppercase; color: var(--ink); }
+.r-k { font: 600 7.5pt/1 var(--label); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-2); }
+.r-v { font: 800 24pt/1.05 var(--mast); text-transform: uppercase; color: var(--ink); }
+.k-ind { left: 17mm; top: 124mm; }
+.ind { position: absolute; left: 17mm; top: 133mm; width: 176mm; columns: 2; column-gap: 8mm; }
+.ind li { font: 400 15pt/1.55 var(--display); color: var(--ink); }
+.gbp-67 { left: 12mm; top: 208mm; width: 42mm; height: 46mm; }
+.gbr-67 { left: 60mm; top: 209mm; width: 56mm; }
+
+/* 08–09 design and media */
+.bw-design { left: 13mm; top: 22mm; font-size: 170pt; }
+.svc-design { left: 13mm; top: 96mm; width: 120mm; }
+.d-field { position: absolute; left: var(--b0); top: 150mm; width: calc(96mm + var(--bleed)); height: 96mm; background: var(--support); }
+.d-photo { left: 40mm; top: 164mm; width: 100mm; height: 68mm; }
+.sk-cross89 { left: 140mm; top: 196mm; width: 130mm; }
+.bw-media { left: 17mm; top: 22mm; font-size: 170pt; }
+.svc-media { left: 17mm; top: 96mm; width: 100mm; }
+.m-sketch { left: 122mm; top: 92mm; width: 74mm; }
+.print { position: absolute; left: 76mm; top: 164mm; width: 117mm; }
+.print .kicker { position: static; margin-bottom: 4mm; }
+.pr-list li { font: 800 30pt/1.08 var(--mast); text-transform: uppercase; color: var(--ink); }
+
+/* 10–11 proof */
+.k-proof { left: 13mm; top: 22mm; }
+.huge-n { position: absolute; left: 10mm; top: 28mm; font: 900 420pt/.78 var(--mast); color: var(--accent); }
+.proof-t { position: absolute; left: 13mm; top: 150mm; width: 150mm; font: 800 30pt/1 var(--mast); text-transform: uppercase; color: var(--brand-ink); }
+.stars { left: 13mm; top: 178mm; width: 62mm; }
+.gb-1011 { left: 30mm; top: 206mm; width: 300mm; height: 64mm; }
+.gbl-1011 { left: 40mm; top: 215mm; width: 150mm; }
+.k-price { left: 17mm; top: 22mm; }
+.pr-k { position: absolute; left: 17mm; top: 30mm; font: 800 30pt/1 var(--mast); text-transform: uppercase; color: var(--ink); }
+.pr-n { position: absolute; left: 15mm; top: 42mm; font: 900 120pt/.85 var(--mast); color: var(--ink); }
+.pr-body { position: absolute; left: 17mm; top: 90mm; width: 110mm; }
+.sage-mid { position: absolute; left: var(--b0); right: var(--b0); top: 114mm; height: 86mm; background: var(--support);
+  padding: 14mm calc(13mm + var(--bleed)) 0 calc(17mm + var(--bleed)); }
+.sm-a { font: 900 54pt/.9 var(--mast); text-transform: uppercase; color: var(--brand-ink); }
+.sm-b { font: italic 400 24pt/1.1 var(--display); color: var(--ink); margin-top: 4mm; }
+.steps { display: flex; gap: 14mm; margin-top: 9mm; }
+.st-n { font: 900 32pt/.9 var(--mast); color: var(--ink); }
+.st-w { font: 800 26pt/1 var(--mast); text-transform: uppercase; color: var(--brand-ink); margin-top: 1.5mm; }
+.gbp-1011 { left: 12mm; top: 213mm; width: 40mm; height: 48mm; }
+.gbr-1011 { left: 12mm; top: 212mm; width: 104mm; }
+.dir { display: flex; align-items: center; gap: 4mm; margin-top: 3mm; }
+.dir-ph { width: 21mm; height: 21mm; }
+.dir .gb-name { margin-top: 0; }
+
+/* 12 back cover */
+.back-mast { position: absolute; left: 13mm; right: 13mm; top: 24mm; font: 900 96pt/.85 var(--mast); text-transform: uppercase; color: var(--accent); }
+.back-tag { position: absolute; left: 13mm; top: 60mm; font: 600 8pt/1 var(--label); letter-spacing: .3em; text-transform: uppercase; color: var(--brand-ink); }
+.contacts { position: absolute; left: 13mm; right: 13mm; top: 84mm; display: grid; grid-template-columns: 1fr 1fr; column-gap: 10mm; row-gap: 9mm; color: var(--brand-ink); }
+.contacts .k { font: 600 6.8pt/1 var(--label); letter-spacing: .26em; text-transform: uppercase; color: var(--accent); margin-bottom: 2.5mm; }
+.contacts .v { font: 400 14pt/1.3 var(--display); }
+.back-field { position: absolute; left: var(--b0); right: var(--b0); top: 196mm; height: 56mm; background: var(--support); }
+.bf-a { position: absolute; left: calc(13mm + var(--bleed)); right: calc(13mm + var(--bleed)); top: 14mm; font: 900 44pt/.95 var(--mast); text-transform: uppercase; color: var(--brand-ink); }
+.credits { position: absolute; left: 13mm; right: 13mm; bottom: 12mm; columns: 2; column-gap: 10mm; font: 400 8pt/1.4 var(--label); letter-spacing: .02em; color: var(--brand-ink); }
+.it img.wide { width: 12mm; height: 7mm; }

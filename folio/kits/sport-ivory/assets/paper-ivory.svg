@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" preserveAspectRatio="none">
+<!-- Original procedural texture by Okou; no source imagery. mode=paper; seed=117. -->
+<defs><filter id="noise" x="0" y="0" width="100%" height="100%">
+<feTurbulence type="fractalNoise" baseFrequency=".035 .42" numOctaves="3" seed="117" stitchTiles="stitch"/>
+<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .333 .333 .334 0 0"/>
+</filter><mask id="texture"><rect width="512" height="512" fill="white" filter="url(#noise)"/></mask></defs>
+<rect width="512" height="512" fill="#2B1D16" mask="url(#texture)"/>
+</svg>
