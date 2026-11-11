@@ -253,13 +253,25 @@ Generate one piece from the `SKILL.md` you just wrote rather than from the
 prompt in your notes, and check it still matches the approved pictures.
 Publish only after that.
 
+The approved pictures are what the template is shown by: the catalog covers
+the style with the first and offers the rest beside it, and the preview shows
+them all. The source is only what the style was read from, and a screenshot or
+a page can look nothing like what the style draws. Copy them into their own
+directory, named so filename order is the order to show them in — the
+strongest first:
+
 ```bash
+mkdir -p examples
+cp <slug>/ref-*.png examples/
 npx --yes --package="${CLI_PKG_URL}" okou user-template publish \
   --title "<user-visible style name>" \
   --kind illustration \
   --source <the primary reference> \
+  --examples examples \
   --package <slug>
 ```
+
+`--examples` takes PNGs only, at most 12.
 
 `--source` takes PNG, JPEG, BMP or WebP. Convert anything else — AVIF, HEIC,
 GIF, TIFF, JPEG 2000, Netpbm — and pass the PNG:
