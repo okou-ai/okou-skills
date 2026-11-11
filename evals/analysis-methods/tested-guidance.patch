@@ -41,6 +41,14 @@
 @@ -80 +80 @@
 -| Content profit ROI on content investment | (Revenue - Other included operating costs - Content investment) / Content investment | Profit return on the stated investment denominator; do not subtract the same cost twice |
 +| Content profit ROI | (Revenue - Included operating costs - Content investment) / Content investment | Profit return under an explicit cost and attribution basis; do not subtract the same cost twice |
+--- a/stats-methods/SKILL.md
++++ b/stats-methods/SKILL.md
+@@ -135 +135 @@
+-3. **Legitimate extremes**: Retain them and preserve the quantity being estimated. If the question concerns a mean or total (such as ARPU or total revenue), keep that metric and add median/IQR or other distribution summaries to describe typical experience rather than replacing the target metric
++3. **Legitimate extremes**: Retain but switch to robust summaries (median, IQR)
+@@ -208 +208 @@
+-- Under 20 true nulls and valid level-0.05 tests, the expected false-positive count is at most one; it equals one only if every test's actual Type I error rate is exactly 0.05. Conservative discrete tests can yield a lower expectation; this is not a guarantee for any particular set of results
++- Under 20 true nulls and valid tests at alpha = 0.05, the expected false-positive count is one; this is not a guarantee for any particular set of tests
 --- a/research-synthesis/SKILL.md
 +++ b/research-synthesis/SKILL.md
 @@ -59 +59 @@

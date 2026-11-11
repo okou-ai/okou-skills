@@ -132,7 +132,7 @@ Never strip outliers automatically. Follow this decision process:
 
 1. **Diagnose**: Is this a recording error, a legitimately extreme observation, or a sign of a separate population?
 2. **Errors**: Verify against source definitions before correcting or excluding (e.g., an impossible age; an epoch timestamp may be valid or a missing-value sentinel)
-3. **Legitimate extremes**: Retain but switch to robust summaries (median, IQR)
+3. **Legitimate extremes**: Retain them and preserve the quantity being estimated. If the question concerns a mean or total (such as ARPU or total revenue), keep that metric and add median/IQR or other distribution summaries to describe typical experience rather than replacing the target metric
 4. **Distinct populations**: Analyze separately (e.g., enterprise accounts vs. self-serve)
 
 **Document every exclusion**: "We set aside 47 records (0.3% of the dataset) with order values above $50K; these bulk enterprise transactions are covered in a separate section."
@@ -205,7 +205,7 @@ Whenever a correlation surfaces, explicitly evaluate:
 ### The Multiple Testing Trap
 
 Running many tests inflates false positives:
-- Under 20 true nulls and valid tests at alpha = 0.05, the expected false-positive count is one; this is not a guarantee for any particular set of tests
+- Under 20 true nulls and valid level-0.05 tests, the expected false-positive count is at most one; it equals one only if every test's actual Type I error rate is exactly 0.05. Conservative discrete tests can yield a lower expectation; this is not a guarantee for any particular set of results
 - If you explored numerous segments before finding the "interesting" one, acknowledge that
 - For confirmatory families, use a suitable multiplicity procedure (e.g., Holm/Bonferroni for family-wise error or an appropriate false-discovery-rate method). Reporting the number of tests does not itself control error. Label post hoc exploration and seek independent confirmation
 
