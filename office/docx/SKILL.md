@@ -25,14 +25,8 @@ description: >
 
 # Word documents
 
-When developing findings, comparisons, recommendations or a plan, read
-[Analysis](../references/analysis.md) before drafting the content. It applies
-to short briefs too. Extraction, translation, formatting and limited edits
-that do not require new analysis use the routes below directly.
-
-For new or substantially rewritten prose, read
-[Writing](../references/writing.md) before drafting titles and sections. Keep
-internal analysis questions separate from the reader-facing outline.
+Follow the shared [Office content guidance](../SKILL.md#content-guidance),
+then select the Word workflow below.
 
 ## Setup
 

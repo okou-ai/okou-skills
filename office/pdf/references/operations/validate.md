@@ -5,16 +5,8 @@ merge. Verify requested content, page count/order, source values and applicable
 [appearance rules](../common/presentation.md). Package or parser success does not
 establish publication compliance or correct visual output.
 
-For analytical content, reconcile the exact PDF's main figures, source
-interpretations, assumptions and recommendations to the checked workings under
-[Analysis](../../../references/analysis.md#accept-the-findings-then-check-the-saved-document).
-Check accompanying prose and qualifications as well as tables and charts;
-successful parsing or rendering does not establish that the argument holds.
-
-For created or rewritten prose, review the saved title and heading outline under
-[Writing](../../../references/writing.md#review-the-saved-wording-as-well-as-its-appearance).
-Check that headings describe their sections in the reader's register and retain
-the evidence's qualifications; parsing and rendering do not assess wording.
+Apply the shared [Office content review](../../../SKILL.md#content-review)
+to the saved deliverable, then run the PDF-specific checks below.
 
 For a user-requested rendered preview or visual review, create `preview/`, run:
 

@@ -5,6 +5,9 @@ separately. No single scanner proves business accuracy or presentation quality.
 For read-only work, never save or recalculate the original without permission.
 For creation/editing, use disposable copies for application and mutation tests.
 
+Apply the shared [Office content review](../../../SKILL.md#content-review)
+to the saved deliverable alongside the workbook-specific checks below.
+
 - [Static checks](#1-static-package-and-formula-checks)
 - [Application and calculation](#2-application-and-calculation-checks)
 - [Presentation](#3-presentation-and-scenario-review)

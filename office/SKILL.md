@@ -6,6 +6,8 @@ license: MIT
 
 # Office files
 
+## Content guidance
+
 Route by the user's requested operation, not analytical statements in the source
 being edited. For extraction, translation, consolidation of established findings,
 formatting, conversion or a limited edit, use the format route directly and skip
@@ -19,9 +21,11 @@ the analytical work; the format routes below cover the file. Read only the
 references needed for the actual work.
 
 When creating or substantially rewriting reader-facing prose, read
-[Writing](references/writing.md) for informative titles, audience-appropriate
-wording and review of the saved text. This applies independently of whether new
-analysis is needed; preserve the scope of limited edits and supplied templates.
+[Writing](references/writing.md) for structure, headings and explanatory prose.
+This includes workbook narratives and applies independently of whether new
+analysis is needed. Preserve the scope of limited edits and supplied templates.
+
+## File workflow
 
 Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
 to the selected subdirectory before running its examples; it is a shell variable,
@@ -42,18 +46,30 @@ within the session. Presentation profiles are formatting guidance, not substanti
 research, policy, medical or legal expertise. Package checks do not certify
 compliance with a publication or government standard.
 
+## Content review
+
+Check the exact saved deliverable against the applicable content guidance:
+[analytical review](references/analysis.md#accept-the-findings-then-check-the-saved-document)
+for conclusions and supporting work, and
+[editorial review](references/writing.md#review-the-completed-text) for newly
+authored or substantially rewritten prose. For limited edits, check the affected
+content and necessary context. Use the selected format's validation for file
+structure, rendering and application behavior; it does not establish content quality.
+
 ## Package map
 
-The top-level `office` package is the single discovery entry. Each format's
-`SKILL.md` routes to references grouped by responsibility:
+The top-level `office` entry owns shared content routing and review, with its
+guides in `references/`. Each format's `SKILL.md` owns setup, presentation profiles
+and file operations, with references grouped by responsibility:
 
 - `common/`: reusable data/presentation conventions.
 - `domains/`: applicable business or named-format requirements.
 - `operations/`: the authorized create/read/edit/fill/validate workflow.
 - `implementation/`: library, package, schema and environment details.
 
-All reference guides are linked directly from the relevant format entry; load
-only those needed. Scripts, templates and assets retain their existing paths.
+Shared guides are linked above; format-specific guides are linked from their
+format entry. Load only those needed. Scripts, templates and assets retain their
+existing paths.
 A format route does not authorize unrelated edits, redesign or extra deliverables.
 
 The implementations are adapted from MiniMax's MIT-licensed skills. Original

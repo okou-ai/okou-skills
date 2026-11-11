@@ -6,10 +6,8 @@ license: MIT
 
 # Excel workbooks
 
-When interpreting results, comparing alternatives or recommending a plan, read
-[Analysis](../references/analysis.md) before drafting the findings. For a
-specified calculation, extraction, formatting or limited formula repair, use
-the applicable routes below without expanding the assignment.
+Follow the shared [Office content guidance](../SKILL.md#content-guidance),
+then select the workbook workflow below.
 
 Select **both an operation and a business scenario** before authoring. Choosing
 CREATE or EDIT does not finish scenario selection. User requirements and an
@@ -35,9 +33,6 @@ common guidance, applicable scenario, and operation needed for the task.
 - For new reader-facing analytical reports/dashboards or authorized chart changes,
   read [analytical charts](references/common/charts.md) during planning. Choose charts for
   the question, not a fixed count; preserve data-only and narrow-edit scope.
-- When creating or substantially rewriting narrative findings, recommendations
-  or report headings, read [Writing](../references/writing.md). Apply it to those
-  passages without renaming source fields or redesigning unrelated sheets.
 
 ## Layer 2 — Business scenario
 

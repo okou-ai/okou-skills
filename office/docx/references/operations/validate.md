@@ -4,16 +4,8 @@ Run on the completed document and repeat affected checks after edits. Existing
 files remain untouched unless their modification is authorized. Set `SKILL_DIR`
 as described in [the entry point](../../SKILL.md#setup).
 
-For analytical content, reconcile the saved document's main figures, source
-interpretations, assumptions and recommendations to the checked workings under
-[Analysis](../../../references/analysis.md#accept-the-findings-then-check-the-saved-document).
-Check accompanying prose and qualifications as well as tables. A structural or
-business-rule validation result does not perform this review.
-
-For created or rewritten prose, review the saved title and heading outline under
-[Writing](../../../references/writing.md#review-the-saved-wording-as-well-as-its-appearance).
-Check that headings describe their sections in the reader's register and retain
-the evidence's qualifications; package checks do not assess wording.
+Apply the shared [Office content review](../../../SKILL.md#content-review)
+to the saved deliverable, then run the DOCX-specific checks below.
 
 ## Package and business checks
 
