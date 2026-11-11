@@ -10,6 +10,11 @@ interpretations, assumptions and recommendations to the checked workings under
 Check accompanying prose and qualifications as well as tables. A structural or
 business-rule validation result does not perform this review.
 
+For created or rewritten prose, review the saved title and heading outline under
+[Writing](../../../references/writing.md#review-the-saved-wording-as-well-as-its-appearance).
+Check that headings describe their sections in the reader's register and retain
+the evidence's qualifications; package checks do not assess wording.
+
 ## Package and business checks
 
 ```bash

@@ -18,6 +18,11 @@ findings. Use it even for a short memo or a task with supplied sources. It cover
 the analytical work; the format routes below cover the file. Read only the
 references needed for the actual work.
 
+When creating or substantially rewriting reader-facing prose, read
+[Writing](references/writing.md) for informative titles, audience-appropriate
+wording and review of the saved text. This applies independently of whether new
+analysis is needed; preserve the scope of limited edits and supplied templates.
+
 Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
 to the selected subdirectory before running its examples; it is a shell variable,
 not a literal directory named `SKILL_DIR`. Do not assume the current working

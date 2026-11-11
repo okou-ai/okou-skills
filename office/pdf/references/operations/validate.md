@@ -11,6 +11,11 @@ interpretations, assumptions and recommendations to the checked workings under
 Check accompanying prose and qualifications as well as tables and charts;
 successful parsing or rendering does not establish that the argument holds.
 
+For created or rewritten prose, review the saved title and heading outline under
+[Writing](../../../references/writing.md#review-the-saved-wording-as-well-as-its-appearance).
+Check that headings describe their sections in the reader's register and retain
+the evidence's qualifications; parsing and rendering do not assess wording.
+
 For a user-requested rendered preview or visual review, create `preview/`, run:
 
 ```bash

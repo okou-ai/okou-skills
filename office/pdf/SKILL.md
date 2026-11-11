@@ -23,6 +23,10 @@ When developing findings, comparisons, recommendations or a plan, read
 to short briefs too. Extraction, translation, formatting and limited edits
 that do not require new analysis use the routes below directly.
 
+For new or substantially rewritten prose, read
+[Writing](../references/writing.md) before drafting titles and sections. Keep
+internal analysis questions separate from the reader-facing outline.
+
 ## 1. Common requirements
 
 Set `SKILL_DIR` to the absolute directory containing this file, not the task's
