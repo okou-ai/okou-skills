@@ -19,10 +19,14 @@ instructions. Load only the references that operation needs.
 For deliverables that require developing or revising analytical conclusions,
 read [Analysis](references/analysis.md).
 
-When drafting or revising document prose, match the tone, formality, and
-terminology to the intended reader and use. Give headings a specific subject
-or supported finding so readers can scan the document. Use question headings
-when they match how readers look for answers, as in an FAQ.
+When drafting or revising prose, use a professional register that suits the
+document type and the reader's expectations. Use standard domain terms and
+natural phrasing in the requested language. Before delivery, reread the title,
+headings at every level, and key paragraphs in the finished draft. Replace
+attention-grabbing questions, slogan-like wording, and drafting labels with
+headings and phrasing customary for this type of document. Read the full text
+for natural expression in the requested language, paying particular attention
+to the wording of domain terms.
 
 Honor the supplied template and limit edits to the requested scope. When
 delivering Word and PDF versions of the same document, render the PDF from the
