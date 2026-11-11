@@ -59,6 +59,16 @@ To add a new skill or improve an existing one:
 3. Include a `SKILL.md` file with tested usage examples.
 4. Submit a pull request.
 
+## Infographics
+
+[infographic](infographic/SKILL.md) turns text and data into static infographics
+through editable AntV rendering or Okou image generation. It includes six starter
+layouts, exact-copy checks, and a render–review–deliver workflow.
+
+```bash
+/plugin install infographic@vm0-skills
+```
+
 ## People search
 
 [people-search](people-search/SKILL.md) finds and verifies professional candidates

@@ -1,0 +1,22 @@
+infographic compare-hierarchy-left-right-circle-node-plain-text
+data
+  title Two ways to collaborate
+  desc Compare the same three criteria on both sides
+  compares
+    - label Live
+      children
+        - label Timing · Same time
+        - label Feedback · Immediate
+        - label Record · Capture notes
+    - label Async
+      children
+        - label Timing · Own schedule
+        - label Feedback · Delayed
+        - label Record · Written by default
+theme
+  colorBg #F8F5F3
+  colorPrimary #3F6655
+  palette #3F6655 #537A93
+  base
+    text
+      font-family sans-serif

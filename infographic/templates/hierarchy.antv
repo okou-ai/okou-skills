@@ -1,0 +1,24 @@
+infographic hierarchy-tree-tech-style-rounded-rect-node
+design
+  title default
+data
+  title How the team is organized
+  desc Parent–child membership, not a measure of importance
+  root
+    label Product team
+    children
+      - label Research
+        children
+          - label Interviews
+          - label Synthesis
+      - label Delivery
+        children
+          - label Design
+          - label Engineering
+theme
+  colorBg #F8F5F3
+  colorPrimary #3F6655
+  palette #3F6655 #537A93 #A66F45
+  base
+    text
+      font-family sans-serif

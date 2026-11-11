@@ -1,0 +1,13 @@
+infographic list-grid-badge-card
+data
+  title A minimal real diagram
+  lists
+    - label Alpha
+      desc A first verified item.
+    - label Beta
+      desc A second verified item.
+theme
+  colorBg #FFFFFF
+  base
+    text
+      font-family sans-serif

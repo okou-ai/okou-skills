@@ -153,6 +153,15 @@
       ]
     },
     {
+      "name": "infographic",
+      "description": "Create polished static infographics with editable AntV rendering or illustration-led Okou image generation, including starter layouts and visual QA.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./infographic"
+      ]
+    },
+    {
       "name": "people-search",
       "description": "Research people through multiple discovery channels and data tools, check original sources, deduplicate findings, and follow up on useful leads.",
       "source": "./",

@@ -1,0 +1,29 @@
+infographic list-grid-badge-card
+design
+  structure
+    type list-grid
+    columns 3
+    gap 24
+data
+  title Six questions for a useful brief
+  desc Independent checks, not a ranked score
+  lists
+    - label Audience
+      desc Who needs this information?
+    - label Message
+      desc What should the reader remember?
+    - label Evidence
+      desc Which facts support the message?
+    - label Structure
+      desc What order makes the idea clear?
+    - label Action
+      desc What should the reader do next?
+    - label Constraints
+      desc What must remain unchanged?
+theme
+  colorBg #F8F5F3
+  colorPrimary #3F6655
+  palette #3F6655 #537A93 #A66F45 #865F7F #6A7A45 #8B6556
+  base
+    text
+      font-family sans-serif

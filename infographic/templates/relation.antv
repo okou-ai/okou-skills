@@ -1,0 +1,36 @@
+infographic relation-dagre-flow-lr-compact-card
+data
+  title How evidence reaches a decision
+  desc Arrows show information flow, not causal proof
+  nodes
+    - id research
+      label User research
+      desc Understand needs.
+    - id metrics
+      label Product metrics
+      desc Observe behavior.
+    - id analysis
+      label Analysis
+      desc Connect the evidence.
+    - id review
+      label Independent review
+      desc Challenge assumptions.
+    - id decision
+      label Decision
+      desc Choose the next action.
+  relations
+    - from research
+      to analysis
+    - from metrics
+      to analysis
+    - from analysis
+      to decision
+    - from review
+      to decision
+theme
+  colorBg #F8F5F3
+  colorPrimary #537A93
+  palette #3F6655 #537A93 #A66F45 #865F7F
+  base
+    text
+      font-family sans-serif

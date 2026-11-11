@@ -1,0 +1,20 @@
+infographic sequence-steps-badge-card
+data
+  title From idea to delivery
+  desc Four steps with a clear handoff at each stage
+  sequences
+    - label Define
+      desc Agree on the problem and success criteria.
+    - label Explore
+      desc Compare options against the same criteria.
+    - label Build
+      desc Create and test the selected approach.
+    - label Deliver
+      desc Share the result and collect feedback.
+theme
+  colorBg #F8F5F3
+  colorPrimary #3F6655
+  palette #3F6655 #537A93 #A66F45 #865F7F
+  base
+    text
+      font-family sans-serif

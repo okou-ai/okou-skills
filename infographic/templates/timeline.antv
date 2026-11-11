@@ -1,0 +1,29 @@
+infographic sequence-timeline-simple
+design
+  structure
+    type sequence-timeline
+    showStepLabels false
+    gap 24
+  item
+    type simple
+    showIcon false
+    width 340
+data
+  title A project in four milestones
+  desc Example dates — replace them with verified events
+  sequences
+    - label 2027-01 · Kickoff
+      desc Confirm scope and responsibilities.
+    - label 2027-02 · Prototype
+      desc Test the central idea with users.
+    - label 2027-03 · Pilot
+      desc Validate a small real-world rollout.
+    - label 2027-04 · Launch
+      desc Release and review the outcomes.
+theme
+  colorBg #F8F5F3
+  colorPrimary #537A93
+  palette #3F6655 #537A93 #A66F45 #865F7F
+  base
+    text
+      font-family sans-serif
