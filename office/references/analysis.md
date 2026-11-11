@@ -1,28 +1,22 @@
 # Develop and check analytical conclusions
 
-After the initial findings, investigate the unresolved question most likely to
-change the conclusion. Choose the relevant checks and use the results to revise
-the judgment.
+Start with the answer the evidence supports. Pursue an open question when
+resolving it could change the conclusion or the reader's decision. Once the
+requested judgment is supported at the needed precision, proceed to the
+deliverable. If a material gap remains after checking the available evidence,
+give the supported part of the answer and identify the missing evidence.
 
-- **Explain a change.** Reconcile the total to the components that drove or
-  offset it. Separate scale, rate, and mix when the data support it. State the
-  baseline.
-- **Evaluate a cause.** Look for evidence that distinguishes the proposed
-  mechanism from a plausible alternative. If the evidence cannot distinguish
-  them, report the measured contribution or association and leave attribution open.
-- **Compare source results.** Check the original table and surrounding text for
-  the metric, population, period, configuration, and data split. Keep values tied
-  to their original conditions and flag discrepancies the sources leave unresolved.
-- **Test a recommendation.** Compare the strongest viable alternative on the
-  same assumptions and state the trade-off. For a plan, recompute fixed and
-  variable costs separately and check capacity, timing, and dependencies under
-  the same scenario. If an uncertain input could reverse the choice, calculate the
-  threshold where it changes when the data allow.
-- **Check material calculations.** Recompute from the source or reconcile against
-  an independent control. Check units, denominators, input types, and the records
-  included in the calculation.
+When a conclusion hinges on a figure, recompute it from the source or reconcile
+it against an independent total. Check the units, denominator, and scope. For
+comparisons, verify that definitions and conditions align, and explain any
+difference that affects interpretation.
 
-Stop when further work within scope is unlikely to change the judgment. If a
-material gap remains, state what the conclusion depends on and what evidence
-would resolve it. Check that key figures, interpretations, and qualifications in
-the saved deliverable match the verified analysis.
+If component data are available, reconcile a change to its measured contributions.
+Check whether the evidence distinguishes a proposed cause from a plausible
+alternative before attributing the change to it. When a recommendation hinges
+on an uncertain assumption, test a plausible value that could change the choice.
+Compare options on the same assumptions and calculate the point at which the
+choice changes when the inputs support it.
+
+Carry verified figures and limits that affect the conclusion into the final
+deliverable.

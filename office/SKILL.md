@@ -19,7 +19,11 @@ instructions. Load only the references that operation needs.
 For deliverables that require developing or revising analytical conclusions,
 read [Analysis](references/analysis.md).
 
-When writing, choose wording and headings that fit the reader and purpose.
+When drafting or revising document prose, match the tone, formality, and
+terminology to the intended reader and use. Give headings a specific subject
+or supported finding so readers can scan the document. Use question headings
+when they match how readers look for answers, as in an FAQ.
+
 Honor the supplied template and limit edits to the requested scope. When
 delivering Word and PDF versions of the same document, render the PDF from the
 authored DOCX.
