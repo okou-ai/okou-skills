@@ -1,15 +1,12 @@
 ---
 name: pdf
 description: >
-  Create, fill, or reformat PDF files, including research and technical reports with
-  tables, charts, equations, citations, figures, code, and flowcharts. Use for
-  "make a PDF", "write a proposal", "professional document", "cover page",
-  "fill in this PDF form", "what fields does this PDF have", "reformat this
-  document", or "convert this Markdown/text to PDF". Distinguish named manuscript
-  requirements (APA, IEEE, journal/institution templates) from visual presets:
-  --type academic is appearance, not standards compliance or research expertise.
-  For a PDF companion to Word, render the DOCX through ../docx/SKILL.md so both
-  requested deliverables retain the same content and layout.
+  Create, fill, reformat, convert or validate PDF files, including reports with
+  tables, charts, equations, citations, figures, code and flowcharts. Use for a
+  requested PDF deliverable, PDF form-field inspection or filling, and PDF layout
+  or saved-file usability checks. Ordinary reading, summaries, translation or
+  content analysis alone does not require this skill. For a PDF companion to
+  Word, use ../docx/SKILL.md and render the authored DOCX.
 license: MIT
 metadata:
   version: "1.0"
@@ -18,8 +15,8 @@ metadata:
 
 # PDF
 
-Follow the shared [Office content guidance](../SKILL.md#content-guidance),
-then select the PDF workflow below.
+Follow [Office](../SKILL.md) for scope and shared authoring rules, then select
+the PDF workflow below.
 
 ## 1. Common requirements
 

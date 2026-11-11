@@ -5,9 +5,6 @@ merge. Verify requested content, page count/order, source values and applicable
 [appearance rules](../common/presentation.md). Package or parser success does not
 establish publication compliance or correct visual output.
 
-Apply the shared [Office content review](../../../SKILL.md#content-review)
-to the saved deliverable, then run the PDF-specific checks below.
-
 For a user-requested rendered preview or visual review, create `preview/`, run:
 
 ```bash

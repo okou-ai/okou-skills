@@ -1,13 +1,13 @@
 ---
 name: xlsx
-description: Create, read, edit, format, and validate Excel spreadsheets. Use for XLSX files, spreadsheet formulas, tables, and financial models, budgets, forecasts, scenarios, or management reports delivered in Excel. Select both the file operation and the business scenario; financial workbooks also load the finance reference. Read CSV/TSV data without changing the source.
+description: Create, edit, format, and validate Excel spreadsheets, including formulas, financial models, budgets, forecasts and scenarios. Use for workbook production, formula repair, or format-specific inspection of cells, recalculation and saved-file usability. Select both the file operation and business scenario. Reading, summarizing or analyzing tabular contents alone does not require this skill; preserve source CSV/TSV files when reading them.
 license: MIT
 ---
 
 # Excel workbooks
 
-Follow the shared [Office content guidance](../SKILL.md#content-guidance),
-then select the workbook workflow below.
+Follow [Office](../SKILL.md) for scope and shared authoring rules, then select
+the workbook workflow below.
 
 Select **both an operation and a business scenario** before authoring. Choosing
 CREATE or EDIT does not finish scenario selection. User requirements and an

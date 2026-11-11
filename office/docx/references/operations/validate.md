@@ -4,9 +4,6 @@ Run on the completed document and repeat affected checks after edits. Existing
 files remain untouched unless their modification is authorized. Set `SKILL_DIR`
 as described in [the entry point](../../SKILL.md#setup).
 
-Apply the shared [Office content review](../../../SKILL.md#content-review)
-to the saved deliverable, then run the DOCX-specific checks below.
-
 ## Package and business checks
 
 ```bash
