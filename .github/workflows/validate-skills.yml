@@ -6,8 +6,6 @@ on:
       - "**/SKILL.md"
       - "office/**"
       - "extract-template/**"
-      - "product-photography/**"
-      - ".claude-plugin/marketplace.json"
       - ".github/workflows/validate-skills.yml"
   push:
     branches:
@@ -16,8 +14,6 @@ on:
       - "**/SKILL.md"
       - "office/**"
       - "extract-template/**"
-      - "product-photography/**"
-      - ".claude-plugin/marketplace.json"
       - ".github/workflows/validate-skills.yml"
 
 jobs:
@@ -140,29 +136,6 @@ jobs:
           fi
 
           echo "No _ACCESS_TOKEN references found. ✓"
-
-  product-photography-contract:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install offline contract-test dependencies
-        run: python3 -m pip install -r product-photography/tests/requirements.txt
-      - name: Validate product-photography schema and package
-        run: python3 -m unittest discover -s product-photography/tests -v
-      - name: Validate product-photography marketplace entry
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          marketplace = json.loads(Path('.claude-plugin/marketplace.json').read_text())
-          entries = [entry for entry in marketplace['plugins'] if entry['name'] == 'product-photography']
-          assert len(entries) == 1, 'Expected one standalone marketplace entry'
-          assert entries[0]['skills'] == ['./product-photography']
-          PY
 
   presentation-syntax:
     runs-on: ubuntu-latest

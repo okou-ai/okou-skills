@@ -65,10 +65,9 @@ To add a new skill or improve an existing one:
 product photograph: studio, lifestyle, macro, flat lay, or brand hero. It separates
 fictional concepts from reference-guided real products, uses an
 [eight-block prompt framework](product-photography/references/prompt-framework.md),
-and checks delivered images without automatic paid retries. The package includes
-structured briefs, worked prompts, offline contract tests, and pinned third-party
-license notices. Image fidelity and quality still require separately authorized
-image evaluation; the offline tests are not a production-readiness claim.
+and checks delivered images without automatic paid retries. The package contains
+photographic guidance, a brief checklist, worked prompts, and pinned third-party
+license notices. Reference-guided editing does not guarantee exact product preservation.
 
 ```bash
 /plugin install product-photography@vm0-skills
