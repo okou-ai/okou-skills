@@ -70,6 +70,17 @@ and task-appropriate expansion and stopping.
 /plugin install people-search@vm0-skills
 ```
 
+## Event flyer pack
+
+[event-flyer-pack](event-flyer-pack/SKILL.md) creates coordinated event flyers,
+table cards, and Story images with real QR overlays and final-file decoding.
+It includes A6 artwork and reduced-size A4 four-up home-print sheets, with
+explicit dimensions and print limitations.
+
+```bash
+/plugin install event-flyer-pack@vm0-skills
+```
+
 ## Business document reference index
 
 [business-skill-index](business-skill-index/SKILL.md) provides a

@@ -162,6 +162,15 @@
       ]
     },
     {
+      "name": "event-flyer-pack",
+      "description": "Create event flyers and coordinated print/social assets with real QR overlays and final-file verification.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./event-flyer-pack"
+      ]
+    },
+    {
       "name": "user-research",
       "description": "User research toolkit — customer intelligence gathering with confidence scoring, and research synthesis for personas, themes, and opportunity prioritization.",
       "source": "./",
