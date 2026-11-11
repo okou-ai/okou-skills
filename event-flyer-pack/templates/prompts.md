@@ -1,8 +1,8 @@
-# 活动物料提示词
+# Event asset prompts
 
-按需选择一个模板，将花括号字段换为用户确认的文字，删除空白的可选行。视觉骨架来自 razbakov/skills 的 event-flyer-pack。用户的本次品牌约束优先。默认参考还原后的 style-reference.png（按 SKILL.md 的资源准备步骤），不复制它的演示活动。
+Choose the required template, replace the braced fields with user-approved copy, and remove empty optional lines. The visual structure is adapted from event-flyer-pack in razbakov/skills. The user's current brand requirements take precedence. By default, inspect the restored style-reference.png using the preparation steps in SKILL.md; do not copy its demo event details.
 
-## 通用构图约束
+## Common composition constraints
 
 Use the approved event copy verbatim. Let the final designed artwork fill the canvas edge to edge; not a photograph of a poster, not a mockup. Create a coherent editorial hierarchy: very large expressive high-contrast serif display title, readable sans-serif event details, optional small italic serif tagline. Use a dark atmospheric scene with controlled light and a dark vignette behind text. Default palette, unless overridden: cobalt #2456FF, warm cream #F7F2E8 and charcoal #181818; at most a small lime #DFFF70 accent. Do not add text, sponsors, logos, watermarks, QR patterns, fake scan labels, UI chrome or hands holding phones. Preserve exactly the specified language, punctuation, event facts and line breaks where feasible. Keep all copy outside the QR square.
 
@@ -87,6 +87,6 @@ Keep essential text out of the top 250 px and bottom 250 px reserved for app ove
 No fake platform UI, link stickers, swipe-up arrows, handles or unrequested text.
 ```
 
-## 可选第二版
+## Optional second version
 
-只改变一个轴（暖/冷光、场景紧/宽、字重/画面占比），保持所有事实、配色和 QR 占位约束不变。不要未经请求机械地每个物料生成两份。
+Change only one axis, such as warm/cool lighting, tight/wide framing, or type weight/artwork balance. Keep all event facts, palette, and QR-placeholder constraints unchanged. Do not automatically generate two versions of every asset without a request.

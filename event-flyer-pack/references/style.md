@@ -1,14 +1,14 @@
-# 默认视觉参考
+# Default visual reference
 
-按 SKILL.md 的准备步骤，用 `scripts/restore_reference.py` 将 `assets/style-reference.png.b64` 还原到任务目录，校验通过后用图片读取工具查看。原 PNG 的 SHA-256 为 `b75d5c270427f16bcff3b8616dd514dd7d9a0445b8f9a28f7221272e882db930`。
+Follow the preparation steps in `SKILL.md`: use `scripts/restore_reference.py` to restore `assets/style-reference.png.b64` into the task directory, verify its checksum, then inspect it with the image-reading tool. The original PNG's SHA-256 is `b75d5c270427f16bcff3b8616dd514dd7d9a0445b8f9a28f7221272e882db930`.
 
-默认保留：
-- 大号高对比衬线标题，强主次关系。
-- 暗色背景上的氛围光影与受控高光，文字区保留深色暗角。
-- 钴蓝 #2456FF、奶油白 #F7F2E8、炭黑 #181818；亮青柠只作少量点缀。
-- 可读的无衬线活动详情，少量斜体副标题，避免挤占 QR 区。
-- 清晰独立的白色 QR 底卡，保留静区。
+Keep these visual defaults:
+- Large, high-contrast serif titles with a clear hierarchy.
+- Atmospheric lighting and controlled highlights against a dark background, with a dark vignette behind text.
+- Cobalt #2456FF, warm cream #F7F2E8, and charcoal #181818; use bright lime only as a small accent.
+- Readable sans-serif event details and restrained italic taglines, without crowding the QR area.
+- A clearly separated white QR card with its quiet zone intact.
 
-只参考视觉，不复制样图里的 AI AFTER HOURS、日期、场地、演示 URL 或免费字样。真实活动可替换场景与主题；用户的本次品牌/风格要求优先，不强制蓝色或暗色。
+Use the image only as a visual reference. Do not copy AI AFTER HOURS, its date, venue, demo URL, or free-entry wording. Adapt the scene and theme to the actual event. The user's current brand or style requirements take precedence; blue and dark backgrounds are not mandatory.
 
-参考图为 **896×1200 数字演示单张**，不是 A6 300 DPI 印刷稿，也不是精确 4:5。不要拉伸它冒充其他尺寸。二维码目的地址 `https://example.com/ai-night` 仅为虚构设计演示，不代表真实活动。
+The reference is an **896×1200 digital demo flyer**, not an A6 300 DPI print master or an exact 4:5 image. Do not stretch it to pass it off as another format. Its QR destination, `https://example.com/ai-night`, is a fictional design-demo URL, not a real event.

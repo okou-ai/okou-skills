@@ -1,20 +1,20 @@
-# 尺寸、组装与验收
+# Dimensions, assembly, and QA
 
-## 先明确生产边界
+## Establish production limits first
 
-- A6 裁切尺寸：105×148 mm，300 DPI 约 1240×1748 px；不是 2:3。
-- 完整 pack：A6 front/back PNG；A4 four-up front/back PDF；桌卡 PNG/PDF；Story JPEG。不得因只做过单张就宣称整套物料验收通过。
-- 数字单张只保证用户要求且实际导出的尺寸，不擅自改成 A6。
-- 上采样不会凭空增加细节；必须标记原始分辨率、实际尺寸与放大情况。
-- 默认产物无出血、无 CMYK/印刷 ICC/PDF-X 认证、无刀模与粘接襟翼；不得称为印厂已确认的 bleed master。真正商业印刷须先询问印厂规格，按实际出血生成/延展画面并另行验收，不把简单加白边算出血。
-- A4 上 4 张原尺寸 A6 几乎占满纸面，外侧不能再无损添加裁切标记。本适配默认四拼为 **95% A6 = 99.75×140.6 mm**，留外侧裁切标记，明确不是足尺寸 A6。打印选 Actual size / 100%；不叠加“适合纸张”缩放。若要求足尺寸 A6，改用更大纸张或先确认不要裁切标记。
-- 桌卡为 105×296 mm 展开，148 mm 处折叠；每个半面 105×148 mm。顶面旋转 180°，不是水平镜像。不承诺所有纸材都能自行站稳，正式印量前先打样。
+- A6 trim size is 105×148 mm, approximately 1240×1748 px at 300 DPI, not 2:3.
+- A full pack includes A6 front/back PNGs, A4 four-up front/back PDFs, tent-card PNG/PDF outputs, and a Story JPEG. Producing one flyer does not establish that the full pack passed QA.
+- A digital-only flyer must use the user's requested and actually exported dimensions; do not substitute A6 without approval.
+- Upsampling does not add detail. Record the original resolution, actual output dimensions, and any enlargement.
+- Default outputs have no bleed, CMYK/print-ICC/PDF-X certification, die lines, or glue flaps. Do not describe them as printer-approved bleed masters. For commercial printing, first obtain the printer's specifications, generate or extend artwork to the required bleed, and review it separately. Adding a white border is not bleed.
+- Four full-size A6 tiles nearly fill an A4 sheet, leaving no room for external crop marks without altering the layout. This adaptation defaults to **95% A6 = 99.75×140.6 mm** tiles with external crop marks; these are explicitly not full-size A6. Print at Actual size / 100%, without an additional Fit to page setting. If full-size A6 is required, use larger paper or first confirm that crop marks may be omitted.
+- The unfolded tent card is 105×296 mm, folded at 148 mm; each half is 105×148 mm. Rotate the top half by 180°; do not mirror it horizontally. Not every paper stock will stand unsupported; make a physical proof before a production run.
 
-## 运行约定
+## Runtime conventions
 
-`PY` 为安装了 scripts/requirements.txt 的 Python，`SKILL_DIR` 为技能目录绝对路径，`OUT` 为当前任务输出目录，`EVENT_URL` 为用户确认的最终 URL。运行前建立输出目录。模板和资源只读，所有生成写到任务目录。
+`PY` is a Python interpreter with `scripts/requirements.txt` installed. `SKILL_DIR` is the skill's absolute directory, `OUT` is the current task's output directory, and `EVENT_URL` is the user-confirmed final URL. Create the output directory before running commands. Treat templates and resources as read-only and write all generated files to the task directory.
 
-### 在叠码前处理底图比例
+### Normalize the base artwork before overlaying the QR
 
 ```bash
 "$PY" "$SKILL_DIR/scripts/formats.py" normalize "$OUT/front-generated.png" \
@@ -24,27 +24,27 @@
   "$OUT/story-base.png" --width 1080 --height 1920 --matte '#181818'
 ```
 
-不裁剪、不拉伸；不足目标比例时扩画布。用图片读取工具检查边缘和占位位置，必要时回到设计修改；不要为凑尺寸接受明显黑边。输出 `qr_verified: false` 是正常的——此阶段是底图，接着叠真实 QR。
+Do not crop or stretch. Extend the canvas when needed to match the target aspect ratio. Inspect the edges and placeholder position with the image-reading tool, and revise the design if necessary. Do not accept obvious black bars merely to meet the dimensions. A `qr_verified: false` result is expected at this stage: this is base artwork, and the real QR is overlaid next.
 
-### 手动叠码
+### Overlay the QR manually
 
 ```bash
 "$PY" "$SKILL_DIR/scripts/overlay_qr.py" "$OUT/front-base.png" "$OUT/qr.png" \
   "$OUT/front.png" --x "$X" --y "$Y" --size "$SIDE" --verify "$EVENT_URL"
 ```
 
-坐标是导出底图的像素，QR 必须完全在画布内。不在最后叠码后再静默缩图。脚本会白底清除整个占位区，并检查保存后的原像素 QR 选区；错误 URL、越界、多个候选白区均需显式处理。
+Coordinates are pixels in the exported base image, and the QR must fit entirely inside the canvas. Do not silently resize after the final overlay. The script clears the entire placeholder with opaque white and verifies a native-pixel QR crop from the saved file. Wrong URLs, out-of-bounds placement, and multiple candidate white areas require explicit resolution.
 
-### 四拼
+### Four-up sheets
 
 ```bash
 "$PY" "$SKILL_DIR/scripts/formats.py" four-up "$OUT/front.png" "$OUT/back.png" \
   --out "$OUT" --slug "$SLUG" --verify "$EVENT_URL" > "$OUT/four-up-qa.json"
 ```
 
-从最终 PDF 以 300 DPI 渲染四个格子，逐格解码；两面共 8 次。双面打印正反对齐取决于打印机，先打样，不保证走纸误差。
+Render all four panels from each final PDF at 300 DPI and decode each panel separately: eight checks across both sides. Duplex alignment depends on the printer. Make a physical proof; paper-feed tolerances are not guaranteed.
 
-### 桌卡
+### Tent card
 
 ```bash
 "$PY" "$SKILL_DIR/scripts/formats.py" tent "$OUT/tent-top.png" \
@@ -52,20 +52,20 @@
   > "$OUT/tent-qa.json"
 ```
 
-两个半面事先都是 A6、正向并已叠码。脚本导出 PNG/PDF，然后分别裁取两半、把顶面转正验码，共 4 次；不要试图用单码检测器一次解整个双码画布。
+Both source halves must already be A6, upright, and QR-overlaid. The script exports PNG/PDF, crops each half, rotates the top half upright for verification, and performs four checks in total. Do not try to decode the entire two-code canvas with a single-code detector.
 
-### Story 最后转 JPEG
+### Convert the Story to JPEG last
 
 ```bash
 "$PY" "$SKILL_DIR/scripts/formats.py" story "$OUT/story.png" \
   "$OUT/instagram-story.jpg" --verify "$EVENT_URL" > "$OUT/story-qa.json"
 ```
 
-源图须是 1080×1920。脚本在最终 JPEG 上重新解码，不能只检查 PNG 原稿。发布平台可能再次压缩；本地通过不代表平台转码后也通过。重要内容离上下端各约 250 px，QR 不贴底。
+The source must be 1080×1920. The script decodes the final JPEG again; checking only the PNG source is insufficient. Publishing platforms may recompress the file, so a local pass does not establish a pass after platform processing. Keep important content approximately 250 px from the top and bottom edges, and do not place the QR against the bottom edge.
 
-## 验收记录
+## QA record
 
-在任务目录保存 qa.json，记录：
+Save `qa.json` in the task directory with these fields:
 
 ```json
 {
@@ -81,19 +81,19 @@
 }
 ```
 
-至少检查：
-1. 标题、日期/星期、时段/时区、场地、票价/入场、CTA 与用户确认文案一致；不漏字、不多字、不乱码。
-2. QR 不压字、不被裁切、四模块以上静区、目的 URL 逐字一致。
-3. 在实际交付的图像和 PDF 上检查，不拿底稿成功代替最终成功。
-4. 检查真实尺寸、纸张尺寸与 PDF 页数；A4 四拼实际 tile 尺寸如实告知。
-5. 若声称目的网页可访问，必须确实访问并确认；脚本只做 URL 语法和编码，不检查线上网站。需要网页检查时遵循当前公共数据/浏览器规则，不请求秘密。
-6. 自动解码不等于真实手机、暗光、远距离和印刷打样测试；未做的写“未测试”。
-7. 只交付选中的、通过检查的最终文件，保留对应生成回执。
+At minimum, check:
+1. The title, date/weekday, time/timezone, venue, price/admission, and CTA exactly match the user-approved copy, without omissions, additions, or garbled text.
+2. The QR does not overlap text or get clipped, has a quiet zone of at least four modules, and decodes to the exact destination URL.
+3. Checks run on the actual images and PDFs being delivered; a successful base file does not establish a successful final export.
+4. Actual image dimensions, paper sizes, and PDF page counts are correct. Disclose the actual tile dimensions on A4 four-up sheets.
+5. If claiming that the destination page is available, visit and verify it. The scripts check URL syntax and encoding, not the live website. Follow current public-data/browser rules when a page check is needed, and do not request secrets.
+6. Automated decoding is not a physical-phone scan, low-light or long-distance scan test, or print proof. Mark checks not performed as "not tested."
+7. Deliver only the selected final files that passed their checks, and retain the corresponding generation receipts.
 
-## 不付费的工具自测
+## Local tool tests without paid generation
 
 ```bash
 "$PY" -m unittest discover -s "$SKILL_DIR/tests" -v
 ```
 
-测试创建合成底图和 QR，检查单码覆盖、无效 URL、错误目的地、白区歧义/越界、PDF 四拼逐格、桌卡旋转、JPEG 二次导出。它验证本地工具链，不替代真实活动的排版目检或商业印刷打样。
+The tests create synthetic artwork and QR codes to check single-code overlays, invalid URLs, wrong destinations, ambiguous white areas, out-of-bounds placement, individual PDF four-up panels, tent-card rotation, and JPEG re-export. They verify the local toolchain, not visual layout for a real event or commercial print proofs.

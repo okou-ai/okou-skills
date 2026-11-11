@@ -1,49 +1,49 @@
 ---
 name: event-flyer-pack
-description: "制作具体活动的宣传单与真实可扫码二维码；适用于活动 flyer、宣传物料包、A6 正反面、A4 四拼、桌卡与 Story。支持仅做一张或完整套装，使用当前可用图像工具出图，再叠加真实二维码并逐件验码。"
+description: "Create event flyers with real, scannable QR codes. Use for single flyers, coordinated promo packs, A6 fronts and backs, A4 four-up sheets, tent cards, and Story assets. Generate artwork with the available image tool, then overlay a real QR and verify every final asset."
 ---
 
 # Event Flyer Pack
 
-将活动信息变成统一风格的宣传物料。让图像工具负责画面与排版；用本地脚本生成、叠加、验证真实二维码，不让图像工具绘制可用二维码。
+Turn event details into a coordinated set of promotional assets. Use the image tool for artwork and typography, then local scripts to generate, overlay, and verify real QR codes. Never ask the image tool to draw a working QR.
 
-## 范围与准备
+## Scope and preparation
 
-- 使用当前可用图像工具出图；调用步骤见 `references/image-generation.md`。
-- 默认使用大号高对比衬线标题、暗色氛围光影、钴蓝/奶油白/炭黑。读取 `references/style.md` 与随附参考图；只参考视觉，不复制虚构活动信息。用户本次风格或品牌要求优先。
-- 单张请求只做单张；完整 pack 制作 A6 正反面、A4 四拼正反 PDF、折叠桌卡、1080×1920 Story。范围不清时只问“单张还是整套”。每个独立设计先出一版，仅在验收失败或用户需要备选时追加。
-- 仅手动调用，不创建自动任务，不自动发帖、群发、公开发布、下印刷订单或创建短链。文件默认私有；涉及第三方账户或费用遵循当前授权与平台规则。
+- Use the available image tool for artwork; see `references/image-generation.md` for invocation steps.
+- Default to large, high-contrast serif titles, dark atmospheric lighting, and cobalt, cream, and charcoal. Read `references/style.md` and inspect the bundled reference image. Borrow its visual language, not its fictional event details. The user's current style or brand requirements take precedence.
+- For a single-flyer request, make only that flyer. A full pack includes A6 fronts and backs, A4 four-up front/back PDFs, a folded tent card, and a 1080×1920 Story. If scope is unclear, ask only whether the user wants a single flyer or a full pack. Start with one version per independent design; add another only if QA fails or the user requests alternatives.
+- Invoke manually only. Do not create automations, automatically post, send bulk messages, publish publicly, place print orders, or create short links. Files are private by default. Follow current authorization and platform rules for third-party accounts and costs.
 
-将 `SKILL_DIR` 设置为本技能目录的绝对路径，`OUT` 设置为本次任务目录。技能资源只读，所有输出写入任务目录。参考图以无损 base64 封装，先还原并校验，再用图片读取工具查看：
+Set `SKILL_DIR` to this skill's absolute directory and `OUT` to the current task's output directory. Treat skill resources as read-only and write all outputs to the task directory. The reference image is stored as lossless base64. Restore it, verify its checksum, then inspect it with the image-reading tool:
 
 ```bash
 mkdir -p "$OUT"
 python3 "$SKILL_DIR/scripts/restore_reference.py" "$OUT/style-reference.png"
 ```
 
-校验失败时停止使用该参考，不默默跳过。准备步骤不调用图像服务。
+If verification fails, stop using that reference; do not silently skip the failure. Preparation does not call an image service.
 
-## 1. 确认活动信息
+## 1. Confirm event details
 
-按 `templates/event-spec.json` 的结构记录本次输入，不修改技能内模板。确认标题、日期、起止时间与时区、场地/线上入口、入场方式、CTA、二维码 URL、语言、物料范围与尺寸。可选项包括副标题、议程、亮点、主办方和已授权图片/Logo。
+Record the current inputs using the structure in `templates/event-spec.json`; do not modify the bundled template. Confirm the title, date, start/end times and timezone, venue or online entry point, admission, CTA, QR URL, language, asset scope, and dimensions. Optional fields include a tagline, agenda, highlights, host, and authorized images or logos.
 
-只追问缺失的关键信息，不沿用演示日期/地址/URL，不假设免费。概念稿可标 TBA；没有真实 URL 就不生成假二维码，也不称为可发布终稿。虚构演示须明显标记。日期与星期冲突时先确认。
+Ask only for missing essential details. Do not reuse demo dates, addresses, or URLs, or assume free entry. Concept drafts may use TBA. Without a real destination URL, do not fabricate a QR or describe the result as ready to publish. Clearly label fictional demos. Resolve date/weekday conflicts before proceeding.
 
-URL 默认 HTTPS，必须与用户确认值完全一致，不擅加 UTM、删参数或换成第三方短链。长 URL 可建议自有短链接或扩大二维码。拒绝钓鱼/恶意用途，不把密钥、会话或一次性登录令牌编码进宣传二维码。
+Use HTTPS by default and preserve the user-confirmed URL exactly. Do not add UTM parameters, remove parameters, or substitute a third-party short link without approval. For long URLs, suggest a user-owned short link or a larger QR. Reject phishing or malicious uses. Never encode secrets, sessions, or one-time login tokens in promotional QR codes.
 
-## 2. 生成完整底图
+## 2. Generate the complete base artwork
 
-读取 `templates/prompts.md` 中所需物料的模板，填入确切文案、场景、配色和占位坐标，删除未提供的可选字段。采用“完整设计 + 空白 QR 区”，不要让占位花括号进入成图。
+Read the relevant template in `templates/prompts.md`. Fill in the exact copy, scene, palette, and placeholder coordinates, and remove optional fields that were not supplied. Request a complete design with an empty QR area. Do not let placeholder braces appear in the artwork.
 
-每个独立设计单独出图：front、back、两个桌卡半面、Story。四拼与桌卡旋转由本地脚本完成，不额外出图。
+Generate each independent design separately: front, back, two upright tent-card halves, and Story. Local scripts handle four-up assembly and tent-card rotation; do not generate extra artwork for those operations.
 
-强制要求固定位置、边长的纯白方形 QR 空位，内部无图案、文字、阴影或圆角，不与文案冲突。即使底图画了假 QR，也必须完全清白覆盖后换成真实码。
+Require a solid pure-white square QR placeholder with a fixed position and side length. It must contain no patterns, text, shadows, or rounded corners, and must not overlap the copy. Even if the artwork includes a fake QR, completely cover it with opaque white before replacing it with a real code.
 
-等待生成完成，保存 job ID、提示词、原件和实际返回尺寸；不要重复提交来查询进度。印刷前按 `references/print-and-qa.md` 处理尺寸，再叠 QR。A6 为 105×148 mm，约 1240×1748 px @300 DPI，不是 2:3；不拉伸或静默裁字，扩画布须目检，上采样不等于新增细节。
+Wait for generation to finish. Save the job ID, prompt, original file, and actual returned dimensions; do not resubmit to check progress. Before printing, normalize dimensions as described in `references/print-and-qa.md`, then overlay the QR. A6 is 105×148 mm, approximately 1240×1748 px at 300 DPI, not 2:3. Do not stretch artwork or silently crop text. Visually inspect any canvas extensions. Upsampling does not add detail.
 
-## 3. 生成并叠加真实二维码
+## 3. Generate and overlay a real QR
 
-在任务专用虚拟环境安装 `scripts/requirements.txt`。沿用 `SKILL_DIR`、`OUT`，将 `EVENT_URL` 设置为用户确认的最终 URL。
+Install `scripts/requirements.txt` in a task-specific virtual environment. Keep the same `SKILL_DIR` and `OUT`, and set `EVENT_URL` to the user-confirmed final URL.
 
 ```bash
 python3 -m venv ./generated/flyer-env
@@ -57,36 +57,36 @@ PY=./generated/flyer-env/bin/python
   "$OUT/qr.png" "$OUT/front.png" --auto-detect --verify "$EVENT_URL"
 ```
 
-自动检测不唯一、未识别或位置不对时，检查图片，再用 `--x X --y Y --size S`；不要盲选最大白块，不同时传手动坐标与 `--auto-detect`。
+If automatic detection finds multiple candidates, finds none, or selects the wrong position, inspect the image and use `--x X --y Y --size S`. Do not blindly select the largest white region or combine manual coordinates with `--auto-detect`.
 
-脚本检查边界，清空整张白底卡，按整数像素模块重绘真实码并保留四模块静区，再从最终导出的原像素选区解码。URL 不完全一致即失败，不交付该文件。复用同一 QR 到其他物料并逐件验码；默认使用普通黑白码，不加 Logo 或渐变。
+The script checks bounds, clears the entire white card, redraws the real QR with integer-pixel modules and a four-module quiet zone, then decodes a native-pixel crop from the final export. Any URL mismatch is a failure; do not deliver that file. Reuse the same QR across other assets and verify each asset separately. Default to plain black and white, without logos or gradients.
 
-## 4. 按需组装物料
+## 4. Assemble the requested assets
 
-按 `references/print-and-qa.md` 使用 `scripts/formats.py`：
+Use `scripts/formats.py` as described in `references/print-and-qa.md`:
 
-- `normalize`：将底图等比装入目标画布，在此之后再叠 QR。
-- `four-up`：生成 A4 四拼正反 PDF，默认 95% A6，给裁切标记留空间，并告知实际尺寸。
-- `tent`：将两张已验码 A6 半面旋转拼接，输出 PNG/PDF；顶面旋转 180°，不是左右镜像文字。
-- `story`：从已验码的 1080×1920 PNG 导出 JPEG，并在 JPEG 上再验码。
+- `normalize`: fit the base artwork proportionally into the target canvas before overlaying the QR.
+- `four-up`: create A4 four-up front/back PDFs at 95% A6 by default, leaving room for crop marks. Disclose the actual tile dimensions.
+- `tent`: rotate and stack two QR-verified A6 halves into PNG/PDF outputs. Rotate the top half by 180°; never horizontally mirror the text.
+- `story`: export a QR-verified 1080×1920 PNG to JPEG, then verify the JPEG again.
 
-多码输出逐格/逐半面解码，PDF 渲染最终页面后验码。不要把整张多码页未识别误判为每个码都坏了，也不要把单张底稿成功当作整套验收成功。
+Decode multi-code outputs one panel or half at a time. For PDFs, render the final pages before checking. Failure to detect a whole multi-code page does not prove that every individual code is broken. A successful base image does not establish that the full pack passed QA.
 
-## 5. 验收与交付
+## 5. Review and deliver
 
-按 `references/print-and-qa.md` 目检最终文件：逐字核对标题、日期/星期、时间/时区、场地、入场、CTA、URL；检查层级、缺漏/乱码、截断和 QR 重叠。自动解码只证明编码，不证明活动真实、网页可用、手机扫描或印刷效果；只报告实际做过的检查。
+Visually inspect the final files using `references/print-and-qa.md`. Compare the title, date/weekday, time/timezone, venue, admission, CTA, and URL against the approved copy. Check hierarchy, omissions, garbled text, clipping, and QR overlaps. Automated decoding verifies encoded content, not whether the event is real, the website is available, a phone can scan it, or the printed result is acceptable. Report only checks actually performed.
 
-在任务目录保存 `qa.json`：文案检查状态、实际尺寸、job ID、每件物料的预期/解码 URL、PDF 页数与印刷限制。验码失败或关键信息未核对的文件不得标为正式终稿。
+Save `qa.json` in the task directory with copy-check status, actual dimensions, job IDs, expected/decoded URLs for every asset, PDF page counts, and print limitations. Do not label files as approved finals if QR verification fails or essential information remains unchecked.
 
-Web 交付前读取 `okou web upload-file -h`，上传每个要展示的最终图片；整套可另打包私有 ZIP。不要只给本地路径，不上传未选草图、密钥或缓存，不自动发到外部平台。
+Before Web delivery, read `okou web upload-file -h` and upload every final image to be shown. A full pack may also be bundled in a private ZIP. Do not provide only local paths, upload unselected drafts, secrets, or caches, or automatically send files to external platforms.
 
-简要回复文件链接、实际制作范围、逐件验码结果与必要印刷限制。只做了单张就明确说单张，不称为整套印刷物料已测试。
+Reply briefly with file links, the actual scope produced, per-asset QR results, and any necessary print limitations. If only one flyer was made, say so; do not claim the full print pack was tested.
 
-## 资源
+## Resources
 
-- `templates/prompts.md`、`templates/event-spec.json`：提示词与空白活动输入结构。
-- `references/image-generation.md`、`references/style.md`、`references/print-and-qa.md`：出图、视觉、组装与验收。
-- `assets/style-reference.png.b64`、`scripts/restore_reference.py`：参考图与校验还原工具。
-- `scripts/generate_qr.py`、`scripts/overlay_qr.py`：真实二维码生成、叠加与验码。
-- `scripts/formats.py`、`tests/test_tools.py`：物料组装与不调用图像服务的工具测试。
-- `NOTICE.md`、`LICENSE.upstream.md`：来源和上游 MIT 声明，分发时一同保留。
+- `templates/prompts.md`, `templates/event-spec.json`: prompts and a blank event-input structure.
+- `references/image-generation.md`, `references/style.md`, `references/print-and-qa.md`: artwork generation, visual direction, assembly, and QA.
+- `assets/style-reference.png.b64`, `scripts/restore_reference.py`: the reference image and checksum-verified restoration tool.
+- `scripts/generate_qr.py`, `scripts/overlay_qr.py`: real QR generation, overlay, and verification.
+- `scripts/formats.py`, `tests/test_tools.py`: asset assembly and local tool tests that do not call an image service.
+- `NOTICE.md`, `LICENSE.upstream.md`: attribution and the upstream MIT declaration; retain both when redistributing.
