@@ -1,22 +1,19 @@
-# Develop and check analytical conclusions
+# Analytical reasoning
 
-Start with the answer the evidence supports. Pursue an open question when
-resolving it could change the conclusion or the reader's decision. Once the
-requested judgment is supported at the needed precision, proceed to the
-deliverable. If a material gap remains after checking the available evidence,
-give the supported part of the answer and identify the missing evidence.
+Define the question and what would count as an answer. Clarify the scope and
+any terms that affect the result. If the question needs to be broken down,
+choose subquestions whose answers help resolve it.
 
-When a conclusion hinges on a figure, recompute it from the source or reconcile
-it against an independent total. Check the units, denominator, and scope. For
-comparisons, verify that definitions and conditions align, and explain any
-difference that affects interpretation.
+Ask what evidence would support or weaken a provisional answer. Choose a
+method suited to the question and the material. Keep observations, assumptions,
+and inferences distinct. Make clear how the evidence leads to each inference
+that matters to the conclusion.
 
-If component data are available, reconcile a change to its measured contributions.
-Check whether the evidence distinguishes a proposed cause from a plausible
-alternative before attributing the change to it. When a recommendation hinges
-on an uncertain assumption, test a plausible value that could change the choice.
-Compare options on the same assumptions and calculate the point at which the
-choice changes when the inputs support it.
+Investigate the point most likely to change the answer. Check a conflicting
+observation, a plausible alternative interpretation, or an assumption the
+answer depends on. Revise the conclusion in light of what the check establishes.
 
-Carry verified figures and limits that affect the conclusion into the final
-deliverable.
+Bring the findings together to answer the original question. Present the
+evidence and reasoning that support the answer, along with any conditions or
+limits that affect its interpretation. If an important uncertainty remains,
+state what can be concluded and what evidence would resolve the open question.
