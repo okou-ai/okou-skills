@@ -6,14 +6,17 @@ license: MIT
 
 # Office files
 
-For work that explains results, evaluates evidence, recommends an option or
-establishes a plan's feasibility, read [Analysis](references/analysis.md) before
-drafting the findings. Use it even for a short memo or a task with supplied
-sources. It covers the analytical work; the format routes below cover the file.
+Route by the user's requested operation, not analytical statements in the source
+being edited. For extraction, translation, consolidation of established findings,
+formatting, conversion or a limited edit, use the format route directly and skip
+the analysis guide. Existing recommendations or numbers do not authorize a new
+investigation.
 
-For extraction, translation, consolidation of established findings, formatting,
-conversion or a limited edit, use the format route directly. Do not turn these
-tasks into an investigation. Read only the references needed for the actual work.
+When asked to explain results, evaluate evidence, recommend an option or establish
+a plan's feasibility, read [Analysis](references/analysis.md) before drafting the
+findings. Use it even for a short memo or a task with supplied sources. It covers
+the analytical work; the format routes below cover the file. Read only the
+references needed for the actual work.
 
 Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
 to the selected subdirectory before running its examples; it is a shell variable,

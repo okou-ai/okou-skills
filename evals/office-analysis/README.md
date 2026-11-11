@@ -21,6 +21,8 @@ only that package. Do not give reference judgments or another condition's answer
 Preserve the request, manifest, raw answer, tool results and actual configuration.
 The manifest freezes inputs; it is not evidence that the author read a file or ran
 a check. Capture those actions from the actual run.
+Isolation here means separate input directories on a shared host, not an
+execution sandbox. Record that limitation when reporting the pilot.
 
 Compare main, the previous analysis revision and the candidate. For repeatability
 use independent repeats and counterbalance condition order. Keep all attempts;
@@ -32,6 +34,8 @@ or earlier scores. Preserve disagreements and their source evidence.
 
 - `operating-review`: a measurable cost-rate residual with an unknown business
   cause; do supported arithmetic without claiming the residual is outsourcing.
+- `fixed-cost-review`: the same totals with a fixed-plus-variable cost model;
+  [variant review](reviewer-fixed-cost.md) checks that decomposition follows it.
 - `launch-plan`: fixed versus variable cost extrapolation and an overloaded
   weekly draft; a proposal must satisfy its own model and resource constraints.
 - `research-comparison`: different configurations and source-specific baseline
@@ -47,7 +51,7 @@ single-run pilot does not estimate a causal effect or establish deployment.
 
 For a later product evaluation, repeat selected tasks through the actual Okou
 authoring path with requested native deliverables and the existing file checks.
-Add unseen variants, including nonproportional costs and genuinely missing inputs,
+Add further unseen variants, including genuinely missing inputs,
 so the agent cannot obtain credit by mechanically applying a learned formula.
 
 Check input isolation and revision/hash preservation with:
