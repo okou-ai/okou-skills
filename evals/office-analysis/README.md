@@ -5,6 +5,10 @@ production skill resources, Office interoperability tests or a calibrated produc
 benchmark. Use fresh sessions and the same model, effort, tools and budget for
 each condition. Return content only; rendering is outside this check.
 
+The [2026-11-11 exploratory pilot](pilot-20261111/README.md) preserves raw answers,
+hashes, the anonymous review and its limits. It did not demonstrate a consistent
+comparative quality improvement.
+
 ## Prepare isolated inputs
 
 From a checkout containing this evaluator:
