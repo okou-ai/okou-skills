@@ -5,6 +5,7 @@ on:
     paths:
       - "**/SKILL.md"
       - "office/**"
+      - "evals/office-analysis/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
   push:
@@ -13,10 +14,19 @@ on:
     paths:
       - "**/SKILL.md"
       - "office/**"
+      - "evals/office-analysis/**"
       - "extract-template/**"
       - ".github/workflows/validate-skills.yml"
 
 jobs:
+  office-analysis-inputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check isolated analysis inputs
+        run: python3 -m unittest discover -s evals/office-analysis -p 'test_*.py'
+
   docx-environment:
     runs-on: ubuntu-latest
     timeout-minutes: 5

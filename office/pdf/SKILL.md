@@ -18,6 +18,11 @@ metadata:
 
 # PDF
 
+When developing findings, comparisons, recommendations or a plan, read
+[Analysis](../references/analysis.md) before drafting the content. It applies
+to short briefs too. Extraction, translation, formatting and limited edits
+that do not require new analysis use the routes below directly.
+
 ## 1. Common requirements
 
 Set `SKILL_DIR` to the absolute directory containing this file, not the task's

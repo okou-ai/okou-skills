@@ -1,13 +1,19 @@
 ---
 name: office
-description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets. Includes Chinese government-style documents, named academic papers, thesis templates and business/editorial formatting in Word; research and technical PDF features; and financial models, budgets, forecasts and scenarios in Excel. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, document formatting or conversion.
+description: Analyze source material and create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets. Use for reports, research comparisons, operating reviews, proposals and plans delivered in DOCX, PDF or XLSX. Includes Chinese government-style documents, named academic papers, thesis templates and business/editorial formatting in Word; research and technical PDF features; and financial models, budgets, forecasts and scenarios in Excel. Also use for spreadsheet formulas, PDF forms, document formatting or conversion.
 license: MIT
 ---
 
 # Office files
 
-Use the format-specific skill below. Read only the selected route and the
-references needed for the task.
+For work that explains results, evaluates evidence, recommends an option or
+establishes a plan's feasibility, read [Analysis](references/analysis.md) before
+drafting the findings. Use it even for a short memo or a task with supplied
+sources. It covers the analytical work; the format routes below cover the file.
+
+For extraction, translation, consolidation of established findings, formatting,
+conversion or a limited edit, use the format route directly. Do not turn these
+tasks into an investigation. Read only the references needed for the actual work.
 
 Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
 to the selected subdirectory before running its examples; it is a shell variable,

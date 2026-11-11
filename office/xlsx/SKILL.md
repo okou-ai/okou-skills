@@ -6,6 +6,11 @@ license: MIT
 
 # Excel workbooks
 
+When interpreting results, comparing alternatives or recommending a plan, read
+[Analysis](../references/analysis.md) before drafting the findings. For a
+specified calculation, extraction, formatting or limited formula repair, use
+the applicable routes below without expanding the assignment.
+
 Select **both an operation and a business scenario** before authoring. Choosing
 CREATE or EDIT does not finish scenario selection. User requirements and an
 existing template or house style take precedence over these defaults.

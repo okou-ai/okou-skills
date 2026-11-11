@@ -4,6 +4,12 @@ Run on the completed document and repeat affected checks after edits. Existing
 files remain untouched unless their modification is authorized. Set `SKILL_DIR`
 as described in [the entry point](../../SKILL.md#setup).
 
+For analytical content, reconcile the saved document's main figures, source
+interpretations, assumptions and recommendations to the checked workings under
+[Analysis](../../../references/analysis.md#accept-the-findings-then-check-the-saved-document).
+Check accompanying prose and qualifications as well as tables. A structural or
+business-rule validation result does not perform this review.
+
 ## Package and business checks
 
 ```bash

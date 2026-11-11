@@ -12,6 +12,12 @@ Keep original records distinguishable from cleaned data and calculated outputs.
 For CSV/TSV, confirm delimiter, encoding and locale; reconcile imported row counts
 and representative records rather than trusting a successful import call.
 
+After writing imported data, reopen the saved file and check the types in the
+actual calculation ranges, including small adjustment tables. Reconcile their
+amount totals and record counts to the source. Inspect the first and last data
+rows against formula ranges; title/header rows can shift those coordinates.
+Retain the source separately from any typed or cleaned representation.
+
 Choose types from field meaning, not appearance alone:
 
 - Preserve identifiers, leading zeros and long account codes as text. A string
