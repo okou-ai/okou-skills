@@ -11,7 +11,7 @@ metadata:
     - "IEEE / ACM / APA / MLA / Chicago / Turabian Style Guides"
     - "Springer LNCS / Nature / HBR Document Templates"
 description: >
-  Create, edit, fill, format, and validate editable Word documents (.docx / Word文档 / 文档)
+  Create, read, edit, fill, and format editable Word documents (.docx / Word文档 / 文档)
   using OpenXML SDK (.NET). Use for reports/报告, proposals, memos, forms, contract
   formatting/合同, Chinese government documents/公文 (GB/T 9704), academic papers
   (IEEE, ACM, APA 7 professional, MLA 9, Chicago/Turabian, Springer LNCS, Nature),
@@ -19,16 +19,11 @@ description: >
   (Modern Corporate, Executive Brief, HBR), 排版 and 套模板. Route creation,
   narrow content edits, or template application without assuming a restyle.
   Provides document structure and presentation guidance, not government-policy,
-  research, or legal expertise or official certification. Ordinary reading,
-  summaries, translation or content analysis alone does not require this skill;
-  use it for Word-file production or format-specific inspection. Use
-  ../pdf/SKILL.md for a standalone PDF.
+  research, or legal expertise or official certification. Use ../pdf/SKILL.md
+  for a standalone PDF.
 ---
 
 # Word documents
-
-Follow [Office](../SKILL.md) for scope and shared authoring rules, then select
-the Word workflow below.
 
 ## Setup
 
