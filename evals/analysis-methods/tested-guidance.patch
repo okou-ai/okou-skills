@@ -1,10 +1,33 @@
 --- a/flux-analysis/SKILL.md
 +++ b/flux-analysis/SKILL.md
-@@ -75,2 +75,2 @@
+@@ -49 +49 @@
+-Input JSON has `baseline` and `actual` arrays with matching, unique `segment` IDs and numeric `quantity` and `price` fields. Prefer decimal strings. Quantities must be nonnegative, in common units, with positive totals in both periods. Supply prices explicitly even for zero-quantity segments. Duplicate JSON keys are rejected, including within rows. Output values are exact rational strings; round only for presentation. The calculator checks arithmetic, not source quality or whether this model fits the business.
++Input JSON has `baseline` and `actual` arrays with matching, unique `segment` IDs and numeric `quantity` and `price` fields. Prefer decimal strings. Quantities must be nonnegative, in common units, with positive totals in both periods. Supply prices explicitly even for zero-quantity segments. Output values are exact rational strings; round only for presentation. The calculator checks arithmetic, not source quality or whether this model fits the business.
+@@ -73,2 +72,0 @@
+-A zero-weight segment has no observed rate in that period. Supply a counterpart rate only when a supported plan, contract, or explicitly labeled scenario justifies it; do not fill an undefined rate with zero. Different counterpart assumptions can reverse the mix/rate effects while leaving the same aggregate change, so reconciliation alone does not validate this allocation. Without a defensible counterpart, report the aggregate change or use a bridge that separates new/discontinued-segment contributions rather than forcing this split.
+-
+@@ -77,2 +75,2 @@
 -- Plan assumed a 50/50 revenue split -> blended 50% margin
 -- Actual revenue split was 40/60 -> blended 48% margin
 +- Plan assumed a 50/50 split -> blended 50% margin
 +- Actual split was 40/60 -> blended 48% margin
+--- a/flux-analysis/scripts/decompose.py
++++ b/flux-analysis/scripts/decompose.py
+@@ -16,10 +15,0 @@
+-
+-
+-def _unique_keys(pairs):
+-    """Reject ambiguous JSON objects before any source value can be overwritten."""
+-    result = {}
+-    for key, value in pairs:
+-        if key in result:
+-            raise ValueError(f"Duplicate JSON key: {key}")
+-        result[key] = value
+-    return result
+@@ -102,2 +92 @@
+-        data = json.loads(args.input.read_text(encoding="utf-8"), parse_float=Decimal,
+-                          object_pairs_hook=_unique_keys)
++        data = json.loads(args.input.read_text(encoding="utf-8"), parse_float=Decimal)
 --- a/analysis-qa/SKILL.md
 +++ b/analysis-qa/SKILL.md
 @@ -8 +8 @@

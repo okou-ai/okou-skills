@@ -46,7 +46,7 @@ python3 "$SKILL_DIR/scripts/decompose.py" --help
 python3 "$SKILL_DIR/scripts/decompose.py" --mode revenue --input inputs.json
 ```
 
-Input JSON has `baseline` and `actual` arrays with matching, unique `segment` IDs and numeric `quantity` and `price` fields. Prefer decimal strings. Quantities must be nonnegative, in common units, with positive totals in both periods. Supply prices explicitly even for zero-quantity segments. Output values are exact rational strings; round only for presentation. The calculator checks arithmetic, not source quality or whether this model fits the business.
+Input JSON has `baseline` and `actual` arrays with matching, unique `segment` IDs and numeric `quantity` and `price` fields. Prefer decimal strings. Quantities must be nonnegative, in common units, with positive totals in both periods. Supply prices explicitly even for zero-quantity segments. Duplicate JSON keys are rejected, including within rows. Output values are exact rational strings; round only for presentation. The calculator checks arithmetic, not source quality or whether this model fits the business.
 
 **Worked example — top-line revenue:**
 - Baseline plan: 10,000 units at $50/unit = $500,000
@@ -69,6 +69,8 @@ Check: Mix Effect + Rate Effect = Actual Blended Rate - Baseline Blended Rate
 ```
 
 Use the denominator of the rate as the weight: revenue shares for gross margin percentages, not unit shares. These effects are rates, not currency amounts; multiply fractional rates by 100 to express percentage points. To explain gross-profit dollars, reconcile revenue and cost dollars separately. The calculator's `--mode weighted-rate` takes `segment`, `weight`, and `rate` fields; weights are nonnegative with positive period totals and are normalized internally.
+
+A zero-weight segment has no observed rate in that period. Supply a counterpart rate only when a supported plan, contract, or explicitly labeled scenario justifies it; do not fill an undefined rate with zero. Different counterpart assumptions can reverse the mix/rate effects while leaving the same aggregate change, so reconciliation alone does not validate this allocation. Without a defensible counterpart, report the aggregate change or use a bridge that separates new/discontinued-segment contributions rather than forcing this split.
 
 **Worked example — gross margin compression:**
 - Segment X earns 60% margin; Segment Y earns 40% margin

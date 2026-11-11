@@ -15,6 +15,16 @@ import json
 from pathlib import Path
 
 
+def _unique_keys(pairs):
+    """Reject ambiguous JSON objects before any source value can be overwritten."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
 def _records(rows, fields):
     if not isinstance(rows, list) or not rows:
         raise ValueError("Each period must be a nonempty array")
@@ -89,7 +99,8 @@ def main():
                         help="JSON file with baseline and actual arrays")
     args = parser.parse_args()
     try:
-        data = json.loads(args.input.read_text(encoding="utf-8"), parse_float=Decimal)
+        data = json.loads(args.input.read_text(encoding="utf-8"), parse_float=Decimal,
+                          object_pairs_hook=_unique_keys)
         if not isinstance(data, dict) or "baseline" not in data or "actual" not in data:
             raise ValueError("Input needs baseline and actual arrays")
         bridge = revenue_bridge if args.mode == "revenue" else weighted_rate_bridge

@@ -113,6 +113,17 @@ class WeightedRateBridgeTests(unittest.TestCase):
             self.assertEqual(result["mix"] + result["rate"], result["change"])
             self.assertEqual(result, BRIDGE.weighted_rate_bridge(base[::-1], end[::-1]))
 
+    def test_unobserved_counterpart_rate_changes_allocation_not_aggregate(self):
+        actual = [rate("a", 50, "0.5"), rate("new", 50, "0.4")]
+        low = BRIDGE.weighted_rate_bridge(
+            [rate("a", 100, "0.5"), rate("new", 0, "0")], actual)
+        high = BRIDGE.weighted_rate_bridge(
+            [rate("a", 100, "0.5"), rate("new", 0, "0.9")], actual)
+        self.assertEqual((low["baseline"], low["actual"], low["change"]),
+                         (high["baseline"], high["actual"], high["change"]))
+        self.assertEqual((low["mix"], low["rate"]), (F("-0.25"), F("0.2")))
+        self.assertEqual((high["mix"], high["rate"]), (F("0.2"), F("-0.25")))
+
 
 class InputContractTests(unittest.TestCase):
     def test_invalid_inputs_fail_without_inventing_missing_values(self):
@@ -171,6 +182,25 @@ class InputContractTests(unittest.TestCase):
             self.assertEqual(json.loads(run.stdout), {"baseline": "1/2", "actual": "19/50",
                                                       "mix": "-1/50", "rate": "-1/10",
                                                       "change": "-3/25"})
+
+    def test_cli_rejects_duplicate_keys_in_rows_and_top_level_for_both_modes(self):
+        raw_inputs = [
+            '{"baseline":[],"baseline":[],"actual":[]}',
+            '{"baseline":[{"segment":"a","quantity":10,"price":2,"price":20}],"actual":[{"segment":"a","quantity":10,"price":3}]}',
+            '{"baseline":[{"segment":"a","weight":10,"rate":0.2,"rate":0.8}],"actual":[{"segment":"a","weight":10,"rate":0.3}]}',
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input.json"
+            for mode in ("revenue", "weighted-rate"):
+                for raw in raw_inputs:
+                    with self.subTest(mode=mode, raw=raw):
+                        path.write_text(raw, encoding="utf-8")
+                        run = subprocess.run([sys.executable, str(SCRIPT), "--mode", mode, "--input", str(path)],
+                                             capture_output=True, text=True)
+                        self.assertNotEqual(run.returncode, 0)
+                        self.assertIn("Duplicate JSON key", run.stderr)
+                        self.assertEqual(run.stdout, "")
+                        self.assertEqual(path.read_text(encoding="utf-8"), raw)
 
 
 if __name__ == "__main__":
