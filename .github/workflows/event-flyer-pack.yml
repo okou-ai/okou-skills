@@ -1,0 +1,32 @@
+name: Event Flyer Pack
+
+on:
+  pull_request:
+    paths:
+      - "event-flyer-pack/**"
+      - ".github/workflows/event-flyer-pack.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "event-flyer-pack/**"
+      - ".github/workflows/event-flyer-pack.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  local-tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: event-flyer-pack/scripts/requirements.txt
+      - name: Install local tool dependencies
+        run: python -m pip install -r event-flyer-pack/scripts/requirements.txt
+      - name: Test QR overlays and exported formats
+        run: python -B -m unittest discover -s event-flyer-pack/tests -v
