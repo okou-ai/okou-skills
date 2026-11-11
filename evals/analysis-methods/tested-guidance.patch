@@ -1,0 +1,38 @@
+--- a/flux-analysis/SKILL.md
++++ b/flux-analysis/SKILL.md
+@@ -75,2 +75,2 @@
+-- Plan assumed a 50/50 revenue split -> blended 50% margin
+-- Actual revenue split was 40/60 -> blended 48% margin
++- Plan assumed a 50/50 split -> blended 50% margin
++- Actual split was 40/60 -> blended 48% margin
+--- a/analysis-qa/SKILL.md
++++ b/analysis-qa/SKILL.md
+@@ -8 +8 @@
+-Select checks relevant to the question, data, and method. Prioritize failures that could change the conclusion or action. Keep calculations and source traces in working notes; include methods, caveats, and supporting detail in the user's requested format where they affect interpretation. Preserve the task's permitted sources and deliverable scope.
++Select checks relevant to the question, data, and method. Prioritize failures that could change the conclusion or action. Keep calculations and source traces in working notes; include methods, caveats, and supporting detail in the user's requested format where they affect interpretation. QA does not require extra deliverables or permission to access additional sources.
+--- a/marketing-analytics/SKILL.md
++++ b/marketing-analytics/SKILL.md
+@@ -15 +15 @@
+-| Open rate | Unique recorded opens / Delivered | Recorded opening activity; [privacy protections](https://www.apple.com/legal/privacy/data/en/mail-privacy-protection/) and automated opens limit interpretation |
++| Open rate | Unique recorded opens / Delivered | Recorded opening activity; privacy protections and automated opens limit interpretation |
+@@ -80 +80 @@
+-| Content profit ROI on content investment | (Revenue - Other included operating costs - Content investment) / Content investment | Profit return on the stated investment denominator; do not subtract the same cost twice |
++| Content profit ROI | (Revenue - Included operating costs - Content investment) / Content investment | Profit return under an explicit cost and attribution basis; do not subtract the same cost twice |
+--- a/research-synthesis/SKILL.md
++++ b/research-synthesis/SKILL.md
+@@ -59 +59 @@
+-- Examine workarounds as possible signals of friction or adaptation, checking whether participants consider them a problem
++- Pay special attention to workarounds — each one represents an unmet need
+@@ -117 +117 @@
+-- Use supported quantitative reach alongside severity and decision relevance; a rare critical failure can matter, and missing reach estimates do not make a qualitative finding unimportant
++- Weight qualitative findings by their quantitative reach — a theme from interviews matters more if analytics show it touches a large user base
+@@ -145,3 +144,0 @@
+-
+-Include only fields and quotations supported by the research; omit unsupported fields instead of filling the template with assumptions.
+-
+@@ -165 +162 @@
+-- Decision-relevant unmet needs
++- Top unmet needs (limit to 3)
+@@ -173 +170 @@
+-- Available, traceable verbatim quotes capturing this persona's perspective
++- 2-3 verbatim quotes capturing this persona's perspective

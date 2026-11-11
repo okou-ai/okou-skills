@@ -7,6 +7,8 @@ description: Plan marketing campaigns, launches, audiences, channels, calendars,
 
 Every campaign rests on five pillars: Goal, Audience, Narrative, Distribution, and Measurement.
 
+Start with the supplied budget cap, deadline, staff capacity, approved claims, and measured history. Keep source facts separate from proposed assumptions; a planning convention is not evidence about this company. When information is missing, proceed with a labeled conditional plan where possible and identify which missing input could change the choice.
+
 ### 1. Goal
 
 Clarify the desired outcome before any other planning begins.
@@ -42,6 +44,8 @@ Develop the central message and its supporting structure.
 - **Validation points**: statistics, customer stories, testimonials, or analyst endorsements for each argument
 - **Competitive distinction**: what separates your offering from alternatives, including inaction
 
+Use supplied or verifiable evidence for validation points. If support is absent, mark the claim for validation or narrow the message; do not invent results, customer stories, endorsements, or testimonials to fill the structure.
+
 Messaging hierarchy:
 1. Why should this matter to me? (connects to the pain or opportunity)
 2. What is being offered? (positions your solution)
@@ -56,7 +60,7 @@ Refer to the Channel Evaluation Guide below for detailed breakdowns.
 
 ### 5. Measurement
 
-Establish how you will determine whether the campaign succeeded. Refer to Performance Indicators by Campaign Type below.
+Define the primary outcome, denominator/cohort, measurement window, and decision threshold using the goal and available tracking. Distinguish observed/attributed outcomes from incremental impact; a launch-time increase alone does not identify the campaign's causal effect. Refer to Performance Indicators by Campaign Type below.
 
 ## Channel Evaluation Guide
 
@@ -113,48 +117,40 @@ Each entry should capture: what is being published, on which platform, the publi
 3. **Map assets to funnel stages**: ensure the calendar covers awareness, consideration, and conversion
 4. **Cluster around themes**: organize related pieces into weekly or biweekly thematic groupings
 5. **Diversify across channels**: avoid over-investing in a single platform; ensure multi-touchpoint coverage
-6. **Preserve flexibility**: hold 20% of calendar slots open for reactive or opportunistic publishing
+6. **Preserve flexibility**: propose slack based on approval uncertainty, response needs, and available capacity rather than a universal percentage
 
-### Recommended Publishing Cadence
-- **Blog**: 1-4 articles per week, scaled to team capacity
-- **Email newsletter**: weekly or biweekly for most subscriber bases
-- **Social media**: 3-7 posts per week per platform (varies by network)
-- **Paid campaigns**: continuous throughout the campaign window, refreshing creative every 2-4 weeks
-- **Webinars**: monthly or quarterly based on available resources
+### Capacity-Based Cadence
 
-### Typical Production Timelines
-- Blog article: 3-5 working days (research, drafting, review, publication)
-- Email campaign: 2-3 working days (copywriting, design, testing, deployment)
-- Social media posts: 1-2 working days (drafting, design, scheduling)
-- Landing page: 5-7 working days (copy, design, development, QA)
-- Video content: 2-4 weeks (scripting, filming, editing)
-- Long-form asset (ebook/whitepaper): 2-4 weeks (outline, draft, design, review cycle)
+Choose formats and frequency from audience demand, observed response, and production/review capacity. Estimate hours per asset by role and compare total required hours with each role's available hours. Shared staff cannot be scheduled at full capacity across multiple channels simultaneously. Treat unmeasured throughput as a planning assumption to validate, not an industry norm.
+
+### Production Dependencies
+
+Work backward from the deadline through research, copy, design/development, review, and publication. Use actual team lead times where available, including approval queues and dependencies. Distinguish elapsed time from effort, identify the critical path, and reduce scope or change sequencing if the plan cannot fit. Do not present generic asset turnaround times as commitments.
 
 ## Budget Planning Approaches
 
-### Revenue-Percentage Method
-- Cross-industry benchmark: 5-15% of revenue goes to marketing; B2B companies typically land at 5-10%, B2C at 10-15%
-- Early-stage and high-growth organizations often allocate 15-25% of revenue
-- Within the overall marketing budget, balance long-term brand investment against short-term performance spend
+### Establishing the Envelope
+
+Use the authorized campaign budget and its cost scope. If none is supplied, build a bottom-up proposal from activities and costs; label it as a proposal. Revenue-percentage benchmarks require a cited, comparable source and do not determine this company's appropriate spend. Do not infer permission to exceed the cap or execute the campaign.
 
 ### Allocation by Category
 
-A starting-point framework, to be refined with historical performance data:
+Build allocations from the chosen activities rather than applying preset percentages:
 
-| Category | Share of Budget | Typical Channels |
-|----------|----------------|------------------|
-| Paid acquisition | 30-40% | Search ads, social ads, display |
-| Content production | 20-30% | Blog, video, design, downloadable assets |
-| Events and sponsorships | 10-20% | Conferences, webinars, community meetups |
-| Technology and tooling | 10-15% | Analytics platforms, automation, CRM |
-| Experimentation | 5-10% | New channel pilots, A/B tests, emerging formats |
+| Cost type | Calculation / constraint |
+|-----------|--------------------------|
+| Variable | Activity units x unit cost, with the source or assumption for each |
+| Fixed or committed | Retain the actual commitment unless a feasible cancellation/change is supported |
+| Production and labor | Include the stated cash/fully loaded cost basis and separately check staff hours; do not double-count costs already included elsewhere |
+| Experimentation | Cost the pilot within the same cap and identify the decision it will inform |
+| Contingency | Explicit unallocated amount based on named risks; include it once in the total |
 
 ### Budget Optimization Principles
-- Concentrate 60-70% of paid spend on your highest-confidence channel
-- Set aside 15-20% for testing unfamiliar channels or tactics
-- Reallocate monthly based on observed performance — never set and forget
-- Factor in production costs alongside media spend
-- Maintain a 10-15% contingency for unforeseen opportunities or overruns
+- Reconcile activity costs plus contingency to the budget cap, showing any unallocated balance
+- When scaling an activity, recalculate variable costs and retain applicable fixed costs; do not proportionally scale the entire budget
+- Show the evidence for channel selection, marginal return assumptions, and capacity/saturation constraints; historical ROAS is not a guaranteed incremental return
+- Schedule reallocation decisions around spend velocity, conversion delays, and planned experiment stopping rules
+- Check that the recommended plan can satisfy both the financial cap and staffing/dependency constraints; if it cannot, state the tradeoff and revise the plan
 
 ## Performance Indicators by Campaign Type
 

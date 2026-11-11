@@ -1,0 +1,16 @@
+{
+  "tested_guidance_sha256": {
+    "flux-analysis/SKILL.md": "bd751aad63f29be63f674ae10b3f7b4aa4dc261fa89d81ae9f559027527f868d",
+    "flux-analysis/scripts/decompose.py": "868401721e78f788a5137227bba587b17361767c151b8f8330edb5d958574484",
+    "analysis-qa/SKILL.md": "7a5d99fd0c0946ef1511ac681df8cb00de578679aa9d1c92f828db5b20f73d27",
+    "marketing-analytics/SKILL.md": "8f7490301f81b0f1aed6e4153b5ef543d3d0807921ee03998f538627bff8a469",
+    "campaign-strategy/SKILL.md": "3484823378b6bcaa8804b237c1a3afd50a410b4fdad251fd91072b5fdb02dfca",
+    "stats-methods/SKILL.md": "17bfb1fa1cd80cced93bd549296fb60d4d585d0f60045966704628bb8b52365e",
+    "research-synthesis/SKILL.md": "f66a21bed19c739e05d566931cdde329f878cb19341127eec90b2db09f53b6fa"
+  },
+  "input_sha256": "2ac8ea199e1923f5501fb78baa8997b5cde7a854f7314e9d465d0cad1ee35483",
+  "answers_sha256": {
+    "finance": "e745f515f4a7bb992a102cfd35379ad09b6f8fb8a23188eaf4c7f791e68a4146",
+    "campaign": "bd1daafb0a89ec9f3a2bc35500c4827c2611ab2e4bc67c0d6dbe809f0a1c9629"
+  }
+}

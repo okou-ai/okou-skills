@@ -3,6 +3,10 @@ name: research-synthesis
 description: Synthesize user research into insights, personas, opportunities, themes, and prioritized actions.
 ---
 
+This skill covers user/customer research such as interviews, usability observations, and surveys. Scientific literature reviews and study-level evidence synthesis require methods suited to those designs; do not route them into personas or interview coding by default.
+
+Preserve source and participant IDs in working notes so claims and quotes can be traced. Separate direct observations, self-reports, analyst interpretations, and proposed actions. Report contradictory or missing evidence that could change a recommendation. Adapt the methods below to the actual question and available data rather than requiring every output type.
+
 ## Core Analytical Methods
 
 ### Thematic Coding
@@ -41,7 +45,7 @@ Strengthen any finding by confirming it through independent lines of evidence:
 - **Participant triangulation**: Examine the same question across different user segments or cohorts
 - **Temporal triangulation**: Look for the same pattern at multiple points in time
 
-Findings backed by several independent sources carry far more weight. When sources diverge, treat the disagreement as informative — it may point to distinct user segments or context-dependent behavior.
+Converging evidence can strengthen a finding when sources are relevant and sufficiently independent. Repeated quotes from the same participant, a survey and interview of the same people, or dashboards derived from one log are not independent replications. When sources diverge, investigate populations, timing, and measurement differences before resolving the disagreement.
 
 ## Working with Interview Data
 
@@ -52,11 +56,11 @@ For every interview, pull out four categories of information:
 **Observed behaviors and expressed attitudes**
 - Separate what participants describe doing from what they feel or believe
 - Record situational context: frequency, setting, collaborators involved
-- Pay special attention to workarounds — each one represents an unmet need
+- Examine workarounds as possible signals of friction or adaptation, checking whether participants consider them a problem
 
 **Illustrative quotations**
 - Select quotes that are specific and vivid, not generic platitudes
-- Attribute by participant profile rather than name: "Mid-market ops lead, 50-person team" rather than "Participant 7"
+- Use non-identifying participant IDs with relevant broad context; keep IDs traceable internally without exposing identifying combinations of details
 - Remember: a quote is evidence supporting a finding, not a finding in itself
 
 **Gaps between stated preferences and actual behavior**
@@ -73,7 +77,7 @@ For every interview, pull out four categories of information:
 ### Patterns Across Multiple Sessions
 
 After coding individual interviews:
-- Identify which observations recur across participants and count their frequency
+- Count unique participants supporting each theme and give the eligible/answered denominator; quote counts are not participant counts. Distinguish an unasked question from an explicit negative response
 - Segment by user type — different roles or contexts often yield different patterns
 - Surface contradictions between participants; these frequently indicate meaningful audience segments
 - Highlight anything that defied your initial expectations
@@ -82,11 +86,11 @@ After coding individual interviews:
 
 ### Quantitative Response Analysis
 
-- **Sample quality**: Evaluate response rate and potential non-response bias before drawing conclusions
+- **Sample quality**: Identify recruitment, target population, invitations/eligibility, response rate when known, item nonresponse, and weighting. Convenience or self-selected samples do not establish population prevalence merely because N is large
 - **Look at distributions, not just means**: A bimodal spread (concentrated at extremes) tells a fundamentally different story than a bell curve, even if the averages match
 - **Slice by segment**: Aggregate numbers can conceal critical differences between user groups
 - **Respect sample size**: Small samples make minor numerical differences unreliable
-- **Contextualize with benchmarks**: Compare against previous periods or industry baselines
+- **Contextualize with benchmarks**: Compare against available, comparable sources using the same question, scale, recruitment, and population; respect closed-data tasks
 
 ### Free-Text Response Analysis
 - Apply the same thematic coding process used for interview data
@@ -97,7 +101,7 @@ After coding individual interviews:
 ### Frequent Pitfalls in Survey Analysis
 - Reporting means without showing distributions — identical averages can mask radically different response shapes
 - Overlooking non-response bias — those who skipped the survey may differ systematically from those who completed it
-- Treating small score fluctuations as meaningful — a fraction-of-a-point shift is usually noise
+- Calling a score fluctuation meaningful or dismissing it as noise without considering uncertainty, sampling, scale, and practical importance
 - Assuming equal intervals on Likert scales — the psychological distance between "Strongly Agree" and "Agree" is not necessarily the same as between "Agree" and "Neutral"
 - Drawing causal conclusions from cross-tabulated correlations
 
@@ -105,14 +109,14 @@ After coding individual interviews:
 
 ### The Iterative Loop
 
-- **Start qualitative**: Interviews and observation uncover the what and the why. They generate hypotheses about user behavior.
-- **Quantify**: Surveys and analytics measure how widespread and how frequent. They validate or challenge hypotheses at scale.
+- **Start qualitative**: Interviews and observation reveal experiences and possible explanations; self-reports alone do not establish a causal mechanism.
+- **Quantify**: Surveys and analytics can measure prevalence/frequency within their sampling and tracking scope. Population estimates require an appropriate sampling or modeling basis.
 - **Return to qualitative**: Dive back in to explain surprising quantitative results.
 
 ### Combining Evidence Effectively
-- Weight qualitative findings by their quantitative reach — a theme from interviews matters more if analytics show it touches a large user base
-- Use qualitative data to decode quantitative anomalies — a retention dip is a number; interviews reveal the onboarding redesign confused new users
-- Present integrated evidence: "42% of respondents flagged difficulty with X (survey data). Interviews trace the root cause to Y (qualitative finding)."
+- Use supported quantitative reach alongside severity and decision relevance; a rare critical failure can matter, and missing reach estimates do not make a qualitative finding unimportant
+- Use qualitative data to propose explanations for quantitative anomalies, then check timing, alternative explanations, and any available behavioral evidence
+- Present integrated evidence with its scope: "42% of the 100 respondents answering this item flagged X; interviews suggest Y as a possible explanation." Do not convert respondent percentages into all-user prevalence or a suggested explanation into a proven root cause
 
 ### When Data Sources Conflict
 - Conflicting evidence across methods is a feature, not a flaw — it demands investigation
@@ -135,9 +139,12 @@ Personas must be grounded in observed patterns, not assumptions:
    - Core frustrations and unaddressed needs
    - Contextual details (role, organization type, adjacent tools)
    - Supporting quotes from research
-4. **Ground-truth with quantitative data**: Estimate the size of each persona segment using analytics or survey demographics
+4. **Check against quantitative data where suitable**: Estimate segment size only if the data identifies those behavioral clusters in the target population; demographic counts alone may not map to them
 
 ### Persona Profile Structure
+
+Include only fields and quotations supported by the research; omit unsupported fields instead of filling the template with assumptions.
+
 ```
 [Label] — [One-sentence characterization]
 
@@ -155,7 +162,7 @@ Product Relationship:
 - Complementary tools in their stack
 
 Frustrations:
-- Top unmet needs (limit to 3)
+- Decision-relevant unmet needs
 - Workarounds they have built
 
 Decision Drivers:
@@ -163,12 +170,12 @@ Decision Drivers:
 - What would push them to leave or upgrade
 
 Voice of the User:
-- 2-3 verbatim quotes capturing this persona's perspective
+- Available, traceable verbatim quotes capturing this persona's perspective
 ```
 
 ### Persona Anti-Patterns
 - **Demographic framing**: Defining personas by age, gender, or geography instead of behavior. Behavioral attributes predict product needs far more reliably.
-- **Persona proliferation**: More than five personas dilutes focus. Aim for three to five.
+- **Unsupported segmentation**: Let distinguishable, decision-relevant patterns determine whether personas are useful and how many are justified; do not fill a persona quota
 - **Assumption-based personas**: Profiles invented without research data are fiction, not tools.
 - **Stale personas**: Personas that are never revisited as the product and market shift lose their usefulness.
 - **Decorative personas**: If a persona does not influence at least one product decision, it is not earning its keep.
@@ -177,7 +184,7 @@ Voice of the User:
 
 ### Estimating the Scale of Each Opportunity
 
-For every insight or opportunity area that emerges from synthesis, estimate:
+For opportunities where sizing would change the decision, estimate what the evidence supports and leave unknowns explicit:
 
 - **Affected population**: How many users face this problem? Ground the estimate in analytics, survey data, or market sizing.
 - **Encounter frequency**: How often does the problem occur for each affected user? (Daily, weekly, monthly, one-time)
@@ -188,13 +195,13 @@ For every insight or opportunity area that emerges from synthesis, estimate:
 
 Rank opportunities along four dimensions:
 
-- **Impact** = (Affected users) x (Frequency) x (Severity)
-- **Evidence quality** = How robust is the supporting data? (Multiple methods and sources >> single data point; behavioral evidence >> self-report)
+- **Impact**: Consider affected users, frequency, and severity. Multiplication is useful only with defined units and meaningful scales; ordinal severity labels do not automatically support arithmetic
+- **Evidence quality**: Assess recruitment, measurement, source independence, relevance, and contradictory evidence, rather than counting sources or assuming all behavioral data outranks self-report
 - **Strategic fit** = Does this align with company direction and product vision?
 - **Execution feasibility** = Can this realistically be built? Consider technical complexity, resource requirements, and time to value.
 
 ### Communicating Opportunity Estimates
 - Make your assumptions visible — show the reasoning chain, not just the conclusion
-- Use ranges to convey uncertainty honestly: "Affects 1,500 to 2,500 users per month" rather than spurious precision like "2,137 users"
-- Integrate qualitative and quantitative evidence: "Support ticket volume suggests roughly 2,000 monthly occurrences. Interview data indicates approximately 60% of those affected consider it a serious blocker."
+- Give bounds only when supported by data or named scenario assumptions; a range does not make an unsupported population estimate valid
+- Keep units and denominators separate: ticket counts are not unique affected users, and interview severity counts do not estimate population percentages without a suitable basis
 - Rank opportunities relative to each other — comparative positioning is often more useful than absolute scores

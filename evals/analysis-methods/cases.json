@@ -1,0 +1,180 @@
+{
+  "finance": {
+    "skills": [
+      "flux-analysis",
+      "analysis-qa"
+    ],
+    "request": "请只用随附数据，写一份给财务负责人的中文分析短笺，解释收入、毛利率、薪酬变化，核对附表指标，并指出最值得追查的事项。保持简洁，只交短笺，无需另外的审计附件。",
+    "data": {
+      "periods": [
+        "plan",
+        "actual"
+      ],
+      "currency": "USD",
+      "quantity_unit": "comparable subscription units",
+      "products": [
+        {
+          "segment": "a",
+          "plan_quantity": 60,
+          "plan_price": 10,
+          "actual_quantity": 40,
+          "actual_price": 12,
+          "plan_margin": "0.60",
+          "actual_margin": "0.50"
+        },
+        {
+          "segment": "b",
+          "plan_quantity": 40,
+          "plan_price": 20,
+          "actual_quantity": 80,
+          "actual_price": 18,
+          "plan_margin": "0.40",
+          "actual_margin": "0.30"
+        }
+      ],
+      "people": {
+        "plan_paid_fte_months": "10.5",
+        "plan_cost_per_fte_month": 1000,
+        "actual_paid_fte_months": "12.25",
+        "actual_cost_per_fte_month": 1100,
+        "other_payroll_costs": 0
+      },
+      "appendix": {
+        "new_accounts": {
+          "prior_month": 10,
+          "current_month": 25,
+          "reported_growth": "150%"
+        },
+        "net_revenue_adjustment": {
+          "gross_revenue": 100,
+          "returns": 150,
+          "reported_net_revenue": -50
+        },
+        "orders": [
+          {
+            "id": "o1",
+            "revenue": 100
+          },
+          {
+            "id": "o2",
+            "revenue": 100
+          }
+        ],
+        "line_items": [
+          {
+            "order_id": "o1",
+            "item": "i1"
+          },
+          {
+            "order_id": "o1",
+            "item": "i2"
+          },
+          {
+            "order_id": "o2",
+            "item": "i3"
+          }
+        ],
+        "joined_report": {
+          "row_count": 3,
+          "distinct_orders": 2,
+          "sum_order_revenue": 300
+        },
+        "business_reporting_timezone": "Asia/Shanghai",
+        "timestamp_utc": "2026-01-01T17:00:00Z",
+        "reported_business_day": "2026-01-01"
+      }
+    }
+  },
+  "campaign": {
+    "skills": [
+      "marketing-analytics",
+      "campaign-strategy",
+      "stats-methods",
+      "research-synthesis",
+      "analysis-qa"
+    ],
+    "request": "请只用随附数据写一份中文决策建议：是否值得扩大内容营销投入，下个月如何安排活动，以及用户研究支持哪些结论。请给出必要的指标和可执行计划，说明关键不确定性。只交一份简短建议，不需额外附件，也不执行投放或发送消息。",
+    "data": {
+      "content_results": {
+        "attributed_revenue": 1000,
+        "content_investment": 200,
+        "other_included_operating_costs": 600,
+        "costs_overlap": false,
+        "attribution_rule": "last click",
+        "randomized_control": false
+      },
+      "acquisition": {
+        "CAC": 180,
+        "monthly_revenue_per_customer": 60,
+        "gross_margin": "0.50",
+        "constant_monthly_contribution_assumption": true,
+        "churn_data": null
+      },
+      "before_after": {
+        "design": "nonrandomized sequential periods",
+        "before": {
+          "conversions": 20,
+          "eligible_unique_visitors": 100
+        },
+        "after": {
+          "conversions": 25,
+          "eligible_unique_visitors": 100
+        }
+      },
+      "monthly_signups": [
+        100,
+        104,
+        102,
+        103
+      ],
+      "next_month": {
+        "cash_budget_cap": 10000,
+        "single_marketer_available_hours": 18,
+        "committed_setup_cash_cost": 4000,
+        "committed_setup_hours": 4,
+        "per_webinar_cash_cost": 2000,
+        "per_webinar_marketer_hours": 6,
+        "initial_proposal_webinars": 4,
+        "other_channel_costs_or_throughput": null
+      },
+      "survey": {
+        "target_customer_population": 1000,
+        "recruitment": "opt-in responses from 100 invited customers",
+        "respondents": 18,
+        "item_answered": 12,
+        "item_yes": 9,
+        "item_text": "Does onboarding feel difficult?"
+      },
+      "interviews": {
+        "participants": 5,
+        "recruitment": "convenience sample of volunteers",
+        "statements": [
+          {
+            "participant": "p1",
+            "quote": "I found the first step confusing."
+          },
+          {
+            "participant": "p1",
+            "quote": "The same setup screen confused me again."
+          },
+          {
+            "participant": "p2",
+            "quote": "I could not tell which setup step came next."
+          },
+          {
+            "participant": "p3",
+            "quote": "I needed help to finish setup."
+          },
+          {
+            "participant": "p4",
+            "quote": "Setup was straightforward."
+          },
+          {
+            "participant": "p5",
+            "quote": "Setup was straightforward."
+          }
+        ]
+      }
+    }
+  }
+}
