@@ -17,7 +17,9 @@ instructions. Load only the references that operation needs.
 - [Excel](xlsx/SKILL.md) for XLSX work.
 
 For deliverables that require developing or revising analytical conclusions,
-read [Analysis](references/analysis.md).
+read [Analysis](references/analysis.md). If an available domain skill covers
+the method needed, follow its analytical guidance alongside the selected file
+workflow.
 
 When drafting or revising prose, use a professional register that suits the
 document type and the reader's expectations. Use standard domain terms and
