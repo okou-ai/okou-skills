@@ -10,7 +10,7 @@ Understand the user's needs, plan a suitable search, and find evidence-supported
 ## Core principles
 
 - **Broad discovery:** Cover complementary candidate pools with targeted searches, adjusting the strategy as gaps emerge.
-- **Strict verification:** Count or present a candidate as a match only after verifying they meet the user's criteria.
+- **Strict verification:** Count or present a candidate as a match only after verifying every qualification the user requires. Keep candidates with unresolved requirements as leads.
 - **Complete accounting:** Keep every candidate's outcome explicit and preserve the full qualified set through ranking and delivery.
 
 ## Workflow
@@ -21,29 +21,33 @@ Understand the user's needs, plan a suitable search, and find evidence-supported
 
 3. **Find and verify efficiently.** Use the tools below and their current schemas. Reuse source-linked facts for the right person and timeframe, researching only material gaps or conflicts. Do not repeat whole biographies or require another source when evidence is already sufficient. Use batch or parallel checks where useful and deduplicate identities.
 
-4. **Rank and share interim results.** Rank qualifying candidates by the user's priorities. When useful results are ready, especially when many candidates qualify, share a prioritized subset rather than making the user wait for the entire list. Label it interim, include links and qualification evidence, and continue the remaining work in the same run. Respect final-only requests; do not delay interim results for contact enrichment unless contactability is a required qualification.
+4. **Rank by confidence.** By default, order qualified candidates from highest to lowest confidence in both interim and final results. Judge confidence that they meet all required qualifications by source reliability, attribution to the person, and fit to the required scope and timeframe. Use the user's preferences to order candidates with similar confidence, and honor any explicit sort order for qualified results. When useful results are ready, share a ranked subset labeled interim with source links and qualification evidence, then continue the work in the same run. Respect final-only requests. When contactability is optional, share interim results as soon as the qualification evidence is ready.
 
-5. **Enrich professional contacts.** By default, try to add a work email or public business contact channel for the verified people being delivered. Reuse existing contacts and announce enrichment before making calls. For missing work emails, explicitly select `fields: ["work-email"]` in `contact_enrich` with the person's name and verified current employer domain; default profile lookup alone does not reveal an email. Cite the source or provider and report lookup status honestly. Do not guess addresses, request private-email or phone-number reveals, or start outreach. Missing contacts do not disqualify a match unless required by the user.
+5. **Enrich each qualified person's professional profile and contacts.** Before final delivery, fill relevant gaps in the person's role, organization, and professional profile link where applicable, and try to add a work email or public business contact channel. Reuse sourced details and contacts, and announce enrichment before making calls. To resolve a missing professional profile, use `contact_enrich` in its default profile mode with a `contact_search` result ID, a LinkedIn profile URL, or the person's name and employer domain. For work-email lookup, explicitly select `fields: ["work-email"]` with the person's name and verified current employer domain. Cite the source or provider for added details and record when a lookup could not verify them. Do not guess addresses, request private-email or phone-number reveals, or start outreach. Missing contacts do not disqualify a match unless required by the user.
 
-6. **Complete the requested scope.** For a fixed target, finish once enough distinct verified matches satisfy the request; previously delivered people do not count toward additional results. For “as many as possible,” continue while meaningful expansions yield qualifying people. High duplication calls for a useful pivot, not automatic completion. Stopping discovery does not finish screening the existing pool: use available evidence and targeted gap checks, without silently discarding unreviewed candidates. Keep unresolved leads separate. Respect explicit scope, time, cost, and call limits; if a real limit prevents completion, explain what remains.
+6. **Complete the requested scope.** For a fixed target, finish once enough distinct verified matches satisfy the request; previously delivered people do not count toward additional results. For “as many as possible,” continue while meaningful expansions yield qualifying people. High duplication calls for a useful pivot, not automatic completion. Stopping discovery does not finish screening the existing pool: use available evidence and targeted gap checks, without silently discarding unreviewed candidates. Respect explicit scope, time, cost, and call limits; if a real limit prevents completion, explain what remains.
 
 ## Tool roles
 
-Choose by evidence need, not as a mandatory all-tools pipeline. These are recommended uses, not exclusive capability boundaries:
+Use the table to choose available tools for the evidence you need.
 
 | Need | Useful tools |
 | --- | --- |
-| Natural-language discovery of professional profile pages | `people_search_semantic` |
-| Exact current title, employer, profile-country, or skill filters | `people_search_structured` |
-| Public professional profiles by identity, role, employer, education, skill, or location | `people_search` |
-| Public cases, interviews, projects, or experience evidence | `web_search` |
-| Reading source text from known public pages | `web_contents` or `web_scrape` |
-| Work-email lookup or professional contact enrichment for a known person | `contact_enrich` |
+| Discover professional profiles when duties can be described in different ways | `people_search_semantic` |
+| Build a candidate pool from exact current titles, employers, profile countries, or skills | `people_search_structured` |
+| Check a known person's identity or role using their name and organization | `people_search` |
+| Find public cases, interviews, projects, or credited work that show what a person did, where, or when | `web_search` |
+| Read several known public URLs in one batch | `web_contents` |
+| Read one known public page | `web_scrape` |
+| Read a known public LinkedIn profile or post when general extraction returns a sign-in page or misses the relevant text | `linkedin_profile` or `linkedin_post`, if available |
+| Resolve a known person's professional profile or look up their work email | `contact_enrich` |
 
-For creators and audience metrics, use enabled tools for the named platform. Structured title/employer filters refer to current roles; profile-country is profile location, not nationality or employer headquarters. Do not turn current-role filters into extra requirements for past-experience searches.
+Cases, interviews, projects, and credited work can surface people with relevant experience. For a known candidate, search their name, organization, and the missing requirement. Use local-language terms when relevant. If a source describes only the organization's work, look for a source that connects the candidate to that work.
+
+Structured title and employer filters refer to current roles, and country filters refer to the person's profile location. For past-experience searches, assess eligibility against the relevant period and any current-role requirement the user specified. For creators and audience metrics, use enabled tools for the named platform.
 
 ## Delivery
 
-- Prefer **Markdown tables or a Sheet/spreadsheet**, with columns suited to the request: person/channel and profile link, key qualifications or metrics, ranking rationale, contact details, and sources.
+- Prefer **Markdown tables or a Sheet/spreadsheet**. Include columns suited to the request for the person or channel, profile link, qualification evidence or metrics, ranking rationale, contact details and lookup status, and sources.
 - After interim batches, deliver a **final consolidated version**, not just a progress summary or references to earlier messages. Reconcile duplicates and corrections, and include all verified matches within the requested scope and result limit. For long lists, provide the complete table or Sheet and label any inline shortlist as a preview.
 - If work remains because of a real limit, label the handoff partial rather than complete and state the remaining gaps. Do not claim exhaustiveness without support.
