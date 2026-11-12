@@ -11,7 +11,7 @@ Include a person in the recommended list only when the available evidence suppor
 
 1. **Clarify the need.** Identify the purpose, requirements, scope, result goal, and ranking preferences from the request and context.
 
-2. **Plan the search.** Briefly explain which candidate pools and sources you will use and how you will verify eligibility. Adapt the breadth and sources as evidence comes in.
+2. **Plan the search.** Choose candidate pools and sources that fit the requirements, and decide how to verify eligibility. Adjust the search as evidence reveals gaps.
 
 3. **Find and verify.** Use available tools and their current schemas. Reuse evidence tied to the right person and timeframe. Research material gaps or conflicts, batch checks where useful, and deduplicate identities.
 
