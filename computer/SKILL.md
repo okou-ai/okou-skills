@@ -1,8 +1,7 @@
 ---
 name: computer
-description: Computer connector for exposing local services to remote sandboxes via
-  authenticated ngrok tunnels. Use when user mentions "computer use", "tunnel",
-  "ngrok", "expose local", or needs to bridge local services to a sandbox.
+description: Expose a local service to a remote sandbox through an authenticated
+  ngrok tunnel. Use for tunnel setup or forwarding a local port to a sandbox.
 ---
 
 ## Environment Variables

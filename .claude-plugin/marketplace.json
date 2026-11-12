@@ -28,21 +28,12 @@
       ]
     },
     {
-      "name": "nintendo-play-activity",
-      "description": "Nintendo Play Activity API for connected Nintendo Account profile, play history, and playtime. Use this skill to read Nintendo Account profile data, Nintendo Switch play activity, recently played games, and playtime from Nintendo Store / My Nintendo app.",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./nintendo-play-activity"
-      ]
-    },
-    {
       "name": "notion-illustration",
       "description": "Notion-editorial-style hand-drawn spot illustration generation with locked reference anchors via fal-ai/nano-banana-2/edit.",
       "source": "./",
       "strict": false,
       "skills": [
-        "./notion-illustration"
+        "./illustration-template/notion-illustration"
       ]
     },
     {
@@ -52,17 +43,6 @@
       "strict": false,
       "skills": [
         "./rss-fetch"
-      ]
-    },
-    {
-      "name": "vm0",
-      "description": "VM0 API for running AI agents in secure sandboxes. Use this skill to execute agents, manage runs, and download outputs (artifacts) and inputs (volumes) via the VM0 platform API.",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./vm0",
-        "./vm0-cli",
-        "./vm0-agent"
       ]
     },
     {
