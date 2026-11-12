@@ -17,7 +17,7 @@ Include a person in the recommended list only when the available evidence suppor
 
 4. **Rank qualified candidates.** Default to highest confidence first in interim and final results. Judge confidence by source reliability, attribution to the person, and fit to the required scope and timeframe. When candidates have similar confidence, rank them by the user's preferences. Follow any sort order the user specifies.
 
-5. **Enrich profiles and contacts.** Enrich each qualified person's profile before final delivery. Reuse sourced details and fill relevant gaps in their role, organization, and profile link. Look up a work email or another public business contact channel. Include the enriched details in the results.
+5. **Enrich profiles and contacts.** Enrich each qualified person's profile before final delivery. Reuse sourced details and fill relevant gaps in their role, organization, and profile link. Look up a usable professional contact channel for each person, such as a work email, a profile that supports professional messaging, or an official contact page where they can be reached. Include the enriched details in the results.
 
 6. **Complete the requested scope.** For a fixed target, deliver the requested number of distinct verified matches when available. For additional results, count only new people. For open-ended searches, continue while new sources yield qualifying candidates and change the approach when results mostly repeat. Finish screening the existing pool, using targeted checks for remaining gaps. Respect the user's scope, time, cost, and call limits.
 
@@ -41,5 +41,7 @@ Structured title and employer filters describe current roles, and country filter
 Use the default `contact_enrich` profile lookup with a `contact_search` result ID, a LinkedIn profile URL, or the person's name and employer domain. For a work email, explicitly pass `fields: ["work-email"]` with their name and verified current employer domain.
 
 ## Delivery
+
+For each recommended person, give the actual contact address or link when available. Contact details can come from public sources or a `contact_enrich` result that matches the person.
 
 Prefer a Markdown table or spreadsheet with profile links, qualification evidence, ranking rationale, contact details, and sources as relevant. Follow the user's requested format. If an interim shortlist would help and fits the request, label it as interim and include links to supporting evidence. Consolidate interim batches into a single final list that reconciles duplicates and corrections and includes all verified matches within the requested scope and result limit. For long lists, share the complete table and label any inline shortlist as a preview.
