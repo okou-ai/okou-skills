@@ -9,7 +9,7 @@ Include a person in the recommended list only when the available evidence suppor
 
 ## Workflow
 
-1. **Clarify the need.** Identify the purpose, requirements, scope, result goal, and ranking preferences. Ask a focused question only when the missing detail would materially change the search.
+1. **Clarify the need.** Identify the purpose, requirements, scope, result goal, and ranking preferences from the request and context.
 
 2. **Plan the search.** Briefly explain which candidate pools and sources you will use and how you will verify eligibility. Adapt the breadth and sources as evidence comes in.
 
