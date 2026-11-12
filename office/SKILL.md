@@ -1,47 +1,38 @@
 ---
 name: office
-description: Create, read, edit, and validate Word documents, PDF files, and Excel spreadsheets. Includes Chinese government-style documents, named academic papers, thesis templates and business/editorial formatting in Word; research and technical PDF features; and financial models, budgets, forecasts and scenarios in Excel. Use for DOCX, PDF, XLSX, spreadsheet formulas, PDF forms, document formatting or conversion.
+description: >
+  Create, edit, format, convert, or validate Word documents, PDFs, and Excel
+  workbooks. Use for file-specific checks of layout, formulas, or form fields.
+  For content-only reading, extraction, or summaries, use a reader directly.
 license: MIT
 ---
 
 # Office files
 
-Use the format-specific skill below. Read only the selected route and the
-references needed for the task.
+Choose the route for the requested operation and follow its setup and validation
+instructions. Load only the references that operation needs.
 
-Set `OFFICE_DIR` to the absolute directory containing this file. Set `SKILL_DIR`
-to the selected subdirectory before running its examples; it is a shell variable,
-not a literal directory named `SKILL_DIR`. Do not assume the current working
-directory is the skill directory.
+- [Word](docx/SKILL.md) for DOCX work and DOCX-to-PDF.
+- [PDF](pdf/SKILL.md) for standalone PDF work and forms.
+- [Excel](xlsx/SKILL.md) for XLSX work.
 
-| Output or task | Read | Set |
-| --- | --- | --- |
-| Word creation, editing, formatting, or DOCX-to-PDF, including government-style, named academic, thesis-template and business/editorial documents | [docx/SKILL.md](docx/SKILL.md) — select the applicable presentation profile as well as the operation | `SKILL_DIR="$OFFICE_DIR/docx"` |
-| Standalone PDF creation, form inspection/filling, or reformatting, including research/technical content | [pdf/SKILL.md](pdf/SKILL.md) — distinguish named manuscript requirements from visual presets | `SKILL_DIR="$OFFICE_DIR/pdf"` |
-| Excel creation, reading, editing, formulas, or validation, including financial budgets and forecasts | [xlsx/SKILL.md](xlsx/SKILL.md) — select its common and business-scenario layers before authoring | `SKILL_DIR="$OFFICE_DIR/xlsx"` |
+For deliverables that require developing or revising analytical conclusions,
+read [Analysis](references/analysis.md). If an available domain skill covers
+the method needed, follow its analytical guidance alongside the selected file
+workflow.
 
-Honor the user's format and supplied template. The selected template's styles
-take precedence over generic typography defaults. For a DOCX and its PDF
-companion, author once and render the DOCX so content and layout remain aligned.
-Use each route's setup and validation commands; reuse a working environment
-within the session. Presentation profiles are formatting guidance, not substantive
-research, policy, medical or legal expertise. Package checks do not certify
-compliance with a publication or government standard.
+When drafting or revising prose, use a professional register that suits the
+document type and the reader's expectations. Use standard domain terms and
+natural phrasing in the requested language. Before delivery, reread the title,
+headings at every level, and key paragraphs in the finished draft. Replace
+attention-grabbing questions, slogan-like wording, and drafting labels with
+headings and phrasing customary for this type of document. Read the full text
+for natural expression in the requested language, paying particular attention
+to the wording of domain terms.
 
-## Package map
+Honor the supplied template and limit edits to the requested scope. When
+delivering Word and PDF versions of the same document, render the PDF from the
+authored DOCX.
 
-The top-level `office` package is the single discovery entry. Each format's
-`SKILL.md` routes to references grouped by responsibility:
-
-- `common/`: reusable data/presentation conventions.
-- `domains/`: applicable business or named-format requirements.
-- `operations/`: the authorized create/read/edit/fill/validate workflow.
-- `implementation/`: library, package, schema and environment details.
-
-All reference guides are linked directly from the relevant format entry; load
-only those needed. Scripts, templates and assets retain their existing paths.
-A format route does not authorize unrelated edits, redesign or extra deliverables.
-
-The implementations are adapted from MiniMax's MIT-licensed skills. Original
-licenses and pinned-source attribution are preserved in each subdirectory's
-`LICENSE` and `UPSTREAM.md`.
+The format implementations are adapted from MiniMax's MIT-licensed skills.
+Each format directory retains its `LICENSE` and `UPSTREAM.md`.
