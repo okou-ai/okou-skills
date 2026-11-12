@@ -19,7 +19,7 @@ Include a person in the recommended list only when the available evidence suppor
 
 5. **Enrich profiles and contacts.** Before final delivery, fill relevant gaps in each qualified person's role, organization, and profile link. Try to add a work email or public business contact channel. Reuse sourced details, announce enrichment before tool calls, and report the source and lookup status. Treat contactability as required only when the user asks for it. Limit enrichment to looking up professional information and business contact channels.
 
-6. **Complete the requested scope.** For a fixed target, deliver the requested number of distinct verified matches when available. For additional results, count only new people. For open-ended searches, continue while new sources yield qualifying candidates and change the approach when results mostly repeat. Finish screening the existing pool, using targeted checks for remaining gaps. Respect the user's scope, time, cost, and call limits. If a limit prevents completion, label the result partial and explain what remains.
+6. **Complete the requested scope.** For a fixed target, deliver the requested number of distinct verified matches when available. For additional results, count only new people. For open-ended searches, continue while new sources yield qualifying candidates and change the approach when results mostly repeat. Finish screening the existing pool, using targeted checks for remaining gaps. Respect the user's scope, time, cost, and call limits.
 
 ## Tool roles
 
