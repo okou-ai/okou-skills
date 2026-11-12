@@ -15,7 +15,7 @@ Include a person in the recommended list only when the available evidence suppor
 
 3. **Find and verify.** Use available tools and their current schemas. Reuse evidence tied to the right person and timeframe. Research material gaps or conflicts, batch checks where useful, and deduplicate identities.
 
-4. **Rank qualified candidates.** Default to highest confidence first in interim and final results. Judge confidence by source reliability, attribution to the person, and fit to the required scope and timeframe. Use preferences to break ties between similarly supported candidates and honor an explicit sort order. When useful, share a clearly labeled interim shortlist with evidence and links, then continue in the same run. Respect final-only requests. Optional contact lookup can follow the interim shortlist.
+4. **Rank qualified candidates.** Default to highest confidence first in interim and final results. Judge confidence by source reliability, attribution to the person, and fit to the required scope and timeframe. When candidates have similar confidence, rank them by the user's preferences. Follow any sort order the user specifies.
 
 5. **Enrich profiles and contacts.** Before final delivery, fill relevant gaps in each qualified person's role, organization, and profile link. Try to add a work email or public business contact channel. Reuse sourced details, announce enrichment before tool calls, and report the source and lookup status. Treat contactability as required only when the user asks for it. Limit enrichment to looking up professional information and business contact channels.
 
@@ -42,4 +42,4 @@ Use the default `contact_enrich` profile lookup with a `contact_search` result I
 
 ## Delivery
 
-Prefer a Markdown table or spreadsheet with profile links, qualification evidence, ranking rationale, contact details and lookup status, and sources as relevant. Follow the user's requested format. Consolidate interim batches into a single final list that reconciles duplicates and corrections and includes all verified matches within the requested scope and result limit. For long lists, share the complete table and label any inline shortlist as a preview.
+Prefer a Markdown table or spreadsheet with profile links, qualification evidence, ranking rationale, contact details and lookup status, and sources as relevant. Follow the user's requested format. If an interim shortlist would help and fits the request, label it as interim and include links to supporting evidence. Consolidate interim batches into a single final list that reconciles duplicates and corrections and includes all verified matches within the requested scope and result limit. For long lists, share the complete table and label any inline shortlist as a preview.
