@@ -29,18 +29,22 @@ Understand the user's needs, plan a suitable search, and find evidence-supported
 
 ## Tool roles
 
-Choose by evidence need, not as a mandatory all-tools pipeline. These are recommended uses, not exclusive capability boundaries:
+Start with the available channel most likely to produce evidence for the hardest required qualification. Use the table to choose a tool for the evidence you need next.
 
 | Need | Useful tools |
 | --- | --- |
-| Natural-language discovery of professional profile pages | `people_search_semantic` |
-| Exact current title, employer, profile-country, or skill filters | `people_search_structured` |
-| Public professional profiles by identity, role, employer, education, skill, or location | `people_search` |
-| Public cases, interviews, projects, or experience evidence | `web_search` |
-| Reading source text from known public pages | `web_contents` or `web_scrape` |
+| Discover professional profiles when duties can be described in different ways | `people_search_semantic` |
+| Build a candidate pool from exact current titles, employers, profile countries, or skills | `people_search_structured` |
+| Check a known person's identity or role using their name and organization | `people_search` |
+| Find public cases, interviews, projects, or credited work that show what a person did, where, or when | `web_search` |
+| Read several known public URLs in one batch | `web_contents` |
+| Read one known public page | `web_scrape` |
+| Read a known public LinkedIn profile or post when general extraction returns a sign-in page or misses the relevant text | `linkedin_profile` or `linkedin_post`, if available |
 | Work-email lookup or professional contact enrichment for a known person | `contact_enrich` |
 
-For creators and audience metrics, use enabled tools for the named platform. Structured title/employer filters refer to current roles; profile-country is profile location, not nationality or employer headquarters. Do not turn current-role filters into extra requirements for past-experience searches.
+When the hardest requirement is what someone has done, start with cases, interviews, projects, or credited work and look for people named there. For a known candidate, search their name, organization, and the missing requirement. Use local-language terms when relevant. If a source describes only the organization's work, look for a source that connects the candidate to that work.
+
+Structured title and employer filters refer to current roles, and country filters refer to the person's profile location. For past-experience searches, assess eligibility against the relevant period and any current-role requirement the user specified. For creators and audience metrics, use enabled tools for the named platform.
 
 ## Delivery
 
