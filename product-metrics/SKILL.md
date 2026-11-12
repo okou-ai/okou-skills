@@ -102,7 +102,7 @@ Granular metrics used to investigate why L1 indicators move:
 
 **Analytical approaches**:
 - Chart retention curves by cohort. Steep initial falloff signals an activation gap. Steady ongoing decline points to an engagement deficit. A flattening curve indicates a healthy stable base.
-- Compare cohorts chronologically. Improving retention in newer cohorts confirms product improvements are landing.
+- Compare retention at the same cohort age. Check differences in acquisition channel, user mix, and observation window before interpreting a change. Use an experiment or another credible causal design to estimate the effect of a product change.
 - Segment by onboarding completion or feature adoption to isolate what behaviors predict lasting retention.
 
 ### Funnel Conversion

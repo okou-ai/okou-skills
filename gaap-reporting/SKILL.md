@@ -211,22 +211,20 @@ Closing cash & equivalents
 
 For every material line:
 - **Absolute change:** Current period amount minus comparison period amount
-- **Relative change:** Absolute change divided by the absolute value of the comparison period, expressed as a percentage
+- **Relative change:** For a positive comparison value, divide the change by that value. For a zero or negative comparison value, show the level change and use a percentage only when a defined denominator and sign convention make it interpretable.
 - **Margin shift (where applicable):** Difference in percentage-of-revenue ratios, expressed in basis points (1 bp = 0.01%)
 
 ### Significance Criteria
 
-Tailor investigation thresholds to the entity's scale and risk profile:
-
-| Balance Magnitude | Absolute Trigger | Relative Trigger |
-|---|---|---|
-| Above $10M | $500K | 5% |
-| $1M to $10M | $100K | 10% |
-| Under $1M | $50K | 15% |
+Use the entity's approved thresholds when available. Otherwise prioritize by
+the size of the movement, the entity's risks, and whether the result could
+change a reporting or management decision. Label any proposed threshold and
+state its basis.
 
 ### Isolating Movement Drivers
 
-Break total movement into root causes:
+Reconcile total movement to measured contributions and offsets. Look for
+evidence that supports a business explanation. Possible drivers include:
 
 - **Volume/quantity shift:** Incremental units at prior-period pricing
 - **Rate/price shift:** Changed pricing applied to current-period units
@@ -238,10 +236,10 @@ Break total movement into root causes:
 
 ### Building the Narrative
 
-For every movement that exceeds significance criteria:
+For each material movement:
 1. State the magnitude (dollars and percentage)
 2. Label the direction as favorable or unfavorable
-3. Attribute the movement to specific drivers from the list above
-4. Explain the underlying business rationale
-5. Indicate whether the movement is transient or reflects a sustained trajectory change
+3. Quantify the drivers the data can support and identify any unexplained amount
+4. Attribute explanations from management or other sources. State a cause only when the evidence supports it
+5. Discuss persistence when supported and identify what remains uncertain
 6. Flag any follow-up actions (deeper investigation, forecast revision, process adjustment)

@@ -5,19 +5,21 @@ description: Analyze marketing performance, attribution, channel metrics, foreca
 
 ## Channel Metric Reference
 
+Use the source platform's definitions and the task's cost basis, reporting window, and cohort. State whether numerators count unique people, sessions, or repeat events; do not mix these silently. A zero denominator makes a ratio undefined, not zero. Compare to supplied targets or genuinely comparable benchmarks with a source and date; the tables below are definitions, not universal performance norms. Observed or attributed outcomes do not by themselves establish incremental impact.
+
 ### Email
 
-| Metric | How It Is Calculated | Typical Range | Insight Provided |
-|--------|---------------------|---------------|-----------------|
-| Delivery rate | Delivered / Sent | 95-99% | Sender reputation and list hygiene |
-| Open rate | Unique opens / Delivered | 15-30% | Subject line and sender name effectiveness |
-| Click-through rate (CTR) | Unique clicks / Delivered | 2-5% | Relevance of content and CTA |
-| Click-to-open rate (CTOR) | Unique clicks / Unique opens | 10-20% | In-email content quality among openers |
-| Unsubscribe rate | Unsubscribes / Delivered | Below 0.5% | Audience-content fit and send frequency tolerance |
-| Bounce rate | Bounces / Sent | Below 2% | List data quality |
-| Conversion rate | Conversions / Delivered | 1-5% | Full-funnel email performance |
-| Revenue per send | Total revenue / Emails sent | Varies | Direct monetary contribution |
-| List growth rate | (New subs - Unsubs) / Total list | 2-5% per month | Audience acquisition health |
+| Metric | How It Is Calculated | Insight Provided |
+|--------|---------------------|-----------------|
+| Delivery rate | Delivered / Sent | Delivery and list hygiene |
+| Open rate | Unique recorded opens / Delivered | Recorded opening activity; [privacy protections](https://www.apple.com/legal/privacy/data/en/mail-privacy-protection/) and automated opens limit interpretation |
+| Click-through rate (CTR) | Unique clicking recipients / Delivered | Recorded response to content and CTA; check bot filtering |
+| Click-to-open rate (CTOR) | Unique clicking recipients / Unique recorded openers | Clicks relative to recorded opens; inherits open-tracking limitations |
+| Unsubscribe rate | Unsubscribes / Delivered | Audience-content fit and send frequency tolerance |
+| Bounce rate | Bounces / Sent | List data quality |
+| Recipient conversion rate | Unique converting recipients / Delivered | Full-funnel email response within a stated window |
+| Revenue per send | Attributed revenue / Emails sent | Revenue credited per sent email |
+| List growth rate | (Closing subscribers - Opening subscribers) / Opening subscribers | Net audience growth, including removals and reactivations |
 
 ### Social Platforms
 
@@ -25,9 +27,9 @@ description: Analyze marketing performance, attribution, channel metrics, foreca
 |--------|---------------------|-----------------|
 | Impressions | Times content appeared in feeds | Distribution breadth |
 | Reach | Unique users who saw content | Audience coverage |
-| Engagement rate | (Reactions + Comments + Shares) / Reach | Content resonance |
+| Engagement rate | (Reactions + Comments + Shares) / Reach | Interactions per reached account; repeat events can exceed 100% |
 | Click-through rate | Link clicks / Impressions | Ability to drive traffic |
-| Follower growth rate | Net new followers / Total followers per period | Audience expansion pace |
+| Follower growth rate | Net new followers / Opening followers | Audience expansion pace |
 | Share/Repost rate | Shares / Reach | Virality and advocacy signal |
 | Video view rate | Views / Impressions | Hook effectiveness for video |
 | Video completion rate | Completed views / Total views | Content quality and length fit |
@@ -43,10 +45,10 @@ description: Analyze marketing performance, attribution, channel metrics, foreca
 | Cost per thousand impressions (CPM) | Spend per 1,000 impressions | Awareness cost efficiency |
 | Conversion rate | Conversions / Clicks | Landing page and offer effectiveness |
 | Cost per acquisition (CPA) | Spend / Conversions | Full-funnel cost efficiency |
-| Return on ad spend (ROAS) | Revenue / Ad spend | Revenue generation return |
+| Return on ad spend (ROAS) | Attributed revenue / Ad spend | Revenue-to-media-spend ratio; not profit ROI or proof of incrementality |
 | Quality Score (search) | Platform relevance rating (1-10) | Alignment of ad, keyword, and destination |
 | Frequency | Average exposures per user | Ad fatigue risk indicator |
-| View-through conversions | Conversions from users who saw but did not click | Influence of display and awareness placements |
+| View-through conversions | Conversions credited to an impression without a click under the platform's window/rules | Impression-based attribution, not demonstrated causal influence |
 
 ### Organic Search / SEO
 
@@ -57,8 +59,8 @@ description: Analyze marketing performance, attribution, channel metrics, foreca
 | Organic CTR | Clicks / Search impressions | Title and meta description appeal |
 | Indexed pages | Pages present in the search index | Crawlability and site architecture |
 | Domain authority | Third-party composite score | Aggregate site strength |
-| Backlink count | External domains linking inward | Off-page authority and content value |
-| Page speed | Time to interactive | UX quality and ranking signal |
+| Backlinks / referring domains | Count of links / distinct linking domains, respectively | Separate measures of inbound links |
+| Page performance | The source's named loading/interactivity metric and unit | Compare the same measurement definition and environment |
 | Organic conversion rate | Conversions / Organic sessions | Intent alignment and content quality |
 | Top organic entry pages | Most-visited pages from search | Highest-performing SEO content |
 
@@ -67,14 +69,15 @@ description: Analyze marketing performance, attribution, channel metrics, foreca
 | Metric | How It Is Calculated | Insight Provided |
 |--------|---------------------|-----------------|
 | Pageviews | Total views across content pages | Content reach |
-| Unique visitors | Distinct users consuming content | True audience size |
+| Unique visitors | Distinct measured visitor IDs consuming content | Measured audience; identity resolution can split or merge people |
 | Average time on page | Duration spent on content pages | Depth of engagement |
-| Bounce rate | Single-page sessions / All sessions | Content-audience alignment and UX |
+| Bounce rate | Source-defined bounced sessions / Sessions | Definitions vary by analytics product; do not mix legacy single-page and engagement-based definitions |
 | Scroll depth | Percentage of page scrolled | Engagement persistence |
 | Social shares | Times content was distributed socially | Audience advocacy |
 | Backlinks generated | External links earned by content | SEO value and authority |
 | Leads attributed | Leads traced to content interaction | Conversion power |
-| Content ROI | Attributed revenue / Production cost | Investment return |
+| Content revenue/cost ratio | Attributed revenue / Stated content cost | Revenue multiple, not profit ROI |
+| Content profit ROI on content investment | (Revenue - Other included operating costs - Content investment) / Content investment | Profit return on the stated investment denominator; do not subtract the same cost twice |
 
 ### Pipeline and Revenue Metrics
 
@@ -86,9 +89,13 @@ description: Analyze marketing performance, attribution, channel metrics, foreca
 | Pipeline created | Dollar value of new opportunities | Marketing revenue impact |
 | Pipeline velocity | Speed of deal progression | Campaign urgency and quality signal |
 | Customer acquisition cost (CAC) | Total marketing + sales spend / New customers | Acquisition efficiency |
-| CAC payback period | Months to recoup CAC from revenue | Unit economics viability |
+| CAC payback period | CAC / Monthly gross profit (or explicitly defined contribution) per acquired customer | Simplified payback at a stable positive monthly contribution; revenue-only payback must be labeled separately |
 | Marketing-sourced revenue | Revenue from marketing-originated deals | Direct marketing contribution |
 | Marketing-influenced revenue | Revenue from deals with any marketing touchpoint | Broader marketing footprint |
+
+Profit ROI requires costs, not just revenue and ad spend. If those costs are unavailable, report the revenue/cost ratio and the missing inputs instead of relabeling it as ROI. For example, $1,000 revenue / $200 content spend = 5x revenue/spend; with $600 other included costs, profit ROI on content spend is ($1,000 - $600 - $200) / $200 = 100%. State which costs are included and avoid counting them twice. See [Google Ads' ROI definition](https://support.google.com/google-ads/answer/1722066?hl=en).
+
+For stable subscription revenue, monthly gross profit can be approximated as monthly revenue per customer times gross margin. If contribution varies or customers churn, use cumulative cohort contribution to estimate payback; a nonpositive contribution provides no finite payback under the constant-rate model. Do not invent margins. See [Stripe's CAC payback calculation](https://stripe.com/resources/more/what-is-the-cac-payback-period). Align CAC's acquisition cohort and cost allocation with the customers used for payback. Marketing-sourced and influenced revenue can overlap; do not add them as separate incremental revenue.
 
 ## Report Structures
 
@@ -141,11 +148,11 @@ When examining performance data, investigate:
 5. **Predictive signals**: which metrics shift first and foreshadow downstream outcomes?
 
 ### Analytical Process
-1. Plot the metric across time with at least 8-12 data points for statistical relevance
+1. Plot the available history at a cadence relevant to the decision; sample count alone does not establish statistical relevance or cover seasonal cycles
 2. Characterize the overall trajectory (rising, declining, stable, or oscillating)
 3. Quantify the rate of change — is the trend accelerating or flattening?
 4. Layer in external events (campaign launches, product updates, market shifts)
-5. Benchmark against targets or industry norms
+5. Compare with supplied targets or sourced, comparable benchmarks
 6. Look for correlations with related metrics
 7. Formulate causal hypotheses and design experiments to test them
 
@@ -157,10 +164,9 @@ When examining performance data, investigate:
 - **Scenario planning**: model optimistic, expected, and pessimistic cases
 
 ### Projection Guardrails
-- Near-term forecasts (1-3 months) carry far more reliability than long-range ones
-- Projections built on fewer than 12 data points should be labeled low-confidence
+- State the horizon, history, assumptions, and validation error when available; no fixed observation count or horizon guarantees reliability
 - External disruptions (market shifts, competitive moves, economic changes) can invalidate trend-based models
-- Always express forecasts as ranges rather than single numbers
+- Provide supported conditional estimates. Distinguish model-based prediction intervals from scenarios that vary named assumptions; when data cannot support bounds, describe uncertainty without inventing a range
 
 ## Attribution Fundamentals
 
@@ -175,23 +181,21 @@ Buyers rarely convert after a single interaction. Attribution assigns credit acr
 | First interaction | All credit to the initial touchpoint | Highlights discovery channels | Ignores conversion drivers |
 | Even distribution | Equal credit across all touchpoints | Acknowledges every channel | Fails to reflect relative influence |
 | Recency-weighted | Increasing credit as touchpoints approach conversion | Balances awareness and closing | Can undervalue early awareness |
-| Position-based (40/20/40) | Heavy credit to first and last, remainder split across the middle | Honors both discovery and conversion | Somewhat arbitrary weight assignment |
-| Algorithmic | Machine-learned credit based on conversion path data | Most reflective of actual influence | Demands large conversion volumes |
+| Position-based | Chosen weights for first, middle, and last touches | Makes a credit policy explicit | Weights are assumptions, not measured influence |
+| Algorithmic | Model-estimated credit from observed paths | Can model patterns beyond a fixed rule | Depends on model assumptions, coverage, and selection; not automatically causal |
 
 ### Practical Attribution Advice
-- If you have no attribution system, begin with last-interaction — it is the simplest and most immediately actionable
-- Contrast first-interaction and last-interaction views to learn which channels drive discovery vs. closure
-- Position-based (40/20/40) is a pragmatic default for most B2B organizations
-- Algorithmic models need high conversion volumes to produce statistically sound results
-- Treat attribution as directional intelligence, never as absolute truth
-- Any multi-touch model is more informative than a single-touch model, and any model outperforms none
+- Use an attribution rule only when the available tracking supports it; otherwise report observable paths or an unattributed share
+- Contrast feasible credit policies to show how investment conclusions depend on the rule
+- State lookback windows, eligible touches, deduplication, identity coverage, and how conversion credit is conserved
+- Credit allocation is descriptive. Estimating incremental channel effects requires an appropriate experiment or credible causal design with stated assumptions
+- More complex attribution is not necessarily more informative; incomplete tracking can make precise-looking allocations misleading
 
 ### Attribution Traps
 - Optimizing a single channel based on single-touch data can starve the rest of the funnel
-- Awareness-oriented channels (display, organic social, PR) will consistently underperform in last-touch reports
-- Conversion-oriented channels (branded search, retargeting) will consistently underperform in first-touch reports
+- A credit rule can systematically favor touches near its chosen position; check this in the observed paths rather than assuming a universal channel ordering
 - Self-reported attribution ("How did you hear about us?") offers useful qualitative signal but is unreliable for quantitative allocation
-- Cross-device and cross-channel tracking gaps guarantee that attribution data is always incomplete
+- Assess cross-device and cross-channel tracking gaps and unobserved paths; do not imply complete coverage without evidence
 
 ## Optimization Methodology
 
@@ -229,20 +233,21 @@ Score every optimization idea on two axes:
 - High: new tooling, cross-team initiative, major content production
 
 Execution order:
-1. High impact, low effort — execute immediately
+1. High impact, low effort — prioritize, subject to evidence, constraints, and authorization
 2. High impact, high effort — plan and staff
 3. Low impact, low effort — pursue if bandwidth allows
 4. Low impact, high effort — defer or deprioritize
 
 ### Experimentation Discipline
-- Isolate a single variable per test for interpretable results
+- Use a single-change comparison or a planned factorial design that can identify the effects and interactions of interest
 - Lock in the success metric before the test begins
-- Calculate the required sample size in advance and resist ending tests prematurely
-- Run each test for at least one complete business cycle (usually a full week for B2B)
+- Plan sample size, randomization unit, run duration, and stopping rule for the baseline rate/variance and meaningful effect. Account for business cycles, repeated users, and delayed conversions; one week is not a universal sufficient duration
 - Record all experiments and outcomes, including negative and null results
-- Circulate learnings across the team — a test that confirms the current approach still builds confidence
+- Communicate negative and inconclusive results without calling non-significance proof that variants are equivalent; share only when requested or authorized
 
-### Ongoing Optimization Rhythm
+### Example Optimization Rhythm
+
+Adapt this cadence to spend velocity, conversion delays, staff capacity, and the test's stopping rule; avoid repeatedly reallocating on noise or interrupting planned experiments.
 - **Daily**: check paid campaign pacing, flag anomalies, review ad approval status
 - **Weekly**: assess channel-level performance, pause lagging efforts, amplify winners
 - **Biweekly**: rotate ad creative and launch new test variants

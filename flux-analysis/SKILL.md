@@ -5,6 +5,8 @@ description: Explain financial variances with driver analysis, period comparison
 
 ## Decomposition Techniques
 
+Use comparable periods, populations, units, and cost structures. A bridge allocates an arithmetic change; it does not by itself establish a business cause. State the order of substitutions, reconcile the components to the observed change, and keep unexplained amounts visible rather than naming them as a known driver.
+
 ### Price x Volume Separation
 
 The foundational split for any metric expressible as unit price multiplied by quantity.
@@ -20,12 +22,31 @@ Check: Quantity Component + Pricing Component = Total Movement
        (when the interaction term is absorbed into one of the two factors)
 ```
 
-**Three-factor formulas (isolating composition shifts):**
+**Three-factor revenue bridge (quantity, mix, then price):**
+
+Let Q0 and Q1 be total baseline and actual quantities, m0_i and m1_i each product's quantity share, and p0_i and p1_i its unit price. Each period's shares sum to 1.
+
 ```
-Quantity Component    = (Actual Units - Baseline Units) x Baseline Price x Baseline Mix Weights
-Pricing Component     = (Actual Price - Baseline Price) x Baseline Units x Actual Mix Weights
-Composition Component = Baseline Price x Baseline Units x (Actual Mix Weights - Baseline Mix Weights)
+Quantity = (Q1 - Q0) x Sum(m0_i x p0_i)
+Mix      = Q1 x Sum((m1_i - m0_i) x p0_i)
+Price    = Q1 x Sum(m1_i x (p1_i - p0_i))
+
+Check: Quantity + Mix + Price = Actual Revenue - Baseline Revenue
 ```
+
+This order allocates interactions to the later components; do not add another interaction term. Other orders can be valid but yield different component values. For one product changing from 100 units at $10 to 110 at $12, the bridge is +$100 quantity, $0 mix, +$220 price = +$320. Using baseline units for the price effect would omit $20.
+
+Only pool quantities with comparable units. For a new product with positive actual quantity, separating mix from price requires a supported baseline price or an explicitly labeled scenario. For a discontinued product with zero actual quantity, its observed baseline price is enough. If a period has zero total quantity or a needed counterpart price cannot be justified, use a direct product-revenue bridge or show the new product's contribution separately.
+
+For repeatable calculations, use the bundled [bridge calculator](scripts/decompose.py):
+
+```bash
+# SKILL_DIR is the absolute path to this flux-analysis skill directory.
+python3 "$SKILL_DIR/scripts/decompose.py" --help
+python3 "$SKILL_DIR/scripts/decompose.py" --mode revenue --input inputs.json
+```
+
+Input JSON has `baseline` and `actual` arrays with matching, unique `segment` IDs and numeric `quantity` fields. Prefer decimal strings for numbers. Quantities must be nonnegative, in common units, with positive totals in both periods. Supply a baseline `price` if either period has positive quantity and an actual `price` if actual quantity is positive. Omit unused prices or leave them null. Duplicate JSON keys are rejected, including within rows. Output values are exact rational strings; round only for presentation. The calculator checks arithmetic, not source quality or whether this model fits the business.
 
 **Worked example — top-line revenue:**
 - Baseline plan: 10,000 units at $50/unit = $500,000
@@ -40,14 +61,21 @@ Applicable when aggregated results blend multiple segments with distinct unit ec
 
 **Formulas:**
 ```
-Rate Component = Sum across segments of [Actual Volume_i x (Actual Rate_i - Baseline Rate_i)]
-Composition Component = Sum across segments of [Baseline Rate_i x (Actual Volume_i - Proportional Volume_i at Baseline Mix)]
+Blended Rate = Sum(w_i x r_i)  # weights sum to 1 in each period
+Mix Effect  = Sum((w1_i - w0_i) x r0_i)
+Rate Effect = Sum(w1_i x (r1_i - r0_i))
+
+Check: Mix Effect + Rate Effect = Actual Blended Rate - Baseline Blended Rate
 ```
+
+Use the denominator of the rate as the weight: revenue shares for gross margin percentages, not unit shares. These effects are rates, not currency amounts; multiply fractional rates by 100 to express percentage points. To explain gross-profit dollars, reconcile revenue and cost dollars separately. The calculator's `--mode weighted-rate` takes `segment`, `weight`, and `rate` fields; weights are nonnegative with positive period totals and are normalized internally.
+
+A segment with positive actual weight and zero baseline weight needs a baseline counterpart rate for the mix/rate split. Use a supported plan, contract, or explicitly labeled scenario. Different counterpart assumptions can reverse the effects while leaving the same aggregate change. Without a defensible counterpart, report the aggregate change or show the new segment separately. When actual weight is zero, the actual rate is unused and can be omitted or left null. If both weights are zero, both rates can be omitted or left null.
 
 **Worked example — gross margin compression:**
 - Segment X earns 60% margin; Segment Y earns 40% margin
-- Plan assumed a 50/50 split -> blended 50% margin
-- Actual split was 40/60 -> blended 48% margin
+- Plan assumed a 50/50 revenue split -> blended 50% margin
+- Actual revenue split was 40/60 -> blended 48% margin
 - The 2-point margin decline is attributable to the shift toward the lower-margin segment
 
 ### People-Cost Decomposition
@@ -55,15 +83,15 @@ Composition Component = Sum across segments of [Baseline Rate_i x (Actual Volume
 Purpose-built for analyzing compensation and headcount-driven expense lines.
 
 ```
-Total Compensation Movement = Actual Spend - Planned Spend
+For comparable spend = paid FTE-periods H x average cost per FTE-period C:
 
-Break into:
-1. Staffing level effect     = (Actual Headcount - Plan Headcount) x Plan Average Cost
-2. Per-capita cost effect    = (Actual Average Cost - Plan Average Cost) x Plan Headcount
-3. Composition effect        = Residual from shifts in seniority, department, or geography mix
-4. Phasing effect            = Impact of hires arriving earlier or later than the plan assumed
-5. Attrition benefit         = Savings from unplanned departures (partially offset by replacement and vacancy costs)
+Staffing Effect  = (H1 - H0) x C0
+Cost-Rate Effect = H1 x (C1 - C0)
+
+Check: Staffing Effect + Cost-Rate Effect = Actual Spend - Planned Spend
 ```
+
+Use paid time or period-average FTE, not closing headcount, when hires and departures occur during the period. Reconcile costs outside this model separately. Hiring, attrition, phasing, and workforce composition can explain these components if supported by payroll or roster data; they are not additional additive components unless a mutually exclusive bridge is defined. An unexplained residual does not prove a composition change.
 
 ### Functional Expense Decomposition
 
@@ -87,21 +115,12 @@ Segment into:
 
 Thresholds govern which movements warrant formal investigation and written explanation. Base them on:
 
-1. **Overall materiality:** Usually 1-5% of a primary benchmark (revenue, total assets, or net income)
+1. **Approved materiality:** Use the task's or organization's threshold and its stated benchmark; financial-statement materiality is not a universal operating-variance rule
 2. **Relative line-item scale:** Apply tighter percentage gates to larger balances
 3. **Historical volatility:** Allow wider bands for inherently variable accounts to filter noise
 4. **Decision relevance:** Would this size of movement influence a management decision or board discussion?
 
-### Suggested Threshold Grid
-
-| Comparison Basis | Suggested Dollar Gate | Suggested Percentage Gate | Trigger Logic |
-|---|---|---|---|
-| Actual vs. annual plan | Entity-specific | 10% | Whichever is breached first |
-| Actual vs. same period last year | Entity-specific | 15% | Whichever is breached first |
-| Actual vs. latest forecast | Entity-specific | 5% | Whichever is breached first |
-| Sequential month-over-month | Entity-specific | 20% | Whichever is breached first |
-
-*Set the dollar gate at roughly 0.5-1% of revenue for income-statement lines.*
+If no threshold is supplied, prioritize by absolute effect and decision consequence. Label any proposed dollar or percentage gates as assumptions and explain which decisions they would change; do not present generic percentages as company policy.
 
 ### Triage Order When Multiple Items Exceed Thresholds
 
@@ -119,11 +138,11 @@ Thresholds govern which movements warrant formal investigation and written expla
 [Line Item]: [Favorable / Unfavorable] movement of $[amount] ([X]%)
 relative to [budget / prior period / forecast] for [reporting period]
 
-Primary driver: [Brief label]
-[Two to three sentences explaining the business cause, quantifying each
-contributing factor where possible.]
+Measured drivers: [Brief labels and contributions]
+[Describe the contributions and any supported business explanation. Attribute
+source-reported explanations and identify material unexplained amounts.]
 
-Outlook: [One-time event / Likely to persist / Improving / Worsening]
+Outlook: [Supported expectation or material uncertainty]
 Next step: [No action / Monitor / Deeper review / Adjust forecast]
 ```
 
@@ -132,9 +151,9 @@ Next step: [No action / Monitor / Deeper review / Adjust forecast]
 Strong narratives consistently satisfy these tests:
 
 - **Precise:** Names concrete factors rather than restating the variance itself
-- **Measured:** Attaches dollar or percentage weight to each cited driver
-- **Explanatory:** Addresses why the movement occurred, not merely that it did
-- **Prospective:** States whether the movement is expected to continue, reverse, or evolve
+- **Measured:** Quantifies contributions where the data support a split
+- **Explanatory:** Separates measured contributions, source-reported explanations, and supported causes
+- **Prospective:** States any supported outlook and the conditions that affect it
 - **Directive:** Identifies any follow-up action or decision prompted by the finding
 - **Compact:** Two to four sentences — not padded filler
 
@@ -199,7 +218,7 @@ Net Movement: +$200K (+2.5% unfavorable)
 ### Presentation Guidelines
 
 1. Sequence drivers from most favorable to most unfavorable (or in a logical business narrative order)
-2. Cap the driver count at 5-8; roll smaller items into an "All other" bucket
+2. Group small items when it improves readability; retain material offsets and a traceable breakdown of any "All other" bucket
 3. Verify arithmetic: opening value plus all drivers equals closing value
 4. Use color to distinguish direction — green for favorable, red for unfavorable — in graphical renderings
 5. Annotate each segment with both the dollar amount and a short label
@@ -232,6 +251,8 @@ Period Accuracy = 1 - |Actual - Forecast| / |Actual|
 
 MAPE (Mean Absolute Percentage Error) = Mean of |Actual - Forecast| / |Actual| across all periods
 ```
+
+These percentage measures are undefined when actual is zero and unstable near zero; `1 - error` can be negative and is not a probability. Choose an appropriate absolute or scaled error measure when needed, disclose zero treatment, and do not silently exclude difficult periods. Compare forecast versions at the same horizon using the same scoring population.
 
 | Month | Forecast | Actual | Deviation | Accuracy |
 |---|---|---|---|---|
