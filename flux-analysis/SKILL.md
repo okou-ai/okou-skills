@@ -36,7 +36,7 @@ Check: Quantity + Mix + Price = Actual Revenue - Baseline Revenue
 
 This order allocates interactions to the later components; do not add another interaction term. Other orders can be valid but yield different component values. For one product changing from 100 units at $10 to 110 at $12, the bridge is +$100 quantity, $0 mix, +$220 price = +$320. Using baseline units for the price effect would omit $20.
 
-Only pool quantities with comparable units. New or discontinued products need explicit counterpart prices to separate mix from price; a missing price is not zero. If a period has zero total quantity or counterpart prices cannot be justified, use a direct product-revenue bridge or disclose an unallocated new/discontinued-product component instead of forcing this decomposition.
+Only pool quantities with comparable units. For a new product with positive actual quantity, separating mix from price requires a supported baseline price or an explicitly labeled scenario. For a discontinued product with zero actual quantity, its observed baseline price is enough. If a period has zero total quantity or a needed counterpart price cannot be justified, use a direct product-revenue bridge or show the new product's contribution separately.
 
 For repeatable calculations, use the bundled [bridge calculator](scripts/decompose.py):
 
@@ -46,7 +46,7 @@ python3 "$SKILL_DIR/scripts/decompose.py" --help
 python3 "$SKILL_DIR/scripts/decompose.py" --mode revenue --input inputs.json
 ```
 
-Input JSON has `baseline` and `actual` arrays with matching, unique `segment` IDs and numeric `quantity` and `price` fields. Prefer decimal strings. Quantities must be nonnegative, in common units, with positive totals in both periods. Supply prices explicitly even for zero-quantity segments. Duplicate JSON keys are rejected, including within rows. Output values are exact rational strings; round only for presentation. The calculator checks arithmetic, not source quality or whether this model fits the business.
+Input JSON has `baseline` and `actual` arrays with matching, unique `segment` IDs and numeric `quantity` fields. Prefer decimal strings for numbers. Quantities must be nonnegative, in common units, with positive totals in both periods. Supply a baseline `price` if either period has positive quantity and an actual `price` if actual quantity is positive. Omit unused prices or leave them null. Duplicate JSON keys are rejected, including within rows. Output values are exact rational strings; round only for presentation. The calculator checks arithmetic, not source quality or whether this model fits the business.
 
 **Worked example — top-line revenue:**
 - Baseline plan: 10,000 units at $50/unit = $500,000
@@ -70,7 +70,7 @@ Check: Mix Effect + Rate Effect = Actual Blended Rate - Baseline Blended Rate
 
 Use the denominator of the rate as the weight: revenue shares for gross margin percentages, not unit shares. These effects are rates, not currency amounts; multiply fractional rates by 100 to express percentage points. To explain gross-profit dollars, reconcile revenue and cost dollars separately. The calculator's `--mode weighted-rate` takes `segment`, `weight`, and `rate` fields; weights are nonnegative with positive period totals and are normalized internally.
 
-A zero-weight segment has no observed rate in that period. Supply a counterpart rate only when a supported plan, contract, or explicitly labeled scenario justifies it; do not fill an undefined rate with zero. Different counterpart assumptions can reverse the mix/rate effects while leaving the same aggregate change, so reconciliation alone does not validate this allocation. Without a defensible counterpart, report the aggregate change or use a bridge that separates new/discontinued-segment contributions rather than forcing this split.
+A segment with positive actual weight and zero baseline weight needs a baseline counterpart rate for the mix/rate split. Use a supported plan, contract, or explicitly labeled scenario. Different counterpart assumptions can reverse the effects while leaving the same aggregate change. Without a defensible counterpart, report the aggregate change or show the new segment separately. When actual weight is zero, the actual rate is unused and can be omitted or left null. If both weights are zero, both rates can be omitted or left null.
 
 **Worked example — gross margin compression:**
 - Segment X earns 60% margin; Segment Y earns 40% margin
@@ -138,11 +138,11 @@ If no threshold is supplied, prioritize by absolute effect and decision conseque
 [Line Item]: [Favorable / Unfavorable] movement of $[amount] ([X]%)
 relative to [budget / prior period / forecast] for [reporting period]
 
-Primary driver: [Brief label]
-[Two to three sentences explaining the business cause, quantifying each
-contributing factor where possible.]
+Measured drivers: [Brief labels and contributions]
+[Describe the contributions and any supported business explanation. Attribute
+source-reported explanations and identify material unexplained amounts.]
 
-Outlook: [One-time event / Likely to persist / Improving / Worsening]
+Outlook: [Supported expectation or material uncertainty]
 Next step: [No action / Monitor / Deeper review / Adjust forecast]
 ```
 
@@ -151,9 +151,9 @@ Next step: [No action / Monitor / Deeper review / Adjust forecast]
 Strong narratives consistently satisfy these tests:
 
 - **Precise:** Names concrete factors rather than restating the variance itself
-- **Measured:** Attaches dollar or percentage weight to each cited driver
-- **Explanatory:** Addresses why the movement occurred, not merely that it did
-- **Prospective:** States whether the movement is expected to continue, reverse, or evolve
+- **Measured:** Quantifies contributions where the data support a split
+- **Explanatory:** Separates measured contributions, source-reported explanations, and supported causes
+- **Prospective:** States any supported outlook and the conditions that affect it
 - **Directive:** Identifies any follow-up action or decision prompted by the finding
 - **Compact:** Two to four sentences — not padded filler
 

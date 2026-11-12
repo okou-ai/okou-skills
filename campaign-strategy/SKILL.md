@@ -60,7 +60,7 @@ Refer to the Channel Evaluation Guide below for detailed breakdowns.
 
 ### 5. Measurement
 
-Define the primary outcome, denominator/cohort, measurement window, and decision threshold using the goal and available tracking. Distinguish observed/attributed outcomes from incremental impact; a launch-time increase alone does not identify the campaign's causal effect. Refer to Performance Indicators by Campaign Type below.
+Define the primary outcome, denominator/cohort, measurement window, and decision threshold using the goal and available tracking. Check that the threshold can trigger within the planned batch size and budget. Distinguish observed/attributed outcomes from incremental impact; a launch-time increase alone does not identify the campaign's causal effect. Refer to Performance Indicators by Campaign Type below.
 
 ## Channel Evaluation Guide
 
@@ -157,7 +157,8 @@ Build allocations from the chosen activities rather than applying preset percent
 ### Awareness Campaigns
 | Indicator | What It Reveals |
 |-----------|----------------|
-| Reach / Impressions | Volume of people exposed to the campaign |
+| Reach | Unique people or accounts exposed within the measurement window |
+| Impressions | Total times the campaign was displayed, including repeat displays |
 | Brand mention volume | Growth in organic brand conversations |
 | Share of voice | Your visibility relative to competitors |
 | Direct site traffic | Unprompted visits to your domain |

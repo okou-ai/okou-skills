@@ -4,6 +4,9 @@
 Input: {"baseline": [...], "actual": [...]} with matching unique segment IDs.
 Revenue rows: segment, quantity (common units), price. Weighted-rate rows:
 segment, weight (denominator amount), rate (fractional units).
+Price or rate may be omitted in the actual period for a zero quantity or
+weight, and in the baseline for segments with zero quantity or weight in both
+periods.
 Numbers may be integers or decimal strings. CLI JSON decimals are parsed exactly.
 Output amounts are rational strings (e.g. "320" or "20/3"), never rounded.
 """
@@ -25,7 +28,7 @@ def _unique_keys(pairs):
     return result
 
 
-def _records(rows, fields):
+def _records(rows, weight, measure):
     if not isinstance(rows, list) or not rows:
         raise ValueError("Each period must be a nonempty array")
     records = {}
@@ -36,8 +39,10 @@ def _records(rows, fields):
         if not isinstance(segment, str) or not segment.strip() or segment in records:
             raise ValueError("Segment IDs must be nonempty, unique strings")
         values = {}
-        for field in fields:
+        for field in (weight, measure):
             value = row.get(field)
+            if field == measure and value is None:
+                continue
             if value is None or isinstance(value, (bool, float)):
                 raise ValueError(f"{segment}: {field} needs an exact number or decimal string")
             try:
@@ -48,46 +53,52 @@ def _records(rows, fields):
     return records
 
 
-def _periods(baseline, actual, fields, weight):
-    base = _records(baseline, fields)
-    end = _records(actual, fields)
+def _periods(baseline, actual, weight, measure):
+    base = _records(baseline, weight, measure)
+    end = _records(actual, weight, measure)
     if base.keys() != end.keys():
-        raise ValueError("Periods need matching segment IDs and explicit counterpart values")
+        raise ValueError("Periods need matching segment IDs")
     for period in (base, end):
         if any(row[weight] < 0 for row in period.values()):
             raise ValueError(f"{weight} must be nonnegative")
         if sum(row[weight] for row in period.values()) <= 0:
             raise ValueError(f"Total {weight} must be positive in both periods")
+    for segment, base_row in base.items():
+        end_row = end[segment]
+        if (base_row[weight] or end_row[weight]) and measure not in base_row:
+            raise ValueError(f"{segment}: baseline {measure} is required when either period has positive {weight}")
+        if end_row[weight] and measure not in end_row:
+            raise ValueError(f"{segment}: actual {measure} is required when actual {weight} is positive")
     return base, end
 
 
 def revenue_bridge(baseline, actual):
     """Substitute total quantity, segment mix, then prices; return exact amounts."""
-    base, end = _periods(baseline, actual, ("quantity", "price"), "quantity")
+    base, end = _periods(baseline, actual, "quantity", "price")
     q0 = sum(row["quantity"] for row in base.values())
     q1 = sum(row["quantity"] for row in end.values())
-    r0 = sum(row["quantity"] * row["price"] for row in base.values())
-    r1 = sum(row["quantity"] * row["price"] for row in end.values())
+    r0 = sum(row["quantity"] * row["price"] for row in base.values() if row["quantity"])
+    r1 = sum(row["quantity"] * row["price"] for row in end.values() if row["quantity"])
     quantity = (q1 - q0) * r0 / q0
     mix = sum((end[s]["quantity"] - q1 * base[s]["quantity"] / q0)
-              * base[s]["price"] for s in base)
+              * base[s]["price"] for s in base if base[s]["quantity"] or end[s]["quantity"])
     price = sum(end[s]["quantity"] * (end[s]["price"] - base[s]["price"])
-                for s in base)
+                for s in base if end[s]["quantity"])
     return {"baseline": r0, "actual": r1, "quantity": quantity, "mix": mix,
             "price": price, "change": r1 - r0}
 
 
 def weighted_rate_bridge(baseline, actual):
     """Normalize denominator weights, substitute mix then rates; return rates."""
-    base, end = _periods(baseline, actual, ("weight", "rate"), "weight")
+    base, end = _periods(baseline, actual, "weight", "rate")
     t0 = sum(row["weight"] for row in base.values())
     t1 = sum(row["weight"] for row in end.values())
-    r0 = sum(row["weight"] * row["rate"] for row in base.values()) / t0
-    r1 = sum(row["weight"] * row["rate"] for row in end.values()) / t1
+    r0 = sum(row["weight"] * row["rate"] for row in base.values() if row["weight"]) / t0
+    r1 = sum(row["weight"] * row["rate"] for row in end.values() if row["weight"]) / t1
     mix = sum((end[s]["weight"] / t1 - base[s]["weight"] / t0)
-              * base[s]["rate"] for s in base)
+              * base[s]["rate"] for s in base if base[s]["weight"] or end[s]["weight"])
     rate = sum(end[s]["weight"] / t1 * (end[s]["rate"] - base[s]["rate"])
-               for s in base)
+               for s in base if end[s]["weight"])
     return {"baseline": r0, "actual": r1, "mix": mix, "rate": rate,
             "change": r1 - r0}
 
