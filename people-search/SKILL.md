@@ -29,7 +29,7 @@ Understand the user's needs, plan a suitable search, and find evidence-supported
 
 ## Tool roles
 
-Start with the available channel most likely to produce evidence for the hardest required qualification. Use the table to choose a tool for the evidence you need next.
+Use the table to choose available tools for the evidence you need.
 
 | Need | Useful tools |
 | --- | --- |
@@ -42,7 +42,7 @@ Start with the available channel most likely to produce evidence for the hardest
 | Read a known public LinkedIn profile or post when general extraction returns a sign-in page or misses the relevant text | `linkedin_profile` or `linkedin_post`, if available |
 | Work-email lookup or professional contact enrichment for a known person | `contact_enrich` |
 
-When the hardest requirement is what someone has done, start with cases, interviews, projects, or credited work and look for people named there. For a known candidate, search their name, organization, and the missing requirement. Use local-language terms when relevant. If a source describes only the organization's work, look for a source that connects the candidate to that work.
+Cases, interviews, projects, and credited work can surface people with relevant experience. For a known candidate, search their name, organization, and the missing requirement. Use local-language terms when relevant. If a source describes only the organization's work, look for a source that connects the candidate to that work.
 
 Structured title and employer filters refer to current roles, and country filters refer to the person's profile location. For past-experience searches, assess eligibility against the relevant period and any current-role requirement the user specified. For creators and audience metrics, use enabled tools for the named platform.
 
