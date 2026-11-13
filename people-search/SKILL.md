@@ -27,7 +27,7 @@ Understand the user's needs, plan a suitable search, and find evidence-supported
 
 6. **Complete the requested scope.** For a fixed target, finish once enough distinct verified matches satisfy the request. Exclude previously delivered people from the count for additional results.
 
-   For “as many as possible,” review coverage after each round of screening. Identify who could meet the same requirements but be missed by the queries, filters, or sources used so far. Choose a searchable signal for those people, then change the query, expand its scope, or use a complementary source to reach them. Use the number of newly verified distinct matches and the remaining concrete ways to reach people you may have missed to decide whether to continue.
+   For “as many as possible,” check whom your queries, filters, or sources may be missing after each round of screening. Use a searchable clue to reach those who could meet the same requirements. Decide whether to continue based on newly verified unique matches and remaining ways to reach likely matches.
 
    Finish screening the existing pool with available evidence and targeted checks for missing qualifications. Respect explicit scope, time, cost, and call limits. If a real limit prevents completion, explain what remains.
 
