@@ -15,11 +15,11 @@ Include a person in the recommended list only when the available evidence suppor
 
 3. **Find and verify.** Use available tools and their current schemas. Reuse evidence tied to the right person and timeframe. Research material gaps or conflicts, batch checks where useful, and deduplicate identities.
 
-4. **Rank qualified candidates.** Default to highest confidence first in interim and final results. Judge confidence by source reliability, attribution to the person, and fit to the required scope and timeframe. When candidates have similar confidence, rank them by the user's preferences. Follow any sort order the user specifies.
+4. **Rank qualified candidates.** Default to highest confidence first in interim and final results. Judge confidence by source reliability, attribution to the person, and fit to the required scope and timeframe. When the user states preferences, give qualified candidates a ranking boost for supported preferences. Apply preferences only to ranking. Follow any sort order the user specifies.
 
 5. **Enrich profiles and contacts.** Enrich each qualified person's profile before final delivery. Reuse sourced details and fill relevant gaps in their role, organization, and profile link. Look up a work email or another public business contact channel. Include the enriched details in the results.
 
-6. **Complete the requested scope.** For a fixed target, deliver the requested number of distinct verified matches when available. For additional results, count only new people. For open-ended searches, continue while new sources yield qualifying candidates and change the approach when results mostly repeat. Finish screening the existing pool, using targeted checks for remaining gaps. Respect the user's scope, time, cost, and call limits.
+6. **Complete the requested scope.** For a fixed target, deliver the requested number of distinct verified matches when available. For additional results, count only new people. For open-ended searches, look for as many distinct people who meet every requirement as possible. Search complementary candidate pools and try another promising pool or source when the current one mostly repeats. Stop expanding when further searches are unlikely to yield additional qualified people. Finish screening the existing pool, using targeted checks for remaining gaps. Respect the user's scope, time, cost, and call limits.
 
 ## Tool roles
 
