@@ -86,8 +86,10 @@ bash "$SKILL_DIR/scripts/docx.sh" --help
 ```
 
 Simple CLI creation supports `report|letter|memo|academic`; `--type academic` is
-not APA/IEEE selection. For custom styles, sections, TOC, images or complex
-tables, read [authoring and sample patterns](references/implementation/authoring.md)
+not APA/IEEE selection. For a new standalone report with headings, tables, lists,
+or captioned images, use the [report workflow](references/operations/create.md#reusable-report-workflow)
+to create and validate the DOCX from one content file. For custom styles, sections,
+TOC, or complex layouts, read [authoring and sample patterns](references/implementation/authoring.md)
 and the relevant actual C# sample before implementing. Compose operations only
 as requested, then validate the completed file. For Word plus PDF, render that
 DOCX rather than independently redesigning its companion.

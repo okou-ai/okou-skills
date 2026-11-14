@@ -27,8 +27,8 @@ def render(source: Path, destination: Path, timeout: int = 60) -> None:
         pdf = work / f"{source.stem}.pdf"
         if completed.returncode or not pdf.is_file() or not pdf.read_bytes().startswith(b"%PDF-"):
             raise RuntimeError(
-                "Writer did not produce a PDF. Install libreoffice-writer; soffice/core alone "
-                f"is insufficient.\n{completed.stdout}\n{completed.stderr}"
+                f"Writer could not render {source.name}. If the Writer probe passes, "
+                f"check whether the source opens in Writer.\n{completed.stdout}\n{completed.stderr}"
             )
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(pdf, destination)

@@ -50,6 +50,16 @@ public static class CreateCommand
             var pageNumbers = parseResult.GetValue(pageNumbersOption);
             var tocPlaceholder = parseResult.GetValue(tocOption);
             var contentJson = parseResult.GetValue(contentJsonOption);
+            ReportContent content;
+            try
+            {
+                content = ReportContent.Read(contentJson);
+            }
+            catch (Exception ex) when (ex is IOException or FormatException or System.Text.Json.JsonException)
+            {
+                Console.Error.WriteLine($"Invalid document content: {ex.Message}");
+                return 1;
+            }
 
             var fontConfig = GetFontConfig(docType);
             var pageSize = GetPageSizeConfig(pageSizeName);
@@ -166,11 +176,7 @@ public static class CreateCommand
             }
 
             // Content from JSON (if provided)
-            if (!string.IsNullOrEmpty(contentJson) && File.Exists(contentJson))
-            {
-                var jsonContent = File.ReadAllText(contentJson);
-                AddContentFromJson(body, jsonContent, fontConfig);
-            }
+            content.AppendTo(mainPart, body, pageSize.WidthDxa - margins.LeftDxa - margins.RightDxa);
 
             // Ensure body has at least one paragraph
             if (!body.Elements<Paragraph>().Any())
@@ -183,6 +189,7 @@ public static class CreateCommand
 
             mainPart.Document.Save();
             Console.WriteLine($"Created {docType} document: {output}");
+            return 0;
         });
 
         return cmd;
@@ -286,41 +293,4 @@ public static class CreateCommand
         stylesPart.Styles.Save();
     }
 
-    private static void AddContentFromJson(Body body, string jsonContent, FontConfig fontConfig)
-    {
-        // Simple JSON content format: array of {type, text, level?}
-        // e.g. [{"type":"heading","text":"Introduction","level":1},{"type":"paragraph","text":"..."}]
-        try
-        {
-            using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonContent);
-            foreach (var element in jsonDoc.RootElement.EnumerateArray())
-            {
-                var type = element.GetProperty("type").GetString() ?? "paragraph";
-                var text = element.GetProperty("text").GetString() ?? "";
-
-                switch (type)
-                {
-                    case "heading":
-                        var level = element.TryGetProperty("level", out var lvl) ? lvl.GetInt32() : 1;
-                        level = Math.Clamp(level, 1, 6);
-                        body.Append(new Paragraph(
-                            new ParagraphProperties(new ParagraphStyleId { Val = $"Heading{level}" }),
-                            new Run(new Text(text))));
-                        break;
-
-                    case "paragraph":
-                        body.Append(new Paragraph(new Run(new Text(text))));
-                        break;
-
-                    case "pagebreak":
-                        body.Append(new Paragraph(new Run(new Break { Type = BreakValues.Page })));
-                        break;
-                }
-            }
-        }
-        catch (System.Text.Json.JsonException ex)
-        {
-            Console.Error.WriteLine($"Warning: could not parse content JSON: {ex.Message}");
-        }
-    }
 }

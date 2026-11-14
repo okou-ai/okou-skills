@@ -6,6 +6,7 @@
 - [Step-by-Step Workflow](#step-by-step-workflow)
 - [Document Type Defaults](#document-type-defaults)
 - [Content Configuration JSON Format](#content-configuration-json-format)
+- [Reusable Report Workflow](#reusable-report-workflow)
 - [Complex Elements Guide](#complex-elements-guide)
 - [Post-Creation Checklist](#post-creation-checklist)
 
@@ -184,11 +185,17 @@ this example as `content.json`:
 ]
 ```
 
-Each block requires `type` and `text`. Supported types are case-sensitive:
+Each block requires a case-sensitive `type`:
 
-- `heading` — heading text; optional `level` from 1 to 6 (default: 1).
-- `paragraph` — body text.
-- `pagebreak` — a page break; set `text` to an empty string.
+- `heading` — `text` and optional `level` from 1 to 6 (default: 1).
+- `paragraph` — body `text`, including inline source locators.
+- `pagebreak` — a page break.
+- `table` — `headers` as strings and `rows` as arrays of strings. Each row must
+  match the number of headers. The header repeats if the table spans pages.
+- `list` — `items` as strings and optional boolean `ordered` (default: bullets).
+- `image` — PNG or JPEG `path` relative to the JSON file (or absolute),
+  `widthPx` and `heightPx` in the image's aspect ratio, `caption`, and optional
+  `alt`. The report scales images wider than the page body to fit.
 
 Set the document type, title, author, page size, and margins with CLI options:
 
@@ -199,8 +206,31 @@ bash "$SKILL_DIR/scripts/docx.sh" create \
   --content-json content.json --output report.docx
 ```
 
-For tables, images, or lists, use the [direct C# path](../implementation/authoring.md#project-scaffold)
-and the relevant `Samples/*.cs` files listed there.
+For complex layout or format-specific features, use the [direct C# path](../implementation/authoring.md#project-scaffold).
+
+## Reusable report workflow
+
+After the DOCX setup, write the content once and use this command for a report
+with ordinary editable paragraphs, headings, lists, tables and inline images.
+
+```bash
+python3 "$SKILL_DIR/scripts/report.py" build \
+  --content report.json --title "Report title" --output report.docx \
+  --timings timing.jsonl
+```
+
+The command publishes the DOCX path only after package and business validation
+pass. Add `--pdf preview.pdf` after confirming Writer is available when a
+companion PDF or render check is needed. A failed render returns an error and
+leaves the structurally validated DOCX available. If a known-good document
+renders, investigate the candidate before changing the environment.
+
+For measured runs, record `started` and `finished` near each actual boundary
+using `report.py mark --timings timing.jsonl <inputs|analysis|upload> <event>`.
+The build records creation, validation and requested rendering with monotonic
+durations and success/failure. Use one timing file per run. Compute elapsed
+times between matching external milestones and keep failed attempts in the log.
+Use the platform receipt to measure submission to the first usable file.
 
 ---
 
