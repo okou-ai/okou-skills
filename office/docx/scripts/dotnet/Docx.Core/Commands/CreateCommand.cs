@@ -233,6 +233,7 @@ public static class CreateCommand
         styles.Append(new Style(
             new StyleName { Val = "Normal" },
             new PrimaryStyle(),
+            new StyleParagraphProperties(new WidowControl()),
             defaultRPr)
         { Type = StyleValues.Paragraph, StyleId = "Normal", Default = true });
 

@@ -191,7 +191,8 @@ Each block requires a case-sensitive `type`:
 - `paragraph` — body `text`, including inline source locators.
 - `pagebreak` — a page break.
 - `table` — `headers` as strings and `rows` as arrays of strings. Each row must
-  match the number of headers. The header repeats if the table spans pages.
+  match the number of headers. Headers repeat and ordinary rows stay together
+  across pages. For readability, keep each row short enough to fit a page.
 - `list` — `items` as strings and optional boolean `ordered` (default: bullets).
 - `image` — PNG or JPEG `path` relative to the JSON file (or absolute),
   `widthPx` and `heightPx` in the image's aspect ratio, `caption`, and optional
@@ -219,14 +220,20 @@ python3 "$SKILL_DIR/scripts/report.py" build \
   --timings timing.jsonl
 ```
 
-The command publishes the DOCX path only after package and business validation
-pass. Add `--pdf preview.pdf` after confirming Writer is available when a
-companion PDF or render check is needed. A failed render returns an error and
-leaves the structurally validated DOCX available. If a known-good document
-renders, investigate the candidate before changing the environment.
+The command publishes the DOCX path after package and business validation.
+For a companion PDF or visual review, add `--pdf preview.pdf` and inspect the
+actual candidate. Run the separate Writer probe when a conversion fails and
+you need to distinguish a candidate problem from a runtime problem. A failed
+render leaves the structurally validated DOCX available. If the renderer alone
+needed repair, render that file again with `render_docx.py`.
+
+The workflow accepts WebP source images when Pillow or `dwebp` is available.
+It creates lossless PNG derivatives in temporary storage and leaves the
+source images unchanged. Complete the draft and citation checks before the
+build. Regenerate when a specific content or layout issue needs correction.
 
 For measured runs, record `started` and `finished` near each actual boundary
-using `report.py mark --timings timing.jsonl <inputs|analysis|upload> <event>`.
+using `report.py mark --timings timing.jsonl <setup|inputs|analysis|upload> <event>`.
 The build records creation, validation and requested rendering with monotonic
 durations and success/failure. Use one timing file per run. Compute elapsed
 times between matching external milestones and keep failed attempts in the log.

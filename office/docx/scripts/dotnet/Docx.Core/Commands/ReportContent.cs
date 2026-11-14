@@ -116,7 +116,15 @@ internal sealed class ReportContent(IEnumerable<ReportContent.Block> blocks)
                     var element = TableSamples.CreateSimpleTable(body, table.Headers, table.Rows);
                     foreach (var column in element.GetFirstChild<TableGrid>()!.Elements<GridColumn>())
                         column.Width = (contentWidthDxa / table.Headers.Length).ToString(CultureInfo.InvariantCulture);
-                    element.GetFirstChild<TableRow>()!.PrependChild(new TableRowProperties(new TableHeader()));
+                    var first = true;
+                    foreach (var row in element.Elements<TableRow>())
+                    {
+                        var properties = new TableRowProperties(new CantSplit());
+                        if (first)
+                            properties.Append(new TableHeader());
+                        row.PrependChild(properties);
+                        first = false;
+                    }
                     break;
                 case ReportList list:
                     AppendList(mainPart, body, list, ++listId);
