@@ -1,19 +1,26 @@
 # Analytical reasoning
 
-Define the question and what would count as an answer. Clarify the scope and
-any terms that affect the result. If the question needs to be broken down,
-choose subquestions whose answers help resolve it.
+Identify what the reader needs to understand or decide. Resolve the scope and
+terms that affect the answer, then choose the smallest set of questions that
+will cover the request. Match the method to the task. For a comparison, use a
+common basis. For an explanation, connect the mechanism to what the evidence
+shows. For a decision, explain the trade-offs and conditions that affect it.
 
-Ask what evidence would support or weaken a provisional answer. Choose a
-method suited to the question and the material. Keep observations, assumptions,
-and inferences distinct. Make clear how the evidence leads to each inference
-that matters to the conclusion.
+Build the consequential conclusions from the permitted material. Keep source
+locations with the observations that support them. Where the distinction
+matters, identify which statements are observed, estimated, inferred, or
+proposed. Keep relevant units, populations, time windows, and methods attached
+to figures and claims.
 
-Investigate the point most likely to change the answer. Check a conflicting
-observation, a plausible alternative interpretation, or an assumption the
-answer depends on. Revise the conclusion in light of what the check establishes.
+Focus additional checking where it could change the answer. Choose what is
+useful for the case, such as checking a definition against the original,
+reconciling two measurements, testing a calculation or assumption, or
+considering another plausible explanation. If the available evidence leaves
+more than one interpretation open, say which conclusion it supports and what
+would resolve the uncertainty.
 
-Bring the findings together to answer the original question. Present the
-evidence and reasoning that support the answer, along with any conditions or
-limits that affect its interpretation. If an important uncertainty remains,
-state what can be concluded and what evidence would resolve the open question.
+Answer the question directly. Explain how the strongest evidence supports the
+conclusion, and what that means for the reader's next step when relevant.
+State the limits beside the conclusions they affect. When evidence is sparse,
+give a conditional answer if justified and identify the most useful missing
+evidence. Scale the depth of analysis to the decision and the requested scope.
