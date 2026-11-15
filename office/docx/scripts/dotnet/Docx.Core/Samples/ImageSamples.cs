@@ -23,6 +23,8 @@
 //   4. Blip.Embed contains the relationship ID (rId) linking to the ImagePart.
 // ============================================================================
 
+using System.ComponentModel;
+using System.Diagnostics;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -65,13 +67,13 @@ public static class ImageSamples
         // Step 1: Add the image file as a part. The ImagePartType must match
         // the actual file format. AddImagePart returns the ImagePart; we then
         // feed data into it.
-        var imageType = GetImagePartType(imagePath);
+        bool isWebP = Path.GetExtension(imagePath).Equals(".webp", StringComparison.OrdinalIgnoreCase);
+        var imageType = isWebP ? ImagePartType.Png : GetImagePartType(imagePath);
+        using Stream stream = isWebP
+            ? new MemoryStream(ConvertWebPToPng(imagePath))
+            : File.OpenRead(imagePath);
         ImagePart imagePart = mainPart.AddImagePart(imageType);
-
-        using (FileStream stream = new FileStream(imagePath, FileMode.Open))
-        {
-            imagePart.FeedData(stream);
-        }
+        imagePart.FeedData(stream);
 
         // Step 2: Get the relationship ID that links the Blip to this ImagePart.
         string relId = mainPart.GetIdOfPart(imagePart);
@@ -82,11 +84,14 @@ public static class ImageSamples
         long cy = heightPx * EmuPerPixel96Dpi;
 
         // Step 4: Build the Drawing element using the reusable helper.
-        // docPropId must be unique across the entire document.
+        uint docPropId = body.Descendants<DW.DocProperties>()
+            .Select(properties => properties.Id?.Value ?? 0U)
+            .DefaultIfEmpty()
+            .Max() + 1;
         Drawing drawing = BuildDrawingElement(
             relId, cx, cy,
-            docPropId: 1U,
-            name: "Image1",
+            docPropId: docPropId,
+            name: $"Image{docPropId}",
             description: null);
 
         // Step 5: Wrap in Paragraph → Run → Drawing
@@ -890,6 +895,51 @@ public static class ImageSamples
             LayoutInCell = true,
             AllowOverlap = true
         };
+    }
+
+    private static byte[] ConvertWebPToPng(string imagePath)
+    {
+        string source = Path.GetFullPath(imagePath);
+        if (!File.Exists(source))
+            throw new FileNotFoundException("WebP input was not found.", source);
+
+        DirectoryInfo tempDirectory = Directory.CreateTempSubdirectory("docx-webp-");
+        try
+        {
+            string target = Path.Combine(tempDirectory.FullName, "image.png");
+            const string pillowScript = "import sys; from PIL import Image; Image.open(sys.argv[1]).save(sys.argv[2], 'PNG')";
+            if (TryImageDecoder("dwebp", "-quiet", source, "-o", target) ||
+                TryImageDecoder(OperatingSystem.IsWindows() ? "python" : "python3", "-c", pillowScript, source, target))
+                return File.ReadAllBytes(target);
+
+            throw new InvalidDataException($"Could not convert WebP image '{imagePath}' to PNG. Verify the image and ensure dwebp or Python with Pillow is available.");
+        }
+        finally
+        {
+            tempDirectory.Delete(recursive: true);
+        }
+    }
+
+    private static bool TryImageDecoder(string executable, params string[] arguments)
+    {
+        var options = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true };
+        foreach (string argument in arguments)
+            options.ArgumentList.Add(argument);
+
+        try
+        {
+            using Process process = Process.Start(options)!;
+            if (process.WaitForExit(30_000))
+                return process.ExitCode == 0;
+
+            process.Kill(entireProcessTree: true);
+            process.WaitForExit();
+            return false;
+        }
+        catch (Win32Exception error) when (error.NativeErrorCode is 2 or 3)
+        {
+            return false;
+        }
     }
 
     /// <summary>

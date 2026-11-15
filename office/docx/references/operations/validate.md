@@ -40,10 +40,11 @@ python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf
 ```
 
 For a user-requested rendered preview or visual review, add `--pages preview/pages`
-and inspect the actual images. Run the rendering environment probe first per
-[setup](../../SKILL.md#setup). Check page breaks, font substitutions, tables,
-headings, fields, headers/footers and content completeness against the chosen
-requirements. Rendering success alone does not verify those properties.
+and inspect the actual images. Render the validated candidate first. If that
+conversion fails, use the [Writer probe](../../SKILL.md#setup) to check the runtime
+separately. If only Writer needed repair, rerender the same validated DOCX.
+Check page breaks, font substitutions, tables, headings, fields, headers/footers
+and content completeness against the chosen requirements.
 
 Deliver only requested formats and state any unexecuted application/visual or
 standards checks. Do not label a structural validator or sample recipe as a

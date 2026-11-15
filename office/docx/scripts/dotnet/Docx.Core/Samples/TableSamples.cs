@@ -84,7 +84,7 @@ public static class TableSamples
         table.Append(grid);
 
         // -- Header Row --
-        var headerRow = new TableRow();
+        var headerRow = new TableRow(new TableRowProperties(new CantSplit(), new TableHeader()));
         foreach (var h in headers)
         {
             var cell = new TableCell();
@@ -100,7 +100,7 @@ public static class TableSamples
         // -- Data Rows --
         foreach (var rowData in data)
         {
-            var row = new TableRow();
+            var row = new TableRow(new TableRowProperties(new CantSplit()));
             foreach (var cellText in rowData)
             {
                 var cell = new TableCell();
