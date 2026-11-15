@@ -33,11 +33,11 @@ are relative to this directory, not the task's working directory.
 First DOCX operation in the session:
 `bash "$SKILL_DIR/scripts/env_check.sh"`. Reuse the working SDK and CLI afterward.
 For permitted missing dependencies, use `scripts/setup.sh --minimal` (Windows:
-`scripts/setup.ps1 -Minimal`). For PDF output, `.doc` conversion or requested
-rendering, run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`; it probes
-Writer with a real DOCX-to-PDF conversion. If needed and setup is allowed, run the
-full setup script without the minimal flag. Do not equate a binary/version probe
-with successful candidate rendering.
+`scripts/setup.ps1 -Minimal`). For PDF output or requested visual review, render
+the validated DOCX first. If rendering fails, or before legacy `.doc`
+conversion, run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`. It
+probes Writer with a real DOCX-to-PDF conversion. If needed and setup is allowed,
+run the full setup script without the minimal flag.
 
 ## Routing order: common → applicable profile → operation
 

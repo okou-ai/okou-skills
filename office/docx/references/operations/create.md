@@ -202,6 +202,16 @@ bash "$SKILL_DIR/scripts/docx.sh" create \
 For tables, images, or lists, use the [direct C# path](../implementation/authoring.md#project-scaffold)
 and the relevant `Samples/*.cs` files listed there.
 
+For a new report built in C#, set `WidowControl` on its `Normal` style to
+keep single lines from being stranded at page breaks. `TableSamples.CreateSimpleTable`
+repeats column headers and keeps rows together across pages. Keep each row short
+enough to fit on one page.
+
+Use `ImageSamples.InsertInlineImage` for inline report figures. It converts
+WebP source images to lossless PNGs in temporary storage when `dwebp` or
+Python with Pillow is available. The source file stays intact. Validate the
+completed report and inspect its render when a PDF or visual review is needed.
+
 ---
 
 ## Complex Elements Guide
