@@ -31,13 +31,19 @@ Set `SKILL_DIR` to the absolute directory containing this file. All command path
 are relative to this directory, not the task's working directory.
 
 First DOCX operation in the session:
-`bash "$SKILL_DIR/scripts/env_check.sh"`. Reuse the working SDK and CLI afterward.
+`bash "$SKILL_DIR/scripts/env_check.sh"`. The Bash entrypoints resolve an installed
+SDK and the target .NET 8 runtime from `DOTNET_ROOT`, `PATH`, or `$HOME/.dotnet`,
+then set the native host environment for each invocation. A fresh noninteractive
+shell does not require another installation; an already-built CLI needs only
+the .NET 8 runtime.
 For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
 (Windows: `scripts/setup.ps1 -Minimal`).
 
-For requested PDF output or rendered visual review, render the validated DOCX
-with `scripts/render_docx.py`. With installation permission, it prepares missing
-rendering dependencies on demand.
+For PDF output or visual review, prepare rendering dependencies before authoring:
+`python3 "$SKILL_DIR/scripts/render_docx.py" --prepare`
+(use `--check` if installation is not permitted).
+Add `--pages qa/pages` for page images. Render the validated DOCX with
+`--no-install`.
 See [rendering and delivery](references/operations/validate.md#rendering-and-delivery)
 for output options.
 

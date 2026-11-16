@@ -235,6 +235,61 @@ class RenderingTests(unittest.TestCase):
                 ensure.assert_called_once_with(pages=False, install=False, timeout=60)
                 render.assert_called_once_with(source, output, 60)
 
+    def test_prepare_needs_no_document_or_output_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            pages = Path(directory) / "future pages"
+            with patch.object(sys, "argv", [str(SCRIPT), "--prepare", "--pages", str(pages)]), \
+                    patch.object(RENDER, "ensure_dependencies") as ensure, \
+                    patch.object(RENDER, "render") as render:
+                RENDER.main()
+                ensure.assert_called_once_with(pages=True, install=True, timeout=60)
+                render.assert_not_called()
+                self.assertFalse(pages.exists())
+
+    def test_prepare_pdf_only_does_not_request_poppler(self):
+        with patch.object(sys, "argv", [str(SCRIPT), "--prepare"]), \
+                patch.object(RENDER, "ensure_dependencies") as ensure:
+            RENDER.main()
+            ensure.assert_called_once_with(pages=False, install=True, timeout=60)
+
+    def test_prepare_honors_no_install(self):
+        with patch.object(sys, "argv", [str(SCRIPT), "--prepare", "--no-install"]), \
+                patch.object(RENDER, "ensure_dependencies") as ensure:
+            RENDER.main()
+            ensure.assert_called_once_with(pages=False, install=False, timeout=60)
+
+    def test_prepare_repairs_writer_once_without_rendering_user_document(self):
+        with patch.object(sys, "argv", [str(SCRIPT), "--prepare"]), \
+                patch.object(RENDER, "check_writer", side_effect=[
+                    RENDER.WriterUnavailableError("core alone cannot load DOCX"), None]) as probe, \
+                patch.object(RENDER, "install_dependencies") as install, \
+                patch.object(RENDER, "render") as render:
+            RENDER.main()
+            install.assert_called_once_with(writer=True, pages=False)
+            self.assertEqual(probe.call_count, 2)
+            render.assert_not_called()
+
+    def test_prepare_invalid_arguments_never_provision(self):
+        for arguments in (["--prepare", "source.docx"], ["--prepare", "--out", "out.pdf"],
+                          ["--prepare", "--check"], ["--prepare", "--timeout", "0"]):
+            with self.subTest(arguments=arguments), \
+                    patch.object(sys, "argv", [str(SCRIPT), *arguments]), \
+                    patch.object(RENDER, "ensure_dependencies") as ensure:
+                with self.assertRaises(SystemExit) as result:
+                    RENDER.main()
+                self.assertEqual(result.exception.code, 2)
+                ensure.assert_not_called()
+
+    def test_prepare_failed_probe_returns_nonzero_without_blind_repair(self):
+        with patch.object(sys, "argv", [str(SCRIPT), "--prepare"]), \
+                patch.object(RENDER, "check_writer", side_effect=PermissionError("profile denied")) as probe, \
+                patch.object(RENDER, "install_dependencies") as install:
+            with self.assertRaises(SystemExit) as result:
+                RENDER.main()
+            self.assertEqual(result.exception.code, 1)
+            probe.assert_called_once()
+            install.assert_not_called()
+
     def test_help_never_provisions(self):
         with patch.object(sys, "argv", [str(SCRIPT), "--help"]), \
                 patch.object(RENDER, "ensure_dependencies") as ensure:
@@ -356,16 +411,30 @@ class EnvironmentCheckTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             work = Path(directory)
             marker = work / "writer-probed"
+            scripts = work / "scripts"
+            scripts.mkdir()
+            for name in ("env_check.sh", "dotnet_env.sh"):
+                shutil.copyfile(SCRIPT.parent / name, scripts / name)
+                (scripts / name).chmod(0o755)
+            built = scripts / "dotnet/Docx.Cli/bin/Debug/net8.0/Docx.Cli.dll"
+            built.parent.mkdir(parents=True)
+            built.touch()
             for name, script in {
-                "dotnet": "#!/bin/sh\necho 8.0.100\n",
+                "dotnet": f'''#!/bin/sh
+case "$1" in
+    --list-sdks) echo "8.0.100 [{work}/sdk]" ;;
+    --list-runtimes) echo "Microsoft.NETCore.App 8.0.1 [{work}/shared/Microsoft.NETCore.App]" ;;
+    *) echo 8.0.100 ;;
+esac
+''',
                 "python3": '#!/bin/sh\ntouch "$WRITER_PROBE_MARKER"\necho "Writer unavailable" >&2\nexit 1\n',
             }.items():
                 executable = work / name
                 executable.write_text(script, encoding="utf-8")
                 executable.chmod(0o755)
             env = {**os.environ, "PATH": str(work) + os.pathsep + os.environ.get("PATH", ""),
-                   "WRITER_PROBE_MARKER": str(marker)}
-            command = [shutil.which("bash"), str(SCRIPT.parent / "env_check.sh")]
+                   "HOME": str(work), "DOTNET_ROOT": str(work), "WRITER_PROBE_MARKER": str(marker)}
+            command = [shutil.which("bash"), str(scripts / "env_check.sh")]
             normal = subprocess.run(command, env=env, capture_output=True, text=True, timeout=30)
             self.assertEqual(normal.returncode, 0, normal.stdout + normal.stderr)
             self.assertFalse(marker.exists(), "DOCX-only check must not probe Writer")

@@ -44,8 +44,9 @@ case "$(uname -s)" in
 esac
 
 # --- Critical: .NET SDK ---
-if ! command -v dotnet &>/dev/null; then
-    printf "[FAIL]    %-14s not found\n" "dotnet"
+source "$SCRIPT_DIR/dotnet_env.sh"
+if ! docx_use_dotnet; then
+    printf "[FAIL]    %-14s compatible SDK and .NET 8 runtime not found\n" "dotnet"
     echo ""
     echo "  .NET SDK is REQUIRED. Install it:"
     case "$OS" in
@@ -75,7 +76,9 @@ else
 fi
 
 # --- Critical: NuGet packages ---
-if [ -d "$DOTNET_DIR" ]; then
+if [ "$STATUS" != "READY" ]; then
+    printf "[FAIL]    %-14s skipped (no compatible SDK selected)\n" "project"
+elif [ -d "$DOTNET_DIR" ]; then
     if [ -f "$DOTNET_DIR/Docx.Cli/bin/Debug/net8.0/Docx.Cli.dll" ]; then
         printf "[OK]      %-14s built\n" "project"
     else
@@ -130,7 +133,7 @@ if $WITH_RENDERING; then
             printf '%s\n' "$writer_check_output" | sed 's/^/           /'
         fi
         STATUS="NOT READY"
-        echo "           Actual render_docx.py conversions can install rendering packages on demand."
+        echo "           Before authoring, use render_docx.py --prepare if dependency installation is permitted."
         echo "           --check never installs; provision packages manually if installation is restricted."
     fi
 fi

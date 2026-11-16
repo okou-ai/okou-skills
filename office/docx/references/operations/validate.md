@@ -36,7 +36,7 @@ bash "$SKILL_DIR/scripts/docx.sh" diff --before in.docx --after out.docx
 For a requested Word/PDF pair, export the authored DOCX instead of redesigning it:
 
 ```bash
-python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf
+python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf --no-install
 ```
 
 For a user-requested rendered preview or visual review, add `--pages preview/pages`

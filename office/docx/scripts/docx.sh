@@ -2,9 +2,14 @@
 # Run the built CLI without project discovery or a rebuild on every command.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/dotnet_env.sh"
+if ! docx_use_dotnet runtime; then
+    echo "The .NET 8 runtime is required. Run: bash \"$SCRIPT_DIR/setup.sh\" --minimal" >&2
+    exit 2
+fi
 CLI_DLL="$SCRIPT_DIR/dotnet/Docx.Cli/bin/Debug/net8.0/Docx.Cli.dll"
 if [[ ! -f "$CLI_DLL" ]]; then
     echo "DOCX CLI is not built. Run: bash \"$SCRIPT_DIR/setup.sh\" --minimal" >&2
     exit 2
 fi
-exec dotnet "$CLI_DLL" "$@"
+exec "$DOCX_DOTNET" "$CLI_DLL" "$@"
