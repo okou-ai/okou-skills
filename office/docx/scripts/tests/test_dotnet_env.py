@@ -47,17 +47,19 @@ class DotnetEnvironmentTests(unittest.TestCase):
                     "SDK_LOG": str(self.log)}
 
     def sdk(self, root=None, version="8.0.428", *, runtime_only=False, selection_failure=False,
-            runtime_major=8):
+            runtime_major=8, runtime_version=None, crlf=False):
         root = root or self.home / ".dotnet"
         root.mkdir(parents=True, exist_ok=True)
         host = root / "dotnet"
         inventory = "" if runtime_only else f"{version} [{root}/sdk]"
         selected = "exit 145" if selection_failure else f"printf '%s\\n' '{version}'"
+        runtime = runtime_version or f"{runtime_major}.0.34"
+        runtime_format = "%s\\r\\n" if crlf else "%s\\n"
         host.write_text(f'''#!/bin/bash
 printf '%s\\n' "${{DOTNET_ROOT:-}}|$*" >> "$SDK_LOG"
 case "$1" in
     --list-sdks) printf '%s\\n' '{inventory}' ;;
-    --list-runtimes) printf '%s\\n' 'Microsoft.NETCore.App {runtime_major}.0.34 [{root}/shared/Microsoft.NETCore.App]' ;;
+    --list-runtimes) printf '{runtime_format}' 'Microsoft.NETCore.App {runtime} [{root}/shared/Microsoft.NETCore.App]' ;;
     --version) {selected} ;;
     nuget) printf '%s\\n' 'nuget.org' ;;
     restore|build) exit 0 ;;
@@ -123,6 +125,30 @@ esac
         host = self.sdk()
         other = self.sdk(self.root / "newer SDK", version="9.0.100", runtime_major=9)
         result = self.run_script("docx.sh", "--help", env={**self.env, "DOTNET_ROOT": str(other.parent)})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(f"ROOT={host.parent}", result.stdout)
+
+    def test_windows_crlf_inventory_resolves_native_root(self):
+        host = self.sdk(self.root / "Windows native SDK", crlf=True)
+        host.write_text(host.read_text().replace(f"{host.parent}/shared/Microsoft.NETCore.App",
+                                                r"C:\Program Files\dotnet\shared\Microsoft.NETCore.App"))
+        cygpath = self.bin / "cygpath"
+        cygpath.write_text(f'''#!/bin/bash
+if [ "$1" = -u ] && [ "$2" = 'C:/Program Files/dotnet' ]; then
+    printf '%s\\n' '{host.parent}'
+else
+    exit 1
+fi
+''')
+        cygpath.chmod(0o755)
+        result = self.run_script("docx.sh", "--help", env={**self.env, "DOTNET_ROOT": str(host.parent)})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(f"ROOT={host.parent}", result.stdout)
+
+    def test_preview_only_root_does_not_hide_stable_runtime(self):
+        host = self.sdk()
+        preview = self.sdk(self.root / "preview SDK", runtime_version="8.0.0-preview.7")
+        result = self.run_script("docx.sh", "--help", env={**self.env, "DOTNET_ROOT": str(preview.parent)})
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn(f"ROOT={host.parent}", result.stdout)
 

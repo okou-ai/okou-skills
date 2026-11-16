@@ -23,7 +23,7 @@ docx_dotnet_host() {
 
 docx_use_dotnet() {
     local mode="${1:-sdk}" candidate host inventory line major found root runtime_directory
-    local on_path runtime_pattern='^Microsoft\.NETCore\.App[[:space:]]+8\.[^[:space:]]+[[:space:]]+\[(.*)\]$'
+    local on_path runtime_pattern='^Microsoft\.NETCore\.App[[:space:]]+8\.[0-9]+\.[0-9]+[[:space:]]+\[(.*)\]$'
     [[ "$mode" = sdk || "$mode" = runtime ]] || return 2
     on_path="$(type -P dotnet || true)"
     for candidate in "${DOTNET_ROOT:+$DOTNET_ROOT/dotnet}" "$on_path" "${HOME:-}/.dotnet/dotnet"; do
@@ -31,6 +31,7 @@ docx_use_dotnet() {
         inventory="$("$candidate" --list-runtimes 2>/dev/null)" || continue
         root=""
         while IFS= read -r line; do
+            line="${line%$'\r'}"
             if [[ "$line" =~ $runtime_pattern ]]; then
                 runtime_directory="${BASH_REMATCH[1]//\\//}"
                 [[ "$runtime_directory" = */shared/Microsoft.NETCore.App ]] || continue
