@@ -49,7 +49,10 @@ public static class TableSamples
     /// <param name="body">The document body to append the table to.</param>
     /// <param name="headers">Column header strings.</param>
     /// <param name="data">Rows of data; each inner array matches headers length.</param>
-    public static Table CreateSimpleTable(Body body, string[] headers, string[][] data)
+    public static Table CreateSimpleTable(Body body, string[] headers, string[][] data) =>
+        CreateSimpleTable(body, headers, data, 9360);
+
+    internal static Table CreateSimpleTable(Body body, string[] headers, string[][] data, int contentWidthDxa)
     {
         var table = new Table();
 
@@ -74,9 +77,8 @@ public static class TableSamples
 
         // -- Table Grid: equal column widths --
         // Grid columns define the default width in DXA.
-        // Total page width ~9360 DXA for letter with 1" margins (8.5" - 2" = 6.5" = 9360 DXA)
         var grid = new TableGrid();
-        int colWidth = 9360 / headers.Length;
+        int colWidth = Math.Max(1, contentWidthDxa / headers.Length);
         foreach (var _ in headers)
         {
             grid.Append(new GridColumn { Width = colWidth.ToString() });

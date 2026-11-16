@@ -45,6 +45,25 @@ namespace Docx.Core.Samples;
 /// </summary>
 public static class ListAndNumberingSamples
 {
+    internal static void AppendList(MainDocumentPart mainPart, Body body, string[] items, bool ordered)
+    {
+        var numbering = mainPart.NumberingDefinitionsPart ?? mainPart.AddNewPart<NumberingDefinitionsPart>();
+        var root = numbering.Numbering ??= new Numbering();
+        int abstractId = root.Elements<AbstractNum>()
+            .Select(num => num.AbstractNumberId?.Value ?? -1).DefaultIfEmpty(-1).Max() + 1;
+        int listId = root.Elements<NumberingInstance>()
+            .Select(num => num.NumberID?.Value ?? 0).DefaultIfEmpty().Max() + 1;
+
+        var level = ordered
+            ? CreateNumberLevel(0, NumberFormatValues.Decimal, "%1.", 720, 360, start: 1)
+            : CreateBulletLevel(0, "\u2022", "Arial", 720, 360);
+        SetupAbstractNum(numbering, abstractId, [level]);
+        SetupNumberingInstance(numbering, listId, abstractId);
+
+        foreach (string item in items)
+            body.AppendChild(CreateListParagraph(item, listId, level: 0));
+    }
+
     // ── 1. Bullet List (3 levels) ──────────────────────────────────────
 
     /// <summary>
@@ -763,7 +782,7 @@ public static class ListAndNumberingSamples
                 new NumberingProperties(
                     new NumberingLevelReference { Val = level },
                     new NumberingId { Val = numId })),
-            new Run(new Text(text)));
+            new Run(new Text(text) { Space = SpaceProcessingModeValues.Preserve }));
         return para;
     }
 

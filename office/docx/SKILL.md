@@ -32,12 +32,14 @@ are relative to this directory, not the task's working directory.
 
 First DOCX operation in the session:
 `bash "$SKILL_DIR/scripts/env_check.sh"`. Reuse the working SDK and CLI afterward.
-For permitted missing dependencies, use `scripts/setup.sh --minimal` (Windows:
-`scripts/setup.ps1 -Minimal`). For PDF output or requested visual review, render
-the validated DOCX first. If rendering fails, or before legacy `.doc`
-conversion, run `bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering`. It
-probes Writer with a real DOCX-to-PDF conversion. If needed and setup is allowed,
-run the full setup script without the minimal flag.
+For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
+(Windows: `scripts/setup.ps1 -Minimal`).
+
+For requested PDF output or rendered visual review, render the validated DOCX
+with `scripts/render_docx.py`. With installation permission, it prepares missing
+rendering dependencies on demand.
+See [rendering and delivery](references/operations/validate.md#rendering-and-delivery)
+for output options.
 
 ## Routing order: common → applicable profile → operation
 
@@ -85,12 +87,12 @@ bash "$SKILL_DIR/scripts/docx.sh" analyze --input document.docx
 bash "$SKILL_DIR/scripts/docx.sh" --help
 ```
 
-Simple CLI creation supports `report|letter|memo|academic`; `--type academic` is
-not APA/IEEE selection. For custom styles, sections, TOC, images or complex
-tables, read [authoring and sample patterns](references/implementation/authoring.md)
-and the relevant actual C# sample before implementing. Compose operations only
-as requested, then validate the completed file. For Word plus PDF, render that
-DOCX rather than independently redesigning its companion.
+Use [`create --content-json`](references/operations/create.md#content-configuration-json-format)
+for a new document with standard headings, paragraphs, tables, lists and inline
+figures. The CLI supports `report|letter|memo|academic`. Named-format profiles
+and custom styles, sections or table layouts use the relevant
+[authoring and sample patterns](references/implementation/authoring.md).
+Validate the completed DOCX. When a PDF is requested, render the same DOCX.
 
 ## References by responsibility
 

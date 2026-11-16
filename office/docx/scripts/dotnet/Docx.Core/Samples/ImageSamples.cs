@@ -62,7 +62,12 @@ public static class ImageSamples
     /// <param name="heightPx">Desired display height in pixels (at 96 dpi).</param>
     public static void InsertInlineImage(
         MainDocumentPart mainPart, Body body,
-        string imagePath, int widthPx, int heightPx)
+        string imagePath, int widthPx, int heightPx) =>
+        InsertInlineImage(mainPart, body, imagePath, widthPx, heightPx, description: null);
+
+    internal static Paragraph InsertInlineImage(
+        MainDocumentPart mainPart, Body body,
+        string imagePath, int widthPx, int heightPx, string? description)
     {
         // Step 1: Add the image file as a part. The ImagePartType must match
         // the actual file format. AddImagePart returns the ImagePart; we then
@@ -92,13 +97,13 @@ public static class ImageSamples
             relId, cx, cy,
             docPropId: docPropId,
             name: $"Image{docPropId}",
-            description: null);
+            description: description);
 
         // Step 5: Wrap in Paragraph → Run → Drawing
         Paragraph para = new Paragraph(
             new Run(drawing));
 
-        body.AppendChild(para);
+        return body.AppendChild(para);
     }
 
     // ── 2. Floating Image (Anchor) ─────────────────────────────────────

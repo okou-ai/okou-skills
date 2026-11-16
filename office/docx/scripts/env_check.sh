@@ -22,9 +22,6 @@ for arg in "$@"; do
     esac
 done
 SETUP_COMMAND="bash \"$SCRIPT_DIR/setup.sh\" --minimal"
-if $WITH_RENDERING; then
-    SETUP_COMMAND="bash \"$SCRIPT_DIR/setup.sh\""
-fi
 
 # Force English output for dotnet CLI
 export DOTNET_CLI_UI_LANGUAGE=en
@@ -128,17 +125,13 @@ if $WITH_RENDERING; then
         soffice_ver=$(soffice --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || echo "?")
         printf "[OK]      %-14s %s (DOCX-to-PDF probe passed)\n" "Writer" "$soffice_ver"
     else
-        printf "[WARN]    %-14s DOCX-to-PDF probe failed\n" "Writer"
+        printf "[FAIL]    %-14s DOCX-to-PDF probe failed\n" "Writer"
         if [ -n "$writer_check_output" ]; then
             printf '%s\n' "$writer_check_output" | sed 's/^/           /'
         fi
-        WARNINGS=$((WARNINGS + 1))
-        case "$OS" in
-            macos)        echo "           Install: brew install --cask libreoffice" ;;
-            linux|wsl)    echo "           Install: sudo apt-get install libreoffice-writer" ;;
-            windows-shell) echo "           Install: winget install TheDocumentFoundation.LibreOffice" ;;
-        esac
-        echo "           Then run: $SETUP_COMMAND"
+        STATUS="NOT READY"
+        echo "           Actual render_docx.py conversions can install rendering packages on demand."
+        echo "           --check never installs; provision packages manually if installation is restricted."
     fi
 fi
 
@@ -198,12 +191,8 @@ if [ "$STATUS" = "READY" ]; then
 else
     echo "Status: NOT READY"
     echo ""
-    echo "Critical dependencies missing. Run setup:"
+    echo "Required checks failed. For missing authoring dependencies, run:"
     echo "  $SETUP_COMMAND"
-    if $WITH_RENDERING; then
-        echo "  powershell scripts/setup.ps1           # Windows PowerShell"
-    else
-        echo "  powershell scripts/setup.ps1 -Minimal  # Windows PowerShell"
-    fi
+    echo "  powershell scripts/setup.ps1 -Minimal  # Windows PowerShell"
     exit 1
 fi

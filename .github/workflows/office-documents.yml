@@ -23,6 +23,8 @@ jobs:
           node-version: "22"
       - name: Select the .NET 8 SDK
         run: dotnet new globaljson --sdk-version 8.0.100 --roll-forward latestFeature
+      - name: Check lazy DOCX rendering setup
+        run: python office/docx/scripts/tests/test_render_docx.py
       - name: Install native dependencies
         run: |
           sudo apt-get update -qq
@@ -36,8 +38,16 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/office/docx/scripts/setup.sh" --minimal
       - name: Check DOCX and PDF environments
         run: |
-          bash office/docx/scripts/env_check.sh
+          bash office/docx/scripts/env_check.sh --with-rendering
           bash office/pdf/scripts/make.sh check
+      - name: Check structured DOCX creation
+        run: python office/docx/scripts/tests/test_create_content.py
+      - name: Render DOCX to PDF and page images without package installation
+        run: |
+          bash office/docx/scripts/docx.sh create --type report --title "Rendering smoke test" --output "$RUNNER_TEMP/render-smoke.docx"
+          python3 office/docx/scripts/render_docx.py "$RUNNER_TEMP/render-smoke.docx" --out "$RUNNER_TEMP/render-smoke.pdf" --pages "$RUNNER_TEMP/render-pages" --no-install
+          test -s "$RUNNER_TEMP/render-smoke.pdf"
+          test -s "$RUNNER_TEMP/render-pages/page-1.png"
   windows-docx:
     runs-on: windows-latest
     steps:
@@ -50,7 +60,11 @@ jobs:
           python-version: "3.12"
       - name: Select the .NET 8 SDK
         run: dotnet new globaljson --sdk-version 8.0.100 --roll-forward latestFeature
+      - name: Check lazy DOCX rendering setup
+        run: python office/docx/scripts/tests/test_render_docx.py
       - name: Set up DOCX from outside the skill directory
         working-directory: ${{ runner.temp }}
         shell: pwsh
         run: '& "$env:GITHUB_WORKSPACE/office/docx/scripts/setup.ps1" -Minimal'
+      - name: Check structured DOCX creation
+        run: python office/docx/scripts/tests/test_create_content.py

@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Text.Json;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -55,134 +56,149 @@ public static class CreateCommand
             var pageSize = GetPageSizeConfig(pageSizeName);
             var margins = GetMargins(marginsName);
 
-            using var doc = WordprocessingDocument.Create(output, WordprocessingDocumentType.Document);
-            var mainPart = doc.AddMainDocumentPart();
-            mainPart.Document = new Document(new Body());
-            var body = mainPart.Document.Body!;
-
-            // Add styles part with defaults
-            AddDefaultStyles(mainPart, fontConfig);
-
-            // Add section properties (page size, margins)
-            var sectPr = new SectionProperties();
-
-            // Add header if requested
-            if (!string.IsNullOrEmpty(headerText))
+            try
             {
-                var headerPart = mainPart.AddNewPart<HeaderPart>();
-                headerPart.Header = new Header(
-                    new Paragraph(new Run(new Text(headerText))));
-                var headerRefId = mainPart.GetIdOfPart(headerPart);
-                sectPr.Append(new HeaderReference
-                {
-                    Type = HeaderFooterValues.Default,
-                    Id = headerRefId
-                });
+                SaveDocument(output, PopulateDocument);
+                Console.WriteLine($"Created {docType} document: {output}");
+                return 0;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException
+                or InvalidDataException or JsonException or NotSupportedException)
+            {
+                Console.Error.WriteLine($"Could not create DOCX: {ex.Message}");
+                return 1;
             }
 
-            // Add footer if requested
-            if (!string.IsNullOrEmpty(footerText) || pageNumbers)
+            void PopulateDocument(WordprocessingDocument doc)
             {
-                var footerPart = mainPart.AddNewPart<FooterPart>();
-                var footerParagraph = new Paragraph();
+                var mainPart = doc.AddMainDocumentPart();
+                mainPart.Document = new Document(new Body());
+                var body = mainPart.Document.Body!;
 
-                if (!string.IsNullOrEmpty(footerText))
+                // Add styles part with defaults
+                AddDefaultStyles(mainPart, fontConfig);
+
+                // Add section properties (page size, margins)
+                var sectPr = new SectionProperties();
+
+                // Add header if requested
+                if (!string.IsNullOrEmpty(headerText))
                 {
-                    footerParagraph.Append(new Run(new Text(footerText)));
+                    var headerPart = mainPart.AddNewPart<HeaderPart>();
+                    headerPart.Header = new Header(
+                        new Paragraph(new Run(new Text(headerText))));
+                    var headerRefId = mainPart.GetIdOfPart(headerPart);
+                    sectPr.Append(new HeaderReference
+                    {
+                        Type = HeaderFooterValues.Default,
+                        Id = headerRefId
+                    });
                 }
 
-                if (pageNumbers)
+                // Add footer if requested
+                if (!string.IsNullOrEmpty(footerText) || pageNumbers)
                 {
+                    var footerPart = mainPart.AddNewPart<FooterPart>();
+                    var footerParagraph = new Paragraph();
+
                     if (!string.IsNullOrEmpty(footerText))
-                        footerParagraph.Append(new Run(new Text(" — ") { Space = SpaceProcessingModeValues.Preserve }));
+                    {
+                        footerParagraph.Append(new Run(new Text(footerText)));
+                    }
 
-                    footerParagraph.Append(new Run(
-                        new FieldChar { FieldCharType = FieldCharValues.Begin }));
-                    footerParagraph.Append(new Run(
-                        new FieldCode(" PAGE ") { Space = SpaceProcessingModeValues.Preserve }));
-                    footerParagraph.Append(new Run(
-                        new FieldChar { FieldCharType = FieldCharValues.End }));
+                    if (pageNumbers)
+                    {
+                        if (!string.IsNullOrEmpty(footerText))
+                            footerParagraph.Append(new Run(new Text(" — ") { Space = SpaceProcessingModeValues.Preserve }));
+
+                        footerParagraph.Append(new Run(
+                            new FieldChar { FieldCharType = FieldCharValues.Begin }));
+                        footerParagraph.Append(new Run(
+                            new FieldCode(" PAGE ") { Space = SpaceProcessingModeValues.Preserve }));
+                        footerParagraph.Append(new Run(
+                            new FieldChar { FieldCharType = FieldCharValues.End }));
+                    }
+
+                    footerPart.Footer = new Footer(footerParagraph);
+                    var footerRefId = mainPart.GetIdOfPart(footerPart);
+                    sectPr.Append(new FooterReference
+                    {
+                        Type = HeaderFooterValues.Default,
+                        Id = footerRefId
+                    });
                 }
 
-                footerPart.Footer = new Footer(footerParagraph);
-                var footerRefId = mainPart.GetIdOfPart(footerPart);
-                sectPr.Append(new FooterReference
+                // Header/footer references must precede page geometry in sectPr.
+                sectPr.Append(new DocumentFormat.OpenXml.Wordprocessing.PageSize
                 {
-                    Type = HeaderFooterValues.Default,
-                    Id = footerRefId
+                    Width = (UInt32Value)(uint)pageSize.WidthDxa,
+                    Height = (UInt32Value)(uint)pageSize.HeightDxa
                 });
+                sectPr.Append(new PageMargin
+                {
+                    Top = margins.TopDxa,
+                    Bottom = margins.BottomDxa,
+                    Left = (UInt32Value)(uint)margins.LeftDxa,
+                    Right = (UInt32Value)(uint)margins.RightDxa
+                });
+
+                // Title
+                if (!string.IsNullOrEmpty(title))
+                {
+                    var titlePara = new Paragraph(
+                        new ParagraphProperties(new ParagraphStyleId { Val = "Title" }),
+                        new Run(new Text(title)));
+                    body.Append(titlePara);
+                }
+
+                // Author subtitle
+                if (!string.IsNullOrEmpty(author))
+                {
+                    var authorPara = new Paragraph(
+                        new ParagraphProperties(new ParagraphStyleId { Val = "Subtitle" }),
+                        new Run(new Text(author)));
+                    body.Append(authorPara);
+                }
+
+                // TOC placeholder
+                if (tocPlaceholder)
+                {
+                    body.Append(new Paragraph(
+                        new ParagraphProperties(new ParagraphStyleId { Val = "TOCHeading" }),
+                        new Run(new Text("Table of Contents"))));
+
+                    // Insert TOC field
+                    var tocPara = new Paragraph();
+                    tocPara.Append(new Run(new FieldChar { FieldCharType = FieldCharValues.Begin }));
+                    tocPara.Append(new Run(new FieldCode(" TOC \\o \"1-3\" \\h \\z \\u ") { Space = SpaceProcessingModeValues.Preserve }));
+                    tocPara.Append(new Run(new FieldChar { FieldCharType = FieldCharValues.Separate }));
+                    tocPara.Append(new Run(new Text("Update this field to generate table of contents.")));
+                    tocPara.Append(new Run(new FieldChar { FieldCharType = FieldCharValues.End }));
+                    body.Append(tocPara);
+
+                    // Page break after TOC
+                    body.Append(new Paragraph(new Run(new Break { Type = BreakValues.Page })));
+                }
+
+                // Content from JSON (if provided)
+                if (!string.IsNullOrEmpty(contentJson))
+                {
+                    int contentWidthDxa = pageSize.WidthDxa - margins.LeftDxa - margins.RightDxa;
+                    int contentHeightDxa = pageSize.HeightDxa - margins.TopDxa - margins.BottomDxa;
+                    CreateContent.Append(mainPart, body, contentJson, contentWidthDxa, contentHeightDxa);
+                }
+
+                // Ensure body has at least one paragraph
+                if (!body.Elements<Paragraph>().Any())
+                {
+                    body.Append(new Paragraph());
+                }
+
+                // sectPr must be the last child of body
+                body.Append(sectPr);
+
+                mainPart.Document.Save();
             }
-
-            // Header/footer references must precede page geometry in sectPr.
-            sectPr.Append(new DocumentFormat.OpenXml.Wordprocessing.PageSize
-            {
-                Width = (UInt32Value)(uint)pageSize.WidthDxa,
-                Height = (UInt32Value)(uint)pageSize.HeightDxa
-            });
-            sectPr.Append(new PageMargin
-            {
-                Top = margins.TopDxa,
-                Bottom = margins.BottomDxa,
-                Left = (UInt32Value)(uint)margins.LeftDxa,
-                Right = (UInt32Value)(uint)margins.RightDxa
-            });
-
-            // Title
-            if (!string.IsNullOrEmpty(title))
-            {
-                var titlePara = new Paragraph(
-                    new ParagraphProperties(new ParagraphStyleId { Val = "Title" }),
-                    new Run(new Text(title)));
-                body.Append(titlePara);
-            }
-
-            // Author subtitle
-            if (!string.IsNullOrEmpty(author))
-            {
-                var authorPara = new Paragraph(
-                    new ParagraphProperties(new ParagraphStyleId { Val = "Subtitle" }),
-                    new Run(new Text(author)));
-                body.Append(authorPara);
-            }
-
-            // TOC placeholder
-            if (tocPlaceholder)
-            {
-                body.Append(new Paragraph(
-                    new ParagraphProperties(new ParagraphStyleId { Val = "TOCHeading" }),
-                    new Run(new Text("Table of Contents"))));
-
-                // Insert TOC field
-                var tocPara = new Paragraph();
-                tocPara.Append(new Run(new FieldChar { FieldCharType = FieldCharValues.Begin }));
-                tocPara.Append(new Run(new FieldCode(" TOC \\o \"1-3\" \\h \\z \\u ") { Space = SpaceProcessingModeValues.Preserve }));
-                tocPara.Append(new Run(new FieldChar { FieldCharType = FieldCharValues.Separate }));
-                tocPara.Append(new Run(new Text("Update this field to generate table of contents.")));
-                tocPara.Append(new Run(new FieldChar { FieldCharType = FieldCharValues.End }));
-                body.Append(tocPara);
-
-                // Page break after TOC
-                body.Append(new Paragraph(new Run(new Break { Type = BreakValues.Page })));
-            }
-
-            // Content from JSON (if provided)
-            if (!string.IsNullOrEmpty(contentJson) && File.Exists(contentJson))
-            {
-                var jsonContent = File.ReadAllText(contentJson);
-                AddContentFromJson(body, jsonContent, fontConfig);
-            }
-
-            // Ensure body has at least one paragraph
-            if (!body.Elements<Paragraph>().Any())
-            {
-                body.Append(new Paragraph());
-            }
-
-            // sectPr must be the last child of body
-            body.Append(sectPr);
-
-            mainPart.Document.Save();
-            Console.WriteLine($"Created {docType} document: {output}");
         });
 
         return cmd;
@@ -287,41 +303,22 @@ public static class CreateCommand
         stylesPart.Styles.Save();
     }
 
-    private static void AddContentFromJson(Body body, string jsonContent, FontConfig fontConfig)
+    private static void SaveDocument(string output, Action<WordprocessingDocument> populate)
     {
-        // Simple JSON content format: array of {type, text, level?}
-        // e.g. [{"type":"heading","text":"Introduction","level":1},{"type":"paragraph","text":"..."}]
+        string destination = Path.GetFullPath(output);
+        string temporary = Path.Combine(Path.GetDirectoryName(destination)!, $".docx-{Guid.NewGuid():N}.tmp");
+        var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.ReadWrite);
         try
         {
-            using var jsonDoc = System.Text.Json.JsonDocument.Parse(jsonContent);
-            foreach (var element in jsonDoc.RootElement.EnumerateArray())
-            {
-                var type = element.GetProperty("type").GetString() ?? "paragraph";
-                var text = element.GetProperty("text").GetString() ?? "";
+            using (stream)
+            using (var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document))
+                populate(document);
 
-                switch (type)
-                {
-                    case "heading":
-                        var level = element.TryGetProperty("level", out var lvl) ? lvl.GetInt32() : 1;
-                        level = Math.Clamp(level, 1, 6);
-                        body.Append(new Paragraph(
-                            new ParagraphProperties(new ParagraphStyleId { Val = $"Heading{level}" }),
-                            new Run(new Text(text))));
-                        break;
-
-                    case "paragraph":
-                        body.Append(new Paragraph(new Run(new Text(text))));
-                        break;
-
-                    case "pagebreak":
-                        body.Append(new Paragraph(new Run(new Break { Type = BreakValues.Page })));
-                        break;
-                }
-            }
+            File.Move(temporary, destination, overwrite: true);
         }
-        catch (System.Text.Json.JsonException ex)
+        finally
         {
-            Console.Error.WriteLine($"Warning: could not parse content JSON: {ex.Message}");
+            File.Delete(temporary);
         }
     }
 }
