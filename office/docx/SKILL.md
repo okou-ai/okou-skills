@@ -85,12 +85,12 @@ bash "$SKILL_DIR/scripts/docx.sh" analyze --input document.docx
 bash "$SKILL_DIR/scripts/docx.sh" --help
 ```
 
-Simple CLI creation supports `report|letter|memo|academic`; `--type academic` is
-not APA/IEEE selection. For custom styles, sections, TOC, images or complex
-tables, read [authoring and sample patterns](references/implementation/authoring.md)
-and the relevant actual C# sample before implementing. Compose operations only
-as requested, then validate the completed file. For Word plus PDF, render that
-DOCX rather than independently redesigning its companion.
+Use [`create --content-json`](references/operations/create.md#content-configuration-json-format)
+for a new document with standard headings, paragraphs, tables, lists and inline
+figures. The CLI supports `report|letter|memo|academic`. Named-format profiles
+and custom styles, sections or table layouts use the relevant
+[authoring and sample patterns](references/implementation/authoring.md).
+Validate the completed DOCX. When a PDF is requested, render the same DOCX.
 
 ## References by responsibility
 

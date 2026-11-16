@@ -172,23 +172,38 @@ margins. Build those explicitly if required.
 ## Content Configuration JSON Format
 
 The CLI `create --content-json` option reads an array of content blocks. Save
-this example as `content.json`:
+this example as `content.json` and use an image from the task:
 
 ```json
 [
   { "type": "heading", "text": "Executive Summary", "level": 1 },
   { "type": "paragraph", "text": "Revenue grew 12% year-over-year." },
-  { "type": "pagebreak", "text": "" },
   { "type": "heading", "text": "Detailed Analysis", "level": 1 },
-  { "type": "paragraph", "text": "North America revenue reached $4.2M, up 15%." }
+  { "type": "table", "headers": ["Region", "Revenue"], "rows": [["North America", "$4.2M"]] },
+  { "type": "image", "path": "figures/revenue.png", "widthPx": 480, "heightPx": 300,
+    "caption": "Revenue by region", "alt": "Bar chart of revenue by region" },
+  { "type": "list", "ordered": true, "items": ["Confirm the period", "Review the regional totals"] }
 ]
 ```
 
-Each block requires `type` and `text`. Supported types are case-sensitive:
+Each block requires a case-sensitive `type`.
 
 - `heading` — heading text; optional `level` from 1 to 6 (default: 1).
 - `paragraph` — body text.
-- `pagebreak` — a page break; set `text` to an empty string.
+- `pagebreak` — a page break.
+- `table` — `headers` is a non-empty array of column names and `rows` is an
+  array of rows with the same number of cells as `headers`. All cells are
+  strings. The header repeats across pages. Keep each row short enough to fit
+  on one page.
+- `list` — `items` is a non-empty array of strings. Set `ordered` to `true`
+  for a numbered list starting at 1. The default is bullets.
+- `image` — `path` is an absolute path or relative to `content.json`. Supply
+  positive integer `widthPx` and `heightPx` in the desired aspect ratio. Large
+  figures scale down to the body area. Optional `caption` and `alt` are strings.
+  PNG and JPEG embed directly. WebP converts through `dwebp` or Python with Pillow.
+
+Supply `text` for headings and paragraphs. The CLI reports invalid blocks by
+position and exits with an error while preserving an existing output file.
 
 Set the document type, title, author, page size, and margins with CLI options:
 
@@ -197,20 +212,13 @@ bash "$SKILL_DIR/scripts/docx.sh" create \
   --type report --title "Quarterly Revenue Analysis" --author "Finance Team" \
   --page-size a4 --margins standard \
   --content-json content.json --output report.docx
+bash "$SKILL_DIR/scripts/docx.sh" validate --input report.docx --business
 ```
 
-For tables, images, or lists, use the [direct C# path](../implementation/authoring.md#project-scaffold)
-and the relevant `Samples/*.cs` files listed there.
-
-For a new report built in C#, set `WidowControl` on its `Normal` style to
-keep single lines from being stranded at page breaks. `TableSamples.CreateSimpleTable`
-repeats column headers and keeps rows together across pages. Keep each row short
-enough to fit on one page.
-
-Use `ImageSamples.InsertInlineImage` for inline report figures. It converts
-WebP source images to lossless PNGs in temporary storage when `dwebp` or
-Python with Pillow is available. The source file stays intact. Validate the
-completed report and inspect its render when a PDF or visual review is needed.
+Use the [direct C# path](../implementation/authoring.md#project-scaffold) for
+custom layouts such as merged cells, nested lists or floating figures. For a
+report built in C#, enable `WidowControl` on its `Normal` style and use the
+bundled table and image helpers for standard pagination and WebP conversion.
 
 ---
 

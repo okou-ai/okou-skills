@@ -38,6 +38,8 @@ jobs:
         run: |
           bash office/docx/scripts/env_check.sh
           bash office/pdf/scripts/make.sh check
+      - name: Check structured DOCX creation
+        run: python office/docx/scripts/tests/test_create_content.py
   windows-docx:
     runs-on: windows-latest
     steps:
@@ -54,3 +56,5 @@ jobs:
         working-directory: ${{ runner.temp }}
         shell: pwsh
         run: '& "$env:GITHUB_WORKSPACE/office/docx/scripts/setup.ps1" -Minimal'
+      - name: Check structured DOCX creation
+        run: python office/docx/scripts/tests/test_create_content.py
