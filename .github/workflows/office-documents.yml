@@ -30,7 +30,7 @@ jobs:
       - name: Install native dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq libreoffice-writer libreoffice-calc poppler-utils fonts-liberation fonts-noto-cjk
+          sudo apt-get install -y -qq libreoffice-writer libreoffice-calc poppler-utils fonts-liberation fonts-noto-cjk fonts-wqy-zenhei
           python3 -m pip install reportlab pypdf matplotlib
           python3 -m pip install -r office/xlsx/requirements-authoring.txt
           npm install -g playwright
@@ -44,6 +44,8 @@ jobs:
           python3 office/docx/scripts/render_docx.py --prepare --pages "$RUNNER_TEMP/prepared-pages" --no-install
           test ! -e "$RUNNER_TEMP/prepared-pages"
           bash office/pdf/scripts/make.sh check
+      - name: Check standalone PDF content and delivery
+        run: python office/pdf/scripts/tests/test_create_pdf.py
       - name: Check structured DOCX creation
         run: python office/docx/scripts/tests/test_create_content.py
       - name: Render DOCX to PDF and page images without package installation

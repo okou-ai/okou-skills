@@ -14,6 +14,7 @@ import importlib.util
 import json
 import os
 import sys
+import tempfile
 
 def ensure_deps():
     if importlib.util.find_spec("pypdf") is None:
@@ -29,35 +30,38 @@ from pypdf import PdfWriter, PdfReader
 
 
 def merge(cover_path: str, body_path: str, out_path: str, title: str = "") -> dict:
-    writer = PdfWriter()
+    cover = PdfReader(cover_path)
+    body = PdfReader(body_path)
+    cover_pages = len(cover.pages)
+    body_pages = len(body.pages)
+    if cover_pages != 1 or not body_pages:
+        raise ValueError(
+            f"Expected one cover page and at least one body page, got {cover_pages} cover and {body_pages} body"
+        )
 
-    for fpath, label in [(cover_path, "cover"), (body_path, "body")]:
-        if not os.path.exists(fpath):
-            return {"status": "error", "error": f"{label} file not found: {fpath}"}
-        reader = PdfReader(fpath)
+    writer = PdfWriter()
+    for reader in (cover, body):
         for page in reader.pages:
             writer.add_page(page)
-
-    # Set PDF metadata
     if title:
         writer.add_metadata({"/Title": title})
 
-    os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-    with open(out_path, "wb") as f:
-        writer.write(f)
+    total_pages = cover_pages + body_pages
+    directory = os.path.dirname(os.path.abspath(out_path))
+    os.makedirs(directory, exist_ok=True)
+    candidate = tempfile.NamedTemporaryFile(dir=directory, prefix=".pdf-", suffix=".tmp", delete=False)
+    try:
+        with candidate:
+            writer.write(candidate)
+        if len(PdfReader(candidate.name).pages) != total_pages:
+            raise ValueError("Merged PDF page count does not match the input PDFs")
+        size_kb = os.path.getsize(candidate.name) // 1024
+        os.replace(candidate.name, out_path)
+    finally:
+        if os.path.exists(candidate.name):
+            os.remove(candidate.name)
 
-    size_kb = os.path.getsize(out_path) // 1024
-    total_pages = len(writer.pages)
-
-    # ── QA checks ─────────────────────────────────────────────────────────────
     warnings = []
-
-    # Page count sanity
-    cover_pages = len(PdfReader(cover_path).pages)
-    body_pages  = len(PdfReader(body_path).pages)
-    if cover_pages != 1:
-        warnings.append(f"Cover PDF has {cover_pages} pages (expected 1)")
-
     # File size sanity
     if size_kb < 20:
         warnings.append(f"Output is very small ({size_kb} KB) — may have blank pages")
@@ -86,10 +90,10 @@ def main():
     parser.add_argument("--title", default="")
     args = parser.parse_args()
 
-    result = merge(args.cover, args.body, args.out, args.title)
-
-    if result["status"] == "error":
-        print(json.dumps(result), file=sys.stderr)
+    try:
+        result = merge(args.cover, args.body, args.out, args.title)
+    except Exception as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
         sys.exit(3)
 
     print(json.dumps(result))
@@ -103,8 +107,6 @@ def main():
         print(f"  ⚠  Warnings:")
         for w in result["warnings"]:
             print(f"     • {w}")
-    else:
-        print(f"  ✓  No issues detected")
     print(f"────────────────────────────────────────────────────────\n")
 
 

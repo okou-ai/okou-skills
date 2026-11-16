@@ -28,11 +28,14 @@ Exit codes: 0 success, 1 bad args/missing file, 2 missing dep, 3 render error
 """
 
 import argparse
+import html
+import importlib.util
 import io
 import json
 import os
+from pathlib import Path
+import re
 import sys
-import importlib.util
 
 
 # ── Dependency bootstrap ───────────────────────────────────────────────────────
@@ -60,7 +63,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.colors import HexColor
 from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase.ttfonts import TTFont, TTFError
 
 
 # ── Font registration ──────────────────────────────────────────────────────────
@@ -74,6 +77,69 @@ def register_fonts(tokens: dict):
                 pass
 
 
+_CJK = re.compile(r"[\u3000-\u30ff\u3400-\u9fff\uac00-\ud7af\uf900-\ufaff\uff01-\uff60\U00020000-\U000323af]")
+_CJK_FONT = "PdfCjk"
+_CJK_BULLET = "·"
+_CJK_FONT_PATHS = (
+    "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+    "/System/Library/Fonts/STHeiti Light.ttc",
+    "/System/Library/Fonts/Supplemental/Songti.ttc",
+)
+
+
+def content_text(value):
+    if isinstance(value, str):
+        yield html.unescape(value)
+    elif isinstance(value, list):
+        for child in value:
+            yield from content_text(child)
+    elif isinstance(value, dict):
+        for key, child in value.items():
+            if key not in {"type", "path", "src"}:
+                yield from content_text(child)
+
+
+def cjk_font_path(tokens: dict, content: list) -> str | None:
+    text = "".join(tokens.get(key, "") for key in ("title", "date", "author"))
+    text += "".join(content_text(content))
+    if not _CJK.search(text):
+        return None
+
+    # Also check visible Latin and punctuation in a mixed-script report.
+    codepoints = {ord(c) for c in text + "0123456789" + _CJK_BULLET if c not in "\r\n\t"}
+    configured = os.environ.get("PDF_CJK_FONT")
+    candidates = (configured,) if configured else _CJK_FONT_PATHS
+    for path in candidates:
+        if not Path(path).is_file():
+            continue
+        try:
+            font = TTFont(_CJK_FONT, path)
+        except (TTFError, OSError, ValueError) as exc:
+            if configured:
+                raise ValueError(f"Cannot load PDF_CJK_FONT {path}: {exc}") from exc
+            continue
+        if all(font.face.charToGlyph.get(value) for value in codepoints):
+            pdfmetrics.registerFont(font)
+            pdfmetrics.registerFontFamily(
+                _CJK_FONT, normal=_CJK_FONT, bold=_CJK_FONT, italic=_CJK_FONT, boldItalic=_CJK_FONT
+            )
+            return path
+    raise ValueError(
+        "No embeddable font covers the report's text. Install fonts-wqy-zenhei "
+        "or set PDF_CJK_FONT to a compatible TrueType font with the required glyphs."
+    )
+
+
+def _paragraph(text, style):
+    paragraph = Paragraph(text, style)
+    if style.fontName == _CJK_FONT:
+        # Inline font markup can select a Latin-only face inside CJK text.
+        for fragment in paragraph.frags:
+            if _CJK.search(getattr(fragment, "text", "")):
+                fragment.fontName = _CJK_FONT
+    return paragraph
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Custom Flowables
 # ══════════════════════════════════════════════════════════════════════════════
@@ -83,7 +149,7 @@ class CalloutBox(Flowable):
 
     def __init__(self, text: str, style, accent: str, bg: str):
         super().__init__()
-        self._para   = Paragraph(text, style)
+        self._para   = _paragraph(text, style)
         self._accent = HexColor(accent)
         self._bg     = HexColor(bg)
 
@@ -116,7 +182,7 @@ class BibliographyItem(Flowable):
 
     def wrap(self, aw, ah):
         self._w    = aw
-        self._para = Paragraph(self._text, self._style)
+        self._para = _paragraph(self._text, self._style)
         _, ph      = self._para.wrap(aw - self.LABEL_W, ah)
         self._h    = ph + 4
         return aw, self._h
@@ -124,7 +190,8 @@ class BibliographyItem(Flowable):
     def draw(self):
         c = self.canv
         c.setFillColor(self._dark)
-        c.setFont("Helvetica-Bold", 8.5)
+        label_font = _CJK_FONT if self._style.fontName == _CJK_FONT else "Helvetica-Bold"
+        c.setFont(label_font, 8.5)
         c.drawString(0, self._h - 12, f"[{self._id}]")
         self._para.drawOn(c, self.LABEL_W, 2)
 
@@ -263,10 +330,6 @@ def make_styles(t: dict) -> dict:
             textColor=HexColor(d),
             spaceBefore=t["section_gap"], spaceAfter=8,
         ),
-        "math_fallback": ParagraphStyle("MathFb",
-            fontName="Courier", fontSize=9, leading=13,
-            textColor=HexColor(dk),
-        ),
         "eq_label": ParagraphStyle("EqLabel",
             fontName="Helvetica", fontSize=9, leading=12,
             textColor=HexColor(mu),
@@ -302,13 +365,24 @@ def _image_from_bytes(png_bytes: bytes, usable_w: float,
 # PNG renderers (matplotlib)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _render_math_png(expr: str, dpi: int = 180) -> bytes | None:
+def _apply_plot_font(fig, font_path: str | None):
+    if font_path:
+        from matplotlib.text import Text
+
+        for artist in fig.findobj(match=Text):
+            properties = artist.get_fontproperties().copy()
+            properties.set_file(font_path)
+            artist.set_fontproperties(properties)
+
+
+def _render_math_png(expr: str, dpi: int = 180) -> bytes:
     """
     Render a LaTeX math expression via matplotlib mathtext.
     No LaTeX binary required — uses matplotlib's built-in math parser.
     Supports: fractions (\\frac), integrals (\\int), sums (\\sum),
               Greek letters, sub/superscripts, etc.
     """
+    fig = None
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -325,14 +399,14 @@ def _render_math_png(expr: str, dpi: int = 180) -> bytes | None:
         buf = io.BytesIO()
         fig.savefig(buf, format="png", dpi=dpi, bbox_inches="tight",
                     facecolor="white", pad_inches=0.1)
-        plt.close(fig)
         buf.seek(0)
         return buf.read()
-    except Exception:
-        return None
+    finally:
+        if fig is not None:
+            plt.close(fig)
 
 
-def _render_chart_png(item: dict, accent: str, dpi: int = 150) -> bytes | None:
+def _render_chart_png(item: dict, accent: str, dpi: int = 150, *, font_path=None) -> bytes:
     """
     Render bar / line / pie chart to PNG using matplotlib.
 
@@ -346,6 +420,7 @@ def _render_chart_png(item: dict, accent: str, dpi: int = 150) -> bytes | None:
         x_label      X-axis label
         y_label      Y-axis label
     """
+    fig = None
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -358,6 +433,13 @@ def _render_chart_png(item: dict, accent: str, dpi: int = 150) -> bytes | None:
         title_text = item.get("title", "")
         labels     = item.get("labels", [])
         datasets   = item.get("datasets", [])
+
+        if chart_type not in ("bar", "line", "pie"):
+            raise ValueError(f"unsupported chart type {chart_type!r}")
+        if not labels or not datasets:
+            raise ValueError("chart requires labels and at least one dataset")
+        if any(len(series["values"]) != len(labels) for series in datasets):
+            raise ValueError("each chart dataset must have one value per label")
 
         # Derive a consistent palette from the document accent color
         r, g, b = mcolors.to_rgb(accent)
@@ -434,19 +516,20 @@ def _render_chart_png(item: dict, accent: str, dpi: int = 150) -> bytes | None:
         if len(datasets) > 1 and chart_type != "pie":
             ax.legend(frameon=False, fontsize=8, loc="upper right")
 
+        _apply_plot_font(fig, font_path)
         plt.tight_layout(pad=0.4)
         buf = io.BytesIO()
         fig.savefig(buf, format="png", dpi=dpi, bbox_inches="tight",
                     facecolor="white", pad_inches=0.06)
-        plt.close(fig)
         buf.seek(0)
         return buf.read()
-    except Exception:
-        return None
+    finally:
+        if fig is not None:
+            plt.close(fig)
 
 
-def _render_flowchart_png(item: dict, accent: str, dark: str,
-                           muted: str, dpi: int = 130) -> bytes | None:
+def _render_flowchart_png(item: dict, accent: str, dark: str, muted: str,
+                          dpi: int = 130, *, font_path: str | None = None) -> bytes:
     """
     Render a top-to-bottom flowchart using matplotlib patches and arrows.
 
@@ -457,6 +540,7 @@ def _render_flowchart_png(item: dict, accent: str, dark: str,
         Forward edges (to a later node) draw straight arrows.
         Back edges (to an earlier node) draw a curved arc to the right.
     """
+    fig = None
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -468,9 +552,11 @@ def _render_flowchart_png(item: dict, accent: str, dark: str,
         nodes_list = item.get("nodes", [])
         edges      = item.get("edges", [])
         if not nodes_list:
-            return None
+            raise ValueError("flowchart requires at least one node")
 
         nodes = {n["id"]: n for n in nodes_list}
+        if len(nodes) != len(nodes_list):
+            raise ValueError("flowchart node IDs must be unique")
         order = {n["id"]: i for i, n in enumerate(nodes_list)}
 
         n_nodes = len(nodes_list)
@@ -499,7 +585,7 @@ def _render_flowchart_png(item: dict, accent: str, dark: str,
         for edge in edges:
             src, dst = edge.get("from"), edge.get("to")
             if src not in pos or dst not in pos:
-                continue
+                raise ValueError(f"flowchart edge {src!r} → {dst!r} references an unknown node")
             x1, y1 = pos[src]
             x2, y2 = pos[dst]
             lbl = edge.get("label", "")
@@ -581,15 +667,16 @@ def _render_flowchart_png(item: dict, accent: str, dark: str,
                 ax.text(cx, cy, label, ha="center", va="center",
                         fontsize=8.5, color=dark_rgb)
 
+        _apply_plot_font(fig, font_path)
         plt.tight_layout(pad=0.2)
         buf = io.BytesIO()
         fig.savefig(buf, format="png", dpi=dpi, bbox_inches="tight",
                     facecolor="white", pad_inches=0.08)
-        plt.close(fig)
         buf.seek(0)
         return buf.read()
-    except Exception:
-        return None
+    finally:
+        if fig is not None:
+            plt.close(fig)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -612,7 +699,7 @@ def _render_flowchart_png(item: dict, accent: str, dark: str,
 
 def _add_heading(story: list, item: dict, ctx: dict, level: int):
     key  = f"h{level}"
-    para = Paragraph(item["text"], ctx["styles"][key])
+    para = _paragraph(item["text"], ctx["styles"][key])
     if level == 1:
         story.append(KeepTogether([para, _divider(ctx["acc"])]))
     else:
@@ -620,19 +707,20 @@ def _add_heading(story: list, item: dict, ctx: dict, level: int):
 
 
 def _add_body(story: list, item: dict, ctx: dict):
-    story.append(Paragraph(item["text"], ctx["styles"]["body"]))
+    story.append(_paragraph(item["text"], ctx["styles"]["body"]))
 
 
 def _add_bullet(story: list, item: dict, ctx: dict):
-    story.append(Paragraph(
-        f"\u2022\u2002{item['text']}", ctx["styles"]["bullet"]
+    bullet = _CJK_BULLET if ctx["tokens"].get("cjk_font_path") else "\u2022"
+    story.append(_paragraph(
+        f"{bullet}{ctx['list_gap']}{item['text']}", ctx["styles"]["bullet"]
     ))
 
 
 def _add_numbered(story: list, item: dict, ctx: dict):
     ctx["numbered_n"] += 1
-    story.append(Paragraph(
-        f"{ctx['numbered_n']}.\u2002{item['text']}",
+    story.append(_paragraph(
+        f"{ctx['numbered_n']}.{ctx['list_gap']}{item['text']}",
         ctx["styles"]["numbered"],
     ))
 
@@ -652,10 +740,18 @@ def _add_table(story: list, item: dict, ctx: dict):
     acc      = ctx["acc"]
     acc_lt   = ctx["acc_lt"]
 
-    headers = [Paragraph(h, styles["table_header"]) for h in item["headers"]]
+    raw_headers = item["headers"]
+    raw_rows = item["rows"]
+    if not isinstance(raw_headers, list) or not raw_headers:
+        raise ValueError("table requires a nonempty list of headers")
+    if not isinstance(raw_rows, list) or any(
+        not isinstance(row, list) or len(row) != len(raw_headers) for row in raw_rows
+    ):
+        raise ValueError("each table row must have one cell per header")
+    headers = [_paragraph(h, styles["table_header"]) for h in raw_headers]
     rows    = [
-        [Paragraph(str(c), styles["table_cell"]) for c in row]
-        for row in item.get("rows", [])
+        [_paragraph(str(c), styles["table_cell"]) for c in row]
+        for row in raw_rows
     ]
     n_cols = len(item["headers"])
 
@@ -689,17 +785,16 @@ def _add_table(story: list, item: dict, ctx: dict):
     story.append(tbl)
     if item.get("caption"):
         story.append(Spacer(1, 4))
-        story.append(Paragraph(item["caption"], styles["caption"]))
+        story.append(_paragraph(item["caption"], styles["caption"]))
     story.append(Spacer(1, 12))
 
 
 def _add_image(story: list, item: dict, ctx: dict):
-    path = str(item.get("path", item.get("src", "")))
-    if not os.path.exists(path):
-        story.append(Paragraph(
-            f"[Image not found: {path}]", ctx["styles"]["caption"]
-        ))
-        return
+    path = item.get("path", item.get("src"))
+    if not isinstance(path, str) or not path:
+        raise ValueError("image requires a nonempty 'path' or 'src'")
+    if not os.path.isfile(path):
+        raise ValueError(f"Image not found: {path}")
     try:
         img = RLImage(path)
         uw  = ctx["usable_w"]
@@ -707,13 +802,12 @@ def _add_image(story: list, item: dict, ctx: dict):
             scale = uw / img.drawWidth
             img.drawWidth  = uw
             img.drawHeight = img.drawHeight * scale
-        story.append(img)
     except Exception as e:
-        story.append(Paragraph(f"[Image error: {e}]", ctx["styles"]["caption"]))
-        return
+        raise ValueError(f"Cannot read image {path}: {e}") from e
+    story.append(img)
     if item.get("caption"):
         story.append(Spacer(1, 4))
-        story.append(Paragraph(item["caption"], ctx["styles"]["caption"]))
+        story.append(_paragraph(item["caption"], ctx["styles"]["caption"]))
     story.append(Spacer(1, 8))
 
 
@@ -733,7 +827,7 @@ def _add_code(story: list, item: dict, ctx: dict):
     uw     = ctx["usable_w"]
     lang   = item.get("language", "")
 
-    pre = Preformatted(item.get("text", ""), ctx["styles"]["code"])
+    pre = Preformatted(item["text"], ctx["styles"]["code"])
     tbl = Table([[pre]], colWidths=[uw])
     tbl.setStyle(TableStyle([
         ("BACKGROUND",    (0, 0), (-1, -1), HexColor(acc_lt)),
@@ -746,7 +840,7 @@ def _add_code(story: list, item: dict, ctx: dict):
     ]))
     story.append(Spacer(1, 6))
     if lang:
-        story.append(Paragraph(lang.upper(), ctx["styles"]["code_lang"]))
+        story.append(_paragraph(lang.upper(), ctx["styles"]["code_lang"]))
     story.append(tbl)
     story.append(Spacer(1, 6))
 
@@ -764,29 +858,13 @@ def _add_math(story: list, item: dict, ctx: dict):
         {"type": "math", "text": "E = mc^2", "label": "(1)"}
         {"type": "math", "text": "\\\\int_0^\\\\infty e^{-x^2}\\\\,dx = \\\\frac{\\\\sqrt{\\\\pi}}{2}"}
     """
-    acc    = ctx["acc"]
-    acc_lt = ctx["acc_lt"]
     uw     = ctx["usable_w"]
-    expr   = item.get("text", "").strip()
+    expr   = item["text"].strip()
     label  = item.get("label", "").strip()
 
+    if not expr:
+        raise ValueError("math requires an expression")
     png = _render_math_png(expr)
-
-    if png is None:
-        # Graceful text fallback if matplotlib unavailable
-        story.append(Spacer(1, 6))
-        pre = Preformatted(f"  {expr}", ctx["styles"]["math_fallback"])
-        tbl = Table([[pre]], colWidths=[uw])
-        tbl.setStyle(TableStyle([
-            ("BACKGROUND",    (0, 0), (-1, -1), HexColor(acc_lt)),
-            ("LEFTPADDING",   (0, 0), (-1, -1), 14),
-            ("RIGHTPADDING",  (0, 0), (-1, -1), 14),
-            ("TOPPADDING",    (0, 0), (-1, -1), 8),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-        ]))
-        story.append(tbl)
-        story.append(Spacer(1, 6))
-        return
 
     img = _image_from_bytes(png, uw, max_frac=0.72)
     story.append(Spacer(1, 10))
@@ -794,7 +872,7 @@ def _add_math(story: list, item: dict, ctx: dict):
     if label:
         label_w   = 44
         formula_w = uw - label_w
-        lbl_para  = Paragraph(label, ctx["styles"]["eq_label"])
+        lbl_para  = _paragraph(label, ctx["styles"]["eq_label"])
         row_tbl   = Table([[img, lbl_para]], colWidths=[formula_w, label_w])
         row_tbl.setStyle(TableStyle([
             ("ALIGN",  (0, 0), (0, 0), "CENTER"),
@@ -811,7 +889,7 @@ def _add_math(story: list, item: dict, ctx: dict):
 
     if item.get("caption"):
         story.append(Spacer(1, 4))
-        story.append(Paragraph(item["caption"], ctx["styles"]["caption"]))
+        story.append(_paragraph(item["caption"], ctx["styles"]["caption"]))
     story.append(Spacer(1, 10))
 
 
@@ -830,14 +908,8 @@ def _add_chart(story: list, item: dict, ctx: dict):
         figure      bool (default true) — prefix caption with "Figure N:"
     """
     uw  = ctx["usable_w"]
-    png = _render_chart_png(item, ctx["acc"])
-
-    if png is None:
-        story.append(Paragraph(
-            "[Chart: install matplotlib to render — pip install matplotlib]",
-            ctx["styles"]["caption"],
-        ))
-        return
+    font_path = ctx["tokens"].get("cjk_font_path")
+    png = _render_chart_png(item, ctx["acc"], font_path=font_path)
 
     img = _image_from_bytes(png, uw, max_frac=0.95)
     story.append(Spacer(1, 8))
@@ -851,7 +923,7 @@ def _add_chart(story: list, item: dict, ctx: dict):
         ctx["figure_n"] += 1
         prefix  = f"Figure {ctx['figure_n']}: " if use_fig else ""
         story.append(Spacer(1, 4))
-        story.append(Paragraph(prefix + raw_cap, ctx["styles"]["caption"]))
+        story.append(_paragraph(prefix + raw_cap, ctx["styles"]["caption"]))
     story.append(Spacer(1, 10))
 
 
@@ -867,14 +939,8 @@ def _add_flowchart(story: list, item: dict, ctx: dict):
         figure  bool (default true) — prefix caption with "Figure N:"
     """
     uw  = ctx["usable_w"]
-    png = _render_flowchart_png(item, ctx["acc"], ctx["dark"], ctx["mu"])
-
-    if png is None:
-        story.append(Paragraph(
-            "[Flowchart: install matplotlib to render — pip install matplotlib]",
-            ctx["styles"]["caption"],
-        ))
-        return
+    font_path = ctx["tokens"].get("cjk_font_path")
+    png = _render_flowchart_png(item, ctx["acc"], ctx["dark"], ctx["mu"], font_path=font_path)
 
     img = _image_from_bytes(png, uw, max_frac=0.78)
     story.append(Spacer(1, 8))
@@ -888,7 +954,7 @@ def _add_flowchart(story: list, item: dict, ctx: dict):
         ctx["figure_n"] += 1
         prefix  = f"Figure {ctx['figure_n']}: " if use_fig else ""
         story.append(Spacer(1, 4))
-        story.append(Paragraph(prefix + raw_cap, ctx["styles"]["caption"]))
+        story.append(_paragraph(prefix + raw_cap, ctx["styles"]["caption"]))
     story.append(Spacer(1, 10))
 
 
@@ -910,7 +976,7 @@ def _add_bibliography(story: list, item: dict, ctx: dict):
     heading = item.get("title", "References")
     if heading:
         story.append(KeepTogether([
-            Paragraph(heading, ctx["styles"]["bib_title"]),
+            _paragraph(heading, ctx["styles"]["bib_title"]),
             _divider(ctx["acc"]),
         ]))
 
@@ -928,11 +994,11 @@ def _add_bibliography(story: list, item: dict, ctx: dict):
 # Story builder
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Block types that break a numbered list sequence
-_RESETS_NUMBERED = frozenset({
+# Supported block types for the standalone body renderer.
+_BLOCK_TYPES = frozenset({
     "h1", "h2", "h3", "body", "bullet", "callout", "table",
     "image", "figure", "code", "math", "chart", "flowchart",
-    "bibliography", "divider", "caption", "pagebreak", "spacer",
+    "bibliography", "divider", "caption", "pagebreak", "spacer", "numbered",
 })
 
 
@@ -949,36 +1015,45 @@ def build_story(content: list, tokens: dict, styles: dict) -> list:
         "dark":       tokens["dark"],
         "figure_n":   0,
         "numbered_n": 0,
+        "list_gap":   " " if tokens.get("cjk_font_path") else "\u2002",
     }
 
     story: list = []
 
-    for item in content:
+    for index, item in enumerate(content, start=1):
+        if not isinstance(item, dict):
+            raise ValueError(f"Content block {index}: expected an object")
         kind = item.get("type", "body")
-
-        if kind in _RESETS_NUMBERED:
+        if not isinstance(kind, str) or kind not in _BLOCK_TYPES:
+            raise ValueError(
+                f"Content block {index}: unsupported type {kind!r}; use 'body' for prose"
+            )
+        if kind != "numbered":
             ctx["numbered_n"] = 0
 
-        if   kind == "h1":           _add_heading(story, item, ctx, 1)
-        elif kind == "h2":           _add_heading(story, item, ctx, 2)
-        elif kind == "h3":           _add_heading(story, item, ctx, 3)
-        elif kind == "body":         _add_body(story, item, ctx)
-        elif kind == "bullet":       _add_bullet(story, item, ctx)
-        elif kind == "numbered":     _add_numbered(story, item, ctx)
-        elif kind == "callout":      _add_callout(story, item, ctx)
-        elif kind == "table":        _add_table(story, item, ctx)
-        elif kind == "image":        _add_image(story, item, ctx)
-        elif kind == "figure":       _add_figure(story, item, ctx)
-        elif kind == "code":         _add_code(story, item, ctx)
-        elif kind == "math":         _add_math(story, item, ctx)
-        elif kind == "chart":        _add_chart(story, item, ctx)
-        elif kind == "flowchart":    _add_flowchart(story, item, ctx)
-        elif kind == "bibliography": _add_bibliography(story, item, ctx)
-        elif kind == "divider":      story.append(_divider(ctx["acc"]))
-        elif kind == "caption":
-            story.append(Paragraph(item["text"], styles["caption"]))
-        elif kind == "pagebreak":    story.append(PageBreak())
-        elif kind == "spacer":       story.append(Spacer(1, item.get("pt", 12)))
+        try:
+            if   kind == "h1":           _add_heading(story, item, ctx, 1)
+            elif kind == "h2":           _add_heading(story, item, ctx, 2)
+            elif kind == "h3":           _add_heading(story, item, ctx, 3)
+            elif kind == "body":         _add_body(story, item, ctx)
+            elif kind == "bullet":       _add_bullet(story, item, ctx)
+            elif kind == "numbered":     _add_numbered(story, item, ctx)
+            elif kind == "callout":      _add_callout(story, item, ctx)
+            elif kind == "table":        _add_table(story, item, ctx)
+            elif kind == "image":        _add_image(story, item, ctx)
+            elif kind == "figure":       _add_figure(story, item, ctx)
+            elif kind == "code":         _add_code(story, item, ctx)
+            elif kind == "math":         _add_math(story, item, ctx)
+            elif kind == "chart":        _add_chart(story, item, ctx)
+            elif kind == "flowchart":    _add_flowchart(story, item, ctx)
+            elif kind == "bibliography": _add_bibliography(story, item, ctx)
+            elif kind == "divider":      story.append(_divider(ctx["acc"]))
+            elif kind == "caption":
+                story.append(_paragraph(item["text"], styles["caption"]))
+            elif kind == "pagebreak":    story.append(PageBreak())
+            elif kind == "spacer":       story.append(Spacer(1, item.get("pt", 12)))
+        except Exception as exc:
+            raise ValueError(f"Content block {index} ({kind}): {exc}") from exc
 
     return story
 
@@ -988,8 +1063,22 @@ def build_story(content: list, tokens: dict, styles: dict) -> list:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def build(tokens: dict, content: list, out_path: str) -> dict:
+    if not isinstance(content, list) or not content:
+        raise ValueError("Content must be a nonempty array of blocks")
+
     register_fonts(tokens)
+    font_path = cjk_font_path(tokens, content)
     styles = make_styles(tokens)
+    if font_path:
+        tokens = {**tokens, "font_body_rl": _CJK_FONT, "font_body_b_rl": _CJK_FONT,
+                  "cjk_font_path": font_path}
+        for style in styles.values():
+            style.fontName = _CJK_FONT
+            style.wordWrap = "CJK"
+
+    story = build_story(content, tokens, styles)
+    if not any(not isinstance(flowable, (Spacer, HRFlowable, PageBreak)) for flowable in story):
+        raise ValueError("Content must contain at least one visible body block")
 
     doc = BeautifulDoc(
         out_path, tokens,
@@ -999,7 +1088,7 @@ def build(tokens: dict, content: list, out_path: str) -> dict:
         topMargin=tokens["margin_top"],
         bottomMargin=tokens["margin_bottom"],
     )
-    doc.build(build_story(content, tokens, styles))
+    doc.build(story)
 
     size = os.path.getsize(out_path)
     return {"status": "ok", "out": out_path, "size_kb": size // 1024}
@@ -1027,24 +1116,15 @@ def main():
             )
             sys.exit(1)
 
-    with open(args.tokens,  encoding="utf-8") as f:
-        tokens = json.load(f)
-    with open(args.content, encoding="utf-8") as f:
-        content = json.load(f)
-
     try:
+        with open(args.tokens, encoding="utf-8") as f:
+            tokens = json.load(f)
+        with open(args.content, encoding="utf-8") as f:
+            content = json.load(f)
         result = build(tokens, content, args.out)
         print(json.dumps(result))
-    except Exception as e:
-        import traceback
-        print(
-            json.dumps({
-                "status": "error",
-                "error": str(e),
-                "trace": traceback.format_exc(),
-            }),
-            file=sys.stderr,
-        )
+    except Exception as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
         sys.exit(3)
 
 

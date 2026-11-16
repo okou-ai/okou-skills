@@ -145,7 +145,8 @@ Two typefaces maximum. Always.
 Cover fonts are loaded live via `@import url(...)` in the cover HTML — Playwright
 fetches them at render time, no local caching. Fetch availability is not proof of
 actual font use: inspect the rendered PDF and disclose fallbacks. Body defaults
-use ReportLab system fonts (Times-Bold / Helvetica), not the cover web fonts.
+use ReportLab system fonts (Times-Bold / Helvetica), with an embedded local
+font for [CJK body text](../implementation/environment.md).
 Token font paths can register available local fonts, but `--type academic` does
 not supply a requested manuscript font and there is no new font-selection CLI.
 
@@ -160,7 +161,7 @@ Pairs by mood (cover HTML only — body defaults use system fonts):
 - Dynamic: `Montserrat` / `Montserrat`
 - Classical: `Cormorant` / `Crimson Pro`
 - Editorial: `Bebas Neue` / `Libre Franklin`
-- Body fallback (always): `Times-Bold` / `Helvetica` (ReportLab system fonts)
+- Body defaults: `Times-Bold` / `Helvetica` (ReportLab system fonts)
 
 ### Type scale
 
