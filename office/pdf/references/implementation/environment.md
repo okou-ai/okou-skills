@@ -23,6 +23,12 @@ and `pypdf`, not the browser pipeline; do not make them install Chromium.
 | `playwright` + Chromium | `render_cover.js` | `npm install -g playwright && npx playwright install chromium` |
 | `matplotlib` | Math, charts, flowcharts | `pip install matplotlib` |
 
+For Chinese and mixed CJK body text, the renderer looks for an embeddable
+TrueType font with the required glyphs. On Debian or Ubuntu, install
+`fonts-wqy-zenhei` as needed. macOS can use its system CJK fonts. Set
+`PDF_CJK_FONT` to an absolute path to a compatible TrueType font to use a specific
+local font. The renderer fails if the selected font cannot cover the text.
+
 `make.sh demo` creates sample material, not a finished user deliverable. The
 existing `run`, `reformat`, `fill`, `check`, `fix` and `demo` entry points retain
 their installed meanings; inspect `make.sh` or relevant script help for uncertain

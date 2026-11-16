@@ -11,7 +11,7 @@
 #         --subtitle S
 #         --abstract A             Optional abstract text for cover
 #         --cover-image URL        Optional cover image URL/path
-#         --content FILE           Path to content.json (optional)
+#         --content FILE           Path to content.json
 #   demo                           Build a full-featured demo to demo.pdf
 #
 # Document types:
@@ -82,11 +82,11 @@ cmd_check() {
     ok=false
   fi
 
-  # matplotlib (optional — required for math/chart/flowchart; degrades gracefully)
+  # matplotlib is required only for math/chart/flowchart.
   if python3 -c "import matplotlib" 2>/dev/null; then
     green "  ✓ matplotlib (math, chart, flowchart blocks enabled)"
   else
-    yellow "  ⚠ matplotlib not installed — math/chart/flowchart blocks degrade to text  (run: make.sh fix)"
+    yellow "  ⚠ matplotlib not installed — required for math/chart/flowchart blocks (run: make.sh fix)"
   fi
 
   if $ok; then
@@ -136,7 +136,7 @@ cmd_fix() {
 }
 
 # ── run ────────────────────────────────────────────────────────────────────────
-cmd_run() {
+cmd_run() (
   local title="Untitled Document"
   local type="general"
   local author=""
@@ -148,9 +148,6 @@ cmd_run() {
   local cover_bg=""
   local content_file=""
   local out="output.pdf"
-  local workdir
-  workdir="$(mktemp -d)"
-
   # Parse options
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -168,6 +165,14 @@ cmd_run() {
       *) echo "Unknown option: $1"; exit 1 ;;
     esac
   done
+
+  if [[ -z "$content_file" ]]; then
+    echo "run requires --content content.json (use demo for sample content)" >&2
+    exit 1
+  fi
+  local workdir
+  workdir="$(mktemp -d)"
+  trap 'rm -rf -- "$workdir"' EXIT
 
   bold "Building: $title"
   echo "  Type    : $type"
@@ -210,9 +215,18 @@ print(f'  Mood    : {t[\"mood\"]}')
 print(f'  Pattern : {t[\"cover_pattern\"]}')
 print(f'  Fonts   : {t[\"font_display\"]} / {t[\"font_body\"]}')"
 
-  # Step 2: cover HTML + render
+  # Render content before starting Chromium so input errors surface immediately.
   echo ""
-  bold "Step 2/4  Rendering cover..."
+  bold "Step 2/4  Rendering body pages..."
+  $PY "$SCRIPTS/render_body.py" \
+    --tokens  "$workdir/tokens.json" \
+    --content "$content_file" \
+    --out     "$workdir/body.pdf"
+  green "  ✓ Body rendered"
+
+  # Step 3: cover HTML + render
+  echo ""
+  bold "Step 3/4  Rendering cover..."
   local subtitle_args=()
   [[ -n "$subtitle" ]] && subtitle_args=(--subtitle "$subtitle")
   $PY "$SCRIPTS/cover.py" \
@@ -225,28 +239,6 @@ print(f'  Fonts   : {t[\"font_display\"]} / {t[\"font_body\"]}')"
     --out   "$workdir/cover.pdf"
   green "  ✓ Cover rendered"
 
-  # Step 3: body
-  echo ""
-  bold "Step 3/4  Rendering body pages..."
-  if [[ -z "$content_file" ]]; then
-    # Generate a minimal placeholder body
-    cat > "$workdir/content.json" <<'JSON'
-[
-  {"type":"h1",   "text":"Document Body"},
-  {"type":"body", "text":"Replace this with your content.json file using --content path/to/content.json"},
-  {"type":"body", "text":"See the content.json schema in the skill README for the full list of supported block types: h1, h2, h3, body, bullet, callout, table, pagebreak, spacer."}
-]
-JSON
-    content_file="$workdir/content.json"
-    yellow "  No content file provided — using placeholder body."
-  fi
-
-  $PY "$SCRIPTS/render_body.py" \
-    --tokens  "$workdir/tokens.json" \
-    --content "$content_file" \
-    --out     "$workdir/body.pdf"
-  green "  ✓ Body rendered"
-
   # Step 4: merge
   echo ""
   bold "Step 4/4  Merging and QA..."
@@ -256,9 +248,7 @@ JSON
     --out   "$out" \
     --title "$title"
 
-  # Cleanup
-  rm -rf "$workdir"
-}
+)
 
 # ── fill ──────────────────────────────────────────────────────────────────────
 cmd_fill() {
@@ -476,7 +466,7 @@ main() {
     echo "         [--author A] [--date D] [--subtitle S]"
     echo "         [--abstract A] [--cover-image URL]"
     echo "         [--accent #HEX] [--cover-bg #HEX]"
-    echo "         [--content content.json] [--out output.pdf]"
+    echo "         --content content.json [--out output.pdf]"
     echo "  fill   --input f.pdf              FILL: inspect or fill form fields"
     echo "  reformat --input doc.md           REFORMAT: parse doc → apply design → PDF"
     echo "  demo                              Build a full-featured demo PDF"

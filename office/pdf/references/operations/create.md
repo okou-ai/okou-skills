@@ -5,7 +5,9 @@ Select [manuscript versus visual requirements](../domains/profiles.md) and
 [presentation](../common/presentation.md) first; run the applicable
 [environment check](../implementation/environment.md).
 
-The implemented pipeline is content → design tokens → cover → body → merge:
+The pipeline renders the body before launching the cover browser. Then it merges
+the two PDFs, reopens the candidate, and replaces the output after it passes the
+page-count check.
 
 ```bash
 bash "$SKILL_DIR/scripts/make.sh" run \
@@ -21,6 +23,9 @@ applicable feature sections. Do not deliver sample/default findings or treat
 `--type` as a content-domain or citation validator. Read
 [visual presets and overrides](../common/presentation.md#visual-presets-and-overrides)
 for supported names and appearance options; do not invent CLI flags.
+The `run` command requires `--content`. Use `demo` for sample material.
+If a block fails, fix the input or the missing dependency and rerun. The
+destination retains its previous contents on failure.
 
 For Word plus PDF, render the authored DOCX through the
 [DOCX route](../../../docx/SKILL.md), rather than separately designing the PDF.

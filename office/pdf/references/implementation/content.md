@@ -20,10 +20,10 @@ the final QA section adds agent checks, not script-enforced validation.
 
 ## Block contract
 
-Supply `content.json` as a JSON array of block objects with a `type`. Escape
-backslashes in JSON math strings. Use the supported kinds below; do not assume
-unknown kinds are rejected by a schema validator. Body styling consumes
-`tokens.json`; nominal sizes below are defaults, not manuscript requirements.
+Supply `content.json` as a nonempty JSON array of block objects with a `type`.
+Escape backslashes in JSON math strings. An unsupported block type stops the
+build and reports its position. Body styling consumes `tokens.json`. Nominal
+sizes below describe the visual presets.
 
 | Block | Fields | Rendering / convention |
 |---|---|---|
@@ -79,10 +79,8 @@ Split complex multi-line proofs into multiple `math` blocks; this does not add
 those environments. Set `"label": "(1)"` for a right-aligned equation number;
 labels are supplied, not auto-generated. Optional `caption` is below the formula.
 
-**Fallback caution:** missing matplotlib or a math rendering failure yields the
-expression in code style, not typeset mathematics. This fallback returns before
-rendering label/caption. `make.sh fix` can install missing dependencies; it cannot
-make unsupported syntax valid. Do not accept fallback as successful math output.
+A math rendering failure stops the build. Install matplotlib if it is missing.
+For unsupported syntax, use a supported expression or supply a rendered figure.
 
 ```json
 {"type":"math","text":"\\bar{x}=\\frac{10+12+15}{3}=12.33","label":"(1)"}
@@ -106,8 +104,7 @@ Colors derive from the document accent for consistency; do not set per-chart
 custom colors (no documented block override). Explicit color requirements that
 cannot be represented must be disclosed rather than silently ignored.
 Set `"figure": true` (default) for figure prefixes or `false` to suppress them.
-An unsuccessful chart render can produce an install-matplotlib placeholder even
-when the cause is not a missing package; inspect output before diagnosing.
+A chart rendering failure stops the build and reports the affected block.
 
 ```json
 {"type":"chart","chart_type":"bar","labels":["Q1","Q2","Q3","Q4"],
@@ -125,8 +122,7 @@ when the cause is not a missing package; inspect output before diagnosing.
   with `figure: false` but a nonempty caption still advances the shared counter,
   without a visible prefix. If both are absent/false it does not advance. Verify
   resulting visible numbering; no renumbering repair is implemented here.
-- A missing image becomes an `[Image not found: ...]` placeholder; image errors
-  may also become text placeholders. Neither is acceptable evidence of a figure.
+- A missing or unreadable image stops the build and reports the affected block.
 
 ## Bibliography
 
@@ -167,7 +163,7 @@ Nodes are placed in input order, top to bottom. Forward edges use straight
 arrows; back-edges to earlier nodes use curved arcs. Keep labels short, 3–5 words
 max: diagrams render at A4-column width with 78% maximum-width scale. Figure
 numbering follows the chart behavior above (`figure: true` by default); `caption`
-is optional. Failure can become an install-matplotlib placeholder, not a diagram.
+is optional. A diagram rendering failure stops the build.
 
 ```json
 {"type":"flowchart",
