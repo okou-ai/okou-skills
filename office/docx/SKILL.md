@@ -25,93 +25,82 @@ description: >
 
 # Word documents
 
+## Pipeline routing
+
+| Task | Workflow |
+|---|---|
+| New document without a structured supplied template | Pipeline A: [CREATE](references/operations/create.md), using the CLI for supported blocks/options |
+| Fill placeholders, replace text or edit authorized content | Pipeline B: [EDIT/FILL](references/operations/edit.md) |
+| Read or analyze an existing document | Use preview/analyze below; preserve the file |
+| Authorized restyling with a pure style template | Pipeline C-1: [OVERLAY](references/operations/template.md) |
+| New content within a structured cover/TOC/section template | Pipeline C-2: [BASE-REPLACE](references/operations/template.md) |
+| Completed output or an affected change | [VALIDATE](references/operations/validate.md) |
+
+Follow the user's requirements and supplied template. Preserve existing
+presentation for narrow edits and read-only work; a mention of APA, 公文 or HBR
+does not by itself authorize restyling. Clarify conflicting requirements.
+
+For a new report, letter, memo or generic academic document without a named
+presentation, use the standard CLI route in CREATE and its validation guide.
+A request for a report or proposal does not select a named business recipe.
+Load additional presentation or SDK references only for requirements outside
+that route.
+
 ## Setup
 
 Set `SKILL_DIR` to the absolute directory containing this file. All command paths
 are relative to this directory, not the task's working directory.
 
 First DOCX operation in the session:
-`bash "$SKILL_DIR/scripts/env_check.sh"`. The Bash entrypoints resolve an installed
-SDK and the target .NET 8 runtime from `DOTNET_ROOT`, `PATH`, or `$HOME/.dotnet`,
-then set the native host environment for each invocation. A fresh noninteractive
-shell does not require another installation; an already-built CLI needs only
-the .NET 8 runtime.
+`bash "$SKILL_DIR/scripts/env_check.sh"`. Bash entrypoints reuse installed .NET;
+a built CLI needs only the .NET 8 runtime.
 For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
 (Windows: `scripts/setup.ps1 -Minimal`).
 
-For PDF output or visual review, prepare rendering dependencies before authoring:
-`python3 "$SKILL_DIR/scripts/render_docx.py" --prepare`
-(use `--check` if installation is not permitted).
-Add `--pages qa/pages` for page images. Render the validated DOCX with
-`--no-install`.
-See [rendering and delivery](references/operations/validate.md#rendering-and-delivery)
-for output options.
+For requested PDF output or rendered visual review, prepare converters before
+authoring where installation is permitted:
+`python3 "$SKILL_DIR/scripts/render_docx.py" --prepare`.
+Add `--pages qa/pages` when page images are needed. Render the validated DOCX
+using the [rendering instructions](references/operations/validate.md#rendering-and-delivery).
 
-## Routing order: common → applicable profile → operation
+## Named presentation profiles
 
-1. For a **narrow EDIT** or **read-only** task, preserve existing presentation:
-   use B for edits and preview/analyze for reading; never recreate or restyle
-   merely because text mentions APA, 公文 or HBR.
-2. Treat explicit user requirements and the supplied template as authoritative.
-   If they conflict, clarify rather than silently replacing either with a recipe.
-3. For **new creation or explicitly requested restyling**, select an applicable
-   profile. Named-format rules override generic academic/business defaults, not
-   the user's requirements or template.
-4. Select A/B/C below. New content in a supplied structured template uses C-2
-   Base-Replace; a simple fill remains B.
+Read a profile when the user requests its named format or supplies a template
+that requires it. Apply those requirements before generic defaults; use the
+operation selected above to preserve or create the required structure.
 
-| Condition (within the authorized scope) | Read directly |
+| Requested format | Read directly |
 |---|---|
 | Chinese government / 公文 / GB/T 9704 layout | [Government](references/domains/government.md) |
-| Named paper: IEEE, ACM, APA, MLA, Chicago/Turabian, LNCS, Nature | [Academic](references/domains/academic.md) |
+| IEEE, ACM, APA, MLA, Chicago/Turabian, LNCS, Nature | [Academic](references/domains/academic.md) |
 | Thesis/dissertation or supplied university template | [Thesis/template](references/domains/thesis-template.md) |
-| Corporate report, executive brief, HBR or editorial presentation | [Business/editorial](references/domains/business-editorial.md) |
-| Generic memo, letter or unspecified layout; narrow edit/read | No domain recipe required |
+| Modern Corporate, Executive Brief, Minimal Modern or HBR presentation | [Business/editorial](references/domains/business-editorial.md) |
 
-Profiles address structure/presentation, not research, government, legal or
-business expertise or official certification. Adapt examples to the supplied
-content; never copy sample findings, citations, agency identities or business
-data. Samples are not CLI recipe selectors or publisher acceptance guarantees.
+Profiles address structure/presentation, not domain expertise or certification.
+When a named profile or custom layout exceeds the CLI's supported blocks and
+options, use the relevant [C# authoring pattern](references/implementation/authoring.md).
+Adapt samples to the task; never copy their findings, citations or identities.
 
-## Pipeline routing
+## Existing documents
 
-| Task | Workflow |
-|---|---|
-| New document without a structured template | Pipeline A: [CREATE](references/operations/create.md) |
-| Fill placeholders, replace text or edit authorized content | Pipeline B: [EDIT/FILL](references/operations/edit.md) |
-| Authorized restyling with a pure style template | Pipeline C-1: [OVERLAY](references/operations/template.md) |
-| New content within a structured cover/TOC/section template | Pipeline C-2: [BASE-REPLACE](references/operations/template.md) |
-| Completed output or an affected change | [VALIDATE](references/operations/validate.md) |
-
-For existing documents, preview and analyze before editing. Convert legacy `.doc`
-only when needed; these entry points remain unchanged:
+Preview and analyze before editing. Convert legacy `.doc` only when needed:
 
 ```bash
 bash "$SKILL_DIR/scripts/doc_to_docx.sh" input.doc output_dir/
 bash "$SKILL_DIR/scripts/docx_preview.sh" document.docx
 bash "$SKILL_DIR/scripts/docx.sh" analyze --input document.docx
-bash "$SKILL_DIR/scripts/docx.sh" --help
 ```
-
-Use [`create --content-json`](references/operations/create.md#content-configuration-json-format)
-for a new document with standard headings, paragraphs, tables, lists and inline
-figures. The CLI supports `report|letter|memo|academic`. Named-format profiles
-and custom styles, sections or table layouts use the relevant
-[authoring and sample patterns](references/implementation/authoring.md).
-Validate the completed DOCX. When a PDF is requested, render the same DOCX.
 
 ## References by responsibility
 
-Each format uses `references/common/`, `domains/`, `operations/` and
-`implementation/`. Select only applicable guides; do not load the whole library.
-For long guides, use their headings/contents or search for the needed element or
-symptom. The operation owns the workflow, profiles own named requirements, and
-implementation guides own SDK/package details. Executable and asset paths stay
-under `scripts/` and `assets/`.
+Select only applicable guides; do not load the whole library. For long guides,
+search for the needed element or symptom. Operations own the workflow, profiles
+own named requirements, and implementation guides own SDK/package details.
+Executable and asset paths stay under `scripts/` and `assets/`.
 
 | Need | Direct reference |
 |---|---|
-| Fonts, sizes, page/table design | [Presentation](references/common/presentation.md) |
+| Custom fonts, sizes, page/table design | [Presentation](references/common/presentation.md) |
 | CJK fonts, 字号, RunFonts and scoped GB/T layout | [CJK typography](references/common/cjk-typography.md) |
 | Hierarchy, spacing, contrast and alignment | [Design principles](references/common/design-principles.md) |
 | Visual mistakes and corrections | [Design examples](references/common/design-examples.md) |

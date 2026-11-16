@@ -1,5 +1,9 @@
 # Professional Document Design & Typography Guide
 
+Use these design starting points for custom layouts. For generic CLI documents,
+use [CREATE's effective presets](../operations/create.md#cli-options-and-defaults);
+for named formats, follow the selected profile or supplied template.
+
 ## Table of Contents
 1. [Font Pairing](#font-pairing)
 2. [Font Sizes by Document Type](#font-sizes-by-document-type)
@@ -9,7 +13,7 @@
 6. [Table Design](#table-design)
 7. [Color Schemes](#color-schemes)
 8. [Visual Hierarchy](#visual-hierarchy)
-9. [Quick Reference Defaults](#quick-reference-defaults)
+9. [Layout Examples](#layout-examples)
 
 ---
 
@@ -38,7 +42,7 @@
 
 | Document Type | Body | H1 | H2 | H3 | Footnotes |
 |--------------|------|----|----|----|----|
-| **Business report** | 11pt | 18-20pt | 14-16pt | 12-13pt bold | 9pt |
+| **Custom business layout** | 11pt | 18-20pt | 14-16pt | 12-13pt bold | 9pt |
 | **Business letter** | 11-12pt | — | — | — | 9-10pt |
 | **Memo** | 11pt | 14pt bold | 12pt bold | 11pt bold | 9pt |
 | **Contract / Legal** | 12pt | 14pt bold caps | 12pt bold | 12pt bold | 10pt |
@@ -69,7 +73,7 @@
 |---------|--------------------------|-------------|
 | Single (1.0) | `line="240"` lineRule="auto" | Tables, footnotes, captions |
 | 1.08 (MS default) | `line="259"` lineRule="auto" | Modern Office documents |
-| 1.15 | `line="276"` lineRule="auto" | Business reports — best general default |
+| 1.15 | `line="276"` lineRule="auto" | Custom business layouts |
 | 1.5 | `line="360"` lineRule="auto" | Some academic, drafts for markup |
 | Double (2.0) | `line="480"` lineRule="auto" | APA/MLA manuscripts, legal briefs |
 | Fixed 28pt | `line="560"` lineRule="exact" | Chinese 公文 (GB/T 9704) |
@@ -252,21 +256,7 @@ I. → A. → 1. → a. → (1) → (a)
 
 ---
 
-## Quick Reference Defaults
-
-### Business Report (Safe Default)
-
-| Parameter | Value | OpenXML |
-|-----------|-------|---------|
-| Body font | Calibri 11pt | sz="22", RunFonts Ascii="Calibri" |
-| H1 | 18pt Bold Dark Blue | sz="36", Bold, Color="#1F3864" |
-| H2 | 14pt Bold Dark Blue | sz="28", Bold |
-| H3 | 12pt Bold Dark Blue | sz="24", Bold |
-| Line spacing | 1.15 | line="276" lineRule="auto" |
-| Para after | 8pt | after="160" |
-| Margins | 1 in all | 1440 DXA all |
-| Page size | Letter or A4 | 12240×15840 or 11906×16838 |
-| Page numbers | Bottom right, 10pt | |
+## Layout Examples
 
 ### Academic Paper (APA 7th)
 
