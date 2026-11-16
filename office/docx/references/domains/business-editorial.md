@@ -1,9 +1,9 @@
 # Business and editorial presentation
 
-Use for requested visual/structural business formats, not business analysis
-expertise. Apply the entry's scope and precedence rules before selecting a recipe.
-A generic memo needs no named recipe; use A and explicit CLI geometry/options
-or task-specific C# rather than loading an editorial profile unnecessarily.
+Use when the user requests one of the named presentations below, not for
+business analysis expertise. For an ordinary report, proposal or memo, use
+[CREATE's standard CLI route](../operations/create.md#standard-cli-creation).
+Apply the entry's scope and precedence rules before selecting a named recipe.
 
 | Requested presentation | Actual source | Method in `AestheticRecipeSamples` |
 |---|---|---|
