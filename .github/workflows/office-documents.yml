@@ -8,6 +8,16 @@ on:
     paths: ["office/**", ".github/workflows/office-documents.yml"]
 
 jobs:
+  office-package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check main Office-only downloads without network or .NET
+        run: python3 office/scripts/tests/test_download_office.py
   native-files:
     runs-on: ubuntu-24.04
     steps:

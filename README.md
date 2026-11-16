@@ -98,7 +98,10 @@ copies of the upstream skill collection.
 
 The [office](office/SKILL.md) entry point bundles the three format-specific
 skills below. Runtime discovery loads the top-level package with all its nested
-files; the individual directories are not separate default skills.
+files; the individual directories are not separate default skills. To download
+current `main`, use the [Office package downloader](office/SKILL.md#download-the-office-package-from-main)
+to get just `office/` (DOCX, PDF, XLSX, and shared guidance) as a `.tar.gz`, without
+downloading the full repository archive or specifying a commit SHA.
 
 The following skills are redistributed from
 [MiniMax-AI/skills](https://github.com/MiniMax-AI/skills) at commit

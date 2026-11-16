@@ -34,5 +34,33 @@ Honor the supplied template and limit edits to the requested scope. When
 delivering Word and PDF versions of the same document, render the PDF from the
 authored DOCX.
 
+## Download the Office package from main
+
+When a fresh source copy is needed, use the helper below instead of the
+repository-level codeload archive. It downloads Git metadata and only `office/`
+file contents from current `main`, then writes an `office.tar.gz` containing the
+complete Office package: this entry point, shared references, DOCX, PDF, XLSX,
+and their license/upstream notices. Other skills and Git history are excluded.
+Use an existing local package when no refresh is needed.
+
+Requires Git with partial-fetch/sparse-checkout support and Python 3 (standard
+library only). No commit SHA is required:
+
+```bash
+DEST="./generated/resources"
+mkdir -p "$DEST"
+curl -fsSL "https://raw.githubusercontent.com/okou-ai/okou-skills/main/office/scripts/download_office.py" \
+  -o "$DEST/download_office.py"
+python3 "$DEST/download_office.py" --out "$DEST/office.tar.gz"
+tar -xzf "$DEST/office.tar.gz" -C "$DEST"
+```
+
+Read `$DEST/office/SKILL.md`, select the required format, and follow its setup
+and validation instructions. The helper resolves `main` once per download and
+reports that SHA for traceability; it does not require or default to a fixed
+commit. The archive is source-only: .NET, Python libraries, and rendering
+dependencies are still provisioned separately. This source download does not
+change the default `office` runtime package.
+
 The format implementations are adapted from MiniMax's MIT-licensed skills.
 Each format directory retains its `LICENSE` and `UPSTREAM.md`.
