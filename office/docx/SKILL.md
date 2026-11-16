@@ -33,22 +33,13 @@ are relative to this directory, not the task's working directory.
 First DOCX operation in the session:
 `bash "$SKILL_DIR/scripts/env_check.sh"`. Reuse the working SDK and CLI afterward.
 For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
-(Windows: `scripts/setup.ps1 -Minimal`). Creating, editing and structurally
-validating a DOCX do not require PDF conversion or rendering dependencies.
+(Windows: `scripts/setup.ps1 -Minimal`).
 
-Only for requested PDF output or rendered visual review, render the validated
-DOCX with `scripts/render_docx.py`. With installation permission, that entry point
-probes Writer and installs unavailable rendering components on demand, without
-running the full authoring setup. Poppler is needed only with `--pages`.
-Use `--no-install` in restricted environments. Python 3 must already be supplied
-by the runtime; fonts remain a separate, document-specific check.
-
-For diagnostics, or before legacy `.doc` conversion, use
-`bash "$SKILL_DIR/scripts/env_check.sh" --with-rendering` or
-`python3 "$SKILL_DIR/scripts/render_docx.py" --check`. These probes do not install
-rendering packages and fail when Writer cannot convert a known-good DOCX.
+For requested PDF output or rendered visual review, render the validated DOCX
+with `scripts/render_docx.py`. With installation permission, it prepares missing
+rendering dependencies on demand.
 See [rendering and delivery](references/operations/validate.md#rendering-and-delivery)
-for supported installers and output options.
+for output options.
 
 ## Routing order: common → applicable profile → operation
 
