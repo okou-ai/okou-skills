@@ -12,6 +12,7 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DOTNET_DIR="$SCRIPT_DIR/dotnet"
 CLI_PROJECT="$DOTNET_DIR/Docx.Cli/Docx.Cli.csproj"
 LOG_FILE="$PROJECT_DIR/.setup.log"
+source "$SCRIPT_DIR/dotnet_env.sh"
 
 # --- Colors ---
 RED='\033[0;31m'
@@ -84,16 +85,16 @@ detect_platform() {
 install_dotnet() {
     step "Checking .NET SDK"
 
-    if command -v dotnet &>/dev/null; then
+    if docx_use_dotnet; then
         local ver
         ver=$(dotnet --version 2>/dev/null || echo "0")
         local major="${ver%%.*}"
         if [ "$major" -ge 8 ] 2>/dev/null; then
             log "dotnet $ver already installed (>= 8.0 OK)"
             return 0
-        else
-            warn "dotnet $ver found but < 8.0, upgrading..."
         fi
+        fail "An SDK is installed, but SDK selection failed. Check global.json and the selected SDK before reinstalling."
+        return 1
     fi
 
     info "Installing .NET SDK..."
@@ -110,8 +111,6 @@ install_dotnet() {
                 wget -q "https://dot.net/v1/dotnet-install.sh" -O /tmp/dotnet-install.sh
                 chmod +x /tmp/dotnet-install.sh
                 /tmp/dotnet-install.sh --channel 8.0 --install-dir "$HOME/.dotnet"
-                export PATH="$HOME/.dotnet:$PATH"
-                echo 'export PATH="$HOME/.dotnet:$PATH"' >> "$HOME/.bashrc"
             fi
             ;;
         dnf)
@@ -138,8 +137,6 @@ install_dotnet() {
                 curl -sSL "https://dot.net/v1/dotnet-install.sh" -o /tmp/dotnet-install.sh
             chmod +x /tmp/dotnet-install.sh
             /tmp/dotnet-install.sh --channel 8.0 --install-dir "$HOME/.dotnet"
-            export PATH="$HOME/.dotnet:$PATH"
-            echo 'export PATH="$HOME/.dotnet:$PATH"' >> "$HOME/.bashrc"
             ;;
         *)
             warn "Unknown package manager. Install .NET SDK manually: https://dotnet.microsoft.com/download"
@@ -147,8 +144,8 @@ install_dotnet() {
             ;;
     esac
 
-    # Verify
-    if command -v dotnet &>/dev/null; then
+    # Resolve again in this process; later entrypoints repeat the same discovery.
+    if docx_use_dotnet; then
         log "dotnet $(dotnet --version) installed"
     else
         fail "dotnet installation failed. Install manually: https://dotnet.microsoft.com/download"
@@ -449,7 +446,7 @@ print_summary() {
     echo "  Project:     $DOTNET_DIR"
     echo ""
     echo "  Usage:"
-    echo "    dotnet run --project $DOTNET_DIR/Docx.Cli -- create --type report --output my_report.docx"
+    echo "    bash \"$SCRIPT_DIR/docx.sh\" create --type report --output my_report.docx"
     echo "    bash $SCRIPT_DIR/env_check.sh     # Quick environment check"
     echo ""
     echo "  Log file: $LOG_FILE"

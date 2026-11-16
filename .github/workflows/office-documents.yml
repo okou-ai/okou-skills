@@ -23,6 +23,8 @@ jobs:
           node-version: "22"
       - name: Select the .NET 8 SDK
         run: dotnet new globaljson --sdk-version 8.0.100 --roll-forward latestFeature
+      - name: Check DOCX SDK discovery in fresh shells
+        run: python office/docx/scripts/tests/test_dotnet_env.py
       - name: Check lazy DOCX rendering setup
         run: python office/docx/scripts/tests/test_render_docx.py
       - name: Install native dependencies
@@ -39,6 +41,8 @@ jobs:
       - name: Check DOCX and PDF environments
         run: |
           bash office/docx/scripts/env_check.sh --with-rendering
+          python3 office/docx/scripts/render_docx.py --prepare --pages "$RUNNER_TEMP/prepared-pages" --no-install
+          test ! -e "$RUNNER_TEMP/prepared-pages"
           bash office/pdf/scripts/make.sh check
       - name: Check structured DOCX creation
         run: python office/docx/scripts/tests/test_create_content.py

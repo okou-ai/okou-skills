@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render DOCX with on-demand dependencies; --check never installs packages."""
+"""Render DOCX; --check is read-only and --prepare provisions converters early."""
 import argparse
 import os
 from pathlib import Path
@@ -183,12 +183,17 @@ def main() -> None:
     parser.add_argument("--out", type=Path, help="PDF output")
     parser.add_argument("--pages", type=Path, help="Also render page PNGs to this directory (needs Poppler)")
     parser.add_argument("--timeout", type=int, default=60, help="Conversion timeout in seconds (default: 60)")
-    parser.add_argument("--check", action="store_true", help="Probe required converters without installing")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true", help="Probe required converters without installing")
+    mode.add_argument("--prepare", action="store_true", help="Prepare required converters without a user document")
     parser.add_argument("--no-install", action="store_true", help="Do not install missing rendering packages")
     args = parser.parse_args()
     if args.timeout <= 0:
         parser.error("--timeout must be positive")
-    if not args.check:
+    if args.prepare:
+        if args.input is not None or args.out is not None:
+            parser.error("--prepare does not accept an input document or --out")
+    elif not args.check:
         if not args.input or not args.input.is_file() or not args.out:
             parser.error("an existing input DOCX and --out PDF path are required")
         if (args.input.resolve() == args.out.resolve()
@@ -201,7 +206,7 @@ def main() -> None:
     try:
         ensure_dependencies(pages=args.pages is not None,
                             install=not (args.check or args.no_install), timeout=args.timeout)
-        if args.check:
+        if args.check or args.prepare:
             print("LibreOffice Writer: DOCX-to-PDF conversion passed")
             if args.pages is not None:
                 print("Poppler: pdftoppm available")

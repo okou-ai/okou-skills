@@ -14,9 +14,13 @@ Examples and recipes do not certify a document or implement new CLI flags.
 
 ## Project scaffold
 
-Reference the bundled SDK project from a regular console project:
+Reference the bundled SDK project from a regular console project. Initialize the
+SDK in the same shell as these direct commands; exports from a previous setup
+subprocess do not change a new shell:
 
 ```bash
+source "$SKILL_DIR/scripts/dotnet_env.sh"
+docx_use_dotnet || exit 1
 dotnet new console --framework net8.0 --output generated/docx-task
 dotnet add generated/docx-task reference "$SKILL_DIR/scripts/dotnet/Docx.Core/Docx.Core.csproj"
 # Put the C# below in generated/docx-task/Program.cs.

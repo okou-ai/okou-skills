@@ -31,13 +31,25 @@ Set `SKILL_DIR` to the absolute directory containing this file. All command path
 are relative to this directory, not the task's working directory.
 
 First DOCX operation in the session:
-`bash "$SKILL_DIR/scripts/env_check.sh"`. Reuse the working SDK and CLI afterward.
+`bash "$SKILL_DIR/scripts/env_check.sh"`. The Bash entrypoints resolve an installed
+SDK and the target .NET 8 runtime from `DOTNET_ROOT`, `PATH`, or `$HOME/.dotnet`,
+then set the native host environment for each invocation. A fresh noninteractive
+shell does not require another installation; an already-built CLI needs only
+the .NET 8 runtime.
 For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
 (Windows: `scripts/setup.ps1 -Minimal`).
 
-For requested PDF output or rendered visual review, render the validated DOCX
-with `scripts/render_docx.py`. With installation permission, it prepares missing
-rendering dependencies on demand.
+For requested PDF output or rendered visual review, check converters during
+initial environment preparation, before drafting a long document:
+`python3 "$SKILL_DIR/scripts/render_docx.py" --check`. Add `--pages qa/pages` when
+page images are needed; this checks Poppler too and does not create that directory.
+With installation permission, use `--prepare` instead of `--check` to provision
+missing converters once, without a user document. Without permission, report the
+missing dependency. Dedicated rendering images should preinstall Writer and
+Poppler; DOCX-only operations do not require them.
+
+After preparation, render the validated DOCX with `scripts/render_docx.py` and
+`--no-install`. Diagnose document failures rather than reinstalling converters.
 See [rendering and delivery](references/operations/validate.md#rendering-and-delivery)
 for output options.
 
