@@ -19,7 +19,7 @@ public static class CreateCommand
         var outputOption = new Option<string>("--output") { Description = "Output DOCX file path", Required = true };
         var typeOption = new Option<string>("--type") { Description = "Document type: report, letter, memo, academic" };
         typeOption.DefaultValueFactory = _ => "report";
-        var titleOption = new Option<string>("--title") { Description = "Document title" };
+        var titleOption = new Option<string>("--title") { Description = "Insert a visible title paragraph before JSON content; omit when the body supplies the title" };
         var authorOption = new Option<string>("--author") { Description = "Document author" };
         var pageSizeOption = new Option<string>("--page-size") { Description = "Page size: letter, a4, legal, a3" };
         pageSizeOption.DefaultValueFactory = _ => "letter";

@@ -76,6 +76,28 @@ def main():
             assert output.read_bytes() == previous
             assert not list(work.glob(".docx-*.tmp"))
 
+        # --title is visible content, not metadata; the caller owns it in one place.
+        for doc_type in ("report", "letter", "memo", "academic"):
+            for automatic_title in (True, False):
+                title = "Shape and phylogeny"
+                title_blocks = [{"type": "heading", "text": "Introduction", "level": 1}]
+                options = ["--type", doc_type]
+                if automatic_title:
+                    options.extend(["--title", title])
+                else:
+                    title_blocks.insert(0, {"type": "heading", "text": title, "level": 1})
+                content.write_text(json.dumps(title_blocks), encoding="utf-8")
+                run(*create, *options, cwd=work)
+                result = run("validate", "--input", str(output), "--business", "--json", cwd=work)
+                assert json.loads(result.stdout)["isValid"], result.stdout
+                with ZipFile(output) as document:
+                    body = ET.fromstring(document.read("word/document.xml")).find("w:body", NS)
+                    paragraphs = body.findall("w:p", NS)
+                    texts = ["".join(p.itertext()) for p in paragraphs]
+                    assert texts == [title, "Introduction"], (doc_type, automatic_title, texts)
+                    styles = body.findall("w:p/w:pPr/w:pStyle", NS)
+                    assert sum(s.get(W + "val") == "Title" for s in styles) == int(automatic_title)
+
 
 if __name__ == "__main__":
     main()

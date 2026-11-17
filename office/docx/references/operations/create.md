@@ -16,9 +16,15 @@ bash "$SKILL_DIR/scripts/docx.sh" create \
 bash "$SKILL_DIR/scripts/docx.sh" validate --input report.docx --business
 ```
 
+Provide the document title in exactly one place. `--title` inserts a visible
+`Title`-style paragraph before the JSON content; it is not metadata-only and
+applies to every `--type`. When using `--title`, start `content.json` with the
+first section, not another copy of the document title. If the body supplies the
+title, omit `--title` to suppress the automatically inserted title.
+
 Choose the title, section structure and content from the task. Omit optional
-metadata the user has not supplied. Apply any requested named format or template
-from the entry's profile routing before choosing generic defaults.
+title or author text the user has not supplied. Apply any requested named format
+or template from the entry's profile routing before choosing generic defaults.
 
 The CLI supplies styles, numbering, tables and package structure. Set the
 supported options and content blocks; use [direct C# authoring](#custom-layouts-and-complex-elements)
@@ -28,7 +34,9 @@ only when required features are outside them.
 
 - `--type`: `report` (default), `letter`, `memo` or `academic`. These are generic
   presets, not named profiles such as APA or HBR.
-- `--title`, `--author`: optional title and author subtitle.
+- `--title`: optional visible title paragraph inserted before the JSON content.
+  Omit when the body supplies the title; the CLI does not deduplicate titles.
+- `--author`: optional visible author subtitle.
 - `--page-size`: `letter` (default), `a4`, `legal` or `a3`. Pass the chosen size
   explicitly when the task requires it.
 - `--margins`: `standard` (default), `narrow` or `wide`.
