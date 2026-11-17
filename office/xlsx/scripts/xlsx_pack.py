@@ -27,10 +27,17 @@ def validate_xml_files(source_dir: str) -> list[str]:
     return bad
 
 
+def formula_check_handoff(xlsx_path: str) -> None:
+    print("\nNext step: run formula_check.py to validate formulas:")
+    print(f"  python3 formula_check.py {xlsx_path}")
+
+
 def pack(source_dir: str, xlsx_path: str) -> None:
+    print("Validating XML files...")
     count = pack_directory(source_dir, xlsx_path)
-    print(f"Packed {count} files → '{xlsx_path}'")
-    print("XML is well-formed. Continue with the impact-driven checks in VALIDATE.")
+    print("✓ All XML files are well-formed")
+    print(f"Packed {count} files → '{xlsx_path}' ({Path(xlsx_path).stat().st_size:,} bytes)")
+    formula_check_handoff(xlsx_path)
 
 
 def main() -> None:
@@ -52,7 +59,8 @@ def main() -> None:
                 replacements[name] = filename
             replace_parts(args.base, replacements, args.paths[0])
             print(f"Replaced {len(replacements)} part(s) → '{args.paths[0]}'")
-            print("Unchanged ZIP member records preserved. Review dependencies and VALIDATE checks.")
+            print("Unchanged ZIP member records preserved.")
+            formula_check_handoff(args.paths[0])
         else:
             if len(args.paths) != 2 or args.part:
                 parser.error("Directory mode expects SOURCE_DIR OUTPUT and no --part")

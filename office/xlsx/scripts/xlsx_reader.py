@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 """
-xlsx_reader.py — Read-only, bounded spreadsheet inspection; optional full analysis.
+xlsx_reader.py — Full spreadsheet analysis with opt-in bounded inspection.
 
 Usage:
-    python3 xlsx_reader.py <file>                   # first sheet A1:L5, stdlib only
-    python3 xlsx_reader.py <file> --inventory       # names/part mappings, no sheet loads
+    python3 xlsx_reader.py <file>                   # full pandas analysis (unchanged)
+    python3 xlsx_reader.py <file> --sheet Sales     # analyze one sheet (unchanged)
+    python3 xlsx_reader.py <file> --inventory       # stdlib names/part mappings only
+    python3 xlsx_reader.py <file> --preview 5       # stdlib first-sheet A1:L5 preview
     python3 xlsx_reader.py <file> --sheet Sales --range B3:D8 --json
-    python3 xlsx_reader.py <file> --analyze         # legacy full pandas analysis
+    python3 xlsx_reader.py <file> --analyze         # explicit alias of the default
     python3 xlsx_reader.py <file> --quality         # full pandas quality audit, no stats
 
 Supports: .xlsx, .xlsm, .csv, .tsv
@@ -43,7 +45,7 @@ def detect_and_load(file_path: str, sheet_name_filter: str | None = None) -> dic
         import pandas as pd
     except ImportError:
         raise RuntimeError(
-            "Full --analyze/--quality mode requires pandas (and an Excel engine for XLSX). "
+            "Full analysis (default, --analyze or --quality) requires pandas (and an Excel engine for XLSX). "
             "Use the stdlib inventory/preview/range modes, or an already authorized analysis environment."
         )
 
@@ -333,23 +335,27 @@ def main() -> None:
     parser.add_argument("--sheet", help="Select a named sheet (all sheets in full analysis if omitted)", default=None)
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument("--inventory", action="store_true", help="List workbook sheets/relationships without opening worksheets")
-    modes.add_argument("--analyze", action="store_true", help="Legacy full pandas structure, quality and statistics")
+    modes.add_argument("--analyze", action="store_true", help="Full pandas structure, quality and statistics (default)")
     modes.add_argument("--quality", action="store_true", help="Full pandas quality audit only (skip statistics)")
-    parser.add_argument("--preview", type=int, default=5, metavar="ROWS", help="Preview worksheet row addresses 1..ROWS (default: 5)")
-    parser.add_argument("--columns", type=int, default=12, help="Preview columns 1..N (default: 12)")
+    parser.add_argument("--preview", type=int, metavar="ROWS", help="Opt-in bounded preview of worksheet row addresses 1..ROWS")
+    parser.add_argument("--columns", type=int, help="Opt-in bounded preview of columns 1..N (otherwise 12)")
     parser.add_argument("--range", dest="cell_range", help="Explicit bounded Excel range, e.g. B3:D8 (max 10,000 cells)")
     parser.add_argument("--encoding", help="CSV/TSV preview encoding; otherwise try UTF-8 BOM, GBK, Latin-1 on decode failure only")
     parser.add_argument(
         "--json", action="store_true", help="Output machine-readable JSON"
     )
     args = parser.parse_args()
-    if args.analyze or args.quality:
-        if args.cell_range or args.encoding or args.preview != 5 or args.columns != 12:
-            parser.error("Range/preview/encoding options are for lightweight inspection, not full analysis")
-    else:
+    preview_options = any(value is not None for value in
+                          (args.cell_range, args.encoding, args.preview, args.columns))
+    lightweight = args.inventory or preview_options
+    if lightweight and (args.analyze or args.quality):
+        parser.error("Inventory/range/preview/encoding options are for lightweight inspection, not full analysis")
+    if lightweight:
         try:
             output = inspect_file(args.file, sheet_name=args.sheet, inventory=args.inventory,
-                                  cell_range=args.cell_range, rows=args.preview, columns=args.columns,
+                                  cell_range=args.cell_range,
+                                  rows=5 if args.preview is None else args.preview,
+                                  columns=12 if args.columns is None else args.columns,
                                   encoding=args.encoding)
             if args.json:
                 print(json.dumps(output, indent=2, ensure_ascii=False))

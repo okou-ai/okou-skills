@@ -117,7 +117,7 @@ def _walk_fields(fields, page_map: dict, parent_name: str = "") -> list:
 
 
 def inspect(pdf_path: str) -> dict:
-    require_file(pdf_path, (".pdf",))
+    require_file(pdf_path)
     PdfReader = require_dependency("pypdf").PdfReader
     try:
         reader = PdfReader(pdf_path)
@@ -159,7 +159,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        require_file(args.input, (".pdf",))
+        require_file(args.input)
         if args.out:
             require_distinct_output(args.out, args.input)
     except ValueError as exc:

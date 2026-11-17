@@ -28,43 +28,15 @@ identities or findings.
 
 ## Workflow
 
-Inventory each unchanged input **once**, without SDK/setup. Choose the necessary
-scope/details up front and reuse these files for all zone, style and relationship
-decisions below; no separate preview/analyze pass. For whole-template zone selection,
-use `--full` (all body elements and complete text, not XML). Byte-preservation checks
-need `--hash-parts` for the preserved base; omit it for metadata-only inspection:
-
-```bash
-# Overlay preserves source parts; Base-Replace preserves template parts.
-# Put --hash-parts on the relevant base inventory (both only if both are compared).
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory source.docx --full --hash-parts > source.inventory.json
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory template.docx --full > template.inventory.json
-# For Base-Replace, move --hash-parts from source to template in these commands.
 ```
-
-1. Choose Overlay or Base-Replace using `body_elements` (zero-based indices and
-   text), `sections`, `styles` and `used_styles` from these inventories. Default
-   inventory is only the first 50 elements / 160 characters per preview; always
-   check `body_coverage` and `text_truncated`. A range (`--start N --end M`) is an
-   alternative to `--full`. Add `--xml` only for actual XML-level ambiguity/editing.
-2. Map used source paragraph/character/table styles to template definitions;
-   preserve required numbering, CJK fonts, fields and semantic emphasis.
-3. **Overlay only**, when style IDs already match and replacement of whole style/
-   numbering parts is safe, use the built CLI (runtime needed):
-   `bash "$SKILL_DIR/scripts/docx.sh" apply-template --input source.docx --template template.docx --output result.docx`.
-   Headers/footers require explicit `--apply-headers-footers`; the CLI does not
-   implement a mapping plan or Base-Replace. For those, adapt
-   [C# authoring](../implementation/authoring.md#structured-template-boundaries).
-4. Validate: `bash "$SKILL_DIR/scripts/docx.sh" validate --input result.docx --business`.
-5. Review: `bash "$SKILL_DIR/scripts/docx.sh" diff --before source.docx --after result.docx`.
-   This is a coarse text/style-ID/count diff, not a preservation certificate.
-   Inventory the result once with `--full --hash-parts` when checking untouched-part
-   bytes; compare `parts[].sha256` against the saved base inventory (not ZIP sizes,
-   and do not rerun the unchanged base). Use `--xml` only if XML detail is needed.
-   Compare `relationships`/`relationship_references` for remapped IDs and existing targets,
-   and text/zones against the authorized changes. External links are not fetched.
-   Apply [affected visual checks](validate.md#rendering-and-delivery); never write
-   over either input.
+1. Analyze source    → CLI: analyze source.docx      (list styles, fonts, structure)
+2. Analyze template  → CLI: analyze template.docx     (list styles, fonts, structure)
+3. Map styles        → Create mapping plan (source style → template style)
+4. Apply template    → CLI: apply-template source.docx --template template.docx --output result.docx
+5. Validate package  → CLI: validate --input result.docx --business
+6. Review edit diff  → CLI: diff --before source.docx --after result.docx --text-only
+                       (changes must stay within the authorized operation)
+```
 
 ---
 
@@ -94,18 +66,16 @@ python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory template.docx --full > te
 
 ## Template Structure Analysis (REQUIRED)
 
-Before choosing Overlay or Base-Replace, review the template inventory from the
-workflow above. Do not repeat the same inspection at each step.
+Before choosing Overlay or Base-Replace, you MUST analyze the template's internal structure. This is the #1 cause of failure when skipped.
 
 ### Step 1: Count template paragraphs and identify structural zones
 
-Use the saved `template.inventory.json` created with `--full`: `body_elements`
-includes each direct body child (including tables and SDTs), its `index`, `text`,
-`paragraph_count` and `table_count`. Counts describe stored XML, not rendered or
-revision-accepted content. `sections[].properties` includes intermediate/final
-section metadata; style records and per-part `used_styles` identify heading-equivalent
-IDs even when numeric. XML is included only with `--xml`; full text alone usually
-suffices to find zones.
+Run `$CLI analyze --input template.docx` or manually inspect:
+
+```bash
+# Quick structure scan
+scripts/docx_preview.sh template.docx
+```
 
 Identify these zones in the template:
 ```
@@ -123,9 +93,7 @@ Zone D: Final sectPr
 
 ### Step 2: Find Zone B boundaries (replacement range)
 
-Search the saved full inventory's body text for anchors marking the replacement
-range. Inspect targeted body XML (`inventory --start N --end M --xml`) or the source
-XML part only if the saved evidence leaves an actual ambiguity; do not repeat all scans:
+Search the template's document.xml for anchor text that marks the start and end of example content:
 
 **Start anchor patterns** (first paragraph of example body):
 - "第1章", "第一章", "Chapter 1", "1 Introduction", "绪论"
@@ -184,14 +152,28 @@ Now that you know the structure:
 
 When template style names differ from source style names, a mapping is required. **This step is mandatory** — skipping it is the #1 cause of formatting failures in template application.
 
-### Step 0: Reuse Both Inventories' Style Records (REQUIRED)
+### Step 0: Extract StyleIds from Both Documents (REQUIRED)
 
-Compare `styles` and `used_styles` in the saved source/template inventories, not
-another command. Every definition has `styleId`, display `name`, `type`, `basedOn`,
-`default`; XML is opt-in with `--xml`. Per-part usage includes `pStyle`, `rStyle` and `tblStyle`.
-For example, source `Heading1` / name `heading 1` / basedOn `Normal` can map to
-template `1` / name `heading 1` / basedOn `a`. Check the full inheritance chain
-and default styles, not only custom definitions or English `Heading*` IDs.
+Before any template application, extract and compare styleIds from both documents:
+
+```bash
+# Extract all styleIds from source
+$CLI analyze --input source.docx --styles-only
+# Output example:
+#   Heading1  (paragraph, basedOn: Normal)
+#   Heading2  (paragraph, basedOn: Normal)
+#   Normal    (paragraph)
+#   ListBullet (paragraph, basedOn: Normal)
+
+# Extract all styleIds from template
+$CLI analyze --input template.docx --styles-only
+# Output example:
+#   1         (paragraph, basedOn: a, name: "heading 1")
+#   2         (paragraph, basedOn: a, name: "heading 2")
+#   3         (paragraph, basedOn: a, name: "heading 3")
+#   a         (paragraph, name: "Normal")
+#   a0        (character, name: "Default Paragraph Font")
+```
 
 **Critical distinction**: `w:styleId` vs `w:name`:
 ```xml
@@ -249,9 +231,15 @@ For renamed or custom styles, provide an explicit mapping:
 
 Follow this algorithm:
 
-1. **List source styleIds** from `used_styles["word/document.xml"]`, and from any
-   copied header/note parts. Include paragraph, run and table styles; absent
-   explicit style references use the applicable default style. No second ZIP scan.
+1. **List source styleIds** actually used in `document.xml` (not all defined in `styles.xml`):
+   ```python
+   # Pseudocode: find all unique pStyle values in source document.xml
+   used_styles = set()
+   for p in body.iter('w:p'):
+       pStyle = p.find('w:pPr/w:pStyle')
+       if pStyle is not None:
+           used_styles.add(pStyle.get('val'))
+   ```
 
 2. **For each used style**, find the best match in template:
    - First try: exact styleId match
@@ -342,8 +330,7 @@ When copying parts (headers, footers, images) from the template into the source 
 - Copying template's `rId7` overwrites source's image reference
 
 **Solution**:
-1. Reuse the inventories' per-source-part `relationships` and
-   `relationship_references`; check existing IDs, internal targets and missing refs
+1. Scan source's `document.xml.rels` for all existing `rId` values
 2. Find the maximum numeric ID (e.g., `rId12`)
 3. Remap all template relationship IDs starting from `rId13`
 4. Update all references in copied parts to use new IDs
@@ -376,8 +363,8 @@ The corresponding text in document.xml references this rId:
 ```
 
 **Merging steps:**
-1. Reuse `relationship_references` in the source inventory for copied hyperlinks
-2. For each, find the corresponding per-part relationship in `relationships`
+1. Scan source document.xml for all `<w:hyperlink r:id="...">` elements
+2. For each, find the corresponding relationship in source's rels file
 3. Check if template already has a relationship with the same Target URL
    - If yes: reuse the existing rId, update the hyperlink reference
    - If no: assign a new rId (starting from template's max rId + 1), add the relationship to template's rels, update the hyperlink reference

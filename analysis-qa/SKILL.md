@@ -5,7 +5,7 @@ description: Quality-check data analysis for joins, metrics, denominators, date 
 
 ## Review Checklist
 
-Select checks relevant to the question, data, and method. Prioritize failures that could change the conclusion or action. Reuse checks already verified against the same inputs, definitions and calculation version; repeat affected checks when those change. Keep calculations and source traces in working notes; include material methods and caveats in the requested format. Preserve permitted sources and deliverable scope. This is a risk reference, not a second analysis pipeline or a requirement to execute every check, calculation path or notes template.
+Select checks relevant to the question, data, and method. Prioritize failures that could change the conclusion or action. Keep calculations and source traces in working notes; include methods, caveats, and supporting detail in the user's requested format where they affect interpretation. Preserve the task's permitted sources and deliverable scope.
 
 ### Data Foundation
 
@@ -138,9 +138,6 @@ JOIN line_items li ON o.id = li.order_id;  -- 3,500 may be correct line-item row
 | Segment shares | Sum to 100% only for an exhaustive, mutually exclusive partition; explain overlap or missing segments |
 
 ### Cross-Validation Approaches
-
-Choose a method that tests the material risk not already covered. Do not run all
-five or repeat equivalent checks merely because another skill was loaded.
 
 1. **Dual calculation**: Derive the same metric via two independent query paths and confirm they match
 2. **Record-level spot checks**: Select a handful of specific entities and manually trace their numbers end to end

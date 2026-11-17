@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Check dependency-free Office routes and reference links
+      - name: Check dependency-free Office tool entry points
         run: python3 -m unittest discover -s office/tests -v
       - name: Check readers, scoped edits and lazy setup without native dependencies
         run: |
@@ -52,7 +52,7 @@ jobs:
           python3 -m pip install -r office/xlsx/requirements-authoring.txt
           npm install -g playwright
           npx --no-install playwright install --with-deps chromium
-      - name: Check native analysis and calculation routes
+      - name: Check legacy reader compatibility and native calculation
         run: python3 -m unittest discover -s office/tests -v
       - name: Set up DOCX from outside the skill directory
         working-directory: ${{ runner.temp }}

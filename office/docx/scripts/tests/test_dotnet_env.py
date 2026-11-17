@@ -1,4 +1,4 @@
-"""Exercise fresh Bash entrypoints without downloading or installing an SDK."""
+"""Exercise runtime checks and missing-CLI SDK fallback with stubbed .NET, no installs."""
 import os
 from pathlib import Path
 import shutil
@@ -111,7 +111,7 @@ esac
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn(f"{selected.parent}|--version", self.log.read_text())
 
-    def test_runtime_only_can_run_and_check_built_cli_but_not_build(self):
+    def test_runtime_only_built_cli_fast_path_and_explicit_build_requires_sdk(self):
         host = self.sdk(runtime_only=True)
         result = self.run_script("docx.sh", "--help")
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -123,6 +123,7 @@ esac
         self.assertNotIn("--list-sdks", self.log.read_text())
         self.assertNotIn("--version", self.log.read_text())
         self.assertNotIn("restore", self.log.read_text())
+        self.assertNotIn("build", self.log.read_text())
         check = self.run_script("env_check.sh", "--build")
         self.assertEqual(check.returncode, 1)
         self.assertIn("compatible SDK and .NET 8 runtime not found", check.stdout)
@@ -195,14 +196,47 @@ fi
         self.assertFalse(self.log.exists())
         self.assertFalse(self.installer_log.exists())
 
-    def test_runtime_check_never_restores_even_with_sdk_and_missing_cli(self):
-        self.sdk()
+    def test_default_check_restores_and_builds_missing_cli_with_sdk(self):
+        host = self.sdk()
+        self.dll.unlink()
+        result = self.run_script("env_check.sh")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        log = self.log.read_text()
+        project = self.project / "Docx.Cli.csproj"
+        self.assertIn(f"{host.parent}|restore {project} --verbosity quiet", log)
+        self.assertIn(f"{host.parent}|build {project} --verbosity quiet --no-restore", log)
+        self.assertLess(log.index("|restore "), log.index("|build "))
+        self.assertIn("build succeeded", result.stdout)
+        self.assertIn("Status: READY", result.stdout)
+        self.assertFalse(self.installer_log.exists())
+
+    def test_default_missing_cli_finds_home_sdk_behind_runtime_only_path_host(self):
+        host = self.sdk()
+        runtime = self.sdk(self.root / "path runtime", runtime_only=True)
+        (self.bin / "dotnet").symlink_to(runtime)
+        self.dll.unlink()
+        result = self.run_script("env_check.sh")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        log = self.log.read_text()
+        self.assertIn(f"{host.parent}|restore ", log)
+        self.assertIn(f"{host.parent}|build ", log)
+        self.assertNotIn(f"{runtime.parent}|restore ", log)
+        self.assertNotIn(f"{runtime.parent}|build ", log)
+        self.assertFalse(self.installer_log.exists())
+
+    def test_runtime_only_missing_cli_fails_without_restore_build_or_install(self):
+        self.sdk(runtime_only=True)
         self.dll.unlink()
         result = self.run_script("env_check.sh")
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("prebuilt CLI missing", result.stdout)
-        self.assertNotIn("restore", self.log.read_text())
-        self.assertNotIn("build", self.log.read_text())
+        self.assertIn("DOCX CLI is missing; a compatible SDK is required", result.stdout)
+        self.assertIn("skipped (no compatible sdk selected)", result.stdout)
+        self.assertIn("Status: NOT READY", result.stdout)
+        log = self.log.read_text()
+        self.assertIn("--list-sdks", log)
+        self.assertNotIn("--version", log)
+        self.assertNotIn("restore", log)
+        self.assertNotIn("build", log)
         self.assertFalse(self.installer_log.exists())
 
     def test_explicit_build_can_restore_and_build_missing_cli(self):
@@ -212,6 +246,27 @@ fi
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("restore ", self.log.read_text())
         self.assertIn("build ", self.log.read_text())
+        self.assertFalse(self.installer_log.exists())
+
+    def test_missing_pandoc_warns_about_legacy_preview_fallback_without_installing(self):
+        self.sdk(runtime_only=True)
+        result = self.run_script("env_check.sh")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("[WARN]    pandoc", result.stdout)
+        self.assertIn("not found — docx_preview.sh will use fallback", result.stdout)
+        self.assertIn("Status: READY (with", result.stdout)
+        self.assertFalse(self.installer_log.exists())
+
+    def test_available_pandoc_reports_legacy_preview_version(self):
+        self.sdk(runtime_only=True)
+        pandoc = self.bin / "pandoc"
+        pandoc.write_text('#!/bin/sh\nprintf "pandoc 3.6.2\\n"\n')
+        pandoc.chmod(0o755)
+        result = self.run_script("env_check.sh")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("[OK]      pandoc", result.stdout)
+        self.assertIn("3.6.2 (content preview)", result.stdout)
+        self.assertNotIn("docx_preview.sh will use fallback", result.stdout)
         self.assertFalse(self.installer_log.exists())
 
     def test_setup_reuses_sdk_and_leaves_shell_profile_unchanged(self):

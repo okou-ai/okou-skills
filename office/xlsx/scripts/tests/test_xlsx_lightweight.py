@@ -58,9 +58,9 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(data['date_system'], '1904')
         self.assertFalse(data['previews'])
 
-    def test_default_and_cli_work_without_site_packages(self):
+    def test_explicit_preview_cli_works_without_site_packages(self):
         before = self.path.read_bytes()
-        result = subprocess.run([sys.executable, '-S', str(SCRIPTS / 'xlsx_reader.py'), str(self.path), '--json'], capture_output=True, text=True)
+        result = subprocess.run([sys.executable, '-S', str(SCRIPTS / 'xlsx_reader.py'), str(self.path), '--preview', '5', '--json'], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
         self.assertEqual(list(data['previews']), ['财务'])
@@ -166,9 +166,9 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(encoding, 'gbk')
         self.assertEqual(values[0]['value'], '中文')
 
-    def test_full_analysis_and_quality_are_explicit_compatible_modes(self):
-        for flag, stats_expected in [('--analyze', True), ('--quality', False)]:
-            with mock.patch.object(sys, 'argv', ['reader', str(self.path), flag, '--sheet', '财务', '--json']), \
+    def test_legacy_default_explicit_analysis_and_quality_are_compatible(self):
+        for flags, stats_expected in [([], True), (['--analyze'], True), (['--quality'], False)]:
+            with mock.patch.object(sys, 'argv', ['reader', str(self.path), *flags, '--sheet', '财务', '--json']), \
                  mock.patch.object(reader, 'detect_and_load', return_value={'财务': object()}) as load, \
                  mock.patch.object(reader, 'explore_structure', return_value={'财务': {}}), \
                  mock.patch.object(reader, 'audit_quality', return_value={'财务': []}) as quality, \
@@ -179,6 +179,19 @@ class ReaderTests(unittest.TestCase):
                 quality.assert_called_once()
                 self.assertEqual(stats.called, stats_expected)
                 self.assertIn('structure', json.loads(output.getvalue()))
+
+    def test_full_analysis_rejects_all_explicit_preview_options(self):
+        for option in (['--preview', '5'], ['--columns', '12'], ['--range', 'A1'], ['--encoding', 'utf-8']):
+            for mode in ('--analyze', '--quality'):
+                with self.subTest(option=option, mode=mode), \
+                     mock.patch.object(sys, 'argv', ['reader', str(self.path), mode, *option]), \
+                     mock.patch.object(reader, 'detect_and_load') as load, \
+                     mock.patch.object(reader, 'inspect_file') as inspect, \
+                     contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+                    reader.main()
+                self.assertEqual(error.exception.code, 2)
+                load.assert_not_called()
+                inspect.assert_not_called()
 
     def test_full_csv_does_not_retry_parser_errors(self):
         path = Path(self.tmp.name) / 'data.csv'

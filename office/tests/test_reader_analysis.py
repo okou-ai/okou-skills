@@ -1,4 +1,4 @@
-"""Optional native checks for the explicit, legacy DataFrame analysis route."""
+"""Optional native checks for backward-compatible DataFrame analysis."""
 
 import hashlib
 import importlib.util
@@ -16,7 +16,7 @@ HAS_ANALYSIS = bool(importlib.util.find_spec("pandas") and importlib.util.find_s
 
 
 @unittest.skipUnless(HAS_ANALYSIS, "optional pandas/openpyxl are not installed")
-class AnalysisOptInTests(unittest.TestCase):
+class ReaderAnalysisTests(unittest.TestCase):
     def setUp(self):
         work = tempfile.TemporaryDirectory(prefix="office-analysis-")
         self.addCleanup(work.cleanup)
@@ -50,12 +50,37 @@ class AnalysisOptInTests(unittest.TestCase):
         self.assertEqual(set(quality["quality"]), {"Sales"})
         self.assertEqual(quality["stats"], {})
 
-    def test_explicit_csv_analysis_retains_numeric_statistics(self):
+    def test_default_csv_analysis_retains_all_legacy_output(self):
         source = self.work / "records.csv"
         source.write_text("Item,Amount\nA,10\nB,20\n", encoding="utf-8")
-        analysis = self.analyze(source, "--analyze")
+        analysis = self.analyze(source)
+        self.assertEqual(analysis, self.analyze(source, "--analyze"))
+        self.assertEqual(set(analysis), {"file", "structure", "quality", "stats"})
         self.assertEqual(analysis["structure"]["records"]["shape"]["rows"], 2)
         self.assertEqual(analysis["stats"]["records"]["Amount"]["mean"], 15)
+
+    def test_default_xlsx_analysis_keeps_all_sheets_and_named_sheet_selection(self):
+        from openpyxl import Workbook
+        workbook = Workbook()
+        sales = workbook.active
+        sales.title = "Sales"
+        sales.append(["Item", "Amount"])
+        sales.append(["A", 10])
+        sales.append(["B", 20])
+        costs = workbook.create_sheet("Costs")
+        costs.append(["Amount"])
+        costs.append([4])
+        costs.append([8])
+        source = self.work / "all-sheets.xlsx"
+        workbook.save(source)
+        analysis = self.analyze(source)
+        self.assertEqual(analysis, self.analyze(source, "--analyze"))
+        self.assertEqual(set(analysis["structure"]), {"Sales", "Costs"})
+        self.assertEqual(set(analysis["quality"]), {"Sales", "Costs"})
+        self.assertEqual(analysis["stats"]["Costs"]["Amount"]["mean"], 6)
+        selected = self.analyze(source, "--sheet", "Sales")
+        self.assertEqual(set(selected["structure"]), {"Sales"})
+        self.assertEqual(selected["stats"]["Sales"]["Amount"]["mean"], 15)
 
 
 if __name__ == "__main__":

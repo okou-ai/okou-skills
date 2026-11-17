@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 """Stdlib-only preservation and package-path regression tests."""
+import contextlib
 import io
 from pathlib import Path
 import stat
@@ -161,9 +162,26 @@ class PackagingTests(unittest.TestCase):
         self.assertIn(b'\n', (directory / 'xl/workbook.xml').read_bytes())
         result = subprocess.run([sys.executable, '-S', str(SCRIPTS / 'xlsx_pack.py'), str(directory), str(self.output)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(f'python3 formula_check.py {self.output}', result.stdout)
         fresh = self.root / 'scoped.xlsx'
         result = subprocess.run([sys.executable, '-S', str(SCRIPTS / 'xlsx_pack.py'), '--base', str(self.base), '--part', 'xl/worksheets/main.xml=' + str(self.replacement), str(fresh)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(f'python3 formula_check.py {fresh}', result.stdout)
+
+    def test_unpack_retains_key_file_inventory_and_detected_risk_warnings(self):
+        with zipfile.ZipFile(self.base, 'a') as package:
+            package.writestr('xl/pivotTables/pivot1.xml', '<pivot/>')
+            package.writestr('xl/charts/chart1.xml', '<chart/>')
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            unpack(str(self.base), str(self.root / 'inventory'))
+        summary = output.getvalue()
+        for expected in ('Key files to inspect/edit:', '[Package root]', '[Workbook]',
+                         'xl/workbook.xml', 'xl/worksheets/main.xml',
+                         'VBA macros — DO NOT modify', 'Pivot tables — update source ranges',
+                         'Charts — update data ranges'):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, summary)
 
     def test_source_symlinks_and_duplicate_cli_parts_rejected(self):
         directory = self.root / 'source-dir'

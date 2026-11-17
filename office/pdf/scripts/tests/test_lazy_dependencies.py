@@ -132,30 +132,47 @@ class LazyDependencyTests(unittest.TestCase):
                 self.assertEqual(attempted, [])
 
     def test_invalid_inputs_precede_dependency_loading_and_preserve_output(self):
-        wrong = self.work / "not-pdf.txt"
-        wrong.write_text("not a PDF")
+        malformed = self.work / "malformed input"
+        malformed.write_text("{broken JSON")
         bad = self.work / "bad.json"
         bad.write_text("[]")
         unknown = self.work / "unknown.json"
         unknown.write_text('[{"type":"unsupported"}]')
         cases = [
-            ("fill_inspect", ["--input", wrong, "--out", self.output]),
+            ("fill_inspect", ["--input", self.work / "absent", "--out", self.output]),
             ("fill_inspect", ["--input", self.work, "--out", self.output]),
+            ("fill_write", ["--input", self.work, "--out", self.output, "--values", '{"Name":"Jane"}']),
             ("fill_write", ["--input", self.source, "--out", self.output, "--values", "[]"]),
             ("fill_write", ["--input", self.source, "--out", self.output, "--values", "broken JSON"]),
             ("fill_write", ["--input", self.source, "--out", self.output, "--data", self.work / "absent.json"]),
-            ("merge", ["--cover", self.source, "--body", wrong, "--out", self.output]),
+            ("fill_write", ["--input", self.source, "--out", self.output, "--data", self.work]),
+            ("fill_write", ["--input", self.source, "--out", self.output, "--data", malformed]),
+            ("merge", ["--cover", self.source, "--body", self.work / "absent", "--out", self.output]),
+            ("merge", ["--cover", self.source, "--body", self.work, "--out", self.output]),
             ("reformat_parse", ["--input", self.work / "absent.pdf", "--out", self.output]),
             ("reformat_parse", ["--input", self.work, "--out", self.output]),
             ("render_body", ["--tokens", self.tokens, "--content", bad, "--out", self.output]),
             ("render_body", ["--tokens", self.tokens, "--content", unknown, "--out", self.output]),
             ("render_body", ["--tokens", self.work, "--content", self.content, "--out", self.output]),
+            ("render_body", ["--tokens", self.tokens, "--content", malformed, "--out", self.output]),
+            ("render_body", ["--tokens", malformed, "--content", self.content, "--out", self.output]),
         ]
         for name, args in cases:
             with self.subTest(name=name, args=args), blocked_runtime() as attempted:
                 code, stdout, stderr = cli(name, *args)
                 self.assertNotEqual(code, 0)
                 self.assertIn("error", stderr)
+                self.assertEqual(attempted, [])
+                self.assertEqual(self.output.read_bytes(), self.old)
+
+    def test_reformat_suffix_dispatch_is_unchanged(self):
+        for suffix in ("", ".data"):
+            source = self.work / ("unknown-format" + suffix)
+            source.write_text('[{"type":"body","text":"Actual prose"}]')
+            with self.subTest(suffix=suffix), blocked_runtime() as attempted:
+                code, stdout, stderr = cli("reformat_parse", "--input", source, "--out", self.output)
+                self.assertEqual(code, 1, stderr)
+                self.assertIn("Unsupported file type", stderr)
                 self.assertEqual(attempted, [])
                 self.assertEqual(self.output.read_bytes(), self.old)
 
@@ -199,15 +216,30 @@ class LazyDependencyTests(unittest.TestCase):
                     function(*args)
                 self.assertEqual(attempted, ["matplotlib"])
 
-    def test_read_only_inspection_does_not_overwrite_source(self):
-        alias = self.work / "hardlink.pdf"
-        os.link(self.source, alias)
-        for output in (self.source, alias):
-            with self.subTest(output=output), blocked_runtime() as attempted:
-                code, stdout, stderr = cli("fill_inspect", "--input", self.source, "--out", output)
-                self.assertEqual(code, 1)
-                self.assertIn("Output must differ", stderr)
-                self.assertEqual(attempted, [])
+    def test_fixed_format_outputs_do_not_alias_sources(self):
+        aliases = {}
+        for source in (self.source, self.tokens, self.content):
+            hardlink = source.with_name(source.name + ".hardlink")
+            symlink = source.with_name(source.name + ".symlink")
+            os.link(source, hardlink)
+            symlink.symlink_to(source)
+            aliases[source] = (source, hardlink, symlink)
+        cases = [
+            ("fill_inspect", self.source, ["--input", self.source]),
+            ("fill_write", self.source, ["--input", self.source, "--values", '{"Name":"Jane"}']),
+            ("merge", self.source, ["--cover", self.source, "--body", self.source]),
+            ("render_body", self.tokens, ["--tokens", self.tokens, "--content", self.content]),
+            ("render_body", self.content, ["--tokens", self.tokens, "--content", self.content]),
+        ]
+        for name, source, args in cases:
+            before = source.read_bytes()
+            for output in aliases[source]:
+                with self.subTest(name=name, output=output), blocked_runtime() as attempted:
+                    code, stdout, stderr = cli(name, *args, "--out", output)
+                    self.assertEqual(code, 1, stderr)
+                    self.assertIn("Output must differ", stderr)
+                    self.assertEqual(attempted, [])
+                    self.assertEqual(source.read_bytes(), before)
 
 
 @unittest.skipUnless(
@@ -247,14 +279,160 @@ class NativePdfTests(unittest.TestCase):
         self.assertEqual(self.source.read_bytes(), before)
         self.assertEqual(list(self.work.glob(".pdf-fill-*.tmp")), [])
 
-    def test_invalid_or_unknown_fields_do_not_replace_output(self):
+    def test_invalid_choices_and_unknown_fields_are_nonfatal_warnings(self):
+        from pypdf import PdfReader
         filler = importlib.import_module("fill_write")
-        for values in ({"Missing": "value"}, {"Country": "not allowed"}, {"Agree": "ambiguous"}):
+        before = self.source.read_bytes()
+        cases = [
+            ({"Missing": "value"}, []),
+            ({"Country": "not allowed"}, []),
+            ({"Name": "Jane Doe", "Country": "not allowed", "Missing": "value"}, ["Name"]),
+        ]
+        for values, filled in cases:
             with self.subTest(values=values):
+                self.output.write_bytes(b"old output")
                 result = filler.fill(str(self.source), str(self.output), values)
-                self.assertEqual(result["status"], "error", result)
-                self.assertEqual(result["exit_code"], 4)
+                self.assertEqual(result["status"], "ok", result)
+                self.assertNotIn("exit_code", result)
+                self.assertEqual(result["filled_fields"], filled)
+                self.assertEqual(result["filled_count"], len(filled))
+                if "Country" in values:
+                    self.assertEqual([error["field"] for error in result["validation_errors"]], ["Country"])
+                if "Missing" in values:
+                    self.assertEqual(result["not_found"], ["Missing"])
+                actual = PdfReader(self.output).get_fields()
+                self.assertEqual(str(actual["Country"]["/V"]), "US")
+                if "Name" in values:
+                    self.assertEqual(str(actual["Name"]["/V"]), "Jane Doe")
+                self.assertEqual(self.source.read_bytes(), before)
+                self.assertEqual(list(self.work.glob(".pdf-fill-*.tmp")), [])
+
+    def test_fill_cli_succeeds_and_reports_field_warnings(self):
+        from pypdf import PdfReader
+        values = {"Name": "Jane Doe", "Country": "not allowed", "Missing": "value"}
+        code, stdout, stderr = cli("fill_write", "--input", self.source, "--out", self.output,
+                                   "--values", json.dumps(values))
+        self.assertEqual(code, 0, stderr)
+        result = json.loads(stdout)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["filled_fields"], ["Name"])
+        self.assertEqual(result["not_found"], ["Missing"])
+        self.assertEqual(result["validation_errors"][0]["field"], "Country")
+        self.assertIn("Fill complete", stderr)
+        self.assertIn("Errors :", stderr)
+        self.assertIn("Not found:", stderr)
+        self.assertEqual(str(PdfReader(self.output).get_fields()["Name"]["/V"]), "Jane Doe")
+
+    def test_checkbox_keeps_legacy_truthy_and_unchecked_values(self):
+        from pypdf import PdfReader
+        filler = importlib.import_module("fill_write")
+        cases = [(True, "/Yes"), ("YES", "/Yes"), (1, "/Yes"), ("on", "/Yes"),
+                 (False, "/Off"), ("false", "/Off"), (0, "/Off"), (None, "/Off"),
+                 ("ambiguous", "/Off"), (" true ", "/Off")]
+        for value, expected in cases:
+            with self.subTest(value=value):
+                result = filler.fill(str(self.source), str(self.output), {"Agree": value})
+                self.assertEqual(result["status"], "ok", result)
+                self.assertEqual(result["filled_fields"], ["Agree"])
+                self.assertNotIn("validation_errors", result)
+                self.assertEqual(str(PdfReader(self.output).get_fields()["Agree"]["/V"]), expected)
+
+    def test_radio_keeps_legacy_value_and_widget_state_handling(self):
+        from pypdf import PdfReader
+        from reportlab.pdfgen import canvas
+        source = self.work / "radio.pdf"
+        document = canvas.Canvas(str(source))
+        document.acroForm.radio(name="Choice", value="One", selected=True, x=30, y=700)
+        document.acroForm.radio(name="Choice", value="Two", selected=False, x=30, y=660)
+        document.showPage()
+        document.save()
+        before = source.read_bytes()
+        original = PdfReader(source).get_fields()["Choice"]
+        widget_states = [str(kid.get_object().get("/AS")) for kid in original["/Kids"]]
+        filler = importlib.import_module("fill_write")
+        for value in ("Two", "/Two", "not-an-option"):
+            with self.subTest(value=value):
+                result = filler.fill(str(source), str(self.output), {"Choice": value})
+                self.assertEqual(result["status"], "ok", result)
+                self.assertNotIn("validation_errors", result)
+                expected = value if value.startswith("/") else "/" + value
+                actual = PdfReader(self.output).trailer["/Root"]["/AcroForm"]["/Fields"][0].get_object()
+                self.assertEqual(str(actual["/V"]), expected)
+                self.assertEqual(str(actual["/AS"]), expected)
+                self.assertEqual([str(kid.get_object().get("/AS")) for kid in actual["/Kids"]], widget_states)
+                self.assertEqual(source.read_bytes(), before)
+
+    def test_fixed_format_clis_accept_extensionless_and_renamed_valid_input(self):
+        from pypdf import PdfReader, PdfWriter
+        tokens_value = importlib.import_module("palette").build_tokens("Compatibility", "general")
+        for suffix in ("", ".txt"):
+            with self.subTest(suffix=suffix):
+                source = self.work / ("form input" + suffix)
+                source.write_bytes(self.source.read_bytes())
+                data = self.work / ("field values" + suffix)
+                data.write_text('{"Name":"Jane Doe"}')
+                tokens = self.work / ("design tokens" + suffix)
+                tokens.write_text(json.dumps(tokens_value))
+                content = self.work / ("body content" + suffix)
+                content.write_text('[{"type":"body","text":"Extensionless actual prose"}]')
+                cover = self.work / ("cover input" + suffix)
+                writer = PdfWriter()
+                writer.add_blank_page(width=595, height=842)
+                writer.write(cover)
+                originals = {path: path.read_bytes() for path in (source, data, tokens, content, cover)}
+
+                code, stdout, stderr = cli("fill_inspect", "--input", source)
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(json.loads(stdout)["field_count"], 3)
+                code, stdout, stderr = cli("fill_write", "--input", source, "--data", data, "--out", self.output)
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(str(PdfReader(self.output).get_fields()["Name"]["/V"]), "Jane Doe")
+                body = self.work / ("body output" + suffix)
+                code, stdout, stderr = cli("render_body", "--tokens", tokens, "--content", content, "--out", body)
+                self.assertEqual(code, 0, stderr)
+                self.assertIn("Extensionless actual prose", PdfReader(body).pages[0].extract_text())
+                parsed = importlib.import_module("reformat_parse").parse_pdf(str(body))
+                self.assertTrue(any("Extensionless actual prose" in block.get("text", "") for block in parsed))
+                code, stdout, stderr = cli("merge", "--cover", cover, "--body", body, "--out", self.output)
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(len(PdfReader(self.output).pages), 2)
+                for path, before in originals.items():
+                    self.assertEqual(path.read_bytes(), before)
+                self.assertEqual(list(self.work.glob(".pdf-*.tmp")), [])
+
+    def test_renamed_invalid_pdfs_still_fail_in_the_actual_parser(self):
+        source = self.work / "not-a-pdf.txt"
+        source.write_bytes(b"not a PDF")
+        cases = [
+            ("fill_inspect", ["--input", source, "--out", self.output]),
+            ("fill_write", ["--input", source, "--out", self.output, "--values", '{"Name":"Jane"}']),
+            ("merge", ["--cover", self.source, "--body", source, "--out", self.output]),
+        ]
+        for name, args in cases:
+            with self.subTest(name=name):
+                code, stdout, stderr = cli(name, *args)
+                self.assertEqual(code, 3, (stdout, stderr))
+                self.assertIn('"status": "error"', stdout + stderr)
+                self.assertNotIn("Unsupported file type", stdout + stderr)
                 self.assertEqual(self.output.read_bytes(), b"old output")
+                self.assertEqual(source.read_bytes(), b"not a PDF")
+                self.assertEqual(list(self.work.glob(".pdf-*.tmp")), [])
+
+    def test_fill_write_or_verification_failure_preserves_existing_output(self):
+        filler = importlib.import_module("fill_write")
+        before = self.source.read_bytes()
+        patches = [
+            patch("pypdf.PdfWriter.write", side_effect=OSError("simulated write failure")),
+            patch("pypdf.PdfReader.get_fields", return_value={"Name": {"/V": "wrong value"}}),
+        ]
+        for failure in patches:
+            with self.subTest(failure=failure), failure:
+                result = filler.fill(str(self.source), str(self.output), {"Name": "Jane Doe"})
+                self.assertEqual(result["status"], "error", result)
+                self.assertIn("Write/verification failed", result["error"])
+                self.assertEqual(self.output.read_bytes(), b"old output")
+                self.assertEqual(self.source.read_bytes(), before)
+                self.assertEqual(list(self.work.glob(".pdf-fill-*.tmp")), [])
 
     @unittest.skipUnless(importlib.util.find_spec("matplotlib"), "optional matplotlib is not installed")
     def test_lazy_plot_features_render_real_output(self):
@@ -311,11 +489,13 @@ class SetupRoutingTests(unittest.TestCase):
             stub = self.work / name
             stub.write_text(
                 '#!/bin/sh\nprintf "%s\\n" "' + name + ' $*" >> "$PDF_TEST_COMMANDS"\n'
-                'if [ "$1" = "-c" ]; then exit 1; fi\nexit 0\n'
+                'if [ "$1" = "-c" ]; then\n'
+                '  case " ${PDF_TEST_AVAILABLE:-} " in *" $3 "*) exit 0 ;; *) exit 1 ;; esac\n'
+                'fi\nexit 0\n'
             )
             stub.chmod(0o755)
         self.env = {**os.environ, "PATH": str(self.work) + os.pathsep + os.environ.get("PATH", ""),
-                    "PDF_TEST_COMMANDS": str(self.commands)}
+                    "PDF_TEST_COMMANDS": str(self.commands), "PDF_TEST_AVAILABLE": ""}
 
     def invoke(self, *args):
         self.commands.write_text("")
@@ -343,6 +523,36 @@ class SetupRoutingTests(unittest.TestCase):
         for unrelated in ("pypdf", "matplotlib", "node ", "npm ", "npx "):
             self.assertNotIn(unrelated, commands)
 
+    def test_default_check_warns_but_succeeds_without_optional_matplotlib(self):
+        self.env["PDF_TEST_AVAILABLE"] = "reportlab pypdf"
+        result, commands = self.invoke("check")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Cannot load matplotlib", result.stdout)
+        self.assertIn("required only for math/chart/flowchart blocks", result.stdout)
+        for package in ("reportlab", "pypdf", "matplotlib"):
+            self.assertIn(package, commands)
+        self.assertIn("node ", commands)
+        for installer in ("pip", "npm ", "npx "):
+            self.assertNotIn(installer, commands)
+
+    def test_explicit_plot_scopes_remain_strict(self):
+        self.env["PDF_TEST_AVAILABLE"] = "reportlab pypdf"
+        for scope in ("body", "pipeline"):
+            with self.subTest(scope=scope):
+                result, commands = self.invoke("check", "--only", scope)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn("Cannot load matplotlib", result.stdout)
+                self.assertNotIn("pip", commands)
+
+    def test_default_check_still_requires_reportlab_and_pypdf(self):
+        for missing in ("reportlab", "pypdf"):
+            self.env["PDF_TEST_AVAILABLE"] = "pypdf" if missing == "reportlab" else "reportlab"
+            with self.subTest(missing=missing):
+                result, commands = self.invoke("check")
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertIn("Cannot load " + missing, result.stdout)
+                self.assertNotIn("pip", commands)
+
     def test_legacy_full_fix_and_minimal_pipeline_are_distinct(self):
         result, commands = self.invoke("fix")
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -359,6 +569,42 @@ class SetupRoutingTests(unittest.TestCase):
             with self.subTest(args=args):
                 result, commands = self.invoke(*args)
                 self.assertEqual(commands, "")
+
+    def test_run_accepts_fixed_format_content_names_before_rendering(self):
+        # Stop at the first rendering-stage command; no real renderer/browser runs.
+        (self.work / "python3").write_text(
+            '#!/bin/sh\nprintf "%s\\n" "python3 $*" >> "$PDF_TEST_COMMANDS"\nexit 17\n'
+        )
+        output = self.work / "output.pdf"
+        output.write_bytes(b"old output")
+        for suffix in ("", ".txt"):
+            content = self.work / ("body content" + suffix)
+            content.write_text('[{"type":"body","text":"Actual prose"}]')
+            before = content.read_bytes()
+            with self.subTest(suffix=suffix):
+                result, commands = self.invoke("run", "--content", str(content), "--out", str(output))
+                self.assertEqual(result.returncode, 17, result.stderr)
+                self.assertIn("palette.py", commands)
+                self.assertNotIn("node ", commands)
+                self.assertEqual(content.read_bytes(), before)
+                self.assertEqual(output.read_bytes(), b"old output")
+
+    def test_run_keeps_regular_file_and_source_alias_guards(self):
+        content = self.work / "body content"
+        content.write_text('[{"type":"body","text":"Actual prose"}]')
+        before = content.read_bytes()
+        hardlink = self.work / "hardlink"
+        os.link(content, hardlink)
+        symlink = self.work / "symlink"
+        symlink.symlink_to(content)
+        cases = [(self.work, self.work / "out.pdf")]
+        cases.extend((content, output) for output in (content, hardlink, symlink))
+        for source, output in cases:
+            with self.subTest(source=source, output=output):
+                result, commands = self.invoke("run", "--content", str(source), "--out", str(output))
+                self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertEqual(commands, "")
+                self.assertEqual(content.read_bytes(), before)
 
     def test_shell_fill_preserves_inline_json_as_one_argument(self):
         args_file = self.work / "args.bin"

@@ -1,17 +1,19 @@
 # Create a new XLSX
 
 Use for a new workbook, not for filling or changing an existing file. Select
-only the applicable business/presentation rules. Keep derived outputs as live
+business scenario and common presentation first. Keep derived outputs as live
 formulas. Follow this order: [plan](#1-plan), [prepare](#2-choose-and-check-the-tools),
-[build](#3-build-in-business-objects), [check](#4-check-by-impact-and-revise),
+[build](#3-build-in-business-objects), [check](#4-calculate-view-and-revise),
 [raw package fallback](#raw-ooxml-path).
 
 ## 1. Plan
 
-Define the required outputs, source/input locations and calculation dependencies;
-keep the requested scope and enough room for readable tables/explanations. Use
-finance semantics for financial work, and its layout defaults only when creating
-authorized reader-facing layouts. Before writing imported values or
+Plan around the user's reading and editing tasks. Define each worksheet or
+section's purpose and order, the source and input locations, and how calculations
+feed the reported results. Prioritize completeness and readability over reducing
+the sheet count; give data and explanations enough space to be inspected. Use
+the finance layer for the structure of budgets, forecasts and financial reports.
+Keep the work within the requested scope. Before writing imported values or
 editable assumptions, read [data and input contracts](../common/data-and-inputs.md)
 for schema, types, source ownership, validation and parameter-linked narrative.
 For reader-facing comparisons or trends, read [analytical charts](../common/charts.md) before building; plan the question,
@@ -39,14 +41,12 @@ python -m pip install -r "$SKILL_DIR/requirements-authoring.txt"
 Before substantial formula authoring, read VALIDATE's application section and run:
 
 ```bash
-python3 "$SKILL_DIR/scripts/libreoffice_recalc.py" --preflight \
-  --receipt /tmp/task-calc.json --task-id task-unique-id
+python3 "$SKILL_DIR/scripts/libreoffice_recalc.py" --preflight
 ```
 
-Check once per unchanged task environment; reuse the explicit fingerprint-bound
-receipt as described in VALIDATE, not a fresh control for each candidate. This
-tests an independent formula control, not the candidate. A working binary/version
-is insufficient. Diagnose failure before any authorized repair/new run. If setup
+This tests an independent formula control, not the candidate. A working binary
+or version string is insufficient. Diagnose a failed control before blaming a
+workbook; repair permitted missing components, then rerun the control. If setup
 or application use is forbidden/unavailable, record that limitation and do not
 present uncalculated output as a ready-to-use model.
 
@@ -71,21 +71,20 @@ report-page settings. They are building blocks, not a financial model template,
 formula evaluator or automatic layout/quality checker. Supplied styles override
 them; do not call financial styling helpers for ordinary non-financial tables.
 
-## 4. Check by impact and revise
+## 4. Calculate, view and revise
 
-Save a complete draft and select the applicable rows in the shared
-[VALIDATE impact matrix](validate.md#1-select-checks-by-impact). A nonformula table
-does not need Calc or driver mutation; a full financial model needs real candidate
-calculation, source-based expected results, meaningful input propagation and
-visual checks. Inspect affected layout in an actual application **or** faithful
-rendered export; printing/pagination requires the actual export. Fix defects and
-repeat affected checks, not unrelated whole-workbook PDF exports.
+Save a first complete draft early. Use VALIDATE to recalculate a copy, compare
+source-based expected results and change relevant inputs. Export the relevant
+sheets and inspect the actual pages; fix clipped headings, cramped notes, split
+columns or chart overlaps, then repeat affected checks. Resolve defects inside
+this authoring attempt rather than returning an unchecked first draft.
 
-For calculated work, inspect conversion preservation and reopen the exact final
-file with formula and cached-value views. Any later save/formula/input change
-requires fresh candidate calculation/readback; an openpyxl save can clear caches.
-Never synthesize answers or treat recalc flags as calculation. Deliver only the
-requested files, not mandatory working scripts/images/reports.
+Select the final delivery file only after checking conversion effects and live
+formulas. Reopen that exact file with formula and cached-value views. Saving an
+openpyxl workbook again after Calc recalculation can clear its caches: recalculate
+and recheck after any later save. Never synthesize cached answers to bypass this.
+Deliver only the requested file; working scripts, images and checks are not
+mandatory extra user attachments.
 
 ## Raw OOXML path
 

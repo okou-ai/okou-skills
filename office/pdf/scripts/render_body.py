@@ -1132,7 +1132,7 @@ def main():
 
     try:
         for fpath in (args.tokens, args.content):
-            require_file(fpath, (".json",))
+            require_file(fpath)
         require_distinct_output(args.out, args.tokens, args.content)
     except ValueError as exc:
         print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)

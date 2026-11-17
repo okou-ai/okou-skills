@@ -18,7 +18,7 @@ values format:
       "Radio1":     "/Choice2"             # radio     (must match a radio value)
     }
 
-Exit codes: 0 success, 1 bad args, 2 dep missing, 3 read/write error, 4 validation error
+Exit codes: 0 success (including field warnings), 1 bad args, 2 dep missing, 3 read/write error
 """
 
 import argparse
@@ -99,11 +99,7 @@ def _walk_and_fill(fields, data: dict, filled: list, errors: list, parent: str =
             filled.append(full)
 
         elif ftype == "checkbox":
-            normalized = str(value).lower()
-            if normalized not in ("true", "1", "yes", "on", "false", "0", "no", "off"):
-                errors.append({"field": full, "error": "Checkbox requires true or false"})
-                continue
-            truthy = normalized in ("true", "1", "yes", "on")
+            truthy = str(value).lower() in ("true", "1", "yes", "on")
             on_val = _get_checkbox_on_value(field)
             pdf_val = on_val if truthy else "/Off"
             field.update({
@@ -126,19 +122,6 @@ def _walk_and_fill(fields, data: dict, filled: list, errors: list, parent: str =
         elif ftype == "radio":
             # Radio value must start with /
             pdf_val = str(value) if str(value).startswith("/") else f"/{value}"
-            widgets = [kid.get_object() for kid in kids] if kids else [field]
-            allowed = set()
-            for widget in widgets:
-                appearance = widget.get("/AP")
-                if appearance:
-                    allowed.update(str(key) for key in appearance.get_object().get("/N", {}) if str(key) != "/Off")
-            if not allowed or pdf_val not in allowed:
-                errors.append({"field": full, "error": f"Radio value must match one of: {sorted(allowed)}"})
-                continue
-            for widget in widgets:
-                appearance = widget.get("/AP")
-                states = appearance.get_object().get("/N", {}) if appearance else {}
-                widget.update({NameObject("/AS"): NameObject(pdf_val if pdf_val in states else "/Off")})
             field.update({
                 NameObject("/V"):  NameObject(pdf_val),
                 NameObject("/AS"): NameObject(pdf_val),
@@ -150,7 +133,7 @@ def _walk_and_fill(fields, data: dict, filled: list, errors: list, parent: str =
 
 
 def fill(pdf_path: str, out_path: str, data: dict) -> dict:
-    require_file(pdf_path, (".pdf",))
+    require_file(pdf_path)
     require_distinct_output(out_path, pdf_path)
     if not isinstance(data, dict) or not data:
         raise ValueError("Field values must be a nonempty JSON object")
@@ -186,10 +169,6 @@ def fill(pdf_path: str, out_path: str, data: dict) -> dict:
     # Warn about requested fields that were never found
     not_found = [k for k in data if k not in filled and not any(e["field"] == k for e in errors)]
 
-    if errors or not_found:
-        return {"status": "error", "error": "Requested fields did not validate; output unchanged",
-                "validation_errors": errors, "not_found": not_found, "exit_code": 4}
-
     directory = os.path.dirname(os.path.abspath(out_path))
     os.makedirs(directory, exist_ok=True)
     candidate = tempfile.NamedTemporaryFile(dir=directory, prefix=".pdf-fill-", suffix=".tmp", delete=False)
@@ -201,7 +180,9 @@ def fill(pdf_path: str, out_path: str, data: dict) -> dict:
             raise ValueError("Filled PDF page count changed")
         actual = reopened.get_fields() or {}
         expected = writer.get_fields() or {}
-        for name in data:
+        # Only fields actually filled require value verification; validation and
+        # unknown-field warnings must not prevent publishing the other changes.
+        for name in filled:
             if name not in actual or str(actual[name].get("/V")) != str(expected[name].get("/V")):
                 raise ValueError(f"Stored value did not verify for field: {name}")
         os.replace(candidate.name, out_path)
@@ -236,10 +217,10 @@ def main():
     args = parser.parse_args()
 
     try:
-        require_file(args.input, (".pdf",))
+        require_file(args.input)
         require_distinct_output(args.out, args.input)
         if args.data:
-            require_file(args.data, (".json",))
+            require_file(args.data)
     except ValueError as exc:
         print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
         sys.exit(1)
@@ -278,7 +259,7 @@ def main():
             print(f"  Not found: {result['not_found']}", file=sys.stderr)
         print("", file=sys.stderr)
     else:
-        sys.exit(result.get("exit_code", 3))
+        sys.exit(3)
 
 
 if __name__ == "__main__":

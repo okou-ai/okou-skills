@@ -1,9 +1,8 @@
 # FILL or inspect a PDF form
 
-Fill existing fields, not a redesigned document. An input alone does not authorize
-restyling. This route needs Python and `pypdf`, never the cover/body browser
-pipeline. Check that input is an existing PDF first; if setup is missing, only an
-authorized `make.sh fix --only fill` installs it. No implicit installs occur.
+Fill fields without altering layout or design. An existing PDF does not authorize
+restyling. This route needs Python and `pypdf`, not the browser pipeline; do not
+make the user install Chromium for form inspection or filling.
 
 Always inspect first for exact field names, types, choices and radio values:
 
@@ -26,8 +25,6 @@ python3 "$SKILL_DIR/scripts/fill_write.py" --input form.pdf --out filled.pdf \
 | `radio` | Must match a radio value from inspection, often beginning with `/` |
 
 For read-only inspection, stop after reporting the findings; do not write a
-filled copy. For a requested fill use only the [FILL checks in VALIDATE](validate.md#fill),
-not CREATE's design/content checklist. Requested invalid/unknown fields fail
-without replacing the destination. Reopen requested stored values and inspect
-only affected widget appearances/pages (expand if evidence requires). A correct
-stored value does not establish that every reader paints its widget correctly.
+filled copy. For a requested fill, reopen the output and check stored fields and
+visible appearances using [VALIDATE](validate.md). A correct stored value alone
+does not establish that every PDF reader paints its widget correctly.

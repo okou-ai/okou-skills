@@ -26,17 +26,6 @@ Search by the **SYMPTOM** you observe, not the technical concept. Each entry fol
 - **Fix** — exact steps, commands, or code
 - **Prevention** — how to avoid it next time
 
-For read-only diagnosis use `docx_inspect.py` (stdlib, no setup). Reuse any saved
-inventory for the same unchanged input; run only the command for the observed
-symptom, not every scan in this guide. Default inventory includes at most 50 body
-elements with 160-character text previews, all style metadata/usage, section
-properties, relationships and ZIP names/sizes; it does not read media/binary parts.
-Check `body_coverage` and `text_truncated`; use `--start N --end M` or `--full` for
-needed body coverage, `--xml` only for XML detail, and `--hash-parts` only for
-byte-preservation comparisons against a saved base inventory. Choose necessary
-evidence once and reuse it at later stages. It does not validate revision/render
-semantics or layout. The CLI `analyze` is only a coarse summary, not a part inspector.
-
 **Quick search keywords:** headings wrong, body text, repair, corrupt, font, tables missing, images missing, TOC broken, update table, page break, section break, hyperlink, numbered list, bullets, margins, page size, Chinese tofu, cover page, track changes, revision marks
 
 ---
@@ -54,10 +43,11 @@ Common mismatches:
 
 Check with:
 ```bash
-# One reusable inventory per unchanged document: used_styles plus style definitions.
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory output.docx > output.inventory.json
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory template.docx > template.inventory.json
-# Compare used_styles pStyle/rStyle/tblStyle against styles[].styleId/name/basedOn.
+# List all pStyle values used in the document
+$CLI analyze --input output.docx | grep -i "pStyle"
+
+# List all styleIds defined in styles.xml
+$CLI analyze --input template.docx --part styles | grep "styleId"
 ```
 
 **Fix:** Build a styleId mapping table before applying the template. Update every `pStyle` value in the document content.
@@ -136,7 +126,7 @@ $CLI pack --input unpacked/ --output fixed.docx
 
 ```bash
 # Check for font contamination
-python3 "$SKILL_DIR/scripts/docx_inspect.py" part output.docx word/document.xml | grep -i "rFonts"
+$CLI analyze --input output.docx | grep -i "font"
 # Look for rFonts in the content — if present, they're overriding styles
 ```
 
@@ -177,10 +167,9 @@ Also strip these common direct formatting overrides:
 **Diagnosis:** Code used `body.findall('w:p')` or `body.Descendants<Paragraph>()` at the top level instead of iterating all children. This skips `w:tbl` elements.
 
 ```bash
-# Reuse full inventories if saved; otherwise request all body elements for counts.
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory source.docx --full > source.inventory.json
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory output.docx --full > output.inventory.json
-# Compare body_elements[].table_count and indexed table text; XML is optional.
+# Verify table count
+$CLI analyze --input source.docx | grep -i "table"
+$CLI analyze --input output.docx | grep -i "table"
 ```
 
 **Fix:** Use `list(body)` or `body.ChildElements` to get ALL top-level children including tables:
@@ -214,8 +203,7 @@ elements = list(body)  # all direct children
 
 ```bash
 # Check relationships
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory output.docx > output.inventory.json
-# Inspect image relationships, relationship_references and parts/target presence.
+$CLI analyze --input output.docx --part rels | grep -i "image"
 
 # Check if media files exist
 $CLI unpack --input output.docx --output unpacked/
@@ -260,7 +248,7 @@ foreach (var drawing in body.Descendants<Drawing>())
 
 ```bash
 # Check if TOC SDT exists
-python3 "$SKILL_DIR/scripts/docx_inspect.py" part output.docx word/document.xml | grep -i "sdt\|toc"
+$CLI analyze --input output.docx | grep -i "sdt\|toc"
 ```
 
 **Fix:**
@@ -312,8 +300,7 @@ body.InsertBefore(breakPara, heading1Paragraph);
 
 ```bash
 # Check hyperlink relationships
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory output.docx > output.inventory.json
-# Match hyperlink IDs per source part in relationships/relationship_references.
+$CLI analyze --input output.docx --part rels | grep -i "hyperlink"
 ```
 
 **Fix:** Merge source document's hyperlink relationships into output's rels file. Update rId references.
@@ -347,7 +334,7 @@ foreach (var hyperlink in body.Descendants<Hyperlink>())
 
 ```bash
 # Check numbering definitions
-python3 "$SKILL_DIR/scripts/docx_inspect.py" part output.docx word/numbering.xml
+$CLI analyze --input output.docx --part numbering
 ```
 
 **Fix:** Map source numIds to template numIds, or merge numbering definitions:
@@ -379,10 +366,8 @@ int maxNumId = targetNumbering.Elements<NumberingInstance>()
 
 ```bash
 # Compare section properties
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory template.docx > template.inventory.json
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory output.docx > output.inventory.json
-# Compare sections[].properties, including intermediate and final sectPr.
-# Section metadata is complete without --full/--xml; reuse saved inventories.
+$CLI analyze --input template.docx | grep -i "sectPr\|margin\|pgSz"
+$CLI analyze --input output.docx | grep -i "sectPr\|margin\|pgSz"
 ```
 
 **Fix:** Use the template's final `sectPr`. For intermediate `sectPr` elements (multi-section documents), merge carefully.
@@ -453,9 +438,8 @@ Common safe CJK fonts: 宋体 (SimSun), 黑体 (SimHei), 仿宋 (FangSong), 楷�
 
 ```bash
 # Check template structure
-python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory template.docx --full > template.inventory.json
-# Reuse this full body text for cover/TOC/declaration and replacement boundaries.
-# Only request --xml for unresolved XML-level details.
+$CLI analyze --input template.docx
+# If template has >50 paragraphs with cover/TOC/declaration, C-2 is needed
 ```
 
 **Fix:** Use Base-Replace (C-2) strategy — template is the base, only replace the example body content zone with the user's content:
@@ -465,9 +449,9 @@ python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory template.docx --full > te
 3. Insert the user's content into the body zone
 4. Keep everything else from the template (cover, declaration, abstract, TOC, sectPr)
 
-The CLI has no Base-Replace strategy flag. Follow TEMPLATE's explicit zone,
-style and relationship plan and adapt the structured-template C# authoring
-pattern; do not mistake Overlay for a Base-Replace implementation.
+```bash
+$CLI apply-template --input source.docx --template template.docx --output out.docx --strategy base-replace
+```
 
 **Prevention:** Analyze template structure FIRST. If template has structural content (cover, TOC, declaration sections), always use C-2 (Base-Replace). Read `references/operations/template.md` for detailed decision criteria.
 
@@ -481,10 +465,7 @@ pattern; do not mistake Overlay for a Base-Replace implementation.
 
 ```bash
 # Check for revision marks
-python3 "$SKILL_DIR/scripts/docx_inspect.py" part output.docx word/document.xml
-# Inspect w:ins/w:del/w:moveFrom/w:moveTo; text preview alone excludes deletions.
-python3 "$SKILL_DIR/scripts/docx_inspect.py" part output.docx word/settings.xml
-# Inspect trackChanges; accepting/removing revisions requires user authorization.
+$CLI analyze --input output.docx | grep -i "revision\|ins\|del\|track"
 ```
 
 **Fix:** Accept all revisions by flattening `w:ins` and `w:del` elements:

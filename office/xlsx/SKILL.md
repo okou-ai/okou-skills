@@ -1,63 +1,84 @@
 ---
 name: xlsx
-description: Create, read, edit, format, and validate Excel spreadsheets. Choose the requested operation first; read XLSX/XLSM/CSV/TSV directly without changing the source. For financial work apply finance semantics; layout defaults apply only to authorized new or layout work.
+description: Create, read, edit, format, and validate Excel spreadsheets. Use for XLSX files, spreadsheet formulas, tables, and financial models, budgets, forecasts, scenarios, or management reports delivered in Excel. Select both the file operation and the business scenario; financial workbooks also load the finance reference. Read CSV/TSV data without changing the source.
 license: MIT
 ---
 
 # Excel workbooks
 
-Set `SKILL_DIR` to this directory's absolute path. Start with the operation;
-load only the relevant references. User requirements, supplied templates and
-house styles take precedence over authoring defaults.
+Select **both an operation and a business scenario** before authoring. Choosing
+CREATE or EDIT does not finish scenario selection. User requirements and an
+existing template or house style take precedence over these defaults.
 
-## Choose the operation
+Set `SKILL_DIR` to the absolute directory containing this file. Read only the
+common guidance, applicable scenario, and operation needed for the task.
 
-| Request | Read | Tool path |
+## Layer 1 — Common workbook rules
+
+- Preserve the source. Read-only analysis must not save, restyle, or recalculate
+  the original. Perform edits and application checks on separate copies.
+- Use live Excel formulas for derived workbook outputs; keep source records and
+  adjustable inputs identifiable. Do not replace formulas with cached answers.
+- Preserve unrelated sheets, formulas, styles, controls, and package features.
+  A narrow edit is not permission to rebuild or redesign the workbook.
+- For new workbooks or requested formatting, read
+  [common presentation](references/common/presentation.md). For narrow edits, apply it only
+  to changed cells without overriding the supplied layout.
+- For imports, new editable inputs or authorized input changes, read
+  [source data and input contracts](references/common/data-and-inputs.md) before
+  populating cells. Keep data types, source assumptions and current narrative coherent.
+- For new reader-facing analytical reports/dashboards or authorized chart changes,
+  read [analytical charts](references/common/charts.md) during planning. Choose charts for
+  the question, not a fixed count; preserve data-only and narrow-edit scope.
+
+## Layer 2 — Business scenario
+
+| Requested work product | Read before planning the workbook |
+| --- | --- |
+| Financial model, revenue/cost budget, forecast, valuation, financial statements, scenario/sensitivity analysis, or financial management report | [Finance](references/domains/finance.md), even if the request never says "finance" |
+| Operational tracker, inventory, roster, ordinary data table, or other non-financial spreadsheet | Common presentation only; do not impose financial colors or extra model tabs |
+| One-cell update, formula repair, or template filling in an existing financial file | Preserve the existing structure and house style; use only the finance rules relevant to the requested change |
+| Read-only extraction or analysis | [Read and analyze](references/operations/read-analyze.md); do not redesign the source |
+
+For mixed workbooks, apply the finance layer to the financial model/report
+areas, not every unrelated table. Finance guidance is bundled here: do not stop
+at a generic spreadsheet route or require an external skill search to find it.
+
+Examples:
+- "Build next quarter's revenue, costs and hiring scenarios" → finance + CREATE.
+- "Make a stock-count tracker" → common presentation + CREATE, not finance.
+- "Change the tax-rate input in this workbook" → EDIT; keep its other tabs and
+  layout, rather than adding an executive-summary sheet.
+
+## Layer 3 — Operation and implementation
+
+| Operation | Read | Tools |
 | --- | --- | --- |
-| Extract/read/analyze XLSX/XLSM/CSV/TSV | [READ](references/operations/read-analyze.md) | Stdlib inventory/preview/range first; explicit `--analyze`/`--quality` only for full pandas work |
-| New workbook | [CREATE](references/operations/create.md) | Suitable installed high-level library, or raw OOXML |
-| Edit/fill/repair existing workbook | [EDIT](references/operations/edit.md) | Inspect relevant parts; scoped `xlsx_pack.py --base/--part` for small edits; directory unpack/pack remains available |
-| Authorized formatting | [Presentation](references/common/presentation.md) + EDIT for existing files | Reuse/append styles; change only intended ranges |
-| Check created/edited work | [VALIDATE](references/operations/validate.md) | One shared impact matrix: calculation, layout, structure and export only as affected |
+| Create a new XLSX | [Create](references/operations/create.md) | Prefer a suitable high-level library; raw OOXML remains available |
+| Edit, fill a template, or repair formulas | [Edit](references/operations/edit.md) | Unpack → targeted XML changes → pack |
+| Read or analyze XLSX/XLSM/CSV/TSV | [Read and analyze](references/operations/read-analyze.md) | `xlsx_reader.py`, then analysis tools as needed |
+| Apply or change formatting | [Common presentation](references/common/presentation.md) and [Edit](references/operations/edit.md) for existing files | Append/reuse styles; change only intended cells |
+| Check a created or edited workbook | [Validate](references/operations/validate.md) | Static checks, application checks, and task/scenario review |
 
-- Preserve sources and unrelated sheets, formulas, styles, controls and binary
-  parts. READ never saves, restyles, recalculates or executes macros. Application
-  and mutation tests use disposable copies; a narrow edit is not redesign permission.
-- Keep derived workbook outputs as live formulas, not substituted cached answers.
-  Missing/blank caches are unknown, not zero; values-only reads never overwrite
-  formula sources. Recheck candidate calculation after later saves/input changes.
-- New/authorized layout work uses [common presentation](references/common/presentation.md).
-  Data-only extraction does not require a theme or reader-facing report layout.
-- Imports or authored/changed editable inputs use the
-  [data/input contract](references/common/data-and-inputs.md); reuse confirmed
-  schema evidence and check affected transformations/records.
-- New reader-facing analytical reports or authorized chart changes use
-  [charts](references/common/charts.md); no fixed chart count or extra model tabs.
+For new financial work using openpyxl, read [high-level primitives](references/implementation/authoring.md)
+when choosing construction helpers. Check the calculation environment before
+substantial formula authoring, then build, view and revise inside the same attempt.
+Read [OOXML details](references/implementation/ooxml.md) only when directly changing
+package relationships, cell types, strings, or style definitions. Style indices
+are workbook-local; never copy an index from an example into an unrelated file.
 
-## Add the applicable business rules
+## Package organization
 
-- Financial models, budgets, forecasts, valuation, statements, sensitivities and
-  financial management reports use [finance](references/domains/finance.md).
-  For READ load its **financial semantics only**, not theme/fonts/spacing. New
-  reader-facing or authorized layout work also uses the relevant authoring defaults.
-- Ordinary trackers, inventories, rosters and tables do not inherit finance colors,
-  font roles, model tabs or sensitivity work. Mixed workbooks apply finance only
-  to the relevant financial areas.
-- A one-cell financial input/formula edit retains the existing structure/style;
-  apply only relevant semantics and dependency checks, not a new overview sheet.
-
-For new financial work using openpyxl, consult
-[authoring primitives](references/implementation/authoring.md) when needed. Check
-actual calculation capability once before substantial formula authoring, reuse
-explicit same-task environment evidence, and still execute each affected candidate.
-Read [OOXML details](references/implementation/ooxml.md) when directly changing
-relationships, types, strings or styles; indices are workbook-local.
+`references/common/` owns reusable data and presentation rules; `domains/` owns
+applicable business conventions; `operations/` owns the requested workflow;
+`implementation/` owns library/package details. The links above are direct entry
+points; load only applicable files. Keep `scripts/`, `templates/` and dependency
+paths unchanged when following these guides.
 
 ## Finish
 
-Use the same [impact-driven checks](references/operations/validate.md#1-select-checks-by-impact)
-at the end of CREATE/EDIT. Real calculation and affected visual checks remain
-necessary for new financial models; unrelated simple edits do not trigger driver
-mutation, Calc or whole-workbook PDF export. Report meaningful checks and limits
-honestly. A scanner exit code is not a business, preservation or visual certificate.
-Deliver only the requested files.
+Use the selected scenario's requirements while building, not as optional
+polish after the workbook is complete. Run the applicable checks in VALIDATE
+and fix discovered defects. A formula scanner's exit code is not a certificate
+of financial accuracy, presentation quality, or usability. State unavailable
+checks honestly and deliver only the files the user requested.

@@ -7,16 +7,13 @@ CREATE / FILL / REFORMAT routing. This is part of the single
 Documentation has one owner per responsibility:
 
 - [Common presentation](references/common/presentation.md): visual presets,
-  overrides and actual capability restrictions; detailed pattern descriptions and
-  aesthetic guidance are in the optional [design reference](references/common/design-reference.md).
+  tokens, typography and appearance priorities.
 - [Requirement profiles](references/domains/profiles.md): named manuscript
   requirements versus visual-only presets and Word/PDF companions.
 - [Operations](references/operations/create.md): task workflows; all operation
   and implementation guides are directly linked from `SKILL.md`.
 - [Content contract](references/implementation/content.md): supported block
-  fields and feature limits.
-- [Validation](references/operations/validate.md): the single acceptance checklist,
-  selected by operation and delivered features.
+  fields, feature limits and feature-specific QA.
 - [Environment](references/implementation/environment.md): route-specific
   dependencies and setup gates.
 

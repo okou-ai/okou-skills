@@ -1,4 +1,4 @@
-"""Exercise the router's documented readers outside the skill directory."""
+"""Exercise explicit read-only tool entry points outside the skill directory."""
 
 import hashlib
 import json
@@ -54,13 +54,14 @@ class ReadOnlyRouteTests(unittest.TestCase):
         self.assertFalse(self.marker.exists(), self.marker.read_text() if self.marker.exists() else "")
         return result.stdout
 
-    def test_docx_preview_needs_no_authoring_setup(self):
+    def test_explicit_docx_inspector_text_needs_no_authoring_setup(self):
         source = self.work / "input.docx"
         with ZipFile(source, "w") as package:
             package.writestr("[Content_Types].xml", '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>')
             package.writestr("_rels/.rels", f'<Relationships xmlns="{REL}"><Relationship Id="r1" Type="{DOCREL}/officeDocument" Target="word/document.xml"/></Relationships>')
             package.writestr("word/document.xml", '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Budget observation: 缺失不是零</w:t></w:r></w:p></w:body></w:document>')
-        output = self.run_reader(["bash", str(OFFICE / "docx/scripts/docx_preview.sh"), str(source)], source)
+        output = self.run_reader([sys.executable, str(OFFICE / "docx/scripts/docx_inspect.py"),
+                                  "text", str(source)], source)
         self.assertIn("Budget observation: 缺失不是零", output)
 
     def test_xlsx_range_needs_no_dataframe_or_calculation_engine(self):

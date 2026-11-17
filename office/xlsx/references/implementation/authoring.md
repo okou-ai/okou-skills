@@ -61,8 +61,7 @@ invalid denominator as a diagnosed model issue, not a fabricated zero result.
 Set widths for each content column and heights for wrapped explanation rows;
 allocate chart space outside the tables and notes. Apply the finance spacing
 reference rather than shrinking content into fewer sheets. Keep grid values and
-formula roles legible; adjust geometry after inspecting the affected application
-view or rendered export (actual export for printing/pagination).
+formula roles legible; adjust geometry after looking at actual exports.
 
 ## Save, calculate and inspect
 
@@ -73,8 +72,6 @@ the final file using `load_workbook(..., data_only=False)` to check formulas and
 prove native calculation. Do not save either readback just to inspect it.
 
 After Calc conversion, compare relevant formulas, features and formatting before
-selecting that file for delivery. Recalculate again after any later save or
-formula/input change. Use VALIDATE's shared impact matrix for affected visual,
-propagation and final-readback checks; application view or rendered export is
-enough for screen QA, but pagination needs export. A helper call or static PASS
-is not a finished-workbook guarantee.
+selecting that file for delivery. Recalculate again after any later library save.
+Export and inspect relevant sheets, revise defects, then check the exact final
+file again. A helper call or static PASS is not a finished-workbook guarantee.

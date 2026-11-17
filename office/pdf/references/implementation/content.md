@@ -4,7 +4,7 @@ Use for CREATE/REFORMAT content features, independently of visual preset. This i
 the single block-contract reference; [design](../common/presentation.md) owns appearance.
 Fields marked `?` are optional in the renderer, even where authoring guidance
 requests them (notably captions). Existing rendering behavior is documented below;
-[VALIDATE](../operations/validate.md) owns acceptance checks, not this schema.
+the final QA section adds agent checks, not script-enforced validation.
 
 ## Contents
 
@@ -178,6 +178,23 @@ is optional. A diagram rendering failure stops the build.
 
 ## Feature-specific rendering QA
 
-The single checklist is [VALIDATE: feature-specific rendering QA](../operations/validate.md#feature-specific-rendering-qa).
-Apply its used-feature rows during the operation's actual-page review; no separate
-content-guide pass or unrelated feature-guide reading is required.
+**Required agent acceptance checks, not existing renderer guarantees.** Render and
+inspect actual PDF page images for each used feature, alongside content/source
+comparison. Record which checks ran; proposed checks or static doc tests are not
+an executed native rendering pass. PDF text extraction alone cannot validate
+rasterized equations/charts/flowcharts. Merge success does not prove compliance.
+
+| Feature | Check in actual rendered output |
+|---|---|
+| Headings / lists / tables | Hierarchy, list resets, all rows/cells, supplied values, column widths, legibility, no clipping or stranded headings |
+| Math | Symbols and glyphs, formula correctness against supplied expression, equation label/caption visibility, no code-style fallback |
+| Charts | Categories and values match table/source, units/axes/legend, correct chart type, readable labels; no placeholder |
+| Figures / captions | Correct asset, aspect ratio, no missing-image/error text; shared numbering and caption sequence match in-text references |
+| Bibliography | All cited IDs resolve to supplied references, consistent intended style, no invented sources; inspect hanging indents and heading suppression |
+| Code | Whitespace/indentation, language label, complete visible lines, no overflow; syntax highlighting is not expected |
+| Flowcharts | All nodes/edges/labels, arrow direction and decision branches, legible back-edges, no clipping or placeholder |
+
+For strict manuscripts additionally verify the actual requested font, sizes,
+spacing, margins, title/cover treatment, pagination, and citation standard in the
+selected capable authoring route. Disclose unsupported or unverified constraints;
+do not fabricate output compliance or infer substantive expertise from a preset.

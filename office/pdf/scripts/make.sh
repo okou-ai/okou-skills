@@ -41,16 +41,17 @@ bold()   { printf '\033[1m%s\033[0m\n' "$*"; }
 dependency_options() {
   DEP_SCOPE="pipeline"
   DEP_PLOTS=true
+  DEP_EXPLICIT_SCOPE=false
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --minimal) DEP_PLOTS=false; shift ;;
       --only)
         [[ $# -ge 2 ]] || { echo "--only requires fill, body or pipeline" >&2; exit 1; }
-        DEP_SCOPE="$2"; shift 2 ;;
+        DEP_SCOPE="$2"; DEP_EXPLICIT_SCOPE=true; shift 2 ;;
       -h|--help)
         echo "Usage: make.sh check|fix [--only fill|body|pipeline] [--minimal]"
-        echo "No options: full pipeline including plots. --minimal omits matplotlib."
-        echo "--only fill: pypdf only; --only body: ReportLab (+ plots unless --minimal)."
+        echo "No options: full pipeline; missing matplotlib is warning-only. --minimal omits it."
+        echo "--only fill: pypdf only; --only body|pipeline: plots required unless --minimal."
         exit 0 ;;
       *) echo "Unknown setup option: $1" >&2; exit 1 ;;
     esac
@@ -75,6 +76,8 @@ cmd_check() {
   for package in "${DEP_PACKAGES[@]}"; do
     if "$PY" -c 'import importlib, sys; importlib.import_module(sys.argv[1])' "$package" 2>/dev/null; then
       green "  ✓ $package"
+    elif [[ "$package" == matplotlib ]] && ! $DEP_EXPLICIT_SCOPE; then
+      yellow "  ⚠ Cannot load matplotlib — required only for math/chart/flowchart blocks (run: make.sh fix)"
     else
       yellow "  ⚠ Cannot load $package"; ok=false
     fi
@@ -160,8 +163,8 @@ cmd_run() (
     echo "run requires --content content.json (use demo for sample content)" >&2
     exit 1
   fi
-  if [[ ! -f "$content_file" || "${content_file##*.}" != [Jj][Ss][Oo][Nn] ]]; then
-    echo "--content requires an existing .json file: $content_file" >&2
+  if [[ ! -f "$content_file" ]]; then
+    echo "--content requires an existing regular file: $content_file" >&2
     exit 1
   fi
   if [[ -d "$out" || "$content_file" -ef "$out" ]]; then

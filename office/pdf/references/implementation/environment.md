@@ -1,48 +1,35 @@
-# PDF environment by operation and features
+# PDF environments and stable entry points
 
-Set `SKILL_DIR` to the directory containing PDF `SKILL.md`. Use Python 3.10+
-and reuse a working environment. Importing helpers, `--help`, argument validation and non-PDF parsing
-never install packages. Runtime dependency errors are nonzero and include an
-explicit setup hint; they must not trigger silent network access or pip.
+Set `SKILL_DIR` to the directory containing the PDF `SKILL.md`, not this guide.
+Reuse a working environment and install missing dependencies only when allowed.
 
-Check input existence/type and content shape before expensive environment checks
-where practical. Select only the required path:
+For the cover/body pipeline, run
+`bash "$SKILL_DIR/scripts/make.sh" check` once per session before this pipeline's
+CREATE/REFORMAT. It verifies an actual Chromium launch. A named manuscript using
+another authoring route follows that route's setup and validation instead;
+DOCX-to-PDF does not require Chromium unless it also invokes this pipeline.
 
-| Operation/feature | Dependencies | Explicit check/setup when needed and authorized |
+When permitted, use `bash "$SKILL_DIR/scripts/make.sh" fix` in an activated Python
+virtual environment. On Linux, Chromium may also need
+`npx playwright install-deps chromium`. FILL and read-only inspection need Python
+and `pypdf`, not the browser pipeline; do not make them install Chromium.
+
+| Tool | Used by | Installation when needed and allowed |
 |---|---|---|
-| Parse `.md` / `.markdown` / `.txt` / `.json` | Python standard library | No dependency setup |
-| Inspect/fill forms, parse PDF text, merge PDFs | Python + `pypdf` | `make.sh check --only fill`; `make.sh fix --only fill` |
-| Render body without math/chart/flowchart | Python + ReportLab | `make.sh check --only body --minimal`; `make.sh fix --only body --minimal` |
-| Render body with math/chart/flowchart | Above + matplotlib | `make.sh check --only body`; `make.sh fix --only body` |
-| Full cover/body, no plot features | Above core packages + Node/Playwright/Chromium | `make.sh check --minimal`; `make.sh fix --minimal` |
-| Full cover/body with plot features | All of the above | `make.sh check`; `make.sh fix` |
+| Python 3.9+ | Python scripts | System/runtime |
+| `reportlab` | `render_body.py` | `pip install reportlab` |
+| `pypdf` | Fill, merge, reformat | `pip install pypdf` |
+| Node.js 18+ | `render_cover.js` | System/runtime |
+| `playwright` + Chromium | `render_cover.js` | `npm install -g playwright && npx playwright install chromium` |
+| `matplotlib` | Math, charts, flowcharts | `pip install matplotlib` |
 
-Invoke the table's commands through the absolute script path, for example:
+For Chinese and mixed CJK body text, the renderer looks for an embeddable
+TrueType font with the required glyphs. On Debian or Ubuntu, install
+`fonts-wqy-zenhei` as needed. macOS can use its system CJK fonts. Set
+`PDF_CJK_FONT` to an absolute path to a compatible TrueType font to use a specific
+local font. The renderer fails if the selected font cannot cover the text.
 
-```bash
-bash "$SKILL_DIR/scripts/make.sh" check --minimal
-```
-
-`fix` is the explicit installation route, only with authorization and preferably
-an activated Python virtual environment. No-option `fix` retains full setup
-including matplotlib; `--minimal` omits it. `--only fill` does not check or install
-ReportLab, matplotlib, Node or Chromium. Body rendering no longer needs `pypdf`;
-the final pipeline still needs it for merging. Plot imports are lazy per block.
-No-option `check` now requires the full selected set, including matplotlib; use
-`--minimal` when no math/chart/flowchart is used.
-
-For this cover/body route, run the selected `check` once per unchanged session;
-it includes an actual Chromium launch only for the pipeline scope. Recheck if
-the environment/features change or a failure invalidates prior evidence. A named
-manuscript or DOCX-to-PDF route uses its own setup/validation, not Chromium here.
-On Linux, Chromium may additionally need authorized OS libraries (for example,
-`npx playwright install-deps chromium`). Never send FILL through this setup.
-
-CJK/mixed-script body text needs an embeddable TrueType font covering the actual
-text. The renderer checks known Linux/macOS candidates and fails when glyphs
-cannot be covered. When authorized, Debian/Ubuntu can install `fonts-wqy-zenhei`;
-or set `PDF_CJK_FONT` to an absolute compatible TrueType path. Requested fonts and
-Google cover fonts still need actual-output verification; do not hide fallbacks.
-
-`demo` is sample material, not a finished deliverable. No new manuscript, APA/IEEE,
-OCR, lossless-layout or font-selection CLI modes are introduced.
+`make.sh demo` creates sample material, not a finished user deliverable. The
+existing `run`, `reformat`, `fill`, `check`, `fix` and `demo` entry points retain
+their installed meanings; inspect `make.sh` or relevant script help for uncertain
+flags. No manuscript/APA/IEEE/OCR engine modes are added by these guides.

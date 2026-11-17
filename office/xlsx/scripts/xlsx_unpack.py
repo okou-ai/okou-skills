@@ -52,7 +52,40 @@ def unpack(xlsx_path: str, output_dir: str, pretty: bool = False) -> None:
                 shutil.rmtree(temporary)
     print(f"Unpacked '{xlsx_path}' → '{output_dir}' ({len(infos)} members)")
     print("XML pretty-print enabled: all XML may change." if pretty else "Original part bytes retained (no XML reserialization).")
-    print("Resolve tab names through workbook relationships; review high-risk parts and structural dependencies.")
+
+    categories = {
+        "Package root": ["[Content_Types].xml", "_rels/.rels"],
+        "Workbook": ["xl/workbook.xml", "xl/_rels/workbook.xml.rels"],
+        "Styles & Strings": ["xl/styles.xml", "xl/sharedStrings.xml"],
+        "Worksheets": sorted(info.filename for info in infos
+                             if info.filename.startswith("xl/worksheets/")
+                             and info.filename.endswith(".xml")),
+    }
+    print("\nKey files to inspect/edit:")
+    for category, files in categories.items():
+        if not files:
+            continue
+        print(f"\n  [{category}]")
+        for name in files:
+            path = target / name
+            if path.is_file():
+                print(f"    {name}  ({path.stat().st_size:,} bytes)")
+            else:
+                print(f"    {name}  (not found)")
+
+    risky = {
+        "xl/vbaProject.bin": "VBA macros — DO NOT modify",
+        "xl/pivotTables": "Pivot tables — update source ranges carefully if shifting rows",
+        "xl/charts": "Charts — update data ranges if shifting rows",
+    }
+    print("\n  [High-risk content detected:]")
+    found_any = False
+    for name, warning in risky.items():
+        if (target / name).exists():
+            print(f"    ⚠️  {name} — {warning}")
+            found_any = True
+    if not found_any:
+        print("    ✓ None (safe to edit)")
 
 
 def main() -> None:

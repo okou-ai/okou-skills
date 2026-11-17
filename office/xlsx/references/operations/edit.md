@@ -8,35 +8,20 @@ just to perform a narrow edit.
 ## 1. Inspect and identify the change
 
 ```bash
-python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --inventory --json
-python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --sheet Sales --range B3:D8 --json
+python3 "$SKILL_DIR/scripts/xlsx_unpack.py" input.xlsx /tmp/xlsx_work
 ```
 
-Start with metadata and the relevant cells, not a full workbook analysis or
-unpack. Resolve named tabs through workbook relationships (including the root
-workbook relationship); `sheet1.xml` need not be the first named tab. Locate a
+Use a fresh working directory. Resolve sheet names through `workbook.xml` and
+its relationships; do not assume `sheet1.xml` is the first named tab. Locate a
 target row by its label, not an unverified row number. Identify formulas,
 styles, shared/inline strings, named ranges, merged cells, controls, data
 validation, conditional formatting, tables, charts and external dependencies
 that may be affected.
 
-Use targeted XML edits rather than a default general-library load/save round-trip
-for feature-rich files: that can discard unsupported parts. For small edits,
-extract only the identified part(s), edit them, then use `xlsx_pack.py --base/--part`
-below. Unchanged local ZIP records, content and member metadata are copied without
-XML reserialization; central-directory offsets necessarily change. Changed XML
-and invalidated digital signatures still need review. Preserve XLSM file type/VBA;
-never execute macros as part of inspection.
-
-For broader changes the old directory workflow remains available:
-
-```bash
-python3 "$SKILL_DIR/scripts/xlsx_unpack.py" input.xlsx /tmp/new-xlsx-work
-```
-
-Use a new directory; existing targets are refused, not deleted. Default unpacking
-retains raw part bytes. `--pretty` is an explicit readability transform that may
-change every XML/rels part; do not use it as the small-edit preservation path.
+Use targeted XML edits rather than a general library load/save round-trip for
+feature-rich files. Such a round-trip can discard unsupported parts. Unpacking
+may reserialize XML, so do not promise byte-identical XML or zero format loss;
+verify the content/features actually preserved.
 
 ## 2. Make the smallest correct edit
 
@@ -101,31 +86,15 @@ Use a fallback only when its meaning is appropriate and documented.
 After changing a formula, clear stale cached results and recheck its entire
 dependent/shared range. Preserve valid formulas elsewhere.
 
-## 5. Package only the change, then check by impact
-
-For a small edit, first copy the selected original XML part to a temporary file
-using ZIP read APIs (the part name must come from verified relationships), edit
-that copy, and replace just the coupled parts:
+## 5. Pack and verify preservation
 
 ```bash
-python3 "$SKILL_DIR/scripts/xlsx_pack.py" --base input.xlsx \
-  --part xl/worksheets/sales.xml=/tmp/sales-edited.xml output.xlsx
-# Repeat --part for required sharedStrings/styles/relationship changes.
-# Legacy broader-directory mode:
-python3 "$SKILL_DIR/scripts/xlsx_pack.py" /tmp/new-xlsx-work output-from-directory.xlsx
+python3 "$SKILL_DIR/scripts/xlsx_pack.py" /tmp/xlsx_work output.xlsx
+python3 "$SKILL_DIR/scripts/formula_check.py" output.xlsx
 ```
 
-`--part` replaces existing XML/rels members only; it is not an insert/delete helper
-or dependency repairer. Both pack modes refuse existing outputs, source traversal,
-symlinks and duplicate/unsafe member paths. Validate replacements before publishing;
-malformed XML never overwrites a target. Directory mode validates all XML but cannot
-recover original ZIP metadata; scoped mode retains untouched member records.
-
-Use the shared [VALIDATE impact matrix](validate.md#1-select-checks-by-impact), not
-an automatic recalc/mutation/export sequence. Verify exact changed values/types,
-related dependencies and untouched features against the source. Formula/model-input
-changes need actual fresh calculation and final formula/cache readback; a verified
-independent nonformula edit does not. Layout impact needs the affected actual view
-**or** export; pagination needs export. Structural changes still require section 3's
-full affected-dependency review. Resolve unintended changes before delivery; a
-successful pack or a clean cached-error scan alone is not preservation proof.
+Use VALIDATE for application checks and recalculation on disposable copies.
+Compare the output's sheet inventory, relevant original records, formulas,
+styles and high-risk parts with the source. Check each requested change and
+its dependents; investigate unintended changes before delivery. A successful
+pack or a clean cached-error scan alone is not proof of preservation.

@@ -1,4 +1,4 @@
-"""Stdlib fixtures exercise the documented text/inventory/part CLI, without .NET."""
+"""Stdlib fixtures exercise the explicit stored-OOXML inspector CLI, without .NET."""
 from collections import Counter
 import hashlib
 import importlib.util
@@ -6,7 +6,6 @@ import io
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -251,14 +250,11 @@ class InspectTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertNotIn("Traceback", result.stderr)
 
-    @unittest.skipIf(os.name == "nt" or not shutil.which("bash"), "requires POSIX bash")
-    def test_preview_needs_only_python_not_dotnet_pandoc_or_unzip(self):
+    def test_explicit_inspector_text_needs_no_dotnet_pandoc_or_unzip(self):
         commands = self.root / "commands"
         commands.mkdir()
-        for name, executable in (("python3", sys.executable), ("dirname", shutil.which("dirname"))):
-            (commands / name).symlink_to(executable)
-        result = subprocess.run([shutil.which("bash"), str(SCRIPTS / "docx_preview.sh"), str(self.source)],
-                                env={"PATH": str(commands), "LANG": "C.UTF-8"},
+        result = subprocess.run([sys.executable, str(SCRIPT), "text", str(self.source)],
+                                env={**os.environ, "PATH": str(commands), "LANG": "C.UTF-8"},
                                 capture_output=True, text=True, encoding="utf-8", timeout=15)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Line 159", result.stdout)

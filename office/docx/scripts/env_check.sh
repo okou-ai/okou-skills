@@ -2,13 +2,14 @@
 # docx Quick Environment Check
 # Cross-platform: macOS, Linux, WSL, Git Bash
 # Check the selected CLI path only; stdlib text/inventory needs no .NET check.
-# Runtime is sufficient for a prebuilt CLI. --build explicitly checks/builds it.
+# Runtime is sufficient for a prebuilt CLI; a missing CLI falls back to SDK restore/build.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DOTNET_DIR="$SCRIPT_DIR/dotnet"
 CLI_PROJECT="$DOTNET_DIR/Docx.Cli/Docx.Cli.csproj"
+CLI_DLL="$DOTNET_DIR/Docx.Cli/bin/Debug/net8.0/Docx.Cli.dll"
 
 WITH_RENDERING=false
 BUILD=false
@@ -18,8 +19,8 @@ for arg in "$@"; do
         --with-rendering) WITH_RENDERING=true ;;
         --help|-h)
             echo "Usage: env_check.sh [--build] [--with-rendering]"
-            echo "  default           Check .NET 8 runtime and prebuilt CLI; never restore/build"
-            echo "  --build           Require compatible SDK; restore/build only if CLI is missing"
+            echo "  default           Check .NET 8 runtime; restore/build a missing CLI with a compatible SDK"
+            echo "  --build           Require compatible SDK even for an already built CLI"
             echo "  --with-rendering  Also probe Writer (standalone, no receipt reuse)"
             exit 0
             ;;
@@ -48,36 +49,41 @@ case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*) OS="windows-shell" ;;
 esac
 
-# --- Build requires SDK; executing a prebuilt CLI only requires runtime ---
+# --- A missing CLI requires SDK; checking a prebuilt CLI only requires runtime ---
 source "$SCRIPT_DIR/dotnet_env.sh"
 MODE=runtime
-$BUILD && MODE=sdk
+if $BUILD || [ ! -f "$CLI_DLL" ]; then
+    MODE=sdk
+fi
 if ! docx_use_dotnet "$MODE"; then
-    if ! $BUILD; then
+    if [ "$MODE" = runtime ]; then
         printf "[FAIL]    %-14s .NET 8 runtime not found\n" "dotnet"
         echo "  Reuse an installed runtime or provision dependencies explicitly: $SETUP_COMMAND"
         STATUS="NOT READY"
     else
-    printf "[FAIL]    %-14s compatible SDK and .NET 8 runtime not found\n" "dotnet"
-    echo ""
-    echo "  .NET SDK is REQUIRED. Install it:"
-    case "$OS" in
-        macos)   echo "    brew install --cask dotnet-sdk" ;;
-        linux|wsl)
-            echo "    # Option 1: Microsoft install script"
-            echo "    wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh"
-            echo "    chmod +x /tmp/dotnet-install.sh && /tmp/dotnet-install.sh --channel 8.0"
-            echo "    # Option 2 (Ubuntu/Debian): sudo apt-get install -y dotnet-sdk-8.0"
-            ;;
-        windows-shell) echo "    winget install Microsoft.DotNet.SDK.8" ;;
-        *) echo "    https://dotnet.microsoft.com/download" ;;
-    esac
-    echo ""
-    echo "  Or run setup: $SETUP_COMMAND"
-    echo ""
-    STATUS="NOT READY"
+        printf "[FAIL]    %-14s compatible SDK and .NET 8 runtime not found\n" "dotnet"
+        if [ ! -f "$CLI_DLL" ]; then
+            echo "  DOCX CLI is missing; a compatible SDK is required to restore/build it."
+        fi
+        echo ""
+        echo "  .NET SDK is REQUIRED. Install it:"
+        case "$OS" in
+            macos)   echo "    brew install --cask dotnet-sdk" ;;
+            linux|wsl)
+                echo "    # Option 1: Microsoft install script"
+                echo "    wget https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh"
+                echo "    chmod +x /tmp/dotnet-install.sh && /tmp/dotnet-install.sh --channel 8.0"
+                echo "    # Option 2 (Ubuntu/Debian): sudo apt-get install -y dotnet-sdk-8.0"
+                ;;
+            windows-shell) echo "    winget install Microsoft.DotNet.SDK.8" ;;
+            *) echo "    https://dotnet.microsoft.com/download" ;;
+        esac
+        echo ""
+        echo "  Or run setup: $SETUP_COMMAND"
+        echo ""
+        STATUS="NOT READY"
     fi
-elif ! $BUILD; then
+elif [ "$MODE" = runtime ]; then
     printf "[OK]      %-14s .NET 8 runtime (%s)\n" "dotnet" "$DOCX_DOTNET"
 else
     local_ver=$(dotnet --version 2>/dev/null || echo "0.0.0")
@@ -94,13 +100,10 @@ fi
 if [ "$STATUS" != "READY" ]; then
     printf "[FAIL]    %-14s skipped (no compatible %s selected)\n" "project" "$MODE"
 elif [ -d "$DOTNET_DIR" ]; then
-    if [ -f "$DOTNET_DIR/Docx.Cli/bin/Debug/net8.0/Docx.Cli.dll" ]; then
+    if [ -f "$CLI_DLL" ]; then
         printf "[OK]      %-14s built\n" "project"
-    elif ! $BUILD; then
-        printf "[FAIL]    %-14s prebuilt CLI missing; use env_check.sh --build with an SDK\n" "project"
-        STATUS="NOT READY"
     else
-        # Explicit build path only; never restore for a runtime operation.
+        # Preserve the default restore/build fallback after selecting a compatible SDK.
         if dotnet restore "$CLI_PROJECT" --verbosity quiet; then
             printf "[OK]      %-14s packages restored\n" "nuget"
             if dotnet build "$CLI_PROJECT" --verbosity quiet --no-restore; then
@@ -123,6 +126,20 @@ elif [ -d "$DOTNET_DIR" ]; then
 else
     printf "[FAIL]    %-14s directory not found: %s\n" "project" "$DOTNET_DIR"
     STATUS="NOT READY"
+fi
+
+# --- Optional: pandoc ---
+if command -v pandoc &>/dev/null; then
+    pandoc_ver=$(pandoc --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || echo "?")
+    printf "[OK]      %-14s %s (content preview)\n" "pandoc" "$pandoc_ver"
+else
+    printf "[WARN]    %-14s not found — docx_preview.sh will use fallback\n" "pandoc"
+    WARNINGS=$((WARNINGS + 1))
+    case "$OS" in
+        macos)        echo "           Install: brew install pandoc" ;;
+        linux|wsl)    echo "           Install: sudo apt-get install pandoc  # or dnf/pacman" ;;
+        windows-shell) echo "           Install: winget install JohnMacFarlane.Pandoc" ;;
+    esac
 fi
 
 # --- Opt-in: LibreOffice Writer / DOCX rendering ---

@@ -197,7 +197,7 @@ def parse_pdf(pdf_path: str) -> list:
     Best-effort: detects headings by font size heuristics if available,
     otherwise falls back to paragraph splitting.
     """
-    require_file(pdf_path, (".pdf",))
+    require_file(pdf_path)
     reader = require_dependency("pypdf").PdfReader(pdf_path)
     all_text = []
 
