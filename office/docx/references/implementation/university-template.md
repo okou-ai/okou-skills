@@ -49,13 +49,18 @@ Some templates define custom styles with Chinese names:
 ### How to Identify Which Pattern
 
 ```bash
-# Extract all styleIds from the template
-$CLI analyze --input template.docx --styles-only
-
-# Or manually:
-# unzip template.docx word/styles.xml
-# Search for w:styleId= in the extracted file
+# Reuse TEMPLATE's saved inventory if available; otherwise inspect once (no SDK).
+python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory template.docx > template.inventory.json
+# Read styles[].styleId/name/type/basedOn and used_styles from this file.
 ```
+
+Style metadata is complete even in the concise default inventory; no `--full`,
+`--xml` or media hashing is needed just to identify numeric style IDs. Reuse the
+same inventory for style mapping. For structural zone selection, choose `--full`
+up front (or a known `--start N --end M` range); default body previews cover only
+50 elements / 160 characters each, explicitly marked in `body_coverage` and
+`text_truncated`. Request `--xml` only for definition/property details and
+`--hash-parts` only on a base/output pair needed for byte-preservation checks.
 
 Look at the first few styleIds. If you see `1`, `2`, `3`, `a`, `a0` → Pattern A.
 If you see `Heading1`, `Normal` → Pattern B.

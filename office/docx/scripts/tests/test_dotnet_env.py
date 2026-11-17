@@ -107,16 +107,23 @@ esac
                 link = self.bin / "dotnet"
                 link.unlink(missing_ok=True)
                 link.symlink_to(other)
-                result = self.run_script("env_check.sh")
+                result = self.run_script("env_check.sh", "--build")
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn(f"{selected.parent}|--version", self.log.read_text())
 
-    def test_runtime_only_can_run_built_cli_but_is_not_sdk_ready(self):
+    def test_runtime_only_can_run_and_check_built_cli_but_not_build(self):
         host = self.sdk(runtime_only=True)
         result = self.run_script("docx.sh", "--help")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn(f"ROOT={host.parent}", result.stdout)
+        self.log.unlink()
         check = self.run_script("env_check.sh")
+        self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+        self.assertIn(".NET 8 runtime", check.stdout)
+        self.assertNotIn("--list-sdks", self.log.read_text())
+        self.assertNotIn("--version", self.log.read_text())
+        self.assertNotIn("restore", self.log.read_text())
+        check = self.run_script("env_check.sh", "--build")
         self.assertEqual(check.returncode, 1)
         self.assertIn("compatible SDK and .NET 8 runtime not found", check.stdout)
         self.assertFalse(self.installer_log.exists())
@@ -173,7 +180,7 @@ fi
 
     def test_environment_check_uses_same_sdk_discovery(self):
         self.sdk()
-        result = self.run_script("env_check.sh")
+        result = self.run_script("env_check.sh", "--build")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("8.0.428 (>= 8.0)", result.stdout)
         self.assertIn("Status: READY", result.stdout)
@@ -181,11 +188,30 @@ fi
 
     def test_missing_sdk_does_not_attempt_restore(self):
         self.dll.unlink()
-        result = self.run_script("env_check.sh")
+        result = self.run_script("env_check.sh", "--build")
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("skipped (no compatible SDK selected)", result.stdout)
+        self.assertIn("skipped (no compatible sdk selected)", result.stdout)
         self.assertNotIn("command not found", result.stderr)
         self.assertFalse(self.log.exists())
+        self.assertFalse(self.installer_log.exists())
+
+    def test_runtime_check_never_restores_even_with_sdk_and_missing_cli(self):
+        self.sdk()
+        self.dll.unlink()
+        result = self.run_script("env_check.sh")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("prebuilt CLI missing", result.stdout)
+        self.assertNotIn("restore", self.log.read_text())
+        self.assertNotIn("build", self.log.read_text())
+        self.assertFalse(self.installer_log.exists())
+
+    def test_explicit_build_can_restore_and_build_missing_cli(self):
+        self.sdk()
+        self.dll.unlink()
+        result = self.run_script("env_check.sh", "--build")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("restore ", self.log.read_text())
+        self.assertIn("build ", self.log.read_text())
         self.assertFalse(self.installer_log.exists())
 
     def test_setup_reuses_sdk_and_leaves_shell_profile_unchanged(self):

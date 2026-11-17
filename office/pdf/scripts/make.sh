@@ -3,8 +3,8 @@
 # Usage: bash make.sh <command> [options]
 #
 # Commands:
-#   check                          Verify all dependencies
-#   fix                            Auto-install missing dependencies
+#   check [--minimal] [--only fill|body|pipeline]  Check selected dependencies
+#   fix   [--minimal] [--only fill|body|pipeline]  Explicitly install selected deps
 #   run   --title T --type TYPE    Full pipeline → output.pdf
 #         --out FILE               Output path (default: output.pdf)
 #         --author A --date D
@@ -37,102 +37,91 @@ green()  { printf '\033[0;32m%s\033[0m\n' "$*"; }
 yellow() { printf '\033[0;33m%s\033[0m\n' "$*"; }
 bold()   { printf '\033[1m%s\033[0m\n' "$*"; }
 
-# ── check ──────────────────────────────────────────────────────────────────────
+# check/fix are explicit, feature-scoped setup commands, never implicit in run/fill.
+dependency_options() {
+  DEP_SCOPE="pipeline"
+  DEP_PLOTS=true
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --minimal) DEP_PLOTS=false; shift ;;
+      --only)
+        [[ $# -ge 2 ]] || { echo "--only requires fill, body or pipeline" >&2; exit 1; }
+        DEP_SCOPE="$2"; shift 2 ;;
+      -h|--help)
+        echo "Usage: make.sh check|fix [--only fill|body|pipeline] [--minimal]"
+        echo "No options: full pipeline including plots. --minimal omits matplotlib."
+        echo "--only fill: pypdf only; --only body: ReportLab (+ plots unless --minimal)."
+        exit 0 ;;
+      *) echo "Unknown setup option: $1" >&2; exit 1 ;;
+    esac
+  done
+  DEP_PACKAGES=()
+  case "$DEP_SCOPE" in
+    fill) DEP_PACKAGES=(pypdf); DEP_PLOTS=false ;;
+    body) DEP_PACKAGES=(reportlab) ;;
+    pipeline) DEP_PACKAGES=(reportlab pypdf) ;;
+    *) echo "Unsupported dependency scope: $DEP_SCOPE" >&2; exit 1 ;;
+  esac
+  if $DEP_PLOTS; then DEP_PACKAGES+=(matplotlib); fi
+}
+
 cmd_check() {
-  local ok=true
-  bold "Checking dependencies..."
-
-  # Python
-  if command -v python3 &>/dev/null; then
-    green "  ✓ python3 $(python3 --version 2>&1 | awk '{print $2}')"
-  else
-    red   "  ✗ python3 not found"
-    ok=false
+  dependency_options "$@"
+  local ok=true package
+  bold "Checking $DEP_SCOPE dependencies..."
+  if ! command -v "$PY" &>/dev/null; then
+    red "  ✗ python3 not found"; exit 2
   fi
-
-  # reportlab
-  if python3 -c "import reportlab" 2>/dev/null; then
-    green "  ✓ reportlab"
-  else
-    yellow "  ⚠ reportlab not installed  (run: make.sh fix)"
-    ok=false
+  for package in "${DEP_PACKAGES[@]}"; do
+    if "$PY" -c 'import importlib, sys; importlib.import_module(sys.argv[1])' "$package" 2>/dev/null; then
+      green "  ✓ $package"
+    else
+      yellow "  ⚠ Cannot load $package"; ok=false
+    fi
+  done
+  if [[ "$DEP_SCOPE" == pipeline ]]; then
+    if command -v "$NODE" &>/dev/null && "$NODE" "$SCRIPTS/render_cover.js" --check; then
+      green "  ✓ playwright + working Chromium"
+    else
+      yellow "  ⚠ Cover renderer unavailable"; ok=false
+    fi
   fi
-
-  # pypdf
-  if python3 -c "import pypdf" 2>/dev/null; then
-    green "  ✓ pypdf"
-  else
-    yellow "  ⚠ pypdf not installed  (run: make.sh fix)"
-    ok=false
-  fi
-
-  # Node.js
-  if command -v node &>/dev/null; then
-    green "  ✓ node $(node --version)"
-  else
-    red   "  ✗ node not found — cover rendering unavailable"
-    ok=false
-  fi
-
-  # Playwright
-  if node "$SCRIPTS/render_cover.js" --check; then
-    green "  ✓ playwright + working Chromium"
-  else
-    yellow "  ⚠ playwright not found  (run: make.sh fix)"
-    ok=false
-  fi
-
-  # matplotlib is required only for math/chart/flowchart.
-  if python3 -c "import matplotlib" 2>/dev/null; then
-    green "  ✓ matplotlib (math, chart, flowchart blocks enabled)"
-  else
-    yellow "  ⚠ matplotlib not installed — required for math/chart/flowchart blocks (run: make.sh fix)"
-  fi
-
   if $ok; then
-    green "\nAll dependencies satisfied."
-    exit 0
+    green "Selected dependencies satisfied."
   else
-    yellow "\nSome dependencies missing. Run: bash make.sh fix"
+    yellow "Missing dependencies. If installation is authorized, use make.sh fix with the same options."
     exit 2
   fi
 }
 
-# ── fix ────────────────────────────────────────────────────────────────────────
 cmd_fix() {
-  bold "Installing missing dependencies..."
-  local rc=0
-
-  # Python packages
-  if command -v python3 &>/dev/null; then
-    if python3 -c "import reportlab, pypdf, matplotlib" 2>/dev/null ||
-       python3 -m pip install -q reportlab pypdf matplotlib; then
-      green "  ✓ Python packages available (reportlab, pypdf, matplotlib)"
-    else
-      yellow "  pip install failed — use an activated virtual environment"
-      rc=3
+  dependency_options "$@"
+  bold "Installing missing $DEP_SCOPE dependencies (explicit setup)..."
+  local rc=0 package
+  local missing=()
+  if command -v "$PY" &>/dev/null; then
+    for package in "${DEP_PACKAGES[@]}"; do
+      "$PY" -c 'import importlib, sys; importlib.import_module(sys.argv[1])' "$package" 2>/dev/null || missing+=("$package")
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+      "$PY" -m pip install -q "${missing[@]}" || { yellow "pip failed — use an activated virtual environment"; rc=3; }
     fi
   else
-    red "  python3 not found"
-    rc=2
+    red "python3 not found"; rc=2
   fi
-
-  # Playwright
-  if command -v npm &>/dev/null; then
-    npm install -g playwright && \
-    npx --no-install playwright install chromium && \
-    node "$SCRIPTS/render_cover.js" --check && \
-    green "  ✓ Playwright + Chromium installed" || \
-    { yellow "  playwright install failed — try manually"; rc=3; }
-  else
-    yellow "  npm not found — cannot install Playwright automatically"
-    rc=2
+  if [[ "$DEP_SCOPE" == pipeline ]]; then
+    if command -v "$NODE" &>/dev/null && "$NODE" "$SCRIPTS/render_cover.js" --check >/dev/null 2>&1; then
+      green "  ✓ Reusing working cover renderer"
+    elif command -v npm &>/dev/null; then
+      npm install -g playwright && \
+      npx --no-install playwright install chromium && \
+      "$NODE" "$SCRIPTS/render_cover.js" --check || { yellow "Playwright setup failed"; rc=3; }
+    else
+      yellow "npm not found — cannot install Playwright"; rc=2
+    fi
   fi
-
-  if [[ $rc -eq 0 ]]; then
-    green "\nAll dependencies installed. Run: bash make.sh check"
-  fi
-  exit $rc
+  if [[ $rc -eq 0 ]]; then green "Selected dependencies available. Verify with make.sh check and the same options."; fi
+  return "$rc"
 }
 
 # ── run ────────────────────────────────────────────────────────────────────────
@@ -148,8 +137,9 @@ cmd_run() (
   local cover_bg=""
   local content_file=""
   local out="output.pdf"
-  # Parse options
+  # Parse/validate arguments before checking any rendering dependencies.
   while [[ $# -gt 0 ]]; do
+    [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
     case "$1" in
       --title)        title="$2";        shift 2 ;;
       --type)         type="$2";         shift 2 ;;
@@ -168,6 +158,14 @@ cmd_run() (
 
   if [[ -z "$content_file" ]]; then
     echo "run requires --content content.json (use demo for sample content)" >&2
+    exit 1
+  fi
+  if [[ ! -f "$content_file" || "${content_file##*.}" != [Jj][Ss][Oo][Nn] ]]; then
+    echo "--content requires an existing .json file: $content_file" >&2
+    exit 1
+  fi
+  if [[ -d "$out" || "$content_file" -ef "$out" ]]; then
+    echo "Output must be a file distinct from the content source: $out" >&2
     exit 1
   fi
   local workdir
@@ -255,6 +253,7 @@ cmd_fill() {
   local input="" out="" values="" data_file="" inspect_only=false
 
   while [[ $# -gt 0 ]]; do
+    [[ "$1" == --inspect || $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
     case "$1" in
       --input)   input="$2";     shift 2 ;;
       --out)     out="$2";       shift 2 ;;
@@ -278,21 +277,20 @@ cmd_fill() {
 
   bold "Filling form: $input → $out"
 
-  local val_args=""
-  if [[ -n "$values" ]];    then val_args="--values $values"; fi
-  if [[ -n "$data_file" ]]; then val_args="--data $data_file"; fi
+  local val_args=()
+  if [[ -n "$values" ]];    then val_args+=(--values "$values"); fi
+  if [[ -n "$data_file" ]]; then val_args+=(--data "$data_file"); fi
 
-  $PY "$SCRIPTS/fill_write.py" --input "$input" --out "$out" $val_args
+  $PY "$SCRIPTS/fill_write.py" --input "$input" --out "$out" "${val_args[@]}"
 }
 
 # ── reformat ───────────────────────────────────────────────────────────────────
-cmd_reformat() {
+cmd_reformat() (
   local input="" title="Reformatted Document" type="general"
   local author="" date="" out="output.pdf" subtitle=""
-  local tmpdir
-  tmpdir="$(mktemp -d)"
 
   while [[ $# -gt 0 ]]; do
+    [[ $# -ge 2 ]] || { echo "Missing value for $1" >&2; exit 1; }
     case "$1" in
       --input)    input="$2";    shift 2 ;;
       --title)    title="$2";    shift 2 ;;
@@ -310,6 +308,15 @@ cmd_reformat() {
     exit 1
   fi
 
+  if [[ ! -f "$input" ]]; then echo "Input is not a regular file: $input" >&2; exit 1; fi
+  if [[ -d "$out" || "$input" -ef "$out" ]]; then
+    echo "Output must be a file distinct from the source: $out" >&2
+    exit 1
+  fi
+  local tmpdir
+  tmpdir="$(mktemp -d)"
+  trap 'rm -rf -- "$tmpdir"' EXIT
+
   bold "Parsing: $input"
   $PY "$SCRIPTS/reformat_parse.py" --input "$input" --out "$tmpdir/content.json"
   green "  ✓ Parsed to content.json"
@@ -325,8 +332,7 @@ cmd_reformat() {
     --out "$out" \
     "${sub_args[@]+"${sub_args[@]}"}"
 
-  rm -rf "$tmpdir"
-}
+)
 
 # ── demo ──────────────────────────────────────────────────────────────────────
 cmd_demo() {
@@ -454,14 +460,15 @@ JSON
 
 # ── dispatch ───────────────────────────────────────────────────────────────────
 main() {
-  if [[ $# -lt 1 ]]; then
+  if [[ $# -lt 1 || "$1" == --help || "$1" == -h ]]; then
     bold "pdf — make.sh"
     echo ""
     echo "Usage: bash make.sh <command> [options]"
     echo ""
     echo "Commands:"
-    echo "  check                             Verify all dependencies"
-    echo "  fix                               Auto-install missing deps"
+    echo "  check [--minimal] [--only SCOPE]   Check selected dependencies"
+    echo "  fix   [--minimal] [--only SCOPE]   Explicit dependency installation"
+    echo "         SCOPE: fill | body | pipeline (default); --minimal omits plots"
     echo "  run    --title T --type TYPE      CREATE: full pipeline → PDF"
     echo "         [--author A] [--date D] [--subtitle S]"
     echo "         [--abstract A] [--cover-image URL]"
@@ -474,8 +481,8 @@ main() {
   fi
 
   case "$1" in
-    check)    cmd_check ;;
-    fix)      cmd_fix   ;;
+    check)    shift; cmd_check "$@" ;;
+    fix)      shift; cmd_fix   "$@" ;;
     run)      shift; cmd_run      "$@" ;;
     fill)     shift; cmd_fill     "$@" ;;
     reformat) shift; cmd_reformat "$@" ;;

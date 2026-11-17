@@ -1,87 +1,66 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-"""
-xlsx_pack.py — Pack a working directory back into a valid xlsx file.
+"""Pack a directory, or replace only named XML parts in a source-preserving copy.
 
-Usage:
-    python3 xlsx_pack.py <source_dir> <output.xlsx>
-
-Requirements:
-    - source_dir must contain [Content_Types].xml at its root
-    - All XML files are re-validated for well-formedness before packing
-
-The resulting xlsx is a valid ZIP archive with correct OOXML structure.
+Legacy: xlsx_pack.py SOURCE_DIR OUTPUT.xlsx
+Scoped: xlsx_pack.py --base INPUT.xlsx --part xl/worksheets/sales.xml=edited.xml OUTPUT.xlsx
+Outputs must be new paths. XML well-formedness is not full OOXML validation.
 """
 
+import argparse
 import sys
-import os
 import zipfile
+from pathlib import Path
 import xml.etree.ElementTree as ET
+from xlsx_package import pack_directory, replace_parts, source_files
 
 
 def validate_xml_files(source_dir: str) -> list[str]:
-    """Return list of XML files that fail to parse."""
+    """Legacy helper: return XML parse failures, without changing any source."""
     bad = []
-    for dirpath, _, filenames in os.walk(source_dir):
-        for fname in filenames:
-            if fname.endswith(".xml") or fname.endswith(".rels"):
-                fpath = os.path.join(dirpath, fname)
-                try:
-                    ET.parse(fpath)
-                except ET.ParseError as e:
-                    rel = os.path.relpath(fpath, source_dir)
-                    bad.append(f"{rel}: {e}")
+    for path, name in source_files(Path(source_dir)):
+        if name.endswith((".xml", ".rels")):
+            try:
+                ET.parse(path)
+            except ET.ParseError as exc:
+                bad.append(f"{name}: {exc}")
     return bad
 
 
 def pack(source_dir: str, xlsx_path: str) -> None:
-    if not os.path.isdir(source_dir):
-        print(f"ERROR: Directory not found: {source_dir}", file=sys.stderr)
+    count = pack_directory(source_dir, xlsx_path)
+    print(f"Packed {count} files → '{xlsx_path}'")
+    print("XML is well-formed. Continue with the impact-driven checks in VALIDATE.")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("paths", nargs="+", help="SOURCE_DIR OUTPUT, or OUTPUT with --base")
+    parser.add_argument("--base", help="Existing XLSX/XLSM; never modified")
+    parser.add_argument("--part", action="append", default=[], metavar="MEMBER=FILE",
+                        help="Existing XML/rels part to replace (repeat for coupled changes)")
+    args = parser.parse_args()
+    try:
+        if args.base:
+            if len(args.paths) != 1:
+                parser.error("--base expects exactly one output path")
+            replacements = {}
+            for value in args.part:
+                name, separator, filename = value.partition("=")
+                if not separator or not filename or name in replacements:
+                    raise ValueError("Each --part must be a distinct MEMBER=FILE")
+                replacements[name] = filename
+            replace_parts(args.base, replacements, args.paths[0])
+            print(f"Replaced {len(replacements)} part(s) → '{args.paths[0]}'")
+            print("Unchanged ZIP member records preserved. Review dependencies and VALIDATE checks.")
+        else:
+            if len(args.paths) != 2 or args.part:
+                parser.error("Directory mode expects SOURCE_DIR OUTPUT and no --part")
+            pack(*args.paths)
+    except (OSError, ValueError, ET.ParseError, zipfile.BadZipFile) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
         sys.exit(1)
-
-    content_types = os.path.join(source_dir, "[Content_Types].xml")
-    if not os.path.isfile(content_types):
-        print(
-            f"ERROR: Missing [Content_Types].xml in {source_dir}\n"
-            "  This file is required at the root of every valid xlsx package.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    # Validate XML well-formedness before packing
-    print("Validating XML files...")
-    bad_files = validate_xml_files(source_dir)
-    if bad_files:
-        print("ERROR: The following files have XML parse errors:", file=sys.stderr)
-        for b in bad_files:
-            print(f"  {b}", file=sys.stderr)
-        print(
-            "\nFix all XML errors before packing. "
-            "A malformed xlsx cannot be opened by Excel or LibreOffice.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    print("✓ All XML files are well-formed")
-
-    # Count files to pack
-    file_count = sum(len(files) for _, _, files in os.walk(source_dir))
-
-    with zipfile.ZipFile(xlsx_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
-        for dirpath, _, filenames in os.walk(source_dir):
-            for fname in filenames:
-                fpath = os.path.join(dirpath, fname)
-                arcname = os.path.relpath(fpath, source_dir)
-                z.write(fpath, arcname)
-
-    size = os.path.getsize(xlsx_path)
-    print(f"Packed {file_count} files → '{xlsx_path}' ({size:,} bytes)")
-    print("\nNext step: run formula_check.py to validate formulas:")
-    print(f"  python3 formula_check.py {xlsx_path}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: xlsx_pack.py <source_dir> <output.xlsx>")
-        sys.exit(1)
-    pack(sys.argv[1], sys.argv[2])
+    main()

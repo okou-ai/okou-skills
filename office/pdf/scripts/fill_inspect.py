@@ -15,23 +15,7 @@ Exit codes: 0 success, 1 bad args / file not found, 2 dep missing, 3 read error
 import argparse
 import json
 import sys
-import importlib.util
-import os
-
-
-
-
-def ensure_deps():
-    if importlib.util.find_spec("pypdf") is None:
-        import subprocess
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "--break-system-packages", "-q", "pypdf"]
-        )
-
-
-ensure_deps()
-from pypdf import PdfReader
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
+from pdf_runtime import DependencyError, require_dependency, require_distinct_output, require_file
 
 
 # ── Field type resolution ──────────────────────────────────────────────────────
@@ -62,6 +46,8 @@ def _field_options(field, ftype: str) -> dict:
     extra = {}
     if ftype in ("checkbox",):
         ap = field.get("/AP")
+        if ap:
+            ap = ap.get_object()
         if ap and "/N" in ap:
             states = [str(k) for k in ap["/N"]]
             extra["states"] = states
@@ -73,7 +59,7 @@ def _field_options(field, ftype: str) -> dict:
         if opt:
             choices = []
             for item in opt:
-                if isinstance(item, (list, ArrayObject)) and len(item) >= 2:
+                if isinstance(item, list) and len(item) >= 2:
                     choices.append({"value": str(item[0]), "label": str(item[1])})
                 else:
                     choices.append({"value": str(item), "label": str(item)})
@@ -83,7 +69,9 @@ def _field_options(field, ftype: str) -> dict:
         if kids:
             values = []
             for kid in kids:
-                ap = kid.get("/AP")
+                ap = kid.get_object().get("/AP")
+                if ap:
+                    ap = ap.get_object()
                 if ap and "/N" in ap:
                     for k in ap["/N"]:
                         if str(k) != "/Off":
@@ -96,13 +84,14 @@ def _walk_fields(fields, page_map: dict, parent_name: str = "") -> list:
     """Recursively collect all leaf fields."""
     result = []
     for field in fields:
+        field = field.get_object()
         name = str(field.get("/T", ""))
         full = f"{parent_name}.{name}" if parent_name else name
 
         kids = field.get("/Kids")
         # Kids that have /T are sub-fields (groups), not widget annotations
         if kids:
-            named_kids = [k for k in kids if "/T" in k]
+            named_kids = [k for k in kids if "/T" in k.get_object()]
             if named_kids:
                 result.extend(_walk_fields(named_kids, page_map, full))
                 continue
@@ -128,6 +117,8 @@ def _walk_fields(fields, page_map: dict, parent_name: str = "") -> list:
 
 
 def inspect(pdf_path: str) -> dict:
+    require_file(pdf_path, (".pdf",))
+    PdfReader = require_dependency("pypdf").PdfReader
     try:
         reader = PdfReader(pdf_path)
     except Exception as e:
@@ -139,7 +130,9 @@ def inspect(pdf_path: str) -> dict:
         if hasattr(page, "indirect_reference") and page.indirect_reference:
             page_map[page.indirect_reference.idnum] = i + 1
 
-    acroform = reader.trailer.get("/Root", {}).get("/AcroForm")
+    acroform = reader.trailer["/Root"].get("/AcroForm")
+    if acroform is not None:
+        acroform = acroform.get_object()
     if acroform is None or "/Fields" not in acroform:
         return {
             "status":     "ok",
@@ -165,12 +158,22 @@ def main():
     parser.add_argument("--out",   default="",    help="Write JSON to file (optional)")
     args = parser.parse_args()
 
-    if not os.path.exists(args.input):
-        print(json.dumps({"status": "error", "error": f"File not found: {args.input}"}),
-              file=sys.stderr)
+    try:
+        require_file(args.input, (".pdf",))
+        if args.out:
+            require_distinct_output(args.out, args.input)
+    except ValueError as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
         sys.exit(1)
 
-    result = inspect(args.input)
+    try:
+        result = inspect(args.input)
+    except Exception as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
+        sys.exit(2 if isinstance(exc, DependencyError) else 3)
+    if result["status"] != "ok":
+        print(json.dumps(result), file=sys.stderr)
+        sys.exit(3)
 
     output = json.dumps(result, indent=2, ensure_ascii=False)
 

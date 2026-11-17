@@ -2,8 +2,12 @@
 
 Use for financial models, budgets, forecasts, valuations, statements and
 financial management reports in Excel, together with common workbook rules.
-Preserve supplied templates/house styles; narrow edits do not authorize redesign.
+For **READ**, use financial semantics only: no theme/font/spacing or model mutation.
+Apply authoring, theme, font, spacing and print defaults only to authorized new
+reader-facing work or relevant layout changes. Preserve supplied templates/house
+styles; narrow edits do not authorize redesign.
 
+- [Financial semantics](#financial-semantics-read-and-authoring)
 - [Plan](#plan-the-reading-and-calculation-paths)
 - [Theme](#apply-the-fixed-green-theme)
 - [Font roles](#apply-financial-font-roles)
@@ -11,35 +15,36 @@ Preserve supplied templates/house styles; narrow edits do not authorize redesign
 - [Readability](#make-the-report-readable)
 - [Review](#review-the-financial-work-not-only-the-file)
 
+## Financial semantics (READ and authoring)
+
+- Use consistent reporting periods, currency, scale, tax basis and signs.
+  Distinguish actual/budget/forecast, assumptions and estimates; do not invent
+  missing data, causes or accounting policies. Distinguish operating income,
+  net income and cash flow rather than treating them as interchangeable.
+- Sum period flows, not stock balances. Quarterly operating margin is total
+  quarterly operating income divided by total quarterly revenue, **not** the
+  simple average of monthly percentages. Reconcile material summaries to detail.
+- Store 5% as `0.05`; distinguish percentage change from percentage-point change.
+  Keep years ungrouped. Missing/invalid/unavailable is not zero; a zero-amount
+  dash is appropriate only with an explicit legend. Preserve source dates/IDs
+  and formula/cache distinctions from READ; do not round intermediate arithmetic.
+- Independently verify calculations material to the requested findings. READ
+  does not require scenarios, sensitivity work, driver mutation or restyling.
+
 ## Plan the reading and calculation paths
 
-1. Fix the audience, decision, reporting periods, currency, scale, and model
-   scope from the request and sources. Distinguish actuals, assumptions and
-   estimates; retain source locations for material inputs. Do not invent missing
-   data, explanations, or accounting policies.
-2. Start the reader with the answer: key results, period/scenario comparisons,
-   main drivers, and material limitations. Keep detailed workings available
-   behind that overview rather than making raw inputs the entry point.
-3. For new budgets, forecasts or multi-scenario models, normally put the
-   overview, editable assumptions and calculation schedules on distinct sheets.
-   Keep source history and required sensitivity work clearly identifiable.
-   For example, use Overview / Drivers / Model, with linked History or
-   Sensitivity sheets where the task needs them. Adapt names and coverage to
-   the request; this is a functional example, not a required tab count.
-4. Use a single-sheet model for a straightforward task only when its results,
-   inputs, workings and explanations remain distinct and readable. If they
-   compete for space or make review difficult, separate their purposes into
-   sheets instead of shrinking text, crowding blocks or omitting context.
-5. Link summary values to the model with formulas; reference assumptions
-   rather than duplicating them in calculation areas. Keep details and source
-   evidence traceable. Include the scenarios, sensitivities and explanations
-   needed to answer the request, without adding unrelated analyses or an
-   unrequested full model.
+For authorized authored models, keep outputs, editable assumptions, retained
+history and workings identifiable and traceable. Separate sheets only when useful
+for complete, readable review; no fixed tab count or names. Link summaries with
+live formulas and reference assumptions rather than duplicating constants. Scope
+scenario/sensitivity work to the request. Use the shared data/input contract for
+input ownership and dynamic or explicitly baseline-qualified explanations.
 
 ## Apply the fixed green theme
 
-Unless the supplied style overrides it, use this palette across financial
-report/model sheets; do not choose a different accent for each workbook.
+For authorized new/layout work only, unless the supplied style overrides it,
+use this palette across financial report/model areas. It is not a READ check or
+permission to recolor unchanged sheets.
 
 | Use | Fill/accent | Text |
 | --- | --- | --- |
@@ -56,7 +61,8 @@ override the font roles below or imply positive/negative performance.
 
 ## Apply financial font roles
 
-Use this precedence for data cells when no supplied convention overrides it:
+For authorized new/layout work, use this precedence for affected data cells
+when no supplied convention overrides it:
 
 | Cell role | Default font | Rule |
 | --- | --- | --- |
@@ -77,11 +83,13 @@ proof of correctness. Inspect fonts/number formats, not copied style indices.
 
 ## Space new report and model sheets
 
-Apply these defaults to new reader-facing layouts, not raw-data-only exports:
+For new reader-facing layouts (not READ/raw-data-only exports), keep hierarchy
+and whitespace readable; narrow edits retain the existing geometry. Optional
+starting presets, not fixed acceptance requirements:
 
-- Leave two blank rows above the main title. Leave one blank row after the
-  title band and one before the first content block; keep any subtitle and
-  unit notation together between them. Share a spacer when boundaries coincide.
+- Two blank rows above the title, one after the title band and one before the
+  first content block; keep subtitle/unit notation together. Share coinciding
+  spacers and adapt the gaps to the actual content.
 - Separate completed sections or standalone tables with one blank row. Keep a
   section band next to its table's column-header row, and headers next to data;
   do not scatter blank rows between every label or record.
@@ -92,17 +100,16 @@ Apply these defaults to new reader-facing layouts, not raw-data-only exports:
   and raw-data blocks. Do not fake spacing with hidden rows or blank formulas.
 - Plan the gaps before writing formulas and ranges. Preserve existing layouts
   during narrow edits; check dependencies if authorized row insertion is needed.
-  Inspect both the worksheet and exported pages for crowded or excessive gaps.
+  Inspect the affected application view or rendered export for crowded/excessive
+  gaps; actual export is necessary when printing/pagination matters.
 
 ## Make the report readable
 
 - State currency and scale near the numbers. Use the supplied currency rather
   than inheriting the starter template's dollar symbol. Keep comparable values
   at consistent precision; use parentheses for negative amounts by default.
-- Display rates as percentages, storing `0.05` for 5%. Distinguish percentage
-  change from percentage-point change. Keep years ungrouped (`2026`, not
-  `2,026`). Do not disguise missing evidence as a zero; use a dash for zero
-  amounts only where the legend makes that meaning clear.
+- Use percentage formats for rates and ungrouped year formats. Preserve the
+  financial semantics above; formats are not permission to change source values.
 - Label actual/budget/forecast periods explicitly. Where they are adjacent, use
   a consistent separator or light neutral fill as a second cue; labels must
   work without color. Do not imply that forecast values are observed actuals.
@@ -119,22 +126,20 @@ Apply these defaults to new reader-facing layouts, not raw-data-only exports:
 
 ## Review the financial work, not only the file
 
-Check the applicable items before delivery and correct any discrepancy:
+Use the shared VALIDATE impact matrix; for READ independently verify only the
+financial semantics/calculations material to the requested findings. For authored
+or changed financial work, also check the applicable items:
 
-- Summary and scenario results reconcile to detail and supplied inputs. Sum
-  period flows, but do not sum stock balances. Operating margin is operating
-  income divided by revenue; for a quarter, divide the quarter's total operating
-  income by its total revenue, not the simple average of monthly percentages.
-- Period, currency, tax basis, sign, and unit assumptions are consistent.
-  Distinguish operating income, net income and cash flow as the model requires.
-- Adjustable drivers actually propagate. On disposable copies, change a
-  material input, recalculate, verify the expected dependencies, then restore
-  the baseline. Trace the effect through detail, summary and sensitivity outputs,
-  not just the headline total. Do not claim propagation from formula text alone.
+- Summary/scenario results reconcile to detail and source inputs on the semantic
+  basis above, with current final live formulas/caches when calculation-driven.
+- For adjustable models being authored or changed, verify material driver effects
+  through detail, summary and required sensitivity outputs using the shared
+  propagation procedure; do not claim execution from formula text alone.
 - Editable inputs, same-sheet calculations, cross-sheet links, and any external
   dependencies follow the selected legend throughout the affected model.
-- Every relevant populated sheet is readable: headings, units, amounts,
-  explanations and charts are not clipped, overlapping or illegibly scaled.
+- For new/layout work, relevant reader-facing areas are actually readable:
+  headings, units, amounts, explanations and charts are not clipped, overlapping
+  or illegibly scaled. Inspect affected areas, not an unrelated blanket export.
 - Key conclusions, scope and limitations are easy to locate. Do not report a
   blanket pass when application or visual checks could not be performed.
 

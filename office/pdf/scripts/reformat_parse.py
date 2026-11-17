@@ -5,7 +5,7 @@ then hand off to the CREATE pipeline (render_body.py).
 
 Supported input formats:
   .md / .txt    — Markdown / plain text
-  .pdf          — Extract text from existing PDF (layout preserved as best-effort)
+  .pdf          — Best-effort text extraction; no layout preservation
   .json         — Pass-through if already content.json format
 
 Usage:
@@ -24,27 +24,11 @@ Exit codes: 0 success, 1 bad args / unsupported format, 2 dep missing, 3 parse e
 
 import argparse
 import json
-import os
 import re
 import sys
-import importlib.util
 from pathlib import Path
 
-
-
-
-def ensure_deps():
-    missing = []
-    if importlib.util.find_spec("pypdf") is None:
-        missing.append("pypdf")
-    if missing:
-        import subprocess
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "--break-system-packages", "-q"] + missing
-        )
-
-
-ensure_deps()
+from pdf_runtime import DependencyError, require_dependency, require_distinct_output, require_file
 
 
 # ── Markdown / plain text parser ───────────────────────────────────────────────
@@ -213,9 +197,8 @@ def parse_pdf(pdf_path: str) -> list:
     Best-effort: detects headings by font size heuristics if available,
     otherwise falls back to paragraph splitting.
     """
-    from pypdf import PdfReader
-
-    reader = PdfReader(pdf_path)
+    require_file(pdf_path, (".pdf",))
+    reader = require_dependency("pypdf").PdfReader(pdf_path)
     all_text = []
 
     for page in reader.pages:
@@ -287,7 +270,7 @@ def validate_content_json(data: list) -> tuple[list, list]:
 # ── Dispatcher ─────────────────────────────────────────────────────────────────
 def parse_file(input_path: str) -> tuple[list, list]:
     """Return (blocks, warnings)."""
-    ext = Path(input_path).suffix.lower()
+    ext = require_file(input_path, (".md", ".markdown", ".txt", ".pdf", ".json")).suffix.lower()
 
     if ext in (".md", ".txt", ".markdown"):
         with open(input_path, encoding="utf-8", errors="replace") as f:
@@ -305,9 +288,9 @@ def parse_file(input_path: str) -> tuple[list, list]:
         if isinstance(data, list):
             return validate_content_json(data)
         # Maybe it's a meta-wrapper {"content": [...]}
-        if isinstance(data, dict) and "content" in data:
+        if isinstance(data, dict) and isinstance(data.get("content"), list):
             return validate_content_json(data["content"])
-        return [], [f"JSON file does not contain a list of content blocks"]
+        raise ValueError("JSON file must contain a list of content blocks")
 
     return [], [f"Unsupported file type: {ext}. Supported: .md .txt .pdf .json"]
 
@@ -319,18 +302,18 @@ def main():
     parser.add_argument("--out",   default="content.json", help="Output content.json path")
     args = parser.parse_args()
 
-    if not os.path.exists(args.input):
-        print(json.dumps({"status": "error", "error": f"File not found: {args.input}"}),
-              file=sys.stderr)
+    try:
+        require_file(args.input, (".md", ".markdown", ".txt", ".pdf", ".json"))
+        require_distinct_output(args.out, args.input)
+    except ValueError as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
         sys.exit(1)
 
     try:
         blocks, warnings = parse_file(args.input)
-    except Exception as e:
-        import traceback
-        print(json.dumps({"status": "error", "error": str(e),
-                          "trace": traceback.format_exc()}), file=sys.stderr)
-        sys.exit(3)
+    except Exception as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
+        sys.exit(2 if isinstance(exc, DependencyError) else 3)
 
     if not blocks:
         print(json.dumps({

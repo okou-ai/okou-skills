@@ -35,8 +35,172 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 import posixpath
 import signal
+import stat
 import xml.etree.ElementTree as ET
 import zipfile
+import hashlib
+import json
+import time
+
+
+class CalculationSession:
+    """Explicit task-scoped environment evidence; never caches candidate results.
+
+    A receipt is opt-in, valid for at most two hours, and bound to a caller's task
+    ID plus bounded executable/install metadata, allowlisted non-secret settings
+    and control-script metadata. No recursive scan, environment dump or version
+    command forms the fingerprint. Unknown layouts/bootstrap overrides cannot
+    reuse capability. Delete receipts after any other dependency/configuration
+    change (including fonts). This is local evidence, not exhaustive monitoring,
+    a signed attestation or a portable guarantee.
+    """
+    def __init__(self, receipt_path: str | None = None, task_id: str | None = None):
+        if receipt_path and not task_id:
+            raise ValueError("A receipt requires an explicit task ID")
+        self.receipt_path = Path(receipt_path) if receipt_path else None
+        self.task_id = task_id
+        self.versions = {}
+        self.passed = {}
+
+    def fingerprint(self, soffice: str) -> str | None:
+        """Fixed passive samples only; an unknown identity is never a cache key."""
+        overrides = ('URE_BOOTSTRAP', 'UNO_SERVICES', 'UNO_TYPES', 'UNO_PATH',
+                     'URE_MORE_SERVICES', 'URE_MORE_TYPES', 'BRAND_BASE_DIR',
+                     'BRAND_INI_DIR', 'SAL_CONFIGFILE')
+        if any(name in os.environ for name in overrides):
+            return None  # Do not interpret arbitrary bootstrap/configuration paths.
+        try:
+            executable = Path(soffice).absolute()
+            binary = executable.resolve(strict=True)
+            program, installation = binary.parent, binary.parent.parent
+            if program.name not in ('program', 'MacOS') or not binary.is_file():
+                return None  # Opaque launchers/custom layouts need a fresh control.
+            registries = [installation / 'share/registry', installation / 'Resources/registry']
+            markers = [program / 'soffice.bin', program / 'soffice.exe',
+                       *(directory / name for directory in registries
+                         for name in ('calc.xcd', 'main.xcd'))]
+            script = Path(__file__).resolve(strict=True)
+            paths = [executable, binary, program, installation, script,
+                     installation / 'Info.plist', *registries, *markers,
+                     *(program / name for name in (
+                         'bootstraprc', 'bootstrap.ini', 'fundamentalrc', 'fundamental.ini',
+                         'unorc', 'uno.ini', 'services/services.rdb', 'types/offapi.rdb',
+                         'libmergedlo.so', 'libmergedlo.dylib', 'mergedlo.dll',
+                         'libsclo.so', 'libsclo.dylib', 'sclo.dll',
+                         'libscfiltlo.so', 'libscfiltlo.dylib', 'scfiltlo.dll')),
+                     Path('/etc/libreoffice/registry/calc.xcd'), Path('/etc/ld.so.cache'),
+                     Path('/var/lib/dpkg/status'), Path('/var/lib/rpm/Packages'),
+                     Path('/var/lib/rpm/rpmdb.sqlite'), Path('/usr/lib/sysimage/rpm/rpmdb.sqlite'),
+                     Path('/lib/apk/db/installed')]
+            records, present = [], set()
+            for path in dict.fromkeys(paths):
+                try:
+                    link = path.lstat()
+                except FileNotFoundError:
+                    records.append((str(path), 'missing'))
+                    continue
+                # A dangling/uninspectable link is unknown, not a stable missing file.
+                is_link = stat.S_ISLNK(link.st_mode)
+                target = path.resolve(strict=True) if is_link else path
+                info = path.stat() if is_link else link
+                present.add(path)
+                records.append((str(path), str(target), link.st_mtime_ns, link.st_ctime_ns,
+                                info.st_mode, info.st_dev, info.st_ino, info.st_size,
+                                info.st_mtime_ns, info.st_ctime_ns))
+            if script not in present or not any(marker in present for marker in markers):
+                return None
+            settings = ('PATH', 'HOME', 'TMPDIR', 'TEMP', 'TMP', 'SystemRoot',
+                        'LANG', 'LANGUAGE', 'LC_ALL', 'LC_CTYPE', 'LC_MESSAGES',
+                        'LC_NUMERIC', 'LC_TIME', 'LC_MONETARY', 'TZ',
+                        'LD_LIBRARY_PATH', 'LD_PRELOAD', 'DYLD_LIBRARY_PATH',
+                        'DYLD_FALLBACK_LIBRARY_PATH', 'SAL_USE_VCLPLUGIN',
+                        'SAL_DISABLE_OPENCL', 'DISPLAY', 'WAYLAND_DISPLAY', 'XDG_RUNTIME_DIR')
+            payload = {'schema': 2, 'task_id': self.task_id, 'paths': records,
+                       'environment': {name: os.environ.get(name) for name in settings},
+                       'cwd': str(Path.cwd()), 'platform': sys.platform,
+                       'uid': getattr(os, 'geteuid', lambda: None)(),
+                       'groups': getattr(os, 'getgroups', lambda: [])()}
+            return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+        except (OSError, RuntimeError):
+            return None
+
+    def _read_receipt(self) -> dict | None:
+        if not self.receipt_path or self.receipt_path.is_symlink():
+            return None
+        try:
+            entry = json.loads(self.receipt_path.read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            return None
+        if (not isinstance(entry, dict) or entry.get('schema') != 1
+                or entry.get('status') != 'passed' or entry.get('formula') != CONTROL_FORMULA
+                or entry.get('expected') != '42' or not isinstance(entry.get('fingerprint'), str)):
+            return None
+        return entry
+
+    def load(self, fingerprint: str | None) -> dict | None:
+        if fingerprint is None:
+            return None
+        entry = self.passed.get(fingerprint) or self._read_receipt()
+        if entry is None:
+            return None
+        if not isinstance(entry, dict) or not isinstance(entry.get('checked_at'), (int, float)):
+            return None
+        if (entry.get('schema') != 1 or entry.get('fingerprint') != fingerprint
+                or entry.get('task_id') != self.task_id or entry.get('status') != 'passed'
+                or not 0 <= time.time() - entry.get('checked_at', 0) <= 7200
+                or entry.get('formula') != CONTROL_FORMULA or entry.get('expected') != '42'):
+            return None
+        self.versions[fingerprint] = entry.get('version', 'unknown')
+        return entry
+
+    def version(self, soffice: str) -> str:
+        # Ordinary candidate conversion does not need a capability fingerprint.
+        # Version metadata is process/session-local and never certifies Calc.
+        if self.receipt_path:
+            fingerprint = self.fingerprint(soffice)
+            if self.load(fingerprint):
+                return self.versions[fingerprint]
+        try:
+            executable = Path(soffice).absolute()
+            binary = executable.resolve(strict=True)
+            link, info = executable.lstat(), binary.stat()
+            key = ('version', str(executable), str(binary), link.st_mtime_ns, link.st_ctime_ns,
+                   info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+        except (OSError, RuntimeError):
+            # Even an unavailable version label may be reused within this session;
+            # this key is never accepted by load()/record() as capability evidence.
+            key = ('version-uninspectable', soffice)
+        if key not in self.versions:
+            self.versions[key] = get_libreoffice_version(soffice)
+        return self.versions[key]
+
+    def record(self, fingerprint: str | None, version: str) -> None:
+        if fingerprint is None:
+            return
+        entry = {'schema': 1, 'status': 'passed', 'task_id': self.task_id,
+                 'fingerprint': fingerprint, 'checked_at': time.time(), 'version': version,
+                 'formula': CONTROL_FORMULA, 'expected': '42'}
+        self.passed[fingerprint] = entry
+        if self.receipt_path:
+            if os.path.lexists(self.receipt_path) and self._read_receipt() is None:
+                raise ValueError("Receipt must be a new path or a recognized control receipt; refusing overwrite")
+            self.receipt_path.parent.mkdir(parents=True, exist_ok=True)
+            # Explicit receipt only; never a global home-directory cache.
+            fd, temporary = tempfile.mkstemp(prefix='.calc-receipt-', dir=self.receipt_path.parent)
+            try:
+                with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+                    json.dump(entry, stream, indent=2)
+                os.replace(temporary, self.receipt_path)
+            finally:
+                if os.path.exists(temporary):
+                    os.unlink(temporary)
+
+    def invalidate(self) -> None:
+        self.versions.clear()
+        self.passed.clear()
+        entry = self._read_receipt()
+        if entry and entry.get('task_id') == self.task_id:
+            self.receipt_path.unlink(missing_ok=True)
 
 
 # ── LibreOffice discovery ───────────────────────────────────────────────────
@@ -136,10 +300,31 @@ def calc_component_diagnostic(soffice: str) -> str:
 
 # ── Recalculation ───────────────────────────────────────────────────────────
 
-def recalculate(
+def recalculate(input_path: str, output_path: str, timeout: int = 60,
+                session: CalculationSession | None = None) -> tuple[bool, str]:
+    """Always execute this candidate; invalidate environment evidence on failure."""
+    session = session or CalculationSession()
+    if session.receipt_path:
+        for candidate in (Path(input_path), Path(output_path)):
+            if (session.receipt_path.resolve() == candidate.resolve()
+                    or (session.receipt_path.exists() and candidate.exists()
+                        and os.path.samefile(session.receipt_path, candidate))):
+                return False, "Receipt must be distinct from candidate input/output; no files changed."
+    try:
+        result = _recalculate(input_path, output_path, timeout, session)
+    except Exception:
+        session.invalidate()
+        raise
+    if not result[0]:
+        session.invalidate()
+    return result
+
+
+def _recalculate(
     input_path: str,
     output_path: str,
-    timeout: int = 60,
+    timeout: int,
+    session: CalculationSession,
 ) -> tuple[bool, str]:
     """
     Run LibreOffice headless recalculation on input_path, write result to output_path.
@@ -149,6 +334,9 @@ def recalculate(
 
     The message explains what happened (success or failure reason).
     """
+    if (Path(input_path).resolve() == Path(output_path).resolve()
+            or (Path(output_path).exists() and os.path.samefile(input_path, output_path))):
+        return False, "Input and output must be distinct; the source is never overwritten."
     soffice = find_soffice()
     if not soffice:
         return False, (
@@ -157,7 +345,7 @@ def recalculate(
             "obtain authorization under the environment's software policy before adding software."
         )
 
-    version = get_libreoffice_version(soffice)
+    version = session.version(soffice)
 
     # Work on a copy in a temp directory to avoid side effects on the source file.
     # LibreOffice writes the output using the same filename stem in --outdir.
@@ -360,28 +548,43 @@ def _verify_preflight_output(path: Path) -> None:
             raise ValueError(f"Preflight!C1 expected cache {CONTROL_EXPECTED}, found {text!r}")
 
 
-def preflight(timeout: int = 60) -> tuple[int, str]:
+def preflight(timeout: int = 60, session: CalculationSession | None = None) -> tuple[int, str]:
     """Run one independent control through recalculate(), never a candidate workbook.
 
     Returns CLI status 0 only after reopening the new output and checking its live
     formula and nonzero numeric cache, 2 for no binary, or 1 for a failed control.
     """
-    if not find_soffice():
+    session = session or CalculationSession()
+    soffice = find_soffice()
+    if not soffice:
+        session.invalidate()
         return 2, ("Preflight unavailable: LibreOffice binary not found. Calc is required. "
                    "No installation or conversion was attempted.")
+    fingerprint = session.fingerprint(soffice)
+    if fingerprint is None:
+        session.invalidate()
+    if session.load(fingerprint):
+        return 0, ("Preflight REUSED: same-task, unchanged-environment successful control receipt. "
+                   "No new control or candidate was executed; candidate calculation remains required when impacted.")
     try:
         with tempfile.TemporaryDirectory(prefix="xlsx_preflight_") as tmpdir:
             source = Path(tmpdir) / "control.xlsx"
             output = Path(tmpdir) / "recalculated.xlsx"
             _write_preflight_workbook(source)
             before = source.read_bytes()
-            success, message = recalculate(str(source), str(output), timeout=timeout)
+            success, message = recalculate(str(source), str(output), timeout=timeout, session=session)
             if not success:
+                session.invalidate()
                 return 1, f"Preflight FAILED: independent formula control failed.\n{message}"
             if source.read_bytes() != before:
                 raise ValueError("The synthetic source workbook was modified")
             _verify_preflight_output(output)
+            if fingerprint is not None:
+                if session.fingerprint(soffice) != fingerprint:
+                    raise ValueError("Calculation environment changed during the control; receipt not reusable")
+                session.record(fingerprint, session.version(soffice))
     except (OSError, ValueError, KeyError, ET.ParseError, zipfile.BadZipFile, RuntimeError) as exc:
+        session.invalidate()
         return 1, f"Preflight FAILED: independent formula control could not be verified: {exc}"
     return 0, (f"Preflight PASSED: reopened synthetic output; Preflight!C1 retains "
                f"{CONTROL_FORMULA} with numeric cached value {CONTROL_EXPECTED} "
@@ -435,7 +638,15 @@ Examples:
         help="Run an independent synthetic formula control and verify the new output cache/formula",
     )
 
+    parser.add_argument("--receipt", help="Explicit same-task preflight receipt JSON; never caches candidates")
+    parser.add_argument("--task-id", help="Task identifier required with --receipt; reuse only in this task")
     args = parser.parse_args()
+    if args.receipt and not args.task_id:
+        parser.error("--receipt requires --task-id")
+    if args.receipt and any(Path(args.receipt).resolve() == Path(p).resolve()
+                            for p in (args.input, args.output) if p):
+        parser.error("Receipt must be distinct from candidate input/output")
+    session = CalculationSession(args.receipt, args.task_id)
 
     # ── --check mode ─────────────────────────────────────────────────────────
     if args.check:
@@ -459,7 +670,7 @@ Examples:
         if args.input or args.output:
             print("ERROR: --preflight accepts no candidate paths; it creates its own synthetic control.")
             sys.exit(1)
-        code, message = preflight(timeout=args.timeout)
+        code, message = preflight(timeout=args.timeout, session=session)
         print(message)
         sys.exit(code)
 
@@ -477,7 +688,7 @@ Examples:
     print(f"Timeout: {args.timeout}s")
     print()
 
-    success, message = recalculate(args.input, args.output, timeout=args.timeout)
+    success, message = recalculate(args.input, args.output, timeout=args.timeout, session=session)
 
     if success:
         print(f"OK: {message}")

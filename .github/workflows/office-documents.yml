@@ -8,6 +8,23 @@ on:
     paths: ["office/**", ".github/workflows/office-documents.yml"]
 
 jobs:
+  lightweight-tools:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check dependency-free Office routes and reference links
+        run: python3 -m unittest discover -s office/tests -v
+      - name: Check readers, scoped edits and lazy setup without native dependencies
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' test; do
+            python3 "$test"
+          done < <(find office -path '*/scripts/tests/test_*.py' -type f \
+            ! -name test_create_content.py ! -name test_create_pdf.py -print0 | sort -z)
   native-files:
     runs-on: ubuntu-24.04
     steps:
@@ -31,27 +48,39 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq libreoffice-writer libreoffice-calc poppler-utils fonts-liberation fonts-noto-cjk fonts-wqy-zenhei
-          python3 -m pip install reportlab pypdf matplotlib
+          python3 -m pip install reportlab pypdf matplotlib pandas
           python3 -m pip install -r office/xlsx/requirements-authoring.txt
           npm install -g playwright
           npx --no-install playwright install --with-deps chromium
+      - name: Check native analysis and calculation routes
+        run: python3 -m unittest discover -s office/tests -v
       - name: Set up DOCX from outside the skill directory
         working-directory: ${{ runner.temp }}
         run: bash "$GITHUB_WORKSPACE/office/docx/scripts/setup.sh" --minimal
       - name: Check DOCX and PDF environments
         run: |
           bash office/docx/scripts/env_check.sh --with-rendering
-          python3 office/docx/scripts/render_docx.py --prepare --pages "$RUNNER_TEMP/prepared-pages" --no-install
+          DOCX_RENDER_SESSION=$(mktemp -d "$RUNNER_TEMP/office-writer-XXXXXX")
+          echo "DOCX_RENDER_SESSION=$DOCX_RENDER_SESSION" >> "$GITHUB_ENV"
+          python3 office/docx/scripts/render_docx.py --prepare --pages "$RUNNER_TEMP/prepared-pages" --no-install \
+            --probe-cache "$DOCX_RENDER_SESSION/writer.json" --probe-session "$DOCX_RENDER_SESSION"
+          test -s "$DOCX_RENDER_SESSION/writer.json"
           test ! -e "$RUNNER_TEMP/prepared-pages"
           bash office/pdf/scripts/make.sh check
+      - name: Check lazy PDF paths with installed rendering dependencies
+        run: python office/pdf/scripts/tests/test_lazy_dependencies.py
       - name: Check standalone PDF content and delivery
         run: python office/pdf/scripts/tests/test_create_pdf.py
       - name: Check structured DOCX creation
         run: python office/docx/scripts/tests/test_create_content.py
       - name: Render DOCX to PDF and page images without package installation
         run: |
+          set -euo pipefail
           bash office/docx/scripts/docx.sh create --type report --title "Rendering smoke test" --output "$RUNNER_TEMP/render-smoke.docx"
-          python3 office/docx/scripts/render_docx.py "$RUNNER_TEMP/render-smoke.docx" --out "$RUNNER_TEMP/render-smoke.pdf" --pages "$RUNNER_TEMP/render-pages" --no-install
+          python3 office/docx/scripts/render_docx.py "$RUNNER_TEMP/render-smoke.docx" --out "$RUNNER_TEMP/render-smoke.pdf" --pages "$RUNNER_TEMP/render-pages" --no-install \
+            --probe-cache "$DOCX_RENDER_SESSION/writer.json" --probe-session "$DOCX_RENDER_SESSION" \
+            2>&1 | tee "$RUNNER_TEMP/writer-render.log"
+          grep -Fq 'Writer capability: reused same-task success receipt' "$RUNNER_TEMP/writer-render.log"
           test -s "$RUNNER_TEMP/render-smoke.pdf"
           test -s "$RUNNER_TEMP/render-pages/page-1.png"
   windows-docx:

@@ -10,26 +10,20 @@ Exit codes: 0 success, 1 bad args/missing file, 2 missing dep, 3 merge error
 """
 
 import argparse
-import importlib.util
 import json
 import os
 import sys
 import tempfile
 
-def ensure_deps():
-    if importlib.util.find_spec("pypdf") is None:
-        import subprocess
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "--break-system-packages", "-q", "pypdf"]
-        )
-
-
-ensure_deps()
-
-from pypdf import PdfWriter, PdfReader
+from pdf_runtime import DependencyError, require_dependency, require_distinct_output, require_file
 
 
 def merge(cover_path: str, body_path: str, out_path: str, title: str = "") -> dict:
+    require_file(cover_path, (".pdf",))
+    require_file(body_path, (".pdf",))
+    require_distinct_output(out_path, cover_path, body_path)
+    pypdf = require_dependency("pypdf")
+    PdfReader, PdfWriter = pypdf.PdfReader, pypdf.PdfWriter
     cover = PdfReader(cover_path)
     body = PdfReader(body_path)
     cover_pages = len(cover.pages)
@@ -91,10 +85,18 @@ def main():
     args = parser.parse_args()
 
     try:
+        require_file(args.cover, (".pdf",))
+        require_file(args.body, (".pdf",))
+        require_distinct_output(args.out, args.cover, args.body)
+    except ValueError as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
+        sys.exit(1)
+
+    try:
         result = merge(args.cover, args.body, args.out, args.title)
     except Exception as exc:
         print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
-        sys.exit(3)
+        sys.exit(2 if isinstance(exc, DependencyError) else 3)
 
     print(json.dumps(result))
 

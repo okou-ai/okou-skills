@@ -33,14 +33,24 @@ Do NOT use when: the user wants to change the look/style of the entire document 
 
 ## Workflow
 
-```
-1. Preview   → CLI: analyze <input.docx>
-2. Analyze   → Understand structure: sections, styles, headings, tables
-3. Identify  → Locate exact edit targets (paragraph index, table index, placeholder text)
-4. Edit      → Apply surgical changes via CLI or direct XML
-5. Validate  → CLI: validate <output.docx>
-6. Diff      → Compare before/after to verify only intended changes were made
-```
+1. For a known text/placeholder edit, read the target text with
+   `bash "$SKILL_DIR/scripts/docx_preview.sh" input.docx`; no .NET setup or render.
+2. Only if structure/styles/target location is needed, use one inventory instead:
+   `python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory input.docx > input.inventory.json`.
+   Reuse its body previews/indices, style usage, section properties and relationships.
+   Check `body_coverage` and `text_truncated`: default is 50 elements / 160 characters
+   per preview. Select `--start N --end M` or `--full` for required targets; add
+   `--xml` only for XML-level edits. If unrelated-part byte preservation must be
+   evidenced, choose `--hash-parts` on this source inventory and the output inventory.
+   Do not rescan the unchanged source at every stage or also run preview/analyze.
+3. Locate exact targets (paragraph/table indices or placeholder text). Inventory
+   body-element indices are not CLI table/paragraph indices; verify the target.
+4. Apply surgical edits with the built CLI (runtime) or direct XML. Keep the
+   source and all unrelated parts intact; no unauthorized restyling.
+5. Run `bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --business`.
+6. Compare before/after for intended text and preservation of unrelated parts.
+   Follow [VALIDATE](validate.md) for checks affected by the edit; render only
+   when layout/pagination impact or requested output requires it.
 
 ---
 
@@ -146,8 +156,10 @@ bash "$SKILL_DIR/scripts/docx.sh" edit fill-table --input input.docx --table-ind
 
 ### By Header Matching
 
-Use the OpenXML SDK to locate a table by its header text, then pass its zero-based
-index to `fill-table`. The CLI does not provide a `--table-match` option.
+Use the saved stdlib inventory's table preview to locate the table by its header;
+check coverage/truncation and request a targeted range with `--xml` or `--full`
+only when necessary. Then verify its zero-based document table index for `fill-table`.
+The CLI does not provide a `--table-match` option.
 
 ### Table Data CSV Format
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # docx Quick Environment Check
 # Cross-platform: macOS, Linux, WSL, Git Bash
-# Run this BEFORE any docx operation. Use setup.sh for initial installation.
+# Check the selected CLI path only; stdlib text/inventory needs no .NET check.
+# Runtime is sufficient for a prebuilt CLI. --build explicitly checks/builds it.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,12 +11,16 @@ DOTNET_DIR="$SCRIPT_DIR/dotnet"
 CLI_PROJECT="$DOTNET_DIR/Docx.Cli/Docx.Cli.csproj"
 
 WITH_RENDERING=false
+BUILD=false
 for arg in "$@"; do
     case "$arg" in
+        --build) BUILD=true ;;
         --with-rendering) WITH_RENDERING=true ;;
         --help|-h)
-            echo "Usage: env_check.sh [--with-rendering]"
-            echo "  --with-rendering  Also probe Writer for conversion or requested visual review"
+            echo "Usage: env_check.sh [--build] [--with-rendering]"
+            echo "  default           Check .NET 8 runtime and prebuilt CLI; never restore/build"
+            echo "  --build           Require compatible SDK; restore/build only if CLI is missing"
+            echo "  --with-rendering  Also probe Writer (standalone, no receipt reuse)"
             exit 0
             ;;
         *) echo "Unknown option: $arg" >&2; exit 2 ;;
@@ -43,9 +48,16 @@ case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*) OS="windows-shell" ;;
 esac
 
-# --- Critical: .NET SDK ---
+# --- Build requires SDK; executing a prebuilt CLI only requires runtime ---
 source "$SCRIPT_DIR/dotnet_env.sh"
-if ! docx_use_dotnet; then
+MODE=runtime
+$BUILD && MODE=sdk
+if ! docx_use_dotnet "$MODE"; then
+    if ! $BUILD; then
+        printf "[FAIL]    %-14s .NET 8 runtime not found\n" "dotnet"
+        echo "  Reuse an installed runtime or provision dependencies explicitly: $SETUP_COMMAND"
+        STATUS="NOT READY"
+    else
     printf "[FAIL]    %-14s compatible SDK and .NET 8 runtime not found\n" "dotnet"
     echo ""
     echo "  .NET SDK is REQUIRED. Install it:"
@@ -64,6 +76,9 @@ if ! docx_use_dotnet; then
     echo "  Or run setup: $SETUP_COMMAND"
     echo ""
     STATUS="NOT READY"
+    fi
+elif ! $BUILD; then
+    printf "[OK]      %-14s .NET 8 runtime (%s)\n" "dotnet" "$DOCX_DOTNET"
 else
     local_ver=$(dotnet --version 2>/dev/null || echo "0.0.0")
     local_major="${local_ver%%.*}"
@@ -77,12 +92,15 @@ fi
 
 # --- Critical: NuGet packages ---
 if [ "$STATUS" != "READY" ]; then
-    printf "[FAIL]    %-14s skipped (no compatible SDK selected)\n" "project"
+    printf "[FAIL]    %-14s skipped (no compatible %s selected)\n" "project" "$MODE"
 elif [ -d "$DOTNET_DIR" ]; then
     if [ -f "$DOTNET_DIR/Docx.Cli/bin/Debug/net8.0/Docx.Cli.dll" ]; then
         printf "[OK]      %-14s built\n" "project"
+    elif ! $BUILD; then
+        printf "[FAIL]    %-14s prebuilt CLI missing; use env_check.sh --build with an SDK\n" "project"
+        STATUS="NOT READY"
     else
-        # Try restore + build
+        # Explicit build path only; never restore for a runtime operation.
         if dotnet restore "$CLI_PROJECT" --verbosity quiet; then
             printf "[OK]      %-14s packages restored\n" "nuget"
             if dotnet build "$CLI_PROJECT" --verbosity quiet --no-restore; then
@@ -105,20 +123,6 @@ elif [ -d "$DOTNET_DIR" ]; then
 else
     printf "[FAIL]    %-14s directory not found: %s\n" "project" "$DOTNET_DIR"
     STATUS="NOT READY"
-fi
-
-# --- Optional: pandoc ---
-if command -v pandoc &>/dev/null; then
-    pandoc_ver=$(pandoc --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1 || echo "?")
-    printf "[OK]      %-14s %s (content preview)\n" "pandoc" "$pandoc_ver"
-else
-    printf "[WARN]    %-14s not found — docx_preview.sh will use fallback\n" "pandoc"
-    WARNINGS=$((WARNINGS + 1))
-    case "$OS" in
-        macos)        echo "           Install: brew install pandoc" ;;
-        linux|wsl)    echo "           Install: sudo apt-get install pandoc  # or dnf/pacman" ;;
-        windows-shell) echo "           Install: winget install JohnMacFarlane.Pandoc" ;;
-    esac
 fi
 
 # --- Opt-in: LibreOffice Writer / DOCX rendering ---

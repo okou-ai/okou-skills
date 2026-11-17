@@ -2,37 +2,47 @@
 name: office
 description: >
   Create, edit, format, convert, or validate Word documents, PDFs, and Excel
-  workbooks. Use for file-specific checks of layout, formulas, or form fields.
-  For content-only reading, extraction, or summaries, use a reader directly.
+  workbooks. Content-only reading, extraction, summaries, and analysis use a
+  reader directly, without authoring setup or presentation workflows.
 license: MIT
 ---
 
 # Office files
 
-Choose the route for the requested operation and follow its setup and validation
-instructions. Load only the references that operation needs.
+Select the operation before the format; load only the references it needs.
 
-- [Word](docx/SKILL.md) for DOCX work and DOCX-to-PDF.
-- [PDF](pdf/SKILL.md) for standalone PDF work and forms.
-- [Excel](xlsx/SKILL.md) for XLSX work.
+**Content-only reading/analysis:** read only the needed parts, sheets or ranges.
+Skip authoring setup, style profiles and output validation. Inspect structure or
+recalculate an authorized copy only when needed for the result; never modify the
+source. Bundled lightweight readers are `docx/scripts/docx_preview.sh` and
+`xlsx/scripts/xlsx_reader.py`, relative to this directory. Use an available PDF
+reader for content, not the cover/browser pipeline.
 
-For deliverables that require developing or revising analytical conclusions,
-read [Analysis](references/analysis.md). If an available domain skill covers
-the method needed, follow its analytical guidance alongside the selected file
-workflow.
+**Create, edit, convert or inspect file features:** select one route:
 
-When drafting or revising prose, use a professional register that suits the
-document type and the reader's expectations. Use standard domain terms and
-natural phrasing in the requested language. Before delivery, reread the title,
-headings at every level, and key paragraphs in the finished draft. Replace
-attention-grabbing questions, slogan-like wording, and drafting labels with
-headings and phrasing customary for this type of document. Read the full text
-for natural expression in the requested language, paying particular attention
-to the wording of domain terms.
+- [Word](docx/SKILL.md): DOCX, templates and DOCX-to-PDF.
+- [PDF](pdf/SKILL.md): standalone PDF creation, redesign and form fields.
+- [Excel](xlsx/SKILL.md): XLSX authoring, formulas and formatting.
 
-Honor the supplied template and limit edits to the requested scope. When
-delivering Word and PDF versions of the same document, render the PDF from the
-authored DOCX.
+## Analytical results
+
+- Answer within the requested scope; clarify only material ambiguities.
+- Trace material conclusions to permitted sources and locations. Distinguish
+  observations, estimates, inferences and proposals; retain units, populations, periods
+  and metric definitions.
+- Verify calculations or assumptions that could change the conclusion; state
+  affected limitations beside the result.
+- Add domain guidance only for a concrete method, structure or correctness gap.
+  Reuse verified inputs/checks; do not restart discovery, full-data profiling,
+  staged research or a separate report merely because a file is involved.
+
+## File delivery
+
+Honor the supplied template and requested scope/formats. Use conventional
+headings and domain terminology; remove drafting labels and unsupported promotional phrasing
+in the final content review, not a separate prose pass. For Word and PDF together,
+render PDF from the authored DOCX. Check affected features; setup or static
+validation alone does not prove correct content, calculation or rendering.
 
 The format implementations are adapted from MiniMax's MIT-licensed skills.
 Each format directory retains its `LICENSE` and `UPSTREAM.md`.
