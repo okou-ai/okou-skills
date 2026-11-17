@@ -16,12 +16,6 @@ bash "$SKILL_DIR/scripts/docx.sh" create \
 bash "$SKILL_DIR/scripts/docx.sh" validate --input report.docx --business
 ```
 
-Provide the document title in exactly one place. `--title` inserts a visible
-`Title`-style paragraph before the JSON content; it is not metadata-only and
-applies to every `--type`. When using `--title`, start `content.json` with the
-first section, not another copy of the document title. If the body supplies the
-title, omit `--title` to suppress the automatically inserted title.
-
 Choose the title, section structure and content from the task. Omit optional
 title or author text the user has not supplied. Apply any requested named format
 or template from the entry's profile routing before choosing generic defaults.
