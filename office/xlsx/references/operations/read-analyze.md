@@ -1,47 +1,69 @@
 # Read and analyze spreadsheet data
 
-Use for extraction or analysis without changing the source. Do not save,
-restyle or recalculate the original. A request for an output file is a separate
-CREATE/EDIT operation; return the requested format, not a mandatory report.
+Extract requested records/results directly; expand analysis only when needed.
+Do not save, restyle, execute macros or recalculate the original. An output file
+is a separate CREATE/EDIT operation, not a mandatory extra report.
 
-## Discover the data
+## Choose the smallest read
 
 ```bash
+# Standard library only; no pandas/openpyxl/Calc needed:
+python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --inventory --json
 python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx
-python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --sheet Sales --json
+python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsm --sheet Sales --range B3:D8 --json
+python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.csv --preview 8 --columns 4 --encoding utf-8-sig
+# Explicit full DataFrame work (optional pandas + appropriate Excel engine):
+python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --analyze --sheet Sales --json
+python3 "$SKILL_DIR/scripts/xlsx_reader.py" input.xlsx --quality --sheet Sales --json
 ```
 
-The reader handles XLSX/XLSM/CSV/TSV through pandas and supports `--quality`.
-Check actual sheet names, headers, extent, units, periods and data types before
-analysis. CSV encoding detection can be ambiguous; confirm text and delimiters
-rather than silently accepting garbled data. Read macros as data, never execute
-them as part of inspection.
+- Default: inventory plus **A1:L5 of the first XML worksheet only**. `--sheet`
+  selects a name, not an assumed part number. `--inventory` opens no worksheets,
+  styles or shared strings and makes no claim about used dimensions/row counts.
+- `--range A1:C8` (or one cell) uses actual Excel row/column addresses. Otherwise
+  `--preview N --columns M` reads addresses A1 through column M/row N. Slices are
+  capped at 10,000 cells. Sparse/absent cells are omitted, not fabricated zeros.
+- Worksheet XML streams only through the requested final row; reaching a late
+  range still scans preceding XML. Referenced shared strings stream until found;
+  styles are read for number-format metadata. These reads do not render Excel,
+  expand shared formulas, evaluate functions or access external links.
+- Numeric values remain exact XML lexical strings with style/number-format IDs;
+  date serials retain the workbook's 1900/1904 basis rather than guessed dates.
+  Unknown formats/types remain explicitly undecoded. Cell-format metadata does
+  not resolve inherited row/column styles, conditional formatting or locale display.
+  Explicit text, long IDs,
+  leading zeros and CJK strings are retained. A numeric `123` formatted `000000`
+  is not silently turned into an identifier; confirm field meaning and locale.
+- Formula text/attributes and cache status are separate: absent/blank caches are
+  unknown, never zero. A stored cache can still be stale. Inline/shared rich-text
+  content excludes phonetic annotations; unsupported annotations/features are not
+  a promise of lossless rendered text extraction.
+- CSV/TSV previews keep all fields as text. Encoding retries occur only on actual
+  decode failures; parser/I/O errors are reported without changing encodings.
+  Automatic UTF-8 BOM/GBK/Latin-1 fallback is ambiguous: confirm delimiter/encoding
+  and text, or specify `--encoding`. Inventory does not count delimited records.
+- `--analyze` restores the old full pandas structure + quality + statistics path;
+  omitted `--sheet` loads all sheets. `--quality` retains full audit/skip-statistics
+  meaning, and `--json` still selects machine-readable output. Lightweight JSON
+  instead reports `sheets`/`previews`; do not treat its sample as an audit result.
+  Full pandas inference is not an identifier/date preservation guarantee: provide
+  an explicit source schema for substantive custom analysis when needed.
 
-For custom analysis, use pandas or another appropriate deterministic tool.
-Read only needed sheets/columns for large files. Account for header offsets,
-merged or multi-row headers, and whether identifiers are text rather than
-quantities. Aggregate actual source columns rather than inferring totals from
-rounded summaries.
+## Interpret and answer
 
-## Interpret values carefully
+Confirm relevant sheets, real headers/offsets, grain, units, periods and types.
+Read only needed sheets/fields; do not run all-column profiling or extra financial
+metrics for a simple extraction. Aggregate source columns, not rounded summaries.
+For financial READ apply only the [finance semantics](../domains/finance.md#financial-semantics-read-and-authoring).
 
-- Missing formula caches are uncalculated/unknown values, not zeros. Reading
-  with `data_only=True` can inspect existing caches but does not calculate
-  formulas; never save that values-only workbook over the formula source.
-- When results require recalculation, use an authorized disposable copy and
-  the VALIDATE workflow. Do not silently alter the original during analysis.
-- Preserve missing, invalid and unavailable states. If coercing mixed types,
-  identify rejected values rather than silently deleting them.
-- Distinguish source records from calculated findings, estimates and proposals.
-  Explain material limits instead of inventing causes or unsupported facts.
-- Report Excel cell/row locations, not pandas indices. Account for the actual
-  header/skip offset rather than assuming a universal index-to-row formula.
-- Match requested decimal precision, currency, units and locale in displayed
-  results. Numeric display is not permission to round intermediate arithmetic.
+Preserve missing, invalid, unavailable and zero states; identify rejected
+conversions. Values-only reads do not calculate formulas and must never overwrite
+the formula source. Fresh results require an authorized disposable copy and the
+[impact-driven validation plan](validate.md), not a save/recalc of the original.
 
-## Answer the actual request
-
-Present the requested findings or extracted records with enough source
-locations and calculation detail to make material results checkable. Include
-relevant quality issues and missing-evidence caveats; do not impose unrelated
-financial metrics, a fixed section template, or an extra file on every task.
+Return requested findings/records with actual Excel cell/row locations and enough
+calculation detail for material results. Account for real header/skip offsets,
+not pandas indices or a universal index-to-row formula. Use requested display
+precision/currency/locale without rounding intermediate arithmetic; disclose
+relevant sampling, cache and quality limits. Do not invent causes or add
+unrequested metrics, sections or files.

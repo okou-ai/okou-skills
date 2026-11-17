@@ -1,9 +1,11 @@
 # CREATE a PDF
 
 Use this cover/body pipeline for a new PDF whose requirements it can implement.
-Select [manuscript versus visual requirements](../domains/profiles.md) and
-[presentation](../common/presentation.md) first; run the applicable
-[environment check](../implementation/environment.md).
+Use the concise [preset/override catalog](../common/presentation.md); keep script
+tokens unless user styles require changes. Consult [requirement profiles](../domains/profiles.md)
+only for a named manuscript or Word/PDF companion. Check input existence/type,
+prepare content, then use the feature-scoped [environment check](../implementation/environment.md)
+once per unchanged session; do not require the optional design reference.
 
 The pipeline renders the body before launching the cover browser. Then it merges
 the two PDFs, reopens the candidate, and replaces the output after it passes the
@@ -13,16 +15,13 @@ page-count check.
 bash "$SKILL_DIR/scripts/make.sh" run \
   --title "Q3 Strategy Review" --type proposal \
   --author "Strategy Team" --date "October 2025" \
-  --accent "#2D5F8A" \
   --content content.json --out report.pdf
 ```
 
 Prepare `content.json` from the actual source using the
 [block contract](../implementation/content.md#block-contract) and only its
-applicable feature sections. Do not deliver sample/default findings or treat
-`--type` as a content-domain or citation validator. Read
-[visual presets and overrides](../common/presentation.md#visual-presets-and-overrides)
-for supported names and appearance options; do not invent CLI flags.
+applicable feature sections. Do not deliver sample/default findings; preset
+selection does not supply content. Do not invent CLI flags.
 The `run` command requires `--content`. Use `demo` for sample material.
 If a block fails, fix the input or the missing dependency and rerun. The
 destination retains its previous contents on failure.

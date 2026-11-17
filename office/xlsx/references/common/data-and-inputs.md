@@ -6,11 +6,11 @@ source is not permission to add validation, helper sheets or formatting to it.
 
 ## Establish the schema before writing
 
-Inspect sheet names, real header rows, used ranges, source record counts, units,
-periods and relevant workbook features before selecting columns or coordinates.
-Keep original records distinguishable from cleaned data and calculated outputs.
-For CSV/TSV, confirm delimiter, encoding and locale; reconcile imported row counts
-and representative records rather than trusting a successful import call.
+Reuse a confirmed source schema (sheet/header locations, relevant fields, grain,
+units and periods); recheck affected fields when source, parsing or structure
+changes, not a second full profile. Keep source records distinct from cleaned/
+calculated outputs. For imports reconcile row counts and representative records;
+for CSV/TSV confirm delimiter, encoding and locale, not just import success.
 
 Choose types from field meaning, not appearance alone:
 
@@ -26,11 +26,11 @@ Choose types from field meaning, not appearance alone:
   conversions or missing records; do not silently drop them or replace them
   with zero to obtain a clean-looking total.
 
-Inspect formulas and existing caches separately when reading calculated files.
-A values-only read does not evaluate formulas and must never overwrite the
-formula source. Use [READ](../operations/read-analyze.md) for analysis boundaries.
+Inspect formulas/caches separately: missing or blank caches are unknown, not
+zero. Values-only reads never calculate or overwrite formula sources. Use
+[READ](../operations/read-analyze.md) for extraction/analysis, without input design.
 
-## Make inputs and calculations maintainable
+## Only for authored/changed editable inputs and calculations
 
 Give each material assumption one identifiable source cell or named range, with
 its unit and source/default/illustrative status. Reference that location from the
@@ -48,7 +48,7 @@ Keep summaries live. Text describing the current scenario must follow the inputs
 or clearly identify the stated baseline; static source/default notes may remain
 static. Check both the numbers and their interpretation after a driver changes.
 
-## Define and check input contracts
+## Only for authored/changed input contracts
 
 For authored editable fields with a known domain, choose suitable type, allowed
 values/range and blank policy. Do not invent business bounds absent from the
@@ -58,8 +58,9 @@ blanket `IFERROR(...,0)` can hide a broken model.
 
 Use validation to guide entry, not as proof that stored data are correct. A list
 object with its error alert disabled does not establish rejection of bad input.
-For a new compatible openpyxl workbook, this pattern encodes a planned whole-
-number range and an enabled Stop alert; its variables come from the input plan:
+For a new compatible openpyxl workbook, consult this optional recipe only when
+needed: it encodes a planned whole-number range and enabled Stop alert, with
+variables from the actual input plan:
 
 ```python
 from openpyxl.worksheet.datavalidation import DataValidation
@@ -89,8 +90,7 @@ writes, check one representative block and its types/formulas before expanding;
 verify tool results and source coverage after structural changes. Choose batch
 size for the tool and workload, not a fixed universal operation count.
 
-Save pending edits before a different program reads the file. Recheck formulas,
-references, caches and relevant features after that boundary; a library save may
-clear application-generated caches. Follow [VALIDATE](../operations/validate.md)
-for calculation, saved-file, visual and honest-delivery checks. Do not infer
-spreadsheet-engine behavior from an authoring library or one preview renderer.
+Save pending authorized edits before another program reads them. A later save
+can clear caches: apply the shared [VALIDATE impact matrix](../operations/validate.md#1-select-checks-by-impact)
+to the exact revision, not an unconditional mutation/recalc/export sequence.
+Authoring libraries and static previews do not prove engine execution.

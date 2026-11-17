@@ -1,13 +1,22 @@
 ---
 name: data-profiling
-description: Profile datasets for schema, distributions, nulls, cardinality, outliers, relationships, and data quality.
+description: Profile datasets for schema, distributions, nulls, cardinality, outliers, relationships, and data quality when profiling is requested or unresolved data risk needs investigation. Not a prerequisite for ordinary file reading or a defined metric calculation.
 ---
+
+## Scope
+
+For a defined extraction or analysis, inspect the fields, grain, keys and quality
+risks needed for that result; reuse a verified schema and prior checks. Expand to
+broader profiling only when requested or when an unresolved issue could change
+the answer. The sections below are a menu for that investigation, not a pipeline
+to execute for every new file. Do not modify, impute or recalculate the source as
+part of inspection.
 
 ## Structural Reconnaissance
 
 ### Table-Level Inventory
 
-Start every new dataset encounter by answering these questions:
+Resolve unknowns relevant to the requested result; do not repeat confirmed metadata:
 
 - What is the total row and column count?
 - What does each row represent (the grain)?
@@ -17,7 +26,7 @@ Start every new dataset encounter by answering these questions:
 
 ### Classifying Columns by Role
 
-Assign every column to one of these categories:
+Classify the columns in scope as needed to interpret their values:
 
 - **Key**: Primary keys, foreign keys, entity identifiers
 - **Attribute**: Categorical fields used for grouping or filtering (region, status, plan_type)
@@ -29,7 +38,11 @@ Assign every column to one of these categories:
 
 ## Column-Level Inspection
 
-### Universal Checks (All Column Types)
+### Checks for Relevant Columns
+
+Compute the statistics needed to investigate the selected risk, not every item
+for every column. Label samples and bounded previews; they do not establish
+whole-dataset completeness or uniqueness.
 
 - Null count and null percentage
 - Count of distinct values and cardinality ratio (distinct / total rows)
@@ -75,7 +88,7 @@ True proportion
 
 ## Discovering Relationships
 
-After examining columns individually, look for connections:
+Investigate relationships needed for the question or a suspected quality issue:
 
 - **Foreign key candidates**: ID columns whose values likely reference another table
 - **Hierarchical dimensions**: Columns that nest naturally (country > region > city)
@@ -85,14 +98,13 @@ After examining columns individually, look for connections:
 
 ## Evaluating Data Quality
 
-### Completeness Ratings
+### Completeness
 
-Assign each column a tier:
-
-- **Full** (>99% populated): No action needed
-- **Mostly full** (95-99%): Investigate the missing values
-- **Gaps present** (80-95%): Determine whether the gaps are systematic and whether the column is still usable
-- **Sparse** (<80%): Likely unusable without imputation or supplemental data
+Report missingness for relevant fields and determine whether it biases the
+requested result. Expected absence may depend on the record type or event;
+a sparse field is not inherently unusable, and high completeness does not prove
+validity. Do not infer usability or choose imputation from a fixed percentage.
+Retain missing, invalid and unavailable states separately from real zeros.
 
 ### Consistency Checks
 
@@ -100,7 +112,7 @@ Scan for:
 - **Value normalization failures**: The same concept spelled multiple ways ("USA", "US", "United States", "us")
 - **Type mismatches**: Numerics stored as text, dates in inconsistent formats
 - **Broken references**: Foreign key values with no matching parent record
-- **Rule violations**: Negative quantities, end dates preceding start dates, percentages outside 0-100
+- **Rule violations**: Values outside the field's actual domain, such as an end date before its start. A true proportion is bounded by 0-100%; growth, ROI and event-per-person ratios need not be. Confirm sign conventions before rejecting negative quantities
 - **Cross-column contradictions**: status = 'shipped' while ship_date is null
 
 ### Accuracy Warning Signs
@@ -133,7 +145,7 @@ When profiling a numeric column, classify its shape:
 
 ### Time-Based Patterns
 
-For any temporal data, investigate:
+When temporal behavior matters to the question, choose relevant checks:
 - **Trend**: Persistent upward or downward drift
 - **Seasonality**: Recurring cycles — weekly, monthly, quarterly, annual
 - **Weekday effects**: Systematic weekday vs. weekend differences
@@ -143,23 +155,27 @@ For any temporal data, investigate:
 
 ### Segment Discovery
 
-Surface natural groupings by:
-- Identifying categorical columns with 3 to 20 distinct values
+When segmentation is requested or could explain a material result, consider:
+- Identifying categorical columns with meaningful, interpretable groups
 - Comparing metric distributions across each segment value
 - Highlighting segments whose behavior diverges meaningfully from the overall
 - Checking whether apparent segments contain meaningful sub-segments
 
 ### Correlation Scanning
 
-Across numeric columns:
-- Build a pairwise correlation matrix
-- Highlight strong associations (|r| > 0.7)
-- Remember that correlation never establishes causation — note this explicitly
-- Probe for non-linear relationships (quadratic, logarithmic) that Pearson r would miss
+For a relevant association question:
+- Select the measures and an appropriate method; do not compute every pair by default
+- Interpret magnitude with sample size, uncertainty, missingness and domain context, not a universal cutoff
+- Correlation does not establish causation
+- Check non-linear relationships only when the question or evidence warrants it
 
 ## Documenting What You Find
 
 ### Dataset Summary Template
+
+Use this only for a requested profile or data dictionary. An ordinary Office
+analysis returns the requested answer or artifact, not an additional profile.
+Adapt the fields to available evidence; do not invent owners or refresh cadences.
 
 ```markdown
 
@@ -196,7 +212,9 @@ Across numeric columns:
 
 ### Schema Discovery Queries
 
-When working directly against a warehouse, use these patterns:
+Use these patterns only when directly querying an authorized warehouse and the
+needed metadata is not already known. Receiving a file is not a reason to
+inventory a warehouse or discover unrelated tables:
 
 ```sql
 -- Enumerate tables in a schema (PostgreSQL)
@@ -222,7 +240,8 @@ ORDER BY pg_total_relation_size(relid) DESC;
 
 ### Tracing Data Lineage
 
-When navigating an unfamiliar warehouse:
+Trace only the dependencies needed for a requested lineage investigation or a
+material source ambiguity; do not map an entire warehouse for ordinary analysis.
 
 1. Begin at the consumption layer — identify which tables power reports and dashboards
 2. Follow dependencies upstream: what feeds those tables?

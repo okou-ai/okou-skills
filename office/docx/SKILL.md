@@ -12,15 +12,14 @@ metadata:
     - "Springer LNCS / Nature / HBR Document Templates"
 description: >
   Create, read, edit, fill, and format editable Word documents (.docx / Word文档 / 文档)
-  using OpenXML SDK (.NET). Use for reports/报告, proposals, memos, forms, contract
+  with stdlib read/inspection and OpenXML SDK (.NET) authoring. Use for reports/报告, proposals, memos, forms, contract
   formatting/合同, Chinese government documents/公文 (GB/T 9704), academic papers
   (IEEE, ACM, APA 7 professional, MLA 9, Chicago/Turabian, Springer LNCS, Nature),
   theses/学位论文 and supplied university templates, business/editorial formats
   (Modern Corporate, Executive Brief, HBR), 排版 and 套模板. Route creation,
   narrow content edits, or template application without assuming a restyle.
-  Provides document structure and presentation guidance, not government-policy,
-  research, or legal expertise or official certification. Use ../pdf/SKILL.md
-  for a standalone PDF.
+  Named profiles guide presentation, not official standards certification. Use
+  ../pdf/SKILL.md for a standalone PDF.
 ---
 
 # Word documents
@@ -31,7 +30,8 @@ description: >
 |---|---|
 | New document without a structured supplied template | Pipeline A: [CREATE](references/operations/create.md), using the CLI for supported blocks/options |
 | Fill placeholders, replace text or edit authorized content | Pipeline B: [EDIT/FILL](references/operations/edit.md) |
-| Read or analyze an existing document | Use preview/analyze below; preserve the file |
+| Read content / answer text questions | Stdlib preview below; no setup, .NET, structural scan or render |
+| Inspect styles, sections or template/edit targets | Stdlib inventory once per input; reuse it |
 | Authorized restyling with a pure style template | Pipeline C-1: [OVERLAY](references/operations/template.md) |
 | New content within a structured cover/TOC/section template | Pipeline C-2: [BASE-REPLACE](references/operations/template.md) |
 | Completed output or an affected change | [VALIDATE](references/operations/validate.md) |
@@ -51,17 +51,20 @@ that route.
 Set `SKILL_DIR` to the absolute directory containing this file. All command paths
 are relative to this directory, not the task's working directory.
 
-First DOCX operation in the session:
-`bash "$SKILL_DIR/scripts/env_check.sh"`. Bash entrypoints reuse installed .NET;
-a built CLI needs only the .NET 8 runtime.
-For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
-(Windows: `scripts/setup.ps1 -Minimal`).
+Check only the selected operation's dependencies:
 
-For requested PDF output or rendered visual review, prepare converters before
-authoring where installation is permitted:
-`python3 "$SKILL_DIR/scripts/render_docx.py" --prepare`.
-Add `--pages qa/pages` when page images are needed. Render the validated DOCX
-using the [rendering instructions](references/operations/validate.md#rendering-and-delivery).
+- **Read text / inspect:** Python 3 standard library only; skip `env_check`, setup,
+  SDK and rendering. The commands below never modify the source.
+- **Execute CLI create/edit/template/validate:** once per session, run
+  `bash "$SKILL_DIR/scripts/env_check.sh"`. A prebuilt CLI needs only .NET 8 runtime;
+  entrypoints rediscover it in fresh shells without editing shell profiles.
+- **Build missing CLI / custom C# authoring:** SDK is required here only. With an
+  installed SDK, use `env_check.sh --build`; for permitted missing dependencies,
+  use `scripts/setup.sh --minimal` (Windows: `scripts/setup.ps1 -Minimal`).
+- **Requested PDF or rendered QA:** use the task-local prepare/receipt commands in
+  [VALIDATE](references/operations/validate.md#rendering-and-delivery) before
+  authoring. Reuse that successful capability check for the candidate; do not also
+  run `env_check.sh --with-rendering` or another standalone probe. No render for reads.
 
 ## Named presentation profiles
 
@@ -76,27 +79,42 @@ operation selected above to preserve or create the required structure.
 | Thesis/dissertation or supplied university template | [Thesis/template](references/domains/thesis-template.md) |
 | Modern Corporate, Executive Brief, Minimal Modern or HBR presentation | [Business/editorial](references/domains/business-editorial.md) |
 
-Profiles address structure/presentation, not domain expertise or certification.
 When a named profile or custom layout exceeds the CLI's supported blocks and
 options, use the relevant [C# authoring pattern](references/implementation/authoring.md).
 Adapt samples to the task; never copy their findings, citations or identities.
 
 ## Existing documents
 
-Preview and analyze before editing. Convert legacy `.doc` only when needed:
+Read only what the task needs; preserve the source:
 
 ```bash
-bash "$SKILL_DIR/scripts/doc_to_docx.sh" input.doc output_dir/
+# Content-only: complete stored body text, not rendered pagination/lossless extraction.
 bash "$SKILL_DIR/scripts/docx_preview.sh" document.docx
-bash "$SKILL_DIR/scripts/docx.sh" analyze --input document.docx
+# Optional: non-body text, explicitly separated from the body (or --part footnotes).
+bash "$SKILL_DIR/scripts/docx_preview.sh" document.docx --part all
+# Only when structure/styles/edit targets are needed: one reusable JSON inventory.
+python3 "$SKILL_DIR/scripts/docx_inspect.py" inventory document.docx > document.inventory.json
 ```
+
+Inventory defaults to bounded body previews, complete style/section/relationship
+metadata and cheap part names/sizes; it does not read media/binary parts. Observe
+its `body_coverage` and truncation markers. Choose range/full text, XML or member
+hashes only when needed, using the [inspection contract](references/implementation/inspection.md)
+or `inventory --help`; reuse the saved input inventory across stages. Presence
+checks/hashes do not replace package or actual-output QA; printed XML is for
+inspection, not byte-preserving repacking.
+Convert legacy `.doc` only when necessary via
+`bash "$SKILL_DIR/scripts/doc_to_docx.sh" input.doc output_dir/` (needs Writer).
+
+Read-only work stops after answering the question. For authored/edited output,
+validate the candidate package, check authorized content/preservation, and repeat
+only affected checks. Render when pagination/layout changed or requested output
+needs visual QA; text-only edits can also reflow, so assess their impact first.
 
 ## References by responsibility
 
-Select only applicable guides; do not load the whole library. For long guides,
-search for the needed element or symptom. Operations own the workflow, profiles
-own named requirements, and implementation guides own SDK/package details.
-Executable and asset paths stay under `scripts/` and `assets/`.
+Load only the operation and relevant named profile/element/symptom; optional design
+references below are not prerequisites for a standard CLI document or narrow edit.
 
 | Need | Direct reference |
 |---|---|

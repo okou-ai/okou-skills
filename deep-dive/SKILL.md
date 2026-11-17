@@ -1,10 +1,16 @@
 ---
 name: deep-dive
-description: Structured research and solution design workflow. Use when user mentions
-  "deep dive", "deep research", "deep innovate", "research this", "investigate",
-  "analyze the codebase", "solution design", "approach comparison", "technical
-  research", "方案选型", "调研", or asks to explore options before implementing.
+description: Staged codebase research and solution design for explicitly requested deep research/deep innovate or an agreed research-before-design engagement. Not a default dependency for ordinary document analysis, general investigation, or a request that already asks for findings and recommendations together.
 ---
+
+# Staged research and solution design
+
+Use the phases below only when the user selected this staged engagement. Broad
+words such as "analyze", "investigate" or "调研" alone do not require phase
+files or a facts-only handoff. For ordinary analysis, answer the requested
+question in the requested format, including recommendations when asked.
+Do not turn a clear, authorized implementation request into another mandatory
+research/feedback round.
 
 ## Operation: deep research
 
@@ -29,7 +35,7 @@ Information gathering phase. Analyze the codebase without suggesting solutions.
 
 ### Workflow
 
-1. **Clarification** - Ask questions to understand the scope
+1. **Clarification** - Ask only questions that block the agreed research scope; reuse resolved context
 2. **Research** - Systematically analyze relevant code
 3. **Documentation** - Record findings to `deep-dive/{task-name}/research.md`
 4. **Completion** - Summarize findings (facts only), ask what to do next
