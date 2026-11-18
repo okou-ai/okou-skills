@@ -1,6 +1,6 @@
 # Qualification Guide
 
-Check eligibility and Fit first. Once the evidence establishes a sufficient match for the task, check Intent for the next step. Then use the evidence from both assessments to complete and summarize the candidate profile.
+Verify eligibility and key matches first. Give a Fit percentage only when the user needs to compare candidates. Check Intent when the key matches are supported by evidence and Intent could affect the next step. Then use the evidence gathered to complete and summarize the candidate profile.
 
 ## Turn the request into verifiable criteria
 
@@ -13,7 +13,7 @@ Use the questions that apply to the task.
 - **Match for this task.** What does the user need from the output, audience, setting, or working conditions? Which facts about the candidate show how well they match? Which decision would a gap affect?
 - **Ability to move forward.** What conditions need to hold for the next step? Which recent signals could change when to follow up? What still needs confirmation?
 
-Define the key Fit criteria, the time window for Intent, and the evidence required for each Intent level before applying them across batches. Recheck affected candidates whenever the task definition changes.
+Define the key matches and any preferences used for comparison. When Intent matters, define the signals to look for, their time window, and the evidence needed for each level. Apply the same criteria across batches and recheck affected candidates if the task changes.
 
 ## Connect evidence to each judgment
 
@@ -27,15 +27,24 @@ For each key fact, record **the conclusion, the supporting fact, the original so
 
 ## Fit
 
+### When to compare candidates
+
+Compare Fit when the user needs to choose among eligible candidates, rank them, or use differences in suitability to decide whom to approach first. This includes requests for the strongest matches and preferences that affect selection. For identity verification, eligibility checks, or a list of people who meet the requirements, give the verification result and evidence. For example, finding ten people who qualify calls for eligibility checks. Selecting the ten strongest matches also calls for comparison.
+
+When comparison is needed, report Fit as a percentage using the following steps.
+
 1. **Build a rubric for the task.** Derive the Fit criteria from the user's decision and ranking preferences. For each criterion, specify what the task calls for, what to verify about the candidate, and what evidence would show a strong match, a partial match, or a clear mismatch. Set the criteria's importance according to their effect on the decision. Apply any weights the user specifies.
 2. **Define overall score bands.** Before scoring, specify what combination of evidence warrants 100% and what verified matches and gaps each lower band represents. Apply the same rubric across batches. Count each fact once.
 3. **Report a supported overall score.** Give each eligible candidate one whole-number percentage from 0% to 100%. Cite the matches and limitations that best explain the score. If evidence for a key criterion is missing, use a provisional score based on verified matches and explain what evidence could change it.
 
-Use the task's goal and preferences to decide what verified match justifies checking Intent. Resolve material gaps in Fit first. When the user asks for every eligible candidate, use the original hard requirements to decide who belongs on the list.
-
 ## Intent
 
-For candidates whose Fit is established, check for current willingness or action. Define **who would take which next step** and set a signal window appropriate to the opportunity. Record the actor, event date, statement or action, source, and relevance to the opportunity. Attribute organizational developments to the organization and individual statements or actions to the person. If the task makes an Intent signal a hard requirement, verify it before counting the candidate as eligible.
+Check Intent when both conditions apply.
+
+1. **The key match is supported.** Verify the other hard requirements and the facts that determine whether the user would consider the person. Resolve any Fit gap that could change that decision first. Gaps that only affect ranking can be investigated alongside Intent.
+2. **Intent could affect the next step.** The result could change whether to follow up, whom to approach first, when to reach out, or how to proceed. If the task makes an Intent signal a hard requirement, verify it before counting the candidate as eligible.
+
+Define **who would take which next step** and set a signal window appropriate to the opportunity. Record the actor, event date, statement or action, source, and relevance to the opportunity. Attribute organizational developments to the organization and individual statements or actions to the person.
 
 | Level or status | Evidence |
 | --- | --- |
@@ -45,7 +54,7 @@ For candidates whose Fit is established, check for current willingness or action
 | **Unverified** | Available evidence is insufficient to assign a level. State whether the check has yet to be made, relevant signals were unavailable, access was blocked, or evidence conflicted. |
 | **Not applicable** | The user's decision does not depend on the other party's willingness or timing. |
 
-Explain Fit and Intent separately and cite the evidence for each. Rank according to the user's decision. If the goal is to find the strongest match, rank by Fit first and use Intent to prioritize follow-up among candidates with similar Fit.
+Explain the key matches and any Intent assessment with sources. Rank according to the user's decision. If the goal is to find the strongest match, rank by Fit first and use Intent to prioritize follow-up among candidates with similar Fit.
 
 ## When to enrich candidate profiles
 
