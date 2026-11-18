@@ -10,9 +10,9 @@ Translate each hard requirement into a fact you can verify. Specify the person, 
 - **Ineligible.** Evidence shows that a hard requirement is unmet. Record the reason and move to other candidates.
 - **Unverified.** Key evidence is missing, or identity, timing, or attribution is disputed. Look for a source that directly addresses the gap. If none is available, keep the person as a lead, state what is known and missing, and move to other candidates.
 
-**Use Fit percentages to compare candidates.** Score candidates when the user needs to choose among eligible people, rank them, or prioritize by suitability. Use the task's goal and preferences to define the criteria, evidence standards, and what full and lower scores mean. Apply any user-specified weights and the same rubric across batches. Count each fact once. Give one whole-number percentage from 0% to 100% with its key evidence. When the request is limited to verifying identities or eligibility, or listing everyone who qualifies, provide the verification result and evidence.
+**Give Fit percentages only when candidates need to be compared.** Define a few score bands using the evidence that matters most to the user's choice. Reuse the evidence gathered during verification. Give candidates in the same band the same whole-number percentage and a short reason. Apply the same bands across batches. Follow any scoring method or weights the user provides. For eligibility checks, deliver the verdict and supporting evidence.
 
-End eligibility verification once the hard requirements are resolved. When comparing candidates, gather enough evidence to explain the differences that affect ranking. If a material ranking gap cannot be resolved, give a provisional score based on verified matches and record the gap. Recheck affected candidates when the task changes.
+End eligibility verification once the hard requirements are resolved. Fill gaps that could change selection, ranking, or follow-up. If a material ranking gap cannot be resolved, give a provisional score based on verified matches and record the gap. Recheck affected candidates when the task changes.
 
 ## Check intent when it affects the next step (Intent)
 
