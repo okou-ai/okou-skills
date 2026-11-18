@@ -2,16 +2,14 @@
 
 ## Turn the request into verifiable criteria
 
-Start with the decision the user needs to make from the list. Translate explicit requirements into verifiable facts and use the decision context to identify relevant matches and profile details the user has left implicit. Pair the desired audience, capability, responsibility, or working conditions with facts about the candidate that are either documented or need verification. Preserve requested fields and distinguish hard requirements, ranking preferences, recent signals, and follow-up items. For each question, identify the subject, the relevant period or scope, and what evidence is sufficient.
+Start with the decision the user needs to make from the list. Pair each task requirement and decision-relevant implicit condition with a verifiable fact about the candidate. Preserve requested fields and distinguish hard requirements, ranking preferences, recent signals, and follow-up items. For each question, identify the subject, the relevant period or scope, and what evidence is sufficient.
 
-| User decision | Facts to verify |
-| --- | --- |
-| Determine whether a candidate can work under the role's terms | Match the role's work location or time zone with the candidate's publicly stated location and acceptable work arrangements. |
-| Select a creator to produce and publish content | Match the requested language to the work's language, the deliverable format to published work and accounts, and the target market to the actual audience. Verify the filming location when local filming is required. |
-| Invite an expert to discuss a system migration | Identify the part they owned, the constraints they faced, and the trade-offs documented in public accounts of the project. |
-| Identify who can move a company pilot forward | Match the work required to the person's current responsibilities and decision authority. Use the organization's project stage and recent actions to assess follow-up timing. |
-| Find a research collaborator | Look for methods they have used, the contribution they can make, and documented access to relevant resources. |
-| Identify someone with a common name at a past event | Match the organization, role, and credits at the time of the event to the person's identity. |
+Use the questions that apply to the task.
+
+- **Identity and attribution.** Who does the evidence identify? When and in what context did the person hold the relevant role or responsibility, or receive the credit?
+- **Relevant experience.** Which action, work, or result best demonstrates relevant experience? What did the person do themselves?
+- **Match for this task.** What does the user need from the output, audience, setting, or working conditions? Which facts about the candidate show how well they match? Which decision would a gap affect?
+- **Ability to move forward.** What conditions need to hold for the next step? Which recent signals could change when to follow up? What still needs confirmation?
 
 Define the key Fit criteria, the time window for Intent, and the evidence required for each Intent level before applying them across batches. Recheck affected candidates whenever the task definition changes.
 
