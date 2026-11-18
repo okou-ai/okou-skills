@@ -24,7 +24,9 @@ class _OriginalNameInfo(zipfile.ZipInfo):
         # Its default writer otherwise normalizes non-ASCII CP437 names to UTF-8,
         # disagreeing with the untouched local record and changing member flags.
         encoding = "utf-8" if self.flag_bits & 0x800 else "cp437"
-        return self.filename.encode(encoding), self.flag_bits
+        # Unicode Path extras can change filename; orig_filename retains the
+        # header-decoded name of the unchanged local record.
+        return self.orig_filename.encode(encoding), self.flag_bits
 
 
 def safe_member(name: str) -> str:

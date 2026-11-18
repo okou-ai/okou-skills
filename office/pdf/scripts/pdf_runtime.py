@@ -29,7 +29,11 @@ def require_dependency(name: str):
 
 def require_file(path: str, suffixes=()):
     source = Path(path)
-    if not source.is_file():
+    try:
+        is_file = source.is_file()
+    except OSError as exc:
+        raise ValueError(f"Cannot access input file {path}: {exc}") from exc
+    if not is_file:
         raise ValueError(f"File not found or not a regular file: {path}")
     if suffixes and source.suffix.lower() not in suffixes:
         raise ValueError(f"Unsupported file type: {source.suffix}; expected {' / '.join(suffixes)}")
@@ -38,11 +42,14 @@ def require_file(path: str, suffixes=()):
 
 def require_distinct_output(out_path: str, *inputs: str):
     output = Path(out_path)
-    if output.is_dir():
-        raise ValueError(f"Output is a directory: {out_path}")
-    for source in inputs:
-        input_path = Path(source)
-        if output.resolve() == input_path.resolve() or (
-            output.exists() and input_path.exists() and output.samefile(input_path)
-        ):
-            raise ValueError("Output must differ from input files")
+    try:
+        if output.is_dir():
+            raise ValueError(f"Output is a directory: {out_path}")
+        for source in inputs:
+            input_path = Path(source)
+            if output.resolve() == input_path.resolve() or (
+                output.exists() and input_path.exists() and output.samefile(input_path)
+            ):
+                raise ValueError("Output must differ from input files")
+    except OSError as exc:
+        raise ValueError(f"Cannot inspect output path {out_path}: {exc}") from exc
