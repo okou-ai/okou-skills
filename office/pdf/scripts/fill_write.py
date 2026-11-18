@@ -18,29 +18,16 @@ values format:
       "Radio1":     "/Choice2"             # radio     (must match a radio value)
     }
 
-Exit codes: 0 success, 1 bad args, 2 dep missing, 3 read/write error, 4 validation error
+Exit codes: 0 success (including field warnings), 1 bad args, 2 dep missing, 3 read/write error
 """
 
 import argparse
 import json
 import os
 import sys
-import importlib.util
+import tempfile
 
-
-
-
-def ensure_deps():
-    if importlib.util.find_spec("pypdf") is None:
-        import subprocess
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "--break-system-packages", "-q", "pypdf"]
-        )
-
-
-ensure_deps()
-from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject, TextStringObject, BooleanObject
+from pdf_runtime import DependencyError, require_dependency, require_distinct_output, require_file
 
 
 # ── Field helpers ─────────────────────────────────────────────────────────────
@@ -59,6 +46,8 @@ def _field_type(field) -> str:
 def _get_checkbox_on_value(field) -> str:
     """Return the /AP /N key that means 'checked' (anything except /Off)."""
     ap = field.get("/AP")
+    if ap:
+        ap = ap.get_object()
     if ap and "/N" in ap:
         for k in ap["/N"]:
             if str(k) != "/Off":
@@ -72,27 +61,26 @@ def _get_dropdown_values(field) -> list[str]:
         return []
     values = []
     for item in opt:
-        try:
-            from pypdf.generic import ArrayObject
-            if isinstance(item, (list, ArrayObject)) and len(item) >= 1:
-                values.append(str(item[0]))
-            else:
-                values.append(str(item))
-        except Exception:
+        if isinstance(item, list) and len(item) >= 1:
+            values.append(str(item[0]))
+        else:
             values.append(str(item))
     return values
 
 
 # ── Walk + fill ───────────────────────────────────────────────────────────────
 def _walk_and_fill(fields, data: dict, filled: list, errors: list, parent: str = ""):
+    from pypdf.generic import NameObject, TextStringObject
+
     for field in fields:
+        field = field.get_object()
         name = str(field.get("/T", ""))
         full = f"{parent}.{name}" if parent else name
 
         # Recurse into named groups
         kids = field.get("/Kids")
         if kids:
-            named = [k for k in kids if "/T" in k]
+            named = [k for k in kids if "/T" in k.get_object()]
             if named:
                 _walk_and_fill(named, data, filled, errors, full)
                 continue
@@ -145,6 +133,14 @@ def _walk_and_fill(fields, data: dict, filled: list, errors: list, parent: str =
 
 
 def fill(pdf_path: str, out_path: str, data: dict) -> dict:
+    require_file(pdf_path)
+    require_distinct_output(out_path, pdf_path)
+    if not isinstance(data, dict) or not data:
+        raise ValueError("Field values must be a nonempty JSON object")
+    pypdf = require_dependency("pypdf")
+    from pypdf.generic import NameObject, BooleanObject
+
+    PdfReader, PdfWriter = pypdf.PdfReader, pypdf.PdfWriter
     try:
         reader = PdfReader(pdf_path)
     except Exception as e:
@@ -154,6 +150,8 @@ def fill(pdf_path: str, out_path: str, data: dict) -> dict:
     writer.clone_document_from_reader(reader)
 
     acroform = writer._root_object.get("/AcroForm")  # type: ignore[attr-defined]
+    if acroform is not None:
+        acroform = acroform.get_object()
     if acroform is None or "/Fields" not in acroform:
         return {
             "status": "error",
@@ -171,12 +169,28 @@ def fill(pdf_path: str, out_path: str, data: dict) -> dict:
     # Warn about requested fields that were never found
     not_found = [k for k in data if k not in filled and not any(e["field"] == k for e in errors)]
 
+    directory = os.path.dirname(os.path.abspath(out_path))
+    os.makedirs(directory, exist_ok=True)
+    candidate = tempfile.NamedTemporaryFile(dir=directory, prefix=".pdf-fill-", suffix=".tmp", delete=False)
     try:
-        os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-        with open(out_path, "wb") as f:
-            writer.write(f)
+        with candidate:
+            writer.write(candidate)
+        reopened = PdfReader(candidate.name)
+        if len(reopened.pages) != len(reader.pages):
+            raise ValueError("Filled PDF page count changed")
+        actual = reopened.get_fields() or {}
+        expected = writer.get_fields() or {}
+        # Only fields actually filled require value verification; validation and
+        # unknown-field warnings must not prevent publishing the other changes.
+        for name in filled:
+            if name not in actual or str(actual[name].get("/V")) != str(expected[name].get("/V")):
+                raise ValueError(f"Stored value did not verify for field: {name}")
+        os.replace(candidate.name, out_path)
     except Exception as e:
-        return {"status": "error", "error": f"Write failed: {e}"}
+        return {"status": "error", "error": f"Write/verification failed: {e}"}
+    finally:
+        if os.path.exists(candidate.name):
+            os.remove(candidate.name)
 
     result = {
         "status":        "ok",
@@ -202,24 +216,34 @@ def main():
     group.add_argument("--values", help="Inline JSON string with field values")
     args = parser.parse_args()
 
-    if not os.path.exists(args.input):
-        print(json.dumps({"status": "error", "error": f"File not found: {args.input}"}),
-              file=sys.stderr)
+    try:
+        require_file(args.input)
+        require_distinct_output(args.out, args.input)
+        if args.data:
+            require_file(args.data)
+    except ValueError as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
         sys.exit(1)
 
-    # Load data
+    # Load data before loading any PDF dependencies.
     try:
         if args.data:
             with open(args.data) as f:
                 data = json.load(f)
         else:
             data = json.loads(args.values)
+        if not isinstance(data, dict) or not data:
+            raise ValueError("Field values must be a nonempty JSON object")
     except Exception as e:
         print(json.dumps({"status": "error", "error": f"JSON parse error: {e}"}),
               file=sys.stderr)
         sys.exit(1)
 
-    result = fill(args.input, args.out, data)
+    try:
+        result = fill(args.input, args.out, data)
+    except Exception as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
+        sys.exit(2 if isinstance(exc, DependencyError) else 3)
     print(json.dumps(result, indent=2, ensure_ascii=False))
 
     if result["status"] == "ok":

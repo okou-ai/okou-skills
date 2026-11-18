@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 """
-xlsx_reader.py — Structure discovery and data analysis tool for Excel/CSV files.
+xlsx_reader.py — Full spreadsheet analysis with opt-in bounded inspection.
 
 Usage:
-    python3 xlsx_reader.py <file>                   # full structure report
-    python3 xlsx_reader.py <file> --sheet Sales     # analyze one sheet
-    python3 xlsx_reader.py <file> --json            # machine-readable output
-    python3 xlsx_reader.py <file> --quality         # data quality audit only
+    python3 xlsx_reader.py <file>                   # full pandas analysis (unchanged)
+    python3 xlsx_reader.py <file> --sheet Sales     # analyze one sheet (unchanged)
+    python3 xlsx_reader.py <file> --inventory       # stdlib names/part mappings only
+    python3 xlsx_reader.py <file> --preview 5       # stdlib first-sheet A1:L5 preview
+    python3 xlsx_reader.py <file> --sheet Sales --range B3:D8 --json
+    python3 xlsx_reader.py <file> --analyze         # explicit alias of the default
+    python3 xlsx_reader.py <file> --quality         # full pandas quality audit, no stats
 
 Supports: .xlsx, .xlsm, .csv, .tsv
 Does NOT modify the source file in any way.
@@ -21,6 +24,10 @@ import sys
 import json
 import argparse
 from pathlib import Path
+import csv
+import zipfile
+import xml.etree.ElementTree as ET
+from xlsx_lightweight import inspect_file
 
 
 # ---------------------------------------------------------------------------
@@ -38,7 +45,8 @@ def detect_and_load(file_path: str, sheet_name_filter: str | None = None) -> dic
         import pandas as pd
     except ImportError:
         raise RuntimeError(
-            "pandas is not installed. Run: pip install pandas openpyxl"
+            "Full analysis (default, --analyze or --quality) requires pandas (and an Excel engine for XLSX). "
+            "Use the stdlib inventory/preview/range modes, or an already authorized analysis environment."
         )
 
     path = Path(file_path)
@@ -58,7 +66,7 @@ def detect_and_load(file_path: str, sheet_name_filter: str | None = None) -> dic
 
     elif suffix in (".csv", ".tsv"):
         sep = "\t" if suffix == ".tsv" else ","
-        encodings = ["utf-8-sig", "gbk", "utf-8", "latin-1"]
+        encodings = ["utf-8-sig", "gbk", "latin-1"]
         last_error = None
         for enc in encodings:
             try:
@@ -66,7 +74,7 @@ def detect_and_load(file_path: str, sheet_name_filter: str | None = None) -> dic
                 df = pd.read_csv(file_path, sep=sep, encoding=enc)
                 df._reader_encoding = enc  # attach metadata (non-standard, for reporting)
                 return {path.stem: df}
-            except (UnicodeDecodeError, Exception) as e:
+            except UnicodeDecodeError as e:
                 last_error = e
                 continue
         raise ValueError(
@@ -324,19 +332,56 @@ def main() -> None:
         description="Read and analyze Excel/CSV files without modifying them."
     )
     parser.add_argument("file", help="Path to .xlsx, .xlsm, .csv, or .tsv file")
-    parser.add_argument("--sheet", help="Analyze a specific sheet only", default=None)
+    parser.add_argument("--sheet", help="Select a named sheet (all sheets in full analysis if omitted)", default=None)
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--inventory", action="store_true", help="List workbook sheets/relationships without opening worksheets")
+    modes.add_argument("--analyze", action="store_true", help="Full pandas structure, quality and statistics (default)")
+    modes.add_argument("--quality", action="store_true", help="Full pandas quality audit only (skip statistics)")
+    parser.add_argument("--preview", type=int, metavar="ROWS", help="Opt-in bounded preview of worksheet row addresses 1..ROWS")
+    parser.add_argument("--columns", type=int, help="Opt-in bounded preview of columns 1..N (otherwise 12)")
+    parser.add_argument("--range", dest="cell_range", help="Explicit bounded Excel range, e.g. B3:D8 (max 10,000 cells)")
+    parser.add_argument("--encoding", help="CSV/TSV preview encoding; otherwise try UTF-8 BOM, GBK, Latin-1 on decode failure only")
     parser.add_argument(
         "--json", action="store_true", help="Output machine-readable JSON"
     )
-    parser.add_argument(
-        "--quality", action="store_true",
-        help="Run data quality audit only (skip stats)"
-    )
     args = parser.parse_args()
+    preview_options = any(value is not None for value in
+                          (args.cell_range, args.encoding, args.preview, args.columns))
+    lightweight = args.inventory or preview_options
+    if lightweight and (args.analyze or args.quality):
+        parser.error("Inventory/range/preview/encoding options are for lightweight inspection, not full analysis")
+    if lightweight:
+        try:
+            output = inspect_file(args.file, sheet_name=args.sheet, inventory=args.inventory,
+                                  cell_range=args.cell_range,
+                                  rows=5 if args.preview is None else args.preview,
+                                  columns=12 if args.columns is None else args.columns,
+                                  encoding=args.encoding)
+            if args.json:
+                print(json.dumps(output, indent=2, ensure_ascii=False))
+            else:
+                print(f"{output['mode'].upper()}: {args.file}")
+                for sheet in output["sheets"]:
+                    print(f"  {sheet['name']} [{sheet['kind']}] {sheet.get('part', '')}")
+                if "date_system" in output:
+                    print(f"  Workbook date system: {output['date_system']}")
+                for name, preview in output["previews"].items():
+                    print(f"\n{name} (bounded slice; not a full analysis):")
+                    for cell in preview["cells"]:
+                        formula = f" formula={cell['formula']!r} cache={cell['cache_status']}" if 'formula' in cell else ''
+                        formatting = f" numFmt={cell['num_fmt_id']}:{cell.get('number_format')!r}" if 'num_fmt_id' in cell else ''
+                        warning = f" WARNING: {cell['warning']}" if 'warning' in cell else ''
+                        print(f"  {cell['address']}: {cell['value']!r} [{cell['type']}]{formula}{formatting}{warning}")
+                for note in output["limitations"]:
+                    print(f"NOTE: {note}")
+            return
+        except (OSError, ValueError, LookupError, csv.Error, ET.ParseError, zipfile.BadZipFile) as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            sys.exit(1)
 
     try:
         sheets = detect_and_load(args.file, sheet_name_filter=args.sheet)
-    except (FileNotFoundError, ValueError, RuntimeError) as e:
+    except (OSError, ValueError, RuntimeError, ImportError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
 

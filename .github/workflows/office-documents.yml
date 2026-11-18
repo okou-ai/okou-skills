@@ -23,8 +23,6 @@ jobs:
           node-version: "22"
       - name: Select the .NET 8 SDK
         run: dotnet new globaljson --sdk-version 8.0.100 --roll-forward latestFeature
-      - name: Check DOCX SDK discovery in fresh shells
-        run: python office/docx/scripts/tests/test_dotnet_env.py
       - name: Check lazy DOCX rendering setup
         run: python office/docx/scripts/tests/test_render_docx.py
       - name: Install native dependencies

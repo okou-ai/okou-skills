@@ -27,48 +27,49 @@ Block types:
 Exit codes: 0 success, 1 bad args/missing file, 2 missing dep, 3 render error
 """
 
+from __future__ import annotations
+
 import argparse
 import html
-import importlib.util
 import io
 import json
 import os
 from pathlib import Path
 import re
 import sys
+import tempfile
+
+from pdf_runtime import DependencyError, require_dependency, require_distinct_output, require_file
 
 
-# ── Dependency bootstrap ───────────────────────────────────────────────────────
-def ensure_deps():
-    missing = [p for p in ("reportlab", "pypdf")
-               if importlib.util.find_spec(p) is None]
-    if missing:
-        import subprocess
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install",
-             "--break-system-packages", "-q"] + missing
-        )
-
-
-ensure_deps()
-
-from reportlab.platypus import (
-    BaseDocTemplate, PageTemplate, Frame,
-    Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, PageBreak, Flowable, KeepTogether,
-    Preformatted, Image as RLImage,
-)
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.colors import HexColor
-from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont, TTFError
+def _load_reportlab():
+    """Load authoring classes on actual rendering, never for import/help."""
+    if "BeautifulDoc" in globals():
+        return
+    require_dependency("reportlab")
+    platypus = require_dependency("reportlab.platypus")
+    names = ("BaseDocTemplate", "PageTemplate", "Frame", "Paragraph", "Spacer",
+             "Table", "TableStyle", "HRFlowable", "PageBreak", "Flowable",
+             "KeepTogether", "Preformatted")
+    globals().update({name: getattr(platypus, name) for name in names})
+    globals()["RLImage"] = platypus.Image
+    for module, names in (
+        ("reportlab.lib.pagesizes", ("A4",)),
+        ("reportlab.lib.styles", ("ParagraphStyle",)),
+        ("reportlab.lib.colors", ("HexColor",)),
+        ("reportlab.lib.enums", ("TA_JUSTIFY", "TA_CENTER")),
+        ("reportlab.pdfbase.ttfonts", ("TTFont", "TTFError")),
+    ):
+        loaded = require_dependency(module)
+        globals().update({name: getattr(loaded, name) for name in names})
+    globals()["pdfmetrics"] = require_dependency("reportlab.pdfbase.pdfmetrics")
+    _define_flowables()
 
 
 # ── Font registration ──────────────────────────────────────────────────────────
 def register_fonts(tokens: dict):
     """Register TTF fonts from token font_paths if present."""
+    _load_reportlab()
     for name, fpath in tokens.get("font_paths", {}).items():
         if os.path.exists(fpath):
             try:
@@ -100,6 +101,7 @@ def content_text(value):
 
 
 def cjk_font_path(tokens: dict, content: list) -> str | None:
+    _load_reportlab()
     text = "".join(tokens.get(key, "") for key in ("title", "date", "author"))
     text += "".join(content_text(content))
     if not _CJK.search(text):
@@ -144,106 +146,104 @@ def _paragraph(text, style):
 # Custom Flowables
 # ══════════════════════════════════════════════════════════════════════════════
 
-class CalloutBox(Flowable):
-    """Highlighted insight box: coloured background + 4px left accent bar."""
+def _define_flowables():
+    # Class bases are resolved only after ReportLab is explicitly loaded.
+    global CalloutBox, BibliographyItem, BeautifulDoc
 
-    def __init__(self, text: str, style, accent: str, bg: str):
-        super().__init__()
-        self._para   = _paragraph(text, style)
-        self._accent = HexColor(accent)
-        self._bg     = HexColor(bg)
+    class CalloutBox(Flowable):
+        """Highlighted insight box: coloured background + 4px left accent bar."""
 
-    def wrap(self, aw, ah):
-        self._w = aw
-        _, ph = self._para.wrap(aw - 36, ah)
-        self._h = ph + 22
-        return aw, self._h
+        def __init__(self, text: str, style, accent: str, bg: str):
+            super().__init__()
+            self._para   = _paragraph(text, style)
+            self._accent = HexColor(accent)
+            self._bg     = HexColor(bg)
 
-    def draw(self):
-        c = self.canv
-        c.setFillColor(self._bg)
-        c.roundRect(0, 0, self._w, self._h, 5, fill=1, stroke=0)
-        c.setFillColor(self._accent)
-        c.rect(0, 0, 4, self._h, fill=1, stroke=0)
-        self._para.drawOn(c, 18, 11)
+        def wrap(self, aw, ah):
+            self._w = aw
+            _, ph = self._para.wrap(aw - 36, ah)
+            self._h = ph + 22
+            return aw, self._h
 
+        def draw(self):
+            c = self.canv
+            c.setFillColor(self._bg)
+            c.roundRect(0, 0, self._w, self._h, 5, fill=1, stroke=0)
+            c.setFillColor(self._accent)
+            c.rect(0, 0, 4, self._h, fill=1, stroke=0)
+            self._para.drawOn(c, 18, 11)
 
-class BibliographyItem(Flowable):
-    """Single hanging-indent bibliography entry rendered as [N] text."""
+    class BibliographyItem(Flowable):
+        """Single hanging-indent bibliography entry rendered as [N] text."""
 
-    LABEL_W = 28
+        LABEL_W = 28
 
-    def __init__(self, ref_id: str, text: str, style, dark: str):
-        super().__init__()
-        self._id    = ref_id
-        self._text  = text
-        self._style = style
-        self._dark  = HexColor(dark)
+        def __init__(self, ref_id: str, text: str, style, dark: str):
+            super().__init__()
+            self._id    = ref_id
+            self._text  = text
+            self._style = style
+            self._dark  = HexColor(dark)
 
-    def wrap(self, aw, ah):
-        self._w    = aw
-        self._para = _paragraph(self._text, self._style)
-        _, ph      = self._para.wrap(aw - self.LABEL_W, ah)
-        self._h    = ph + 4
-        return aw, self._h
+        def wrap(self, aw, ah):
+            self._w    = aw
+            self._para = _paragraph(self._text, self._style)
+            _, ph      = self._para.wrap(aw - self.LABEL_W, ah)
+            self._h    = ph + 4
+            return aw, self._h
 
-    def draw(self):
-        c = self.canv
-        c.setFillColor(self._dark)
-        label_font = _CJK_FONT if self._style.fontName == _CJK_FONT else "Helvetica-Bold"
-        c.setFont(label_font, 8.5)
-        c.drawString(0, self._h - 12, f"[{self._id}]")
-        self._para.drawOn(c, self.LABEL_W, 2)
+        def draw(self):
+            c = self.canv
+            c.setFillColor(self._dark)
+            label_font = _CJK_FONT if self._style.fontName == _CJK_FONT else "Helvetica-Bold"
+            c.setFont(label_font, 8.5)
+            c.drawString(0, self._h - 12, f"[{self._id}]")
+            self._para.drawOn(c, self.LABEL_W, 2)
 
+    class BeautifulDoc(BaseDocTemplate):
+        def __init__(self, path: str, tokens: dict, **kw):
+            self._t = tokens
+            super().__init__(path, **kw)
+            fr = Frame(
+                self.leftMargin, self.bottomMargin,
+                self.width, self.height, id="body",
+            )
+            tmpl = PageTemplate(id="main", frames=fr, onPage=self._decorate)
+            self.addPageTemplates([tmpl])
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Page template (header + footer)
-# ══════════════════════════════════════════════════════════════════════════════
+        def _decorate(self, canv, doc):
+            t   = self._t
+            lm  = doc.leftMargin
+            rm  = doc.rightMargin
+            pw  = doc.pagesize[0]
+            ph  = doc.pagesize[1]
+            top = ph - doc.topMargin
 
-class BeautifulDoc(BaseDocTemplate):
-    def __init__(self, path: str, tokens: dict, **kw):
-        self._t = tokens
-        super().__init__(path, **kw)
-        fr = Frame(
-            self.leftMargin, self.bottomMargin,
-            self.width, self.height, id="body",
-        )
-        tmpl = PageTemplate(id="main", frames=fr, onPage=self._decorate)
-        self.addPageTemplates([tmpl])
+            canv.saveState()
 
-    def _decorate(self, canv, doc):
-        t   = self._t
-        lm  = doc.leftMargin
-        rm  = doc.rightMargin
-        pw  = doc.pagesize[0]
-        ph  = doc.pagesize[1]
-        top = ph - doc.topMargin
+            # Header accent rule
+            canv.setStrokeColor(HexColor(t["accent"]))
+            canv.setLineWidth(1.5)
+            canv.line(lm, top + 12, pw - rm, top + 12)
 
-        canv.saveState()
+            # Header: title (left) + date (right)
+            canv.setFillColor(HexColor(t["muted"]))
+            canv.setFont(t["font_body_rl"], t["size_meta"])
+            canv.drawString(lm, top + 16, t["title"].upper())
+            canv.drawRightString(pw - rm, top + 16, t.get("date", ""))
 
-        # Header accent rule
-        canv.setStrokeColor(HexColor(t["accent"]))
-        canv.setLineWidth(1.5)
-        canv.line(lm, top + 12, pw - rm, top + 12)
+            # Footer rule
+            canv.setStrokeColor(HexColor("#DDDDDD"))
+            canv.setLineWidth(0.5)
+            canv.line(lm, doc.bottomMargin - 12, pw - rm, doc.bottomMargin - 12)
 
-        # Header: title (left) + date (right)
-        canv.setFillColor(HexColor(t["muted"]))
-        canv.setFont(t["font_body_rl"], t["size_meta"])
-        canv.drawString(lm, top + 16, t["title"].upper())
-        canv.drawRightString(pw - rm, top + 16, t.get("date", ""))
+            # Footer: author (left) + page number (right)
+            canv.setFillColor(HexColor(t["muted"]))
+            canv.setFont(t["font_body_rl"], t["size_meta"])
+            canv.drawString(lm, doc.bottomMargin - 22, t.get("author", ""))
+            canv.drawRightString(pw - rm, doc.bottomMargin - 22, str(doc.page))
 
-        # Footer rule
-        canv.setStrokeColor(HexColor("#DDDDDD"))
-        canv.setLineWidth(0.5)
-        canv.line(lm, doc.bottomMargin - 12, pw - rm, doc.bottomMargin - 12)
-
-        # Footer: author (left) + page number (right)
-        canv.setFillColor(HexColor(t["muted"]))
-        canv.setFont(t["font_body_rl"], t["size_meta"])
-        canv.drawString(lm, doc.bottomMargin - 22, t.get("author", ""))
-        canv.drawRightString(pw - rm, doc.bottomMargin - 22, str(doc.page))
-
-        canv.restoreState()
+            canv.restoreState()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -251,6 +251,7 @@ class BeautifulDoc(BaseDocTemplate):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def make_styles(t: dict) -> dict:
+    _load_reportlab()
     hf  = t["font_display_rl"]
     bf  = t["font_body_rl"]
     bfb = t["font_body_b_rl"]
@@ -384,7 +385,7 @@ def _render_math_png(expr: str, dpi: int = 180) -> bytes:
     """
     fig = None
     try:
-        import matplotlib
+        matplotlib = require_dependency("matplotlib")
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
 
@@ -422,7 +423,7 @@ def _render_chart_png(item: dict, accent: str, dpi: int = 150, *, font_path=None
     """
     fig = None
     try:
-        import matplotlib
+        matplotlib = require_dependency("matplotlib")
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
         import matplotlib.colors as mcolors
@@ -542,7 +543,7 @@ def _render_flowchart_png(item: dict, accent: str, dark: str, muted: str,
     """
     fig = None
     try:
-        import matplotlib
+        matplotlib = require_dependency("matplotlib")
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
         import matplotlib.patches as mpatch
@@ -1003,6 +1004,8 @@ _BLOCK_TYPES = frozenset({
 
 
 def build_story(content: list, tokens: dict, styles: dict) -> list:
+    validate_content(content)
+    _load_reportlab()
     usable_w = A4[0] - tokens["margin_left"] - tokens["margin_right"]
 
     ctx: dict = {
@@ -1021,13 +1024,7 @@ def build_story(content: list, tokens: dict, styles: dict) -> list:
     story: list = []
 
     for index, item in enumerate(content, start=1):
-        if not isinstance(item, dict):
-            raise ValueError(f"Content block {index}: expected an object")
         kind = item.get("type", "body")
-        if not isinstance(kind, str) or kind not in _BLOCK_TYPES:
-            raise ValueError(
-                f"Content block {index}: unsupported type {kind!r}; use 'body' for prose"
-            )
         if kind != "numbered":
             ctx["numbered_n"] = 0
 
@@ -1062,10 +1059,25 @@ def build_story(content: list, tokens: dict, styles: dict) -> list:
 # Main build
 # ══════════════════════════════════════════════════════════════════════════════
 
-def build(tokens: dict, content: list, out_path: str) -> dict:
+def validate_content(content: list):
+    """Cheap shape/type checks precede any authoring dependency import."""
     if not isinstance(content, list) or not content:
         raise ValueError("Content must be a nonempty array of blocks")
+    for index, item in enumerate(content, start=1):
+        if not isinstance(item, dict):
+            raise ValueError(f"Content block {index}: expected an object")
+        kind = item.get("type", "body")
+        if not isinstance(kind, str) or kind not in _BLOCK_TYPES:
+            raise ValueError(
+                f"Content block {index}: unsupported type {kind!r}; use 'body' for prose"
+            )
 
+
+def build(tokens: dict, content: list, out_path: str) -> dict:
+    validate_content(content)
+    if not isinstance(tokens, dict) or not tokens:
+        raise ValueError("Tokens must be a nonempty JSON object")
+    require_distinct_output(out_path)
     register_fonts(tokens)
     font_path = cjk_font_path(tokens, content)
     styles = make_styles(tokens)
@@ -1080,17 +1092,28 @@ def build(tokens: dict, content: list, out_path: str) -> dict:
     if not any(not isinstance(flowable, (Spacer, HRFlowable, PageBreak)) for flowable in story):
         raise ValueError("Content must contain at least one visible body block")
 
-    doc = BeautifulDoc(
-        out_path, tokens,
-        pagesize=A4,
-        leftMargin=tokens["margin_left"],
-        rightMargin=tokens["margin_right"],
-        topMargin=tokens["margin_top"],
-        bottomMargin=tokens["margin_bottom"],
-    )
-    doc.build(story)
-
-    size = os.path.getsize(out_path)
+    directory = os.path.dirname(os.path.abspath(out_path))
+    os.makedirs(directory, exist_ok=True)
+    candidate = tempfile.NamedTemporaryFile(dir=directory, prefix=".pdf-body-", suffix=".tmp", delete=False)
+    candidate.close()
+    try:
+        doc = BeautifulDoc(
+            candidate.name, tokens,
+            pagesize=A4,
+            leftMargin=tokens["margin_left"],
+            rightMargin=tokens["margin_right"],
+            topMargin=tokens["margin_top"],
+            bottomMargin=tokens["margin_bottom"],
+        )
+        doc.build(story)
+        size = os.path.getsize(candidate.name)
+        with open(candidate.name, "rb") as rendered:
+            if not size or rendered.read(5) != b"%PDF-" or doc.page < 1:
+                raise ValueError("Renderer did not produce a nonempty PDF")
+        os.replace(candidate.name, out_path)
+    finally:
+        if os.path.exists(candidate.name):
+            os.remove(candidate.name)
     return {"status": "ok", "out": out_path, "size_kb": size // 1024}
 
 
@@ -1107,14 +1130,13 @@ def main():
     parser.add_argument("--out",     default="body.pdf")
     args = parser.parse_args()
 
-    for fpath in (args.tokens, args.content):
-        if not os.path.exists(fpath):
-            print(
-                json.dumps({"status": "error",
-                            "error": f"File not found: {fpath}"}),
-                file=sys.stderr,
-            )
-            sys.exit(1)
+    try:
+        for fpath in (args.tokens, args.content):
+            require_file(fpath)
+        require_distinct_output(args.out, args.tokens, args.content)
+    except ValueError as exc:
+        print(json.dumps({"status": "error", "error": str(exc)}), file=sys.stderr)
+        sys.exit(1)
 
     try:
         with open(args.tokens, encoding="utf-8") as f:
@@ -1125,7 +1147,7 @@ def main():
         print(json.dumps(result))
     except Exception as exc:
         print(json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
-        sys.exit(3)
+        sys.exit(2 if isinstance(exc, DependencyError) else 3)
 
 
 if __name__ == "__main__":

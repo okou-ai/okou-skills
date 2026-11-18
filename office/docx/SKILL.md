@@ -57,8 +57,9 @@ a built CLI needs only the .NET 8 runtime.
 For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
 (Windows: `scripts/setup.ps1 -Minimal`).
 
-For requested PDF output or rendered visual review, prepare converters before
-authoring where installation is permitted:
+For requested PDF output or rendered visual review, the rendering command
+automatically provisions unavailable converters where installation is permitted.
+To prepare them before authoring, optionally run
 `python3 "$SKILL_DIR/scripts/render_docx.py" --prepare`.
 Add `--pages qa/pages` when page images are needed. Render the validated DOCX
 using the [rendering instructions](references/operations/validate.md#rendering-and-delivery).
