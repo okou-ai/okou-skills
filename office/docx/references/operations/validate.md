@@ -36,8 +36,12 @@ bash "$SKILL_DIR/scripts/docx.sh" diff --before in.docx --after out.docx
 For a requested Word/PDF pair, export the authored DOCX instead of redesigning it:
 
 ```bash
-python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf --no-install
+python3 "$SKILL_DIR/scripts/render_docx.py" doc.docx --out output/doc.pdf
 ```
+
+Where package installation is permitted, rendering attempts one automatic
+dependency installation during preflight when needed (Writer, plus Poppler for
+`--pages`). Add `--no-install` when installation is not permitted.
 
 For a user-requested rendered preview or visual review, add `--pages preview/pages`
 to the rendering command and inspect the actual images. Render the validated
