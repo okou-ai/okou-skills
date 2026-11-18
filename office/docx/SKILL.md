@@ -38,8 +38,12 @@ description: >
 
 For DOCX-only delivery, validate the final file with the script and skip
 rendering and visual review when it contains no images or tables and the
-task does not require visual verification. See
-[rendering and delivery](references/operations/validate.md#rendering-and-delivery).
+task does not require visual verification. Set `SKILL_DIR` as described
+in [Setup](#setup) and run:
+
+```bash
+bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
+```
 
 Follow the user's requirements and supplied template. Preserve existing
 presentation for narrow edits and read-only work; a mention of APA, 公文 or HBR

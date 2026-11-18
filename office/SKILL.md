@@ -36,8 +36,12 @@ authored DOCX.
 
 For DOCX-only delivery, skip rendering and visual review when
 the finished document has no images or tables and the task does not require
-visual verification. Run the
-[DOCX validation script](docx/references/operations/validate.md#package-and-business-checks).
+visual verification. Set `SKILL_DIR` to the absolute path of the
+[DOCX skill directory](docx/SKILL.md#setup) and run:
+
+```bash
+bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
+```
 
 The format implementations are adapted from MiniMax's MIT-licensed skills.
 Each format directory retains its `LICENSE` and `UPSTREAM.md`.
