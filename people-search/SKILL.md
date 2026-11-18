@@ -1,53 +1,46 @@
 ---
 name: people-search
-description: Find, verify, and rank people or creators using public professional sources. Use for fixed targets, additional candidates, or finding as many as possible. Clarify requirements, plan the search, enrich professional contacts, and deliver ranked interim batches followed by a final table or spreadsheet.
+description: Find people or verify and enrich an existing list using public professional sources. Build an evidence-backed candidate profile that supports screening, comparison, or follow-up. Report eligibility, Fit, Intent, and public contact channels where relevant.
 ---
 
 # People Search
 
-Understand the user's needs, plan a suitable search, and find evidence-supported matches. Rank qualifying candidates, share useful interim results, and deliver a consolidated final version.
+## Define the decision
 
-## Core principles
+- Identify the decision the user needs to make, the hard requirements, the ranking preferences, and the search scope. For each hard requirement, specify who or what to verify, the relevant time period or geography, and what evidence is sufficient to pass. When a current role is required, verify it with current evidence and record the candidate's role and responsibilities at the time of any historical case separately. Use the user's examples to derive criteria. Record any relationship between the examples and the user that the evidence establishes.
+- Identify which aspects of a candidate's profile matter to the decision. Pair each task need with a question about the candidate, then identify the facts and sources that could change eligibility, ranking, follow-up timing, or the next action.
+- Before scoring, use the [Qualification guide](references/qualify.md) to define the Fit percentage, Intent levels, and evidence requirements for this task. Ask a clarifying question only if missing information would materially change eligibility and cannot be inferred from context.
+- Record the required deliverable contents, format, and visibility for handoff and final validation.
+- Start with the supplied list when asked to verify it or fill profile gaps. When finding additional people, deduplicate against earlier batches and count the newly verified candidates.
 
-- **Broad discovery:** Cover complementary candidate pools with targeted searches, adjusting the strategy as gaps emerge.
-- **Strict verification:** Count or present a candidate as a match only after verifying every qualification the user requires. Keep candidates with unresolved requirements as leads.
-- **Complete accounting:** Keep every candidate's outcome explicit and preserve the full qualified set through ranking and delivery.
+## Choose search sources and maintain candidate records
 
-## Workflow
+Start with the source most likely to establish the key requirements directly. Run independent queries in parallel and read known URLs in batches when supported. Switch sources when results duplicate existing evidence or consistently lack key facts. Use the tools' current parameters. See [Tools and evidence](references/tool-evidence.md) for filtering, pagination, result types, and failure handling.
 
-1. **Clarify the need.** Establish the purpose, required qualifications, relevant scope, result goal, and ranking priorities from the request and context. Ask focused questions only when missing information would materially change the search; do not repeat questions already answered.
+| Lead | Where to start | What to verify |
+| --- | --- | --- |
+| Event, project, paper, case study, or credited work | Use `web_search` with the event, work, topic, or time period. | Check the original agenda or credits for the person's role, contribution, and timing. |
+| Similar responsibilities across different job titles | Describe the actual responsibilities and experience in `people_search_semantic`. | Review the professional profiles and relevant experience in the results. |
+| Known name and organization, or a specific question about who qualifies | Use `people_search` with the name and organization, or ask who meets a verifiable criterion. | Discover or check candidates. If the response includes `sourceIds`, follow them to verify against the underlying sources. |
+| Specific current title, employer, profile country, or skill | Use `people_search_structured` to filter professional histories. | Check the experience, time period, and geographic scope. |
+| Business contacts at a target company | Use `contact_search` with company, title, seniority, or person and company location filters. | Select contacts from the previews for further verification. |
+| Creator or work on a specific platform | Start with content search for that platform. On Instagram, `creator_search` can find accounts by name or bio. | Verify the account and the attribution of the original work. For speaker identity or language, see [Audio and video attribution and language](references/tool-evidence.md#audio-and-video-attribution-and-language). Verify visible actions in the original footage and audience geography using audience analytics. |
+| Known public URL or a specific evidence gap | Use `web_scrape` for a single page or its links and `web_contents` for batches. Use `linkedin_profile` or `linkedin_post` for known LinkedIn URLs when useful. | Check the relevant passage, credit, or link destination, including who or what it refers to and where it came from. |
 
-2. **Plan the search.** Select promising candidate pools, complementary sources, query directions, and the checks needed to establish eligibility. Briefly explain the approach before searching. Match the breadth to the user's goal and adjust as evidence or gaps emerge.
+Maintain one exportable record per person with **identity and profile, the verdict for each hard requirement, key profile details, evidence for Fit and Intent, relevant contact channels, and unresolved questions**. Update the record as each fact is verified. Link it to the original source, the relevant passage or timestamp, and applicable dates. Deduplicate by person or account before detailed verification. Treat the same original page returned by multiple APIs as one source.
 
-3. **Find and verify efficiently.** Use the tools below and their current schemas. Reuse source-linked facts for the right person and timeframe, researching only material gaps or conflicts. Use batch or parallel checks where useful and deduplicate identities.
+For parallel work, share eligibility criteria, record fields, and allowed status values across groups. Split discovery by lead or source, assign detailed verification by person or account, and reuse existing evidence. When groups keep separate records, confirm that the first record from each group merges into the shared format.
 
-4. **Rank by confidence.** By default, order qualified candidates from highest to lowest confidence in both interim and final results. Judge confidence that they meet all required qualifications by source reliability, attribution to the person, and fit to the required scope and timeframe. Use the user's preferences to order candidates with similar confidence, and honor any explicit sort order for qualified results. When useful results are ready, share a ranked subset labeled interim with source links and qualification evidence, then continue the work in the same run. Respect final-only requests. When contactability is optional, share interim results as soon as the qualification evidence is ready.
+## Decide what to do next based on the evidence
 
-5. **Enrich each qualified person's professional profile and contacts.** Before final delivery, fill relevant gaps in the person's role, organization, and professional profile link where applicable, and try to add a work email or public business contact channel. Reuse sourced details and contacts, and announce enrichment before making calls. To resolve a missing professional profile, use `contact_enrich` in its default profile mode with a `contact_search` result ID, a LinkedIn profile URL, or the person's name and employer domain. For work-email lookup, explicitly select `fields: ["work-email"]` with the person's name and verified current employer domain. Cite the source or provider for added details and record when a lookup could not verify them. Do not guess addresses, request private-email or phone-number reveals, or start outreach. Missing contacts do not disqualify a match unless required by the user.
+- **Verify eligibility.** Prioritize the hard requirement most likely to block inclusion. Cite the same source when it supports multiple findings. Add candidates to the recommendations and assess Fit and Intent once all hard requirements pass. Mark a candidate ineligible when evidence contradicts a hard requirement. Mark the relevant requirement Unverified when attribution is unclear, key evidence is missing, or sources conflict, and state the specific gap.
+- **Fill key profile gaps.** Identify whose facts you need to verify, the decision they could change, and which source could answer directly. Use the [profile evidence guidance](references/qualify.md#when-to-enrich-candidate-profiles) to decide whether to gather more evidence, switch sources, or record an open question.
+- **Check professional profiles and contact channels.** Use the default profile mode of `contact_enrich` when identity, responsibilities, or organization still need verification. When contact channels are needed, start with an existing public professional channel and look up a work email separately when needed. See [Professional profiles and work email](references/tool-evidence.md#professional-profiles-and-work-email). If contact information is a hard requirement, verify eligibility against it. Outreach requires explicit user authorization.
+- **Decide when to finish.** For a fixed count or an enumerable scope, verify candidates against the user's requirements. For open-ended searches, assess whether new candidates could change the recommendations or add distinct options, and whether credible sources remain for key gaps. When the user wants a larger list, check whether a new source could still yield qualified candidates.
 
-6. **Complete the requested scope.** For a fixed target, finish once enough distinct verified matches satisfy the request; previously delivered people do not count toward additional results. For “as many as possible,” continue while meaningful expansions yield qualifying people. High duplication calls for a useful pivot. Respect explicit scope, time, cost, and call limits; if a real limit prevents completion, explain what remains.
+## Deliver from candidate records
 
-## Tool roles
-
-Use the table to choose available tools for the evidence you need.
-
-| Need | Useful tools |
-| --- | --- |
-| Discover professional profiles when duties can be described in different ways | `people_search_semantic` |
-| Build a candidate pool from exact current titles, employers, profile countries, or skills | `people_search_structured` |
-| Check a known person's identity or role using their name and organization | `people_search` |
-| Find public cases, interviews, projects, or credited work that show what a person did, where, or when | `web_search` |
-| Read several known public URLs in one batch | `web_contents` |
-| Read one known public page | `web_scrape` |
-| Read a known public LinkedIn profile or post when general extraction returns a sign-in page or misses the relevant text | `linkedin_profile` or `linkedin_post`, if available |
-| Resolve a known person's professional profile or look up their work email | `contact_enrich` |
-
-Cases, interviews, projects, and credited work can surface people with relevant experience. For a known candidate, search their name, organization, and the missing requirement. Use local-language terms when relevant. If a source describes only the organization's work, look for a source that connects the candidate to that work.
-
-Structured title and employer filters refer to current roles, and country filters refer to the person's profile location. For past-experience searches, assess eligibility against the relevant period and any current-role requirement the user specified. For creators and audience metrics, use enabled tools for the named platform.
-
-## Delivery
-
-- Prefer **Markdown tables or a Sheet/spreadsheet**. Include columns suited to the request for the person or channel, profile link, qualification evidence or metrics, ranking rationale, contact details and lookup status, and sources.
-- After interim batches, deliver a **final consolidated version**, not just a progress summary or references to earlier messages. Reconcile duplicates and corrections, and include all verified matches within the requested scope and result limit. For long lists, provide the complete table or Sheet and label any inline shortlist as a preview.
-- If work remains because of a real limit, label the handoff partial rather than complete and state the remaining gaps. Do not claim exhaustiveness without support.
+- **Decide whether to deliver an interim shortlist.** Follow the user's delivery instructions. When none are given, use the purpose of the task to decide whether a partial result independently supports a next step. For candidate-pool expansion or tasks where screening can begin while research continues, share an initial batch once enough evidence supports the candidates and state what the batch covers. When the decision depends on a full comparison, complete coverage, or resolving a unique identity, consolidate the verified results before delivering them.
+- In tables and reports, use **Fit as a whole-number percentage** and **Intent as High, Medium, or Low** as the two assessment columns. Include the rationale and evidence for each. Use Unverified for insufficient evidence of intent and Not applicable when intent is irrelevant. Preserve eligibility, key profile details, and follow-up items. Include public contact channels, their ownership, and verification status where relevant. Store Fit as a sortable numeric percentage. When sorting by Intent level, use High, Medium, Low.
+- Generate, sort, and consolidate deliverables from the same candidate records, including previously delivered batches in the final result. Check format, visibility, deduplication, counts, links between assessments and evidence, and deliverable usability against the requirements recorded at the start. Deliver the finished output once validated. If the complete list is a file, give a summary and link in chat. When the user asks to see the full list in chat, reuse the generated content. Label any excerpt from a long list as a preview.
+- When coverage is limited, deliver verified results and state the scope searched and facts that still lack evidence. Claim completeness only for an enumerable scope that has been fully covered.
