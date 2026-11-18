@@ -36,6 +36,11 @@ description: >
 | New content within a structured cover/TOC/section template | Pipeline C-2: [BASE-REPLACE](references/operations/template.md) |
 | Completed output or an affected change | [VALIDATE](references/operations/validate.md) |
 
+For DOCX-only delivery, validate the final file with the script and skip
+rendering and visual review when it contains no images or tables and the
+task does not require visual verification. See
+[rendering and delivery](references/operations/validate.md#rendering-and-delivery).
+
 Follow the user's requirements and supplied template. Preserve existing
 presentation for narrow edits and read-only work; a mention of APA, 公文 or HBR
 does not by itself authorize restyling. Clarify conflicting requirements.
@@ -57,7 +62,8 @@ a built CLI needs only the .NET 8 runtime.
 For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
 (Windows: `scripts/setup.ps1 -Minimal`).
 
-For requested PDF output or rendered visual review, the rendering command
+When the [validation workflow](references/operations/validate.md#rendering-and-delivery)
+calls for a PDF export or visual review, the rendering command
 automatically provisions unavailable converters where installation is permitted.
 To prepare them before authoring, optionally run
 `python3 "$SKILL_DIR/scripts/render_docx.py" --prepare`.

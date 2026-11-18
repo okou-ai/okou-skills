@@ -33,6 +33,16 @@ bash "$SKILL_DIR/scripts/docx.sh" diff --before in.docx --after out.docx
 
 ## Rendering and delivery
 
+For DOCX-only delivery, check the completed document for images and tables,
+including those inherited from a template. When it contains neither and the
+task does not require visual verification, run the package and business
+validation script above and skip rendering and visual review. Skip renderer
+setup on this path.
+
+When images or tables introduce a layout risk, render the affected content
+and inspect the relevant pages. Follow any explicit visual review or layout
+verification requirements regardless of document contents.
+
 For a requested Word/PDF pair, export the authored DOCX instead of redesigning it:
 
 ```bash
@@ -48,6 +58,7 @@ to the rendering command and inspect the actual images. Render the validated
 candidate first. Check page breaks, font substitutions, tables, headings, fields,
 headers/footers and content completeness against the chosen requirements.
 
-Deliver only requested formats and state any unexecuted application/visual or
-standards checks. Do not label a structural validator or sample recipe as a
-complete publication/government compliance certificate.
+Deliver only requested formats and state any required application, visual or
+standards checks that could not be completed. Do not label a structural
+validator or sample recipe as a complete publication/government compliance
+certificate.

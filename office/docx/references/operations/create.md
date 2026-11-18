@@ -98,6 +98,9 @@ bundled table/image helpers for standard pagination and WebP conversion.
 
 ## Validation and delivery
 
-Follow [VALIDATE](validate.md) for package/business checks, targeted repairs and
-any requested rendered review or PDF companion. Confirm that the resulting
-content, citations and required structure match the task.
+Run the [validation script](validate.md#package-and-business-checks) on the
+final DOCX. For DOCX-only delivery with no images or tables, skip rendering
+and visual review unless the task requires visual verification. Follow
+[rendering and delivery](validate.md#rendering-and-delivery) when applicable.
+Confirm that the resulting content, citations and required structure match
+the task.
