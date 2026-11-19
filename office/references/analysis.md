@@ -1,26 +1,30 @@
 # Analytical reasoning
 
-Identify what the reader needs to understand or decide. Resolve the scope and
-terms that affect the answer, then choose the smallest set of questions that
-will cover the request. Match the method to the task. For a comparison, use a
-common basis. For an explanation, connect the mechanism to what the evidence
-shows. For a decision, explain the trade-offs and conditions that affect it.
+Identify what the reader needs to understand or decide, including scope and
+terms that affect the answer. Choose the smallest set of questions that covers
+the request. For each decisive question, work backward from what would answer
+it to the necessary evidence and method.
 
-Build the consequential conclusions from the permitted material. Keep source
-locations with the observations that support them. Where the distinction
-matters, identify which statements are observed, estimated, inferred, or
-proposed. Keep relevant units, populations, time windows, and methods attached
-to figures and claims.
+Carry out the comparison, derivation, or evidence-based explanation needed to
+answer those questions. Use a common basis for comparisons; connect mechanisms
+to observed results and decisions to trade-offs. Retain the inputs, assumptions,
+and key workings for material results in working notes. Scale the method and
+effort to the task.
 
-Focus additional checking where it could change the answer. Choose what is
-useful for the case, such as checking a definition against the original,
-reconciling two measurements, testing a calculation or assumption, or
-considering another plausible explanation. If the available evidence leaves
-more than one interpretation open, say which conclusion it supports and what
-would resolve the uncertainty.
+Build consequential conclusions from the permitted material. Keep source
+locations with supporting observations, and distinguish observed, estimated,
+inferred, and proposed statements where it matters. Preserve relevant units,
+denominators, populations, time windows, and measurement conditions.
 
-Answer the question directly. Explain how the strongest evidence supports the
-conclusion, and what that means for the reader's next step when relevant.
-State the limits beside the conclusions they affect. When evidence is sparse,
-give a conditional answer if justified and identify the most useful missing
-evidence. Scale the depth of analysis to the decision and the requested scope.
+Focus checking where it could change the answer. For key conclusions, check
+whether the evidence supports the claim's scope and strength, and whether an
+unstated assumption, omitted information, or plausible alternative changes
+the interpretation. Use the permitted material to check sources, reconcile
+measurements, or test the relevant calculation or assumption. Revise the
+conclusion or approach when the result does not hold.
+
+Before delivery, check that the analysis answers the original questions.
+State conclusions directly, with the evidence and essential workings needed
+to assess them. Keep limits beside the conclusions they affect. When the
+evidence cannot settle a question, give a conditional answer where justified
+and identify the most useful missing evidence.
