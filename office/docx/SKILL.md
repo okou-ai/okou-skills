@@ -66,8 +66,7 @@ a built CLI needs only the .NET 8 runtime.
 For permitted missing authoring dependencies, use `scripts/setup.sh --minimal`
 (Windows: `scripts/setup.ps1 -Minimal`).
 
-When the [validation workflow](references/operations/validate.md#rendering-and-delivery)
-calls for a PDF export or visual review, the rendering command
+For requested PDF output or rendered visual review, the rendering command
 automatically provisions unavailable converters where installation is permitted.
 To prepare them before authoring, optionally run
 `python3 "$SKILL_DIR/scripts/render_docx.py" --prepare`.
