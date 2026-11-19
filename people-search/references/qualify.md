@@ -2,7 +2,7 @@
 
 ## Verify the user's basic requirements
 
-Turn each hard requirement into a fact you can verify. Specify who or what it applies to, the relevant time period or scope, and what evidence is sufficient. Start with the requirement most likely to rule someone out. For key facts, record the original source and the relevant passage or timestamp. Distinguish event, publication, and verification dates. Use [Tools and evidence](tool-evidence.md) to judge what each source supports.
+Turn each hard requirement into a fact you can verify. Specify who or what it applies to, the relevant time period or scope, and what evidence is sufficient. Start with the requirement most likely to rule someone out. For key facts, record the original source and the relevant passage or timestamp. Distinguish event, publication, and verification dates. Use [Tools and evidence](tool-evidence.md) to judge what each source supports. A reliable source that directly states the fact for the right person and period establishes it; another source adds information only when the first is indirect, dated or disputed.
 
 - **Qualified.** Evidence supports every hard requirement. Start building this person's task-specific profile as soon as they qualify.
 - **Ineligible.** Evidence shows a hard requirement is unmet. Record why and move on to other people.
