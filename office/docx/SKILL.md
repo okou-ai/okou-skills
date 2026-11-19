@@ -36,6 +36,15 @@ description: >
 | New content within a structured cover/TOC/section template | Pipeline C-2: [BASE-REPLACE](references/operations/template.md) |
 | Completed output or an affected change | [VALIDATE](references/operations/validate.md) |
 
+For DOCX-only delivery, validate the final file with the script and skip
+rendering and visual review when it contains no images or tables and the
+task does not require visual verification. Set `SKILL_DIR` as described
+in [Setup](#setup) and run:
+
+```bash
+bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --document-rules
+```
+
 Follow the user's requirements and supplied template. Preserve existing
 presentation for narrow edits and read-only work; a mention of APA, 公文 or HBR
 does not by itself authorize restyling. Clarify conflicting requirements.

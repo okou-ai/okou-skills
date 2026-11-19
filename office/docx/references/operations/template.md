@@ -33,7 +33,7 @@ identities or findings.
 2. Analyze template  → CLI: analyze template.docx     (list styles, fonts, structure)
 3. Map styles        → Create mapping plan (source style → template style)
 4. Apply template    → CLI: apply-template source.docx --template template.docx --output result.docx
-5. Validate package  → CLI: validate --input result.docx --business
+5. Validate package  → CLI: validate --input result.docx --document-rules
 6. Review edit diff  → CLI: diff --before source.docx --after result.docx --text-only
                        (changes must stay within the authorized operation)
 ```

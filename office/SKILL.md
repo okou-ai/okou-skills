@@ -34,5 +34,14 @@ Honor the supplied template and limit edits to the requested scope. When
 delivering Word and PDF versions of the same document, render the PDF from the
 authored DOCX.
 
+For DOCX-only delivery, skip rendering and visual review when
+the finished document has no images or tables and the task does not require
+visual verification. Set `SKILL_DIR` to the absolute path of the
+[DOCX skill directory](docx/SKILL.md#setup) and run:
+
+```bash
+bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --document-rules
+```
+
 The format implementations are adapted from MiniMax's MIT-licensed skills.
 Each format directory retains its `LICENSE` and `UPSTREAM.md`.

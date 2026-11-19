@@ -519,6 +519,6 @@ When a document has multiple problems, fix them in this priority order:
 $CLI unpack --input broken.docx --output unpacked/
 $CLI validate --input broken.docx --xsd assets/xsd/wml-subset.xsd  # find all errors
 $CLI fix-order --input broken.docx                                   # fix element ordering
-$CLI validate --input broken.docx --business                         # check business rules
+$CLI validate --input broken.docx --document-rules                         # check document rules
 scripts/docx_preview.sh broken.docx                                  # text/content check
 ```
