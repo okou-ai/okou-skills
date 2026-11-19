@@ -7,11 +7,11 @@ as described in [the entry point](../../SKILL.md#setup).
 ## Package and business checks
 
 ```bash
-bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
+bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --document-rules
 ```
 
 `validate` always runs the OpenXML SDK validator on all package parts, including
-structure and relationships. `--business` adds general document checks; it is not
+structure and relationships. `--document-rules` adds general document checks; it is not
 domain certification. Neither a package pass nor a business pass certifies
 GB/T, APA or publisher compliance.
 Read [validation details](../implementation/validation.md) for actual coverage.

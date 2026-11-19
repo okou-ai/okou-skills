@@ -6,7 +6,7 @@ package. Run setup once before using the CLI.
 ## Package validation
 
 ```bash
-bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --business --json
+bash "$SKILL_DIR/scripts/docx.sh" validate --input output.docx --document-rules --json
 ```
 
 Every `validate` command runs the OpenXML SDK validator across the package,
@@ -14,9 +14,9 @@ including styles, headers, footers and relationships. It reports invalid element
 order, missing required parts and invalid attributes without enforcing a design
 recipe. Failures return a nonzero exit code.
 
-`--business` adds the shipped business checks for margins, font-size ranges,
+`--document-rules` adds the document checks for margins, font-size ranges,
 heading hierarchy, table widths, relationships and comments. It does not require
-12 pt body text or replace the selected template's typography.
+12 pt body text or replace the selected template's typography. The legacy `--business` spelling remains an alias.
 
 ## Optional subset XSD
 
@@ -34,7 +34,7 @@ It does not provide full OOXML coverage. Drawing internals, math, vendor
 extensions, markup compatibility and other package parts need the SDK validator.
 Do not remove valid features merely because the subset does not describe them.
 The retained `business-rules.xsd` and `aesthetic-rules.xsd` are upstream design
-references; they are not executable replacements for `--business`, and their
+references; they are not executable replacements for `--document-rules`, and their
 XSD 1.1 assertions are not supported by .NET's XSD 1.0 engine.
 
 ## Diagnose and review

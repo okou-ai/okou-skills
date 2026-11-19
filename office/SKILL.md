@@ -40,7 +40,7 @@ visual verification. Set `SKILL_DIR` to the absolute path of the
 [DOCX skill directory](docx/SKILL.md#setup) and run:
 
 ```bash
-bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
+bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --document-rules
 ```
 
 The format implementations are adapted from MiniMax's MIT-licensed skills.

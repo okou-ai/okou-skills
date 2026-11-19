@@ -42,7 +42,7 @@ task does not require visual verification. Set `SKILL_DIR` as described
 in [Setup](#setup) and run:
 
 ```bash
-bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --business
+bash "$SKILL_DIR/scripts/docx.sh" validate --input doc.docx --document-rules
 ```
 
 Follow the user's requirements and supplied template. Preserve existing

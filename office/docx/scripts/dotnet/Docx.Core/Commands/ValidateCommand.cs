@@ -10,20 +10,20 @@ public static class ValidateCommand
     {
         var inputOption = new Option<string>("--input") { Description = "DOCX file to validate", Required = true };
         var xsdOption = new Option<string>("--xsd") { Description = "XSD schema path for XML validation" };
-        var businessOption = new Option<bool>("--business") { Description = "Run business rule validation" };
+        var documentRulesOption = new Option<bool>("--document-rules", "--business") { Description = "Check document rules such as margins, heading hierarchy, and table widths" };
         var gateCheckOption = new Option<string>("--gate-check") { Description = "Template DOCX for gate-check validation" };
         var jsonOption = new Option<bool>("--json") { Description = "Output results as JSON" };
 
         var cmd = new Command("validate", "Validate DOCX structure and content")
         {
-            inputOption, xsdOption, businessOption, gateCheckOption, jsonOption
+            inputOption, xsdOption, documentRulesOption, gateCheckOption, jsonOption
         };
 
         cmd.SetAction((parseResult) =>
         {
             var input = parseResult.GetValue(inputOption)!;
             var xsd = parseResult.GetValue(xsdOption);
-            var business = parseResult.GetValue(businessOption);
+            var documentRules = parseResult.GetValue(documentRulesOption);
             var gateCheck = parseResult.GetValue(gateCheckOption);
             var asJson = parseResult.GetValue(jsonOption);
 
@@ -42,7 +42,7 @@ public static class ValidateCommand
                 combinedResult.Merge(xsdValidator.Validate(input, xsd));
             }
 
-            if (business)
+            if (documentRules)
             {
                 var bizValidator = new BusinessRuleValidator();
                 combinedResult.Merge(bizValidator.Validate(input));

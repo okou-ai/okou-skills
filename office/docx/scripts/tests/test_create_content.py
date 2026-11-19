@@ -46,8 +46,10 @@ def main():
         content.write_text(json.dumps(blocks), encoding="utf-8")
         create = ("create", "--content-json", str(content), "--output", str(output))
         run(*create, cwd=work)
-        result = run("validate", "--input", str(output), "--business", "--json", cwd=work)
+        result = run("validate", "--input", str(output), "--document-rules", "--json", cwd=work)
         assert json.loads(result.stdout)["isValid"], result.stdout
+        legacy = run("validate", "--input", str(output), "--business", "--json", cwd=work)
+        assert json.loads(legacy.stdout) == json.loads(result.stdout), legacy.stdout
 
         with ZipFile(output) as document:
             body = ET.fromstring(document.read("word/document.xml")).find("w:body", NS)
@@ -88,7 +90,7 @@ def main():
                     title_blocks.insert(0, {"type": "heading", "text": title, "level": 1})
                 content.write_text(json.dumps(title_blocks), encoding="utf-8")
                 run(*create, *options, cwd=work)
-                result = run("validate", "--input", str(output), "--business", "--json", cwd=work)
+                result = run("validate", "--input", str(output), "--document-rules", "--json", cwd=work)
                 assert json.loads(result.stdout)["isValid"], result.stdout
                 with ZipFile(output) as document:
                     body = ET.fromstring(document.read("word/document.xml")).find("w:body", NS)
