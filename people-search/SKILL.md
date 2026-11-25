@@ -49,6 +49,12 @@ After establishing the candidate list, enrich the confirmed people with informat
 | Business and working context | Whom does the work serve, and under what business, technical, or organizational conditions? |
 | Professional collaboration | With whom has the person worked, in what relationship, and on what shared work? |
 
+Before searching for more profile details, extract the relevant facts from material already read into the person's record. Prefer sources that connect a named person to actual work: project pages, customer cases, credited works, publications, or professional activity. Read the relevant text, images, or footage rather than relying on a search snippet or a list of links. A source can supply several profile fields; extract those facts together instead of searching separately for each category.
+
+Describe relevant practice with the specific work, the person's role and actions, and what was produced or completed. For outcomes, report the work product, completion state, or observable performance that matters to this task; a number or a positive outcome is not required. For collaboration, identify the counterpart or team, the working relationship, and the shared work where relevant. A title, author credit, client logo, project association, or employer alone does not establish these details. Keep personal actions, team results, and organization-level relationships distinct.
+
+Write these supported facts into the delivered person entry or file, with the corresponding sources. A portfolio link or a general claim such as “experienced” does not replace the facts already found. Apply the task-relevant profile questions across the full confirmed list. Before another lookup, identify a specific missing fact that could affect the user's choice, and choose a source likely to answer it. If the remaining gap cannot be resolved from available evidence, retain the person and state what is unknown; do not invent detail or turn optional profile completeness into an eligibility requirement.
+
 Add findings to the same person record and describe outcomes and limitations accurately. Keep sources for important facts; mark uncertain information for confirmation rather than guessing. Distinguish current roles from historical experience and personal contributions from team achievements. Inspect footage for visible actions; follower and view counts do not establish actual audience characteristics.
 
 Keep confirmed people in the list when optional profile or contact details remain unavailable, and note the gaps.
