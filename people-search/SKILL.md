@@ -11,26 +11,22 @@ Find relevant people across the user's scope, establish their basic information,
 
 Use the request and context to determine the search direction, scope, and number of people. For a broad request, start with relevant responsibilities, experience, or work without adding eligibility thresholds. Ask only when missing information would materially change the direction.
 
-Choose a search entry point from the table below. When given a list, start by enriching those people; when asked for more, deduplicate against previous results.
+Choose enabled Okou data tools for the information currently missing. Their coverage overlaps: select by source, supported inputs, and returned format, not a mandatory sequence or a requirement to use every matching tool. Use known URLs or selected records directly and reuse sufficient information already returned. Run `okou data tools` to check availability and `okou data describe <tool>` for supported inputs before use. When given a list, start by enriching those people; when asked for more, deduplicate against previous results.
 
 Continue beyond the first batch. Cover relevant organizations, locations, descriptions of responsibilities, or platforms using complementary sources and queries. If results repeatedly return the same people, switch to an entry point that reaches a different pool. For a defined scope such as a team roster or event list, check each member. For an open-ended search, consolidate when the main relevant sources have been covered and further expansion yields few new people; state the coverage and remaining gaps.
 
-| Situation | API | Purpose |
+| Next action | Tool choice | Selection rule |
 | --- | --- | --- |
-| Known name or organization | `people_search` | Find profiles and establish identity and professional background. |
-| Search by responsibilities, expertise, or experience | `people_search_semantic` | Describe the person in natural language to discover people across job titles. |
-| Filter by a specific current role, company, country, or skill | `people_search_structured` | Select candidates from professional records. |
-| Find relevant decision-makers at target companies | `contact_search` | Search contacts by company and responsibilities; if target companies are unclear, start with `company_search` and `company_profile`. |
-| Find people through projects, papers, talks, or cases | `web_search` | Find original work, credits, and participants, and add relevant experience. |
-| Read known pages | `web_scrape`, `web_contents` | Read one page or a batch to extract person-specific information and sources. |
-| Read known LinkedIn profiles or updates | `linkedin_profile`, `linkedin_company`, `linkedin_post`, `linkedin_company_posts` | Add professional background, company context, or relevant updates. |
-| Find creators on video or content platforms | `youtube_search`, `tiktok_search`, `instagram_reels_search` | Discover publishers through relevant content. |
-| Search people or content on Xiaohongshu, Douyin, Weibo, and other platforms | `social_data_quote` → `social_data_create` | Search or read accounts and works on the selected platform. |
-| Enrich a known person's professional profile | `contact_enrich` in default profile mode | Resolve identity, organization, role, and other profile details. |
-| Find a work email | `contact_enrich` with `fields: ["work-email"]` | Look up a work email using the name and verified current employer domain. |
-| Inspect a creator's work, performance, or video content | The platform's work, statistics, or transcript APIs; `social_download_create` when footage is needed | Add specific works, public metrics, or evidence from speech and footage. |
+| Find professional profiles or resolve an identity from a text brief | `people_search` or `people_search_semantic` | Both accept natural-language briefs. Choose `people_search` for model-extracted profile fields with sources; choose `people_search_semantic` for matching profile pages and extracted text. |
+| Find professional records or prospects using filters | `people_search_structured` or `contact_search` | Choose `people_search_structured` for exact current title/employer, profile-country, or skill filters and professional records. Choose `contact_search` for title/seniority, person-location, employer-domain, company-location, or company-size filters; it returns previews, not revealed contacts. |
+| Discover people and sources across the public web | `web_search` | Search for people or public pages such as personal sites, rosters, projects, papers, talks, interviews, and cases. Use it for public-page discovery, not only professional-profile records. |
+| Find people through a specific platform or podcasts | Account, content, or show search in the [platform table](references/tool-evidence.md#platform-tools) | Search accounts by handle, name, or bio when supported; search content by topic or work and follow its publisher. Podcast search returns shows, not a guest directory. Select the route for the platform and operation needed. |
+| Read a known profile, page, or piece of work | Platform readers in the [platform table](references/tool-evidence.md#platform-tools); `web_contents` or `web_scrape` for accessible public pages | Prefer a matching platform reader when its supported output fits the need. `web_contents` reads full text and metadata from 1–20 known public URLs; `web_scrape` extracts Markdown or links from one known public page. |
+| Add company context | `company_search` or `company_profile` | Use `company_search` to discover companies by supported criteria; use `company_profile` when the company domain is already known. Company context is not a person's work history or contribution. |
+| Explicitly fill a selected person's professional profile | `contact_enrich` in default profile mode | Use a supported ID, LinkedIn URL, or name plus employer domain. Enrich the selected person, not every discovery result automatically; this is distinct from a work-email lookup. |
+| Explicitly look up a person's work email | `contact_enrich` with `fields: ["work-email"]` | Use name plus current employer domain for the requested lookup. Reuse public professional contacts already found; do not guess addresses. No phone numbers or private email addresses are retrieved. |
 
-Use `okou data describe <tool>` for current parameters. Consult the [tool reference](references/tool-evidence.md) as needed for specific platform APIs and saved-job readers.
+Consult the [tool reference](references/tool-evidence.md) as needed for platform-specific tools, result limits, supported pagination, and saved-job readers.
 
 Basic information usually includes name or account, organization and role, and public profile links; add location when relevant. Resolve identities against sources to avoid combining different people's records.
 
