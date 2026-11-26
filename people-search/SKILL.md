@@ -53,7 +53,7 @@ Add findings to the same person record and describe outcomes and limitations acc
 
 Use one row per person, with basic columns for **name or account, organization and role, profile link, contacts (phone, email, or another channel), and sources**.
 
-Choose and split profile columns to suit the task and support comparison. Add fields such as location or work metrics when relevant.
+Choose and split profile columns to suit the task and support comparison. Add fields such as location or work metrics when relevant. Write profile fields as specific facts such as projects, dates, and numbers. Follow each key fact with a short quote and its link rather than relying on the sources column. Prefer public pages that name the person.
 
 Keep contacts in a separate column, listing the actual public professional contact details and whose channel they are. Extract contacts already present in sources into the table rather than substituting a paper or profile link. Note when none were found.
 
