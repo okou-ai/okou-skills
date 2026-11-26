@@ -11,26 +11,31 @@ Find relevant people across the user's scope, establish their basic information,
 
 Use the request and context to determine the search direction, scope, and number of people. For a broad request, start with relevant responsibilities, experience, or work without adding eligibility thresholds. Ask only when missing information would materially change the direction.
 
-Choose a search entry point from the table below. When given a list, start by enriching those people; when asked for more, deduplicate against previous results.
+Choose enabled Okou data tools by the evidence needed. These are task-relevant entry points, not provider-native endpoints or a mandatory all-tools pipeline. Run `okou data tools` to check availability and `okou data describe <tool>` for supported inputs before use. When given a list, start by enriching those people; when asked for more, deduplicate against previous results.
 
 Continue beyond the first batch. Cover relevant organizations, locations, descriptions of responsibilities, or platforms using complementary sources and queries. If results repeatedly return the same people, switch to an entry point that reaches a different pool. For a defined scope such as a team roster or event list, check each member. For an open-ended search, consolidate when the main relevant sources have been covered and further expansion yields few new people; state the coverage and remaining gaps.
 
-| Situation | API | Purpose |
+| Situation | Okou data tool | Use and limits |
 | --- | --- | --- |
-| Known name or organization | `people_search` | Find profiles and establish identity and professional background. |
-| Search by responsibilities, expertise, or experience | `people_search_semantic` | Describe the person in natural language to discover people across job titles. |
-| Filter by a specific current role, company, country, or skill | `people_search_structured` | Select candidates from professional records. |
-| Find relevant decision-makers at target companies | `contact_search` | Search contacts by company and responsibilities; if target companies are unclear, start with `company_search` and `company_profile`. |
-| Find people through projects, papers, talks, or cases | `web_search` | Find original work, credits, and participants, and add relevant experience. |
-| Read known pages | `web_scrape`, `web_contents` | Read one page or a batch to extract person-specific information and sources. |
-| Read known LinkedIn profiles or updates | `linkedin_profile`, `linkedin_company`, `linkedin_post`, `linkedin_company_posts` | Add professional background, company context, or relevant updates. |
-| Find creators on video or content platforms | `youtube_search`, `tiktok_search`, `instagram_reels_search` | Discover publishers through relevant content. |
-| Search people or content on Xiaohongshu, Douyin, Weibo, and other platforms | `social_data_quote` → `social_data_create` | Search or read accounts and works on the selected platform. |
-| Enrich a known person's professional profile | `contact_enrich` in default profile mode | Resolve identity, organization, role, and other profile details. |
-| Find a work email | `contact_enrich` with `fields: ["work-email"]` | Look up a work email using the name and verified current employer domain. |
-| Inspect a creator's work, performance, or video content | The platform's work, statistics, or transcript APIs; `social_download_create` when footage is needed | Add specific works, public metrics, or evidence from speech and footage. |
+| Discover professional profiles or resolve a person's identity | `people_search` | Search by identity, role, employer, education, skill, or location using a natural-language query. Use source-backed profiles as leads; verify model-extracted fields. |
+| Describe responsibilities, expertise, or experience in natural language | `people_search_semantic` | Discover semantically relevant professional profile pages and source text across job titles. Results are leads, not verified biographies or a complete candidate pool. |
+| Filter professional records by exact current title, employer, profile-country, or skill | `people_search_structured` | Apply supported structured filters. Title and employer filters concern current employment; country concerns the person's profile location, not company headquarters. Do not turn past-experience requirements into current-employer restrictions. |
+| Identify target companies or establish company context | `company_search`, `company_profile` | Discover companies from supported name, domain, location, size, or keyword criteria; resolve a known domain for company details. Use the results to guide people searches, not as evidence of an individual's role or contribution. |
+| Find professional prospects at target companies | `contact_search` | Search by supported title, seniority, location, and employer criteria. Results are previews, not revealed contacts; matching a title does not establish decision-making authority. |
+| Find people through public rosters, projects, papers, talks, interviews, or cases | `web_search` | Discover named participants, original work, and experience evidence beyond professional-profile records. Inspect the relevant source before treating search snippets as verified facts; use the social tools for platform-specific content. |
+| Read known public source pages | `web_scrape`, `web_contents` | Extract Markdown or links from one URL with `web_scrape`, or full text and source metadata from 1–20 supplied URLs with `web_contents`. Reuse sufficient text already returned; check content freshness for time-sensitive claims. |
+| Read known LinkedIn profiles, company pages, or posts | `linkedin_profile`, `linkedin_company`, `linkedin_post`, `linkedin_company_posts` | Read public member details, company context, individual posts, or recent company posts from known URLs. Company-level information alone does not verify an individual's responsibilities. |
+| Discover indexed Instagram creator accounts | `creator_search` | Search by handle, display name, or bio. Returns basic public profile information, not a cross-platform creator search or private contact enrichment. |
+| Discover creators through relevant videos or Reels | `youtube_search`, `tiktok_search`, `instagram_reels_search` | Search public content and follow its publisher to the relevant account. Content search is not an exhaustive account directory; verify authorship and task relevance. |
+| Find relevant podcast shows as leads to people | `podcast_search` | Search show metadata by name, with optional language and topic. Verify hosts or guests in named episode or show sources; the tool does not supply transcripts or establish a complete guest list. |
+| Search or read public accounts and content on Xiaohongshu, Douyin, Weibo, or other supported social platforms | `social_data_quote` → `social_data_create` | Quote one bounded platform operation, then submit it. Check support for the requested platform and operation; do not assume every platform supports account search, content search, or the same inputs. |
+| Explicitly enrich a selected person's professional profile | `contact_enrich` in default profile mode | Resolve one selected person using a supported ID, LinkedIn URL, or name plus employer domain. Do not silently enrich every discovered result or treat profile enrichment as a work-email lookup. |
+| Explicitly look up a person's work email | `contact_enrich` with `fields: ["work-email"]` | Use the person's name and verified current employer domain when a work-email lookup is requested. Reuse public professional contacts already found; do not guess addresses. This mode does not retrieve phone numbers or private email addresses. |
+| Inspect specific work, public metrics, transcripts, or visible actions | Platform-specific content, statistics, or transcript tools; `social_download_create` when footage is needed | Follow the tool reference for supported platform tools. Use transcripts for spoken content and inspect footage for visible actions; download only when needed and supported. |
 
-Use `okou data describe <tool>` for current parameters. Consult the [tool reference](references/tool-evidence.md) as needed for specific platform APIs and saved-job readers.
+Treat profile records, search snippets, and generated fields as leads until the relevant claims are checked against sources. Reuse sufficient source text already returned. Do not treat successful page extraction as proof that the content is current; verify time-sensitive facts against the current authoritative source, or state the freshness uncertainty.
+
+Consult the [tool reference](references/tool-evidence.md) as needed for platform-specific tools, result limits, supported pagination, and saved-job readers.
 
 Basic information usually includes name or account, organization and role, and public profile links; add location when relevant. Resolve identities against sources to avoid combining different people's records.
 
