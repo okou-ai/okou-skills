@@ -1,64 +1,88 @@
 ---
 name: people-search
-description: Find people or enrich existing lists, covering the requested scope as fully as possible. Deliver basic information, task-relevant profiles, and public professional contacts with sources, preferably as a Markdown table or XLSX file.
+description: Find relevant people or enrich existing lists with broad coverage, verified identities, public professional contacts, and task-relevant profiles. Deliver results as a Markdown table or XLSX file.
 ---
 
 # People Search
 
-Find relevant people across the user's scope, establish their basic information, and add task-relevant profiles and public professional contacts. Deliver a table that helps the user understand, compare, and contact them.
+Discover relevant people across the requested scope, verify their identities and relevance, extract or enrich public professional contacts, and build profiles that support comparison and outreach. Deliver the results in a structured table.
 
-## Find people and establish basic information
+## 1. Define scope and search strategy
 
-Use the request and context to determine the search direction, scope, and number of people. For a broad request, start with relevant responsibilities, experience, or work without adding eligibility thresholds. Ask only when missing information would materially change the direction.
+- **Scope the request**: Use the user's goal and context to determine the search direction, target profile, geography/industry, and desired count. For broad requests, start from core responsibilities, relevant experience, or representative work without adding arbitrary thresholds. Ask clarifying questions only when missing details would materially change the search direction.
+- **Handle existing lists**: When given a list, prioritize enriching and verifying those individuals first. When asked to find more, deduplicate strictly against previous results.
+- **Check tools first**: Run `okou data tools` to check availability and `okou data describe <tool>` to confirm supported parameters before use. Do not pass provider-native parameters that the schema does not expose. Consult the [tool reference](references/tool-evidence.md) for platform-specific tools, pagination, work-email lookups, and saved-job results.
 
-Choose enabled Okou data tools for the information currently missing. Their coverage overlaps: select by source, supported inputs, and returned format, not a mandatory sequence or a requirement to use every matching tool. Use known URLs or selected records directly and reuse sufficient information already returned. Run `okou data tools` to check availability and `okou data describe <tool>` for supported inputs before use. When given a list, start by enriching those people; when asked for more, deduplicate against previous results.
+## 2. Multi-source discovery: Ensure broad coverage
 
-For explicit requests to "find all" or "find as many as possible," prefer the selected discovery tool's maximum supported result or page size, subject to the user's quantity, time, and cost limits. Use only supported size controls; reaching the limit does not establish complete coverage or replace deduplication and verification.
+Do not stop after the first batch. Combine complementary sources based on where the target audience is active to avoid single-channel blind spots:
 
-Continue beyond the first batch. Cover relevant organizations, locations, descriptions of responsibilities, or platforms using complementary sources and queries. If results repeatedly return the same people, switch to an entry point that reaches a different pool. For a defined scope such as a team roster or event list, check each member. For an open-ended search, consolidate when the main relevant sources have been covered and further expansion yields few new people; state the coverage and remaining gaps.
+- **Expand queries**: Run batched searches using title synonyms (including bilingual titles and common variations), adjacent subfields, and target company/organization lists.
+- **Cross-channel entry points**:
+  1. **Direct profile search**: Query structured or semantic professional databases directly.
+  2. **Company-to-people**: Identify target organizations and domains via `company_search` or `company_profile`, then look up key role holders.
+  3. **Work-to-people**: Use `web_search` or niche platforms to find papers, open-source repositories, talks, podcasts, industry articles, or award lists, then trace back to the authors and leads.
+- **Maximize coverage and pagination**: When asked to "find all" or "find as many as possible," use the maximum supported page size and paginate (e.g., via `scrollToken` in `people_search_structured`) within the user's quantity, time, and cost limits. If an entry point repeatedly returns the same people, switch to another platform or search angle.
+- **Convergence and gaps**: For closed scopes (e.g., a team roster or event speaker list), verify every member. For open-ended searches, consolidate once primary sources are covered and new queries yield few fresh candidates; clearly note **coverage and remaining gaps** upon delivery.
 
-| Next action | Tool choice | Selection rule |
+| Next action | Recommended tool | Selection rule |
 | --- | --- | --- |
-| Find professional profiles or resolve an identity from a text brief | `people_search` or `people_search_semantic` | Both accept natural-language briefs. Choose `people_search` for model-extracted profile fields with sources; choose `people_search_semantic` for matching profile pages and extracted text. |
-| Find professional records or prospects using filters | `people_search_structured` or `contact_search` | Choose `people_search_structured` for exact current title/employer, profile-country, or skill filters and professional records. Choose `contact_search` for title/seniority, person-location, employer-domain, company-location, or company-size filters; it returns previews, not revealed contacts. |
-| Discover people and sources across the public web | `web_search` | Search for people or public pages such as personal sites, rosters, projects, papers, talks, interviews, and cases. Use it for public-page discovery, not only professional-profile records. |
-| Find people through a specific platform or podcasts | Account, content, or show search in the [platform table](references/tool-evidence.md#platform-tools) | Search accounts by handle, name, or bio when supported; search content by topic or work and follow its publisher. Podcast search returns shows, not a guest directory. Select the route for the platform and operation needed. |
-| Read a known profile, page, or piece of work | Platform readers in the [platform table](references/tool-evidence.md#platform-tools); `web_contents` or `web_scrape` for accessible public pages | Prefer a matching platform reader when its supported output fits the need. `web_contents` reads full text and metadata from 1–20 known public URLs; `web_scrape` extracts Markdown or links from one known public page. |
-| Add company context | `company_search` or `company_profile` | Use `company_search` to discover companies by supported criteria; use `company_profile` when the company domain is already known. Company context is not a person's work history or contribution. |
-| Explicitly fill a selected person's professional profile | `contact_enrich` in default profile mode | Use a supported ID, LinkedIn URL, or name plus employer domain. Enrich the selected person, not every discovery result automatically; this is distinct from a work-email lookup. |
-| Explicitly look up a person's work email | `contact_enrich` with `fields: ["work-email"]` | Use name plus current employer domain for the requested lookup. Reuse public professional contacts already found; do not guess addresses. No phone numbers or private email addresses are retrieved. |
+| Find profiles or resolve identities from a natural-language brief | `people_search` / `people_search_semantic` | Use `people_search` for model-extracted profile fields with sources; use `people_search_semantic` for matching profile pages and semantic text search. |
+| Filter professional records by exact criteria | `people_search_structured` / `contact_search` | Use `people_search_structured` for current title, employer, country, or skill filters. Use `contact_search` for seniority, company size/domain/location, or person-location filters (returns previews only, not unlocked contacts). |
+| Discover people and public evidence across the web | `web_search` | Search personal sites, team directories, papers, projects, interviews, and case studies—not just professional databases. |
+| Find people via niche platforms or podcasts | Platform tools in [tool reference](references/tool-evidence.md#platform-tools) | Search accounts by handle, name, or bio, or search content by topic to trace publishers. Podcast search returns shows rather than a guest directory; verify hosts/guests in episode sources. |
+| Read known profiles or public pages | Matching platform readers / `web_contents` / `web_scrape` | Prefer platform-specific readers when available. Use `web_contents` for full text and metadata from 1–20 public URLs, or `web_scrape` to extract Markdown/links from a single page. |
+| Add company context | `company_search` / `company_profile` | Use `company_profile` when the domain is known; otherwise use `company_search`. Company context does not substitute for an individual's work history or contribution. |
+| Enrich a selected person's full profile | `contact_enrich` (default profile mode) | Pass a supported ID, LinkedIn URL, or name + employer domain. Enrich selected targets on demand rather than every discovery result automatically. |
+| Look up a work email | `contact_enrich` (`fields: ["work-email"]`) | Pass the person's name + verified current employer domain. Retrieves work emails only—no personal emails or phone numbers. Never guess email formats. |
 
-Consult the [tool reference](references/tool-evidence.md) as needed for platform-specific tools, result limits, supported pagination, and saved-job readers.
+## 3. Verify identities and deduplicate: Ensure accuracy
 
-Basic information usually includes name or account, organization and role, and public profile links; add location when relevant. Resolve identities against sources to avoid combining different people's records.
+- **Identity resolution**: Before merging records from multiple sources, cross-check organization, profile links, or career history to confirm they belong to the same person and avoid combining different individuals with the same name.
+- **Distinguish current vs. past roles**: Clearly separate current employment from historical experience. Note in the results if a profile shows someone has left a role or has not been updated in years.
+- **Rank by relevance**: Prioritize candidates who strongly match the request and are backed by public facts. Check each mandatory criterion against available evidence. List useful leads with unresolved requirements separately as "To be confirmed" and exclude them from the confirmed count.
+- **Batch-process large result sets**:
+  - Save complete tool responses locally and build a lightweight index per candidate (ID, source, evidence/gaps, full-record pointer) instead of loading raw JSON into context.
+  - Review all candidates in batches, reading full records by ID as needed rather than substituting the first N results for full coverage.
 
-## Handle large result files
+## 4. Contact discovery funnel: Ensure reachability
 
-- Save complete responses locally. Build a lightweight index for every candidate with an ID, source, evidence or gaps, and a full-record pointer, rather than loading whole responses into context.
-- Review all candidates in batches, reading saved full records by ID as needed. Mark missing evidence as unverified; do not substitute first-N candidates or text prefixes for full coverage.
-- If file limits require splitting, split at candidate boundaries, include a manifest, and check for lost records. Preserve the requested delivery format and complete verified list.
+Follow a **public extraction first, targeted enrichment second** approach. Record the actual public work number, email address, or direct professional contact URL alongside its source. A personal LinkedIn profile can serve as a contact route; messaging availability may vary.
 
-## Build task-relevant profiles
+1. **Extract from public sources**: Pull published work phone numbers, professional emails, or official business/press contacts directly from papers (corresponding author sections), personal sites, GitHub profiles, company team pages, social bios, or press releases, keeping the source link. Check who owns each contact; label shared office, press, and agency channels as indirect.
+2. **Targeted work-email enrichment**: If no public email is found for a high-relevance candidate (or when explicitly requested), use `contact_enrich` (`fields: ["work-email"]`) with their name and verified current employer domain.
+3. **Reachable social/public channels**: Record public accounts suitable for professional outreach and clearly label channel ownership.
+4. **Compliance and transparency**: Do not search for or guess private phone numbers or personal emails. If no valid contact is found, explicitly state "No public contact found."
 
-Use the purpose of the search to identify professional information that helps the user understand and compare people. Select the relevant content from the six categories below, establish specific facts, and split them into table columns as useful.
+**Priority public channels by audience**:
 
-| Profile content | What to learn |
+| Target audience | Priority public sources & reachable channels |
 | --- | --- |
-| Professional role and responsibilities | In what role does the person work, and what do they usually take responsibility for? |
-| Professional knowledge and skills | What relevant knowledge or skills are supported, and what is their scope? |
-| Practical experience and personal contribution | What relevant work has the person done, and what did they personally undertake and complete? |
-| Outcomes and performance | What work products, results, or observable performance did the work produce? |
-| Business and working context | Whom does the work serve, and under what business, technical, or organizational conditions? |
-| Professional collaboration | With whom has the person worked, in what relationship, and on what shared work? |
+| **Executives / Business decision-makers** | LinkedIn, company team pages, conference/podcast speaker pages, `contact_enrich` (work email) |
+| **Engineers / Developers** | GitHub profile with a published professional contact, personal blogs/sites, X/Twitter, LinkedIn |
+| **Researchers / Academics** | University or lab pages, paper corresponding-author blocks, Google Scholar, personal academic sites, LinkedIn |
+| **Creators / KOLs / Industry bloggers** | Business/partnership emails or agency contacts listed in primary platform bios (Xiaohongshu, Douyin, WeChat Official Accounts, YouTube, Instagram, etc.) |
 
-Add findings to the same person record and describe outcomes and limitations accurately. Keep sources for important facts; mark uncertain information for confirmation rather than guessing. Distinguish current roles from historical experience and personal contributions from team achievements. Inspect footage for visible actions; follower and view counts do not establish actual audience characteristics.
+## 5. Build task-relevant profiles
 
-## Deliver a table
+For confirmed matches, extract profile details aligned with the user's goal and split them into comparable table columns as needed:
 
-Use one row per person, with basic columns for **name or account, organization and role, profile link, contacts (phone, email, or another channel), and sources**.
+| Profile dimension | What to capture |
+| --- | --- |
+| **Match rationale & tags** | A one-sentence explanation of why they fit the request, plus core professional tags. |
+| **Role & capability scope** | Current role, business/technical ownership, and evidenced core skills. |
+| **Practical experience & personal contribution** | Representative projects, products, or research, specifying what the person personally owned (distinguishing personal contribution from team outcomes). |
+| **Outcomes & impact** | Observable results, papers/patents, open-source projects, product milestones, or public talks. |
+| **Business context & network** | Organizational, business, or technical context, plus key collaborators, co-authors, or institutional backing. |
+| **Recent activity / Outreach hook** | Recent posts, new launches, talks, or public hiring/collaboration signals useful for breaking the ice. |
 
-Choose and split profile columns to suit the task and support comparison. Add fields such as location or work metrics when relevant. Write profile fields as specific facts such as projects, dates, and numbers. Follow each key fact with a short quote and its link rather than relying on the sources column. Prefer public pages that name the person.
+**Facts and citations**:
+- **Cite concrete facts**: Ground profile points in project names, dates, metrics, tangible outputs, or direct quotes rather than generic praise. Follower counts and views do not establish audience quality.
+- **Include inline citations**: Follow key facts directly with brief evidence and a source link (preferring public pages that name the person) rather than dumping all links into the final column. Mark unverified details as "To be confirmed" instead of guessing.
 
-Keep contacts in a separate column, listing the actual public professional contact details and whose channel they are. Extract contacts already present in sources into the table rather than substituting a paper or profile link. Note when none were found.
+## 6. Delivery standards
 
-Prefer a Markdown table or XLSX file containing the complete list, ordered by relevance to the user's needs. Honor a requested result count; otherwise preserve all relevant people supported by facts rather than showing only the first few to keep the table short. Follow an explicitly requested format. Briefly explain any shortfall in people, coverage, or important information. Before delivery, check duplicates, key facts, and source links.
+- **Clear structure**: One row per person, ordered from highest to lowest relevance.
+- **Core columns**: `Name / Handle`, `Organization & Role`, `Location (if relevant)`, `Profile Link`, `Contacts (dedicated column: actual work phone, email, or contact URL and ownership)`, `Match Rationale`, `Profile Details (split into 2–4 comparable columns by task)`, and `Sources`.
+- **Output format**: Prefer a complete **Markdown table** or **XLSX file** (following any explicitly requested format). Honor a requested count; otherwise preserve all fact-backed relevant candidates rather than truncating the list for brevity.
+- **Pre-delivery check**: Verify there are no duplicates, confirm contacts are extracted into their own column, ensure key facts include working source links, and briefly note **coverage, key gaps, or enrichment shortfalls** after the table.
