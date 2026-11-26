@@ -11,7 +11,7 @@ Discover relevant people across the requested scope, verify their identities and
 
 - **Scope the request**: Use the user's goal and context to determine the search direction, target profile, geography/industry, and desired count. For broad requests, start from core responsibilities, relevant experience, or representative work without adding arbitrary thresholds. Ask clarifying questions only when missing details would materially change the search direction.
 - **Handle existing lists**: When given a list, prioritize enriching and verifying those individuals first. When asked to find more, deduplicate strictly against previous results.
-- **Check tools first**: Run `okou data tools` to check availability and `okou data describe <tool>` to confirm supported parameters before use. Do not pass provider-native parameters that the schema does not expose.
+- **Check tools first**: Run `okou data tools` to check availability and `okou data describe <tool>` to confirm supported parameters before use. Do not pass provider-native parameters that the schema does not expose. Consult the [tool reference](references/tool-evidence.md) for platform-specific tools, pagination, work-email lookups, and saved-job results.
 
 ## 2. Multi-source discovery: Ensure broad coverage
 
