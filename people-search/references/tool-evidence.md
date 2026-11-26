@@ -32,6 +32,8 @@ General social-data search example: `{"platform":"xiaohongshu","operation":"sear
 
 ## Saved jobs and media
 
+Use `social_download_create` only when footage is needed and the platform supports it.
+
 | Submitted task | Read the result |
 | --- | --- |
 | Professional profile, contact, or company job that is still submitted | `company_contact_get` with `jobId`. |
