@@ -32,6 +32,12 @@ Consult the [tool reference](references/tool-evidence.md) as needed for platform
 
 Basic information usually includes name or account, organization and role, and public profile links; add location when relevant. Resolve identities against sources to avoid combining different people's records.
 
+## Handle large result files
+
+- Save complete responses locally. Build a lightweight index for every candidate with an ID, source, evidence or gaps, and a full-record pointer, rather than loading whole responses into context.
+- Review all candidates in batches, reading saved full records by ID as needed. Mark missing evidence as unverified; do not substitute first-N candidates or text prefixes for full coverage.
+- If file limits require splitting, split at candidate boundaries, include a manifest, and check for lost records. Preserve the requested delivery format and complete verified list.
+
 ## Build task-relevant profiles
 
 Use the purpose of the search to identify professional information that helps the user understand and compare people. Select the relevant content from the six categories below, establish specific facts, and split them into table columns as useful.
