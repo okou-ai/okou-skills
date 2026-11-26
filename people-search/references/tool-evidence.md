@@ -2,6 +2,10 @@
 
 Use this reference for platform-specific tools, parameters, or saved jobs. Use only enabled Okou-managed data tools and inputs exposed by the current `okou data describe <tool>` schema; do not import provider-native parameters into a managed-tool request.
 
+## Choose a discovery route
+
+Use `people_search` for sourced profile fields or `people_search_semantic` for matching pages and text. Use `people_search_structured` for exact professional filters and `contact_search` for prospect previews by seniority, location, or employer attributes. Find rosters and work samples with `web_search`, then read pages with `web_contents` or `web_scrape`. Use `company_search` to discover employers and `company_profile` for a known domain.
+
 ## Platform tools
 
 | Platform | Discover and read content | Additional information |
