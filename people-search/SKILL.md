@@ -32,6 +32,15 @@ Consult the [tool reference](references/tool-evidence.md) as needed for platform
 
 Basic information usually includes name or account, organization and role, and public profile links; add location when relevant. Resolve identities against sources to avoid combining different people's records.
 
+## Handle large result files
+
+Keep candidate coverage separate from how much text is read into context at once. When results are too large for one read or file:
+
+- Preserve the complete returned response locally, including full text and source metadata. Do not load the whole response into context; note any upstream truncation.
+- Build a compact index covering every candidate: stable ID, name, source URL, task-relevant evidence excerpts, missing evidence, and the saved full-record location.
+- Review the entire index in manageable batches and use IDs to read saved full records for verification as needed. Keep missing evidence unverified, not disqualified. Do not replace full coverage with the first few candidates or fixed-length text prefixes.
+- If file-size limits require splitting, write candidate-aligned JSONL volumes with a manifest of file names, IDs, and counts; check that no record is lost. Preserve the user's delivery format and complete verified list, making raw files or archives available when useful. Compression reduces transfer size, not search charges or decompressed context size.
+
 ## Build task-relevant profiles
 
 Use the purpose of the search to identify professional information that helps the user understand and compare people. Select the relevant content from the six categories below, establish specific facts, and split them into table columns as useful.
