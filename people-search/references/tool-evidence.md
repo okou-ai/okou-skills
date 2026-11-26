@@ -19,15 +19,16 @@ General social-data search example: `{"platform":"xiaohongshu","operation":"sear
 
 ## Professional profiles and email
 
-- `people_search_structured` filters exact titles and employers by current employment; country concerns the person's profile location, not company headquarters. It has no semantic `query` input and is not a past-employer search. Values within one field are OR; different fields are AND. For another page, repeat the same filters and pass the returned `scroll_token` as `scrollToken`. Every returned record is chargeable; each explicit next-page request buys another page.
+- `people_search_structured` requires at least one of `titles`, `companyNames`, `companyDomains`, `countries`, or `skills`. Filters use exact matches after lowercase normalization, with OR within one field and AND across fields. Title and employer filters concern current employment; country concerns the person's profile location, not company headquarters, and uses full country names rather than country codes. Requested fields include work history and education, but these are not exposed as search filters; there is no semantic `query` input.
+- For another structured-search page, repeat the same filters and pass the returned `scroll_token` as `scrollToken`. Every returned record is chargeable; each explicit next-page request buys another page.
 - `contact_search` previews may mask names; `has_email` does not mean an email has been retrieved. Explicitly use a selected ID with `contact_enrich` when a full profile is needed; do not silently enrich every discovered result.
 - Extract public professional contacts from papers, personal pages, or organization pages already read into the final table's Contacts column, retaining the source. If a paper already provides the email, neither repeat a paid lookup nor leave only the paper link in the table.
 - For a separate work-email lookup, use `contact_enrich` with `fields: ["work-email"]`; default mode only enriches the profile. Use the person's name and verified current employer domain. This mode does not retrieve phone numbers or private email addresses. Do not guess addresses. Actual outreach requires user authorization.
 
-## Page extraction
+## Public web search and page extraction
 
+- `web_search` accepts `query`, optional `limit` (default 5, maximum 10), `recency` (`hour`, `day`, `week`, `month`, or `year`), and `domains` (up to 20 allowed domains or subdomains, without protocols or paths). It searches public pages for both people and supporting sources, not a structured professional-record database. No pagination or provider-native search-mode controls are exposed.
 - `web_contents` accepts only `urls`, reading full text and source metadata for 1–20 distinct public URLs per batch. Do not pass provider-native content, summary, or freshness options that its schema does not expose. Check the status and content returned for each URL.
-- Successful extraction does not establish freshness. Verify time-sensitive claims against the current authoritative source, or state the freshness uncertainty.
 
 ## Saved jobs and media
 
