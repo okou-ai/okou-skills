@@ -1,17 +1,19 @@
 ---
 name: people-search
-description: Find people or enrich existing lists, covering the requested scope as fully as possible. Deliver basic information, task-relevant profiles, and public professional contacts with sources, preferably as a Markdown table or XLSX file.
+description: Find and confirm people who meet the user's request before enriching their profiles and public professional contacts. Cover the requested scope as fully as possible and deliver a sourced Markdown table or XLSX file.
 ---
 
 # People Search
 
-Find relevant people across the user's scope, establish their basic information, and add task-relevant profiles and public professional contacts. Deliver a table that helps the user understand, compare, and contact them.
+First find and confirm people who meet the user's request. Once the candidate list is established, enrich those people's profiles and public professional contacts, then deliver a table that helps the user understand, compare, and contact them.
 
-## Find people and establish basic information
+## 1. Find and confirm suitable people
 
 Use the request and context to determine the search direction, scope, and number of people. For a broad request, start with relevant responsibilities, experience, or work without adding eligibility thresholds. Ask only when missing information would materially change the direction.
 
-Choose a search entry point from the table below. When given a list, start by enriching those people; when asked for more, deduplicate against previous results.
+Choose a search entry point from the table below. When asked to verify an existing list, check those people against the request first. If the user only asks to enrich a supplied list, start at profile enrichment. When asked for more people, deduplicate against previous results.
+
+During discovery, verify identity and the facts needed to confirm whether each person meets the request, retaining the sources. Check project, skill, or other profile-related facts here when they establish a user requirement; save broader profile research for the next stage. Establish the requested count or search coverage before moving to detailed enrichment.
 
 Continue beyond the first batch. Cover relevant organizations, locations, descriptions of responsibilities, or platforms using complementary sources and queries. If results repeatedly return the same people, switch to an entry point that reaches a different pool. For a defined scope such as a team roster or event list, check each member. For an open-ended search, consolidate when the main relevant sources have been covered and further expansion yields few new people; state the coverage and remaining gaps.
 
@@ -34,9 +36,9 @@ Use `okou data describe <tool>` for current parameters. Consult the [tool refere
 
 Basic information usually includes name or account, organization and role, and public profile links; add location when relevant. Resolve identities against sources to avoid combining different people's records.
 
-## Build task-relevant profiles
+## 2. Build profiles for confirmed people
 
-Use the purpose of the search to identify professional information that helps the user understand and compare people. Select the relevant content from the six categories below, establish specific facts, and split them into table columns as useful.
+After establishing the candidate list, enrich the confirmed people with information that helps the user understand and compare them. Select task-relevant content from the six categories below, reuse facts already verified during discovery, and split them into table columns as useful.
 
 | Profile content | What to learn |
 | --- | --- |
@@ -47,9 +49,17 @@ Use the purpose of the search to identify professional information that helps th
 | Business and working context | Whom does the work serve, and under what business, technical, or organizational conditions? |
 | Professional collaboration | With whom has the person worked, in what relationship, and on what shared work? |
 
+Before searching for more profile details, extract the relevant facts from material already read into the person's record. Prefer sources that connect a named person to actual work: project pages, customer cases, credited works, publications, or professional activity. Read the relevant text, images, or footage rather than relying on a search snippet or a list of links. A source can supply several profile fields; extract those facts together instead of searching separately for each category.
+
+Describe relevant practice with the specific work, the person's role and actions, and what was produced or completed. For outcomes, report the work product, completion state, or observable performance that matters to this task; a number or a positive outcome is not required. For collaboration, identify the counterpart or team, the working relationship, and the shared work where relevant. A title, author credit, client logo, project association, or employer alone does not establish these details. Keep personal actions, team results, and organization-level relationships distinct.
+
+Write these supported facts into the delivered person entry or file, with the corresponding sources. A portfolio link or a general claim such as “experienced” does not replace the facts already found. Apply the task-relevant profile questions across the full confirmed list. Before another lookup, identify a specific missing fact that could affect the user's choice, and choose a source likely to answer it. If the remaining gap cannot be resolved from available evidence, retain the person and state what is unknown; do not invent detail or turn optional profile completeness into an eligibility requirement.
+
 Add findings to the same person record and describe outcomes and limitations accurately. Keep sources for important facts; mark uncertain information for confirmation rather than guessing. Distinguish current roles from historical experience and personal contributions from team achievements. Inspect footage for visible actions; follower and view counts do not establish actual audience characteristics.
 
-## Deliver a table
+Keep confirmed people in the list when optional profile or contact details remain unavailable, and note the gaps.
+
+## 3. Deliver a table
 
 Use one row per person, with basic columns for **name or account, organization and role, profile link, contacts (phone, email, or another channel), and sources**.
 
@@ -57,4 +67,4 @@ Choose and split profile columns to suit the task and support comparison. Add fi
 
 Keep contacts in a separate column, listing the actual public professional contact details and whose channel they are. Extract contacts already present in sources into the table rather than substituting a paper or profile link. Note when none were found.
 
-Prefer a Markdown table or XLSX file containing the complete list, ordered by relevance to the user's needs. Honor a requested result count; otherwise preserve all relevant people supported by facts rather than showing only the first few to keep the table short. Follow an explicitly requested format. Briefly explain any shortfall in people, coverage, or important information. Before delivery, check duplicates, key facts, and source links.
+Prefer a Markdown table or XLSX file containing the complete list, ordered by relevance to the user's needs. Honor a requested result count; otherwise preserve all confirmed matches rather than showing only the first few to keep the table short. Follow an explicitly requested format. Briefly explain any shortfall in people, coverage, or important information. Before delivery, check duplicates, key facts, and source links.
