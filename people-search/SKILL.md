@@ -47,13 +47,17 @@ Use the purpose of the search to identify professional information that helps th
 | Business and working context | Whom does the work serve, and under what business, technical, or organizational conditions? |
 | Professional collaboration | With whom has the person worked, in what relationship, and on what shared work? |
 
-Add findings to the same person record and describe outcomes and limitations accurately. Keep sources for important facts; mark uncertain information for confirmation rather than guessing. Distinguish current roles from historical experience and personal contributions from team achievements. Inspect footage for visible actions; follower and view counts do not establish actual audience characteristics.
+Add findings to the same person record and describe outcomes and limitations accurately. Give each profile field at least one checkable detail, such as a named project or work, a date, a number, or a collaborator; judgments such as "strong fit" or "experienced" do not replace facts. Mark uncertain information for confirmation rather than guessing. Distinguish current roles from historical experience and personal contributions from team achievements. Inspect footage for visible actions; follower and view counts do not establish actual audience characteristics.
+
+Give each key fact an evidence anchor: **the fact with its date when available, a short quote in the source's language, the specific page URL, the location (section heading, item number, page, or timestamp), and the source date**. Anchor each stated requirement, preference, and profile field separately, next to the fact it supports, rather than listing sources at the end.
+
+Support key claims with first-party public pages that name the person, such as team pages, course instructor pages, author contribution statements, pull requests or commits, event programs, or video timestamps. Use LinkedIn profiles as a supplement: quote the text the tool actually returned, and corroborate it with a public page when possible.
 
 ## Deliver a table
 
-Use one row per person, with basic columns for **name or account, organization and role, profile link, contacts (phone, email, or another channel), and sources**.
+Use one row per person, with basic columns for **name or account, organization and role, profile link, and contacts (phone, email, or another channel)**. Put each evidence anchor with the fact it supports. When cells get too long, list each person's anchors after the table or in a separate evidence sheet with one row per fact; a single sources column does not replace them.
 
-Choose and split profile columns to suit the task and support comparison. Add fields such as location or work metrics when relevant.
+Choose and split profile columns to suit the task and support comparison. Add fields such as location or work metrics when relevant. When the request states preferences, mark each one for every person as met, not found, or not met, and give an evidence anchor for each met preference rather than leaving it implied in the rationale.
 
 Keep contacts in a separate column, listing the actual public professional contact details and whose channel they are. Extract contacts already present in sources into the table rather than substituting a paper or profile link. Note when none were found.
 
