@@ -13,6 +13,8 @@ Use the request and context to determine the search direction, scope, and number
 
 Choose enabled Okou data tools for the information currently missing. Their coverage overlaps: select by source, supported inputs, and returned format, not a mandatory sequence or a requirement to use every matching tool. Use known URLs or selected records directly and reuse sufficient information already returned. Run `okou data tools` to check availability and `okou data describe <tool>` for supported inputs before use. When given a list, start by enriching those people; when asked for more, deduplicate against previous results.
 
+For explicit requests to "find all" or "find as many as possible," prefer the selected discovery tool's maximum supported result or page size, subject to the user's quantity, time, and cost limits. Use only supported size controls; reaching the limit does not establish complete coverage or replace deduplication and verification.
+
 Continue beyond the first batch. Cover relevant organizations, locations, descriptions of responsibilities, or platforms using complementary sources and queries. If results repeatedly return the same people, switch to an entry point that reaches a different pool. For a defined scope such as a team roster or event list, check each member. For an open-ended search, consolidate when the main relevant sources have been covered and further expansion yields few new people; state the coverage and remaining gaps.
 
 | Next action | Tool choice | Selection rule |
