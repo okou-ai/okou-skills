@@ -18,7 +18,7 @@ Discovery, fact-checking, and profile development work together throughout the r
 
 ## Discover people and develop coverage
 
-Build coverage across the requested scope by combining complementary sources and search entry points. Use organization-level requirements to find relevant organizations and the people responsible, and personal-experience requirements to trace documented work to its contributors. Follow connections between people, responsibilities, organizations, projects, and publications to reach additional relevant groups and strengthen individual evidence. Maintain a cumulative view of the people and facts found across entry points, the groups and sources explored, and the discovery opportunities and promising leads that remain.
+Build coverage across the requested scope by combining complementary sources and search entry points. Use organization-level requirements to find relevant organizations and the people responsible, and personal-experience requirements to trace documented work to its contributors. Follow connections between people, responsibilities, organizations, projects, and publications to reach additional relevant groups and strengthen individual evidence. Keep a cumulative view in the research ledger of the people and facts found across entry points, the groups and sources explored, and the discovery opportunities and promising leads that remain.
 
 - **Expand queries**: Run batched searches using title synonyms (including bilingual titles and common variations), adjacent subfields, and target company/organization lists.
 - **Cross-channel entry points**:
@@ -27,7 +27,7 @@ Build coverage across the requested scope by combining complementary sources and
   3. **Work-to-people**: Use `web_search` or niche platforms to find papers, open-source repositories, talks, podcasts, industry articles, or award lists, then trace back to the authors and leads.
 - **Maximize coverage and pagination**: When asked to "find all" or "find as many as possible," use the maximum supported page size and paginate (e.g., via `scrollToken` in `people_search_structured`) within the user's quantity, time, and cost limits. If an entry point repeatedly returns the same people, switch to another platform or search angle.
 
-- **Coverage and consolidation**: For a defined population, such as a team roster or event speaker list, work through the full population. For an open-ended search, use the accumulated view of groups, sources, people, and unresolved evidence to guide further research. When additional supported matches become harder to find, identify where further discovery or investigation of existing leads could expand coverage. Decide when to consolidate by considering these remaining opportunities alongside the user's goals, requested scope and count, and actual time or resource constraints. Explain the coverage achieved and the gaps that remain.
+- **Coverage and consolidation**: For a defined population, such as a team roster or event speaker list, work through the full population. For an open-ended search, use the accumulated view of groups, sources, people, and unresolved evidence to guide further research. When additional supported matches become harder to find, identify where further discovery or investigation of existing leads could expand coverage. Decide when to consolidate by considering the open directions in the ledger alongside the user's goals, requested scope and count, and actual time or resource constraints; a long conversation alone is not a reason to stop. Explain the coverage achieved and the gaps that remain.
 
 | Next action | Recommended tool | Selection rule |
 | --- | --- | --- |
@@ -40,6 +40,15 @@ Build coverage across the requested scope by combining complementary sources and
 | Enrich a selected person's full profile | `contact_enrich` (default profile mode) | Pass a supported ID, LinkedIn URL, or name + employer domain. Enrich selected targets on demand rather than every discovery result automatically. |
 | Look up a work email | `contact_enrich` (`fields: ["work-email"]`) | Pass the person's name + verified current employer domain. Retrieves work emails only—no personal emails or phone numbers. Never guess email formats. |
 
+## Keep a research ledger
+
+Keep the research state in a workspace file, such as `people-ledger.md`, rather than only in the conversation:
+
+- **People**: One entry per person with the per-person research record described below, any public contacts found, and a status: match, lead, or excluded with the reason.
+- **Directions**: The groups, sources, and queries explored, and the directions still open.
+
+When reading search results or saved responses, look at compact fields first (title, URL, author, date, and a short snippet) and read the full text only for promising results. Add facts to the ledger as soon as they are confirmed. After earlier conversation has been compacted, read the ledger and continue with the open directions instead of re-reading saved responses. Build the delivered list from the ledger.
+
 ## Research people and build task-relevant profiles
 
 Develop profiles from the information that helps the user understand and compare people. Begin with relevant leads and enrich the understanding of each person through their roles, experience, work, contributions, and organizational context. The information gathered supports both the profile and the assessment of how the person relates to the request; it can also open further discovery paths.
@@ -49,7 +58,7 @@ Choose the dimensions and depth needed for the user's decision. Direct research 
 - **Identity and context**: Cross-check names or handles, organizations, profile links, and career history when connecting information across sources. Keep current roles and historical experience clear.
 - **Relevance to the request**: Use concrete facts about each person's work, experience, and responsibilities to explain their relevance to the user's goals. Update the explanation as research develops.
 - **Profile content**: Select and develop the professional information useful for the user's questions. Use concrete work and sources to show what the person knows, has done, and has contributed, together with the scope and limitations of that experience.
-- **Per-person research record**: Keep the facts supporting each candidate's match to the user's requirements alongside the task-relevant profile facts, source URLs and relevant passages or locations, dates, attribution to the person, team, or organization, and open questions. Use these records to guide further research and prepare the delivered profiles.
+- **Per-person research record**: In each person's ledger entry, keep the facts supporting the match to the user's requirements alongside the task-relevant profile facts, source URLs and relevant passages or locations, dates, attribution to the person, team, or organization, and open questions. Use these records to guide further research and prepare the delivered profiles.
 - **Follow information gaps**: Read relevant source sections and use targeted follow-up queries to establish personal actions, observable outputs, and working context. Choose follow-ups by the missing facts that matter to the user's decision. A title, project name, or organization-level result alone does not establish a person's skills, actions, or outcomes.
 
 | Profile dimension | What to capture |
@@ -62,8 +71,6 @@ Choose the dimensions and depth needed for the user's decision. Direct research 
 | **Professional collaboration** | Relevant collaborators, co-authors, teams, or organizations, what they worked on together, and whether the relationship is personal or organizational. |
 
 Organize these details into comparable fields suited to the task. Describe facts and outcomes accurately, distinguish personal contributions from team or organizational achievements, and make clear which information is established and which remains uncertain.
-
-For large result sets, save complete tool responses locally and maintain a lightweight index for each candidate, including identity, sources, relevant information, open questions, and a full-record pointer. Work through the candidates in batches, reading full records as needed while preserving coverage of the whole result set.
 
 **Facts and citations**:
 - **Cite concrete facts**: Ground profile points in project names, dates, metrics, tangible outputs, or direct quotes rather than generic praise. Follower counts and views do not establish audience quality.
