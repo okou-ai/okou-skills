@@ -44,18 +44,22 @@ Choose complementary sources and search entry points according to the user's goa
 
 Develop profiles from the information that helps the user understand and compare people. Begin with relevant leads and enrich the understanding of each person through their roles, experience, work, contributions, and organizational context. The information gathered supports both the profile and the assessment of how the person relates to the request; it can also open further discovery paths.
 
+Choose the dimensions and depth needed for the user's decision. Continue discovering people while researching their profiles across the requested scope. Within the requested scope and count, retain people who meet the user's selection requirements even when some profile details remain unknown. Use those gaps to guide further research and make remaining limitations visible; profile completeness is not an additional selection requirement.
+
 - **Identity and context**: Cross-check names or handles, organizations, profile links, and career history when connecting information across sources. Keep current roles and historical experience clear.
 - **Relevance to the request**: Use the available facts to explain how each person relates to the user's needs, updating that assessment as more information becomes available. Distinguish firm requirements from preferences and make unresolved conditions visible.
 - **Profile content**: Select and develop the professional information useful for the user's questions. Use concrete work and sources to show what the person knows, has done, and has contributed, together with the scope and limitations of that experience.
+- **Per-person research record**: For the dimensions relevant to the task, keep concrete facts with source URLs and relevant passages or locations, dates, attribution to the person, team, or organization, and open questions. Use these records to prepare the delivered profiles.
+- **Follow information gaps**: Read relevant source sections and use targeted follow-up queries to establish personal actions, observable outputs, and working context. Choose follow-ups by the missing facts that matter to the user's decision. A title, project name, or organization-level result alone does not establish a person's skills, actions, or outcomes.
 
 | Profile dimension | What to capture |
 | --- | --- |
-| **Professional role and responsibilities** | The person's role, what they take responsibility for, and the scope of their work. |
-| **Professional knowledge and skills** | Relevant knowledge and skills supported by their work, including the areas and contexts in which they apply. |
-| **Practical experience and personal contribution** | Projects, products, research, or other work, with the person's own participation and contribution made clear. |
-| **Outcomes and performance** | Concrete work products, results, or observable performance, with the supported scope and limitations. |
-| **Business and working context** | The organizational, business, technical, or operating conditions in which the person works. |
-| **Professional collaboration** | Relevant collaborators, co-authors, teams, or organizations and the nature of the working relationship. |
+| **Professional role and responsibilities** | The person's role, responsibilities, scope, and relevant dates, distinguishing current from historical work. |
+| **Professional knowledge and skills** | Knowledge or skills supported by concrete work, how and where they were applied, and any supported limitations. |
+| **Practical experience and personal contribution** | Specific projects or work episodes, the person's actions or ownership, and the circumstances and boundaries of their contribution. |
+| **Outcomes and performance** | Concrete work products, actual service or process delivery, observed behavior, results or setbacks, with attribution and supported limits. Quantified gains or success claims are not required. |
+| **Business and working context** | The organizational, business, technical, or operating conditions relevant to the request, such as the users, products, channels, systems, or workflows involved. |
+| **Professional collaboration** | Relevant collaborators, co-authors, teams, or organizations, what they worked on together, and whether the relationship is personal or organizational. |
 
 Organize these details into comparable fields suited to the task. Describe facts and outcomes accurately, distinguish personal contributions from team or organizational achievements, and make clear which information is established and which remains uncertain.
 
@@ -89,9 +93,15 @@ Present the people and the information needed to compare, assess, and contact th
 
 - **Structure**: Use one row per person, ordered according to the user's needs and the relevance supported by the available information.
 - **Core information**: Include name or handle, organization and role, location when relevant, profile links, task-relevant profile details, public professional contacts, and sources. Choose profile columns that support meaningful comparison for the task.
+- **Profile delivery**: State the researched facts in the delivered material with citations. When a concise comparison table cannot carry the full profiles, include the supporting detail in the requested file or an accompanying attachment, with a clear pointer from each person. Preserve the information needed to understand their work, contribution, outcomes, and context when summarizing.
 - **Contacts**: Keep contact details in a dedicated column, with the actual work phone, email, or professional contact URL and its ownership clearly identified.
-- **Evidence and uncertainty**: Distinguish supported matches from promising leads with unresolved conditions. Keep confirmed counts consistent with those distinctions and make material information gaps visible.
+- **Evidence and uncertainty**: Keep selection status separate from profile completeness. Distinguish supported matches from promising leads with unresolved selection requirements, and keep confirmed counts consistent. Show missing profile details for otherwise qualifying people without moving them out of the matching set solely for those gaps.
 - **Format and scope**: Prefer a complete Markdown table or XLSX file, following any format and result count requested by the user. When no count is specified, retain the relevant, fact-backed people found across the research rather than shortening the list for presentation.
 - **Coverage**: Briefly explain the scope covered, remaining gaps, and any material research or enrichment limitations.
 
-- **Pre-delivery check**: Verify there are no duplicates, confirm contacts are extracted into their own column, ensure key facts include working source links, and briefly note **coverage, key gaps, or enrichment shortfalls** after the table.
+**Pre-delivery check**:
+
+- **Coverage and counts**: Reconcile the candidate records with the delivered list and the user's requested scope and count. Ensure relevant people have not been lost while enriching, batching, or summarizing their profiles.
+- **Profile completeness**: For each delivered person, compare the task-relevant dimensions and recorded facts with what the user will actually receive in the answer or attachment. Follow up on material gaps within the task's constraints and explicitly describe what remains unknown. A source link alone does not deliver the facts contained in that source.
+- **Evidence and attribution**: Check that the delivered claims have working supporting links, preserve relevant dates and limitations, and distinguish personal contributions from team or organizational results.
+- **Delivery integrity**: Remove duplicates, confirm contacts are in their own column, keep counts consistent with selection status, and briefly note **coverage, key gaps, or enrichment shortfalls** after the table.
