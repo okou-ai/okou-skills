@@ -19,7 +19,12 @@ General social-data search example: `{"platform":"xiaohongshu","operation":"sear
 
 ## Professional profiles and email
 
+Search entry points have different coverage and evidence limits. Use their current managed schemas to choose result size and continuation; follow only the page or cursor controls actually exposed. For a bounded route without continuation, expand through complementary queries or sources rather than importing an upstream provider's pagination parameters.
+
+- `people_search_semantic` returns a bounded set of profile matches from a natural-language brief. Treat returned text as discovery material and read the relevant underlying sources to establish the user's requirements.
+
 - `people_search_structured` requires at least one of `titles`, `companyNames`, `companyDomains`, `countries`, or `skills`. Filters use exact matches after lowercase normalization, with OR within one field and AND across fields. Title and employer filters concern current employment; country concerns the person's profile location, not company headquarters, and uses full country names rather than country codes. Requested fields include work history and education, but these are not exposed as search filters; there is no semantic `query` input.
+- Structured-search work history and education are a fixed field projection, not a complete personal profile. Relevant descriptions, projects, or summaries may require a separate reader such as `linkedin_profile` or the underlying work source. Distinguish a field that was not requested from evidence that a person lacks the experience.
 - For another structured-search page, repeat the same filters and pass the returned `scroll_token` as `scrollToken`. Every returned record is chargeable; each explicit next-page request buys another page.
 - `contact_search` previews may mask names; `has_email` does not mean an email has been retrieved. Explicitly use a selected ID with `contact_enrich` when a full profile is needed; do not silently enrich every discovered result.
 - Extract public professional contacts from papers, personal pages, or organization pages already read into the final table's Contacts column, retaining the source. If a paper already provides the email, neither repeat a paid lookup nor leave only the paper link in the table.
@@ -29,6 +34,12 @@ General social-data search example: `{"platform":"xiaohongshu","operation":"sear
 
 - `web_search` accepts `query`, optional `limit` (default 5, maximum 10), `recency` (`hour`, `day`, `week`, `month`, or `year`), and `domains` (up to 20 allowed domains or subdomains, without protocols or paths). It searches public pages for both people and supporting sources, not a structured professional-record database. No pagination or provider-native search-mode controls are exposed.
 - `web_contents` accepts only `urls`, reading full text and source metadata for 1–20 distinct public URLs per batch. Do not pass provider-native content, summary, or freshness options that its schema does not expose. Check the status and content returned for each URL.
+
+## Saved responses and selective reading
+
+`okou data call <tool> --input '<json>'` saves the response body and prints an outline. Use `okou data show <ref> --outline` to inspect the returned structure, then read relevant observed field paths with `okou data show <ref> <path>`. Array displays are limited (20 items by default), and large selections may return another outline. Work from the saved file when a complete candidate index or a different range is needed; a displayed subset is not the whole result set.
+
+The saved body contains what the provider returned, including any upstream field restrictions. Preserve the candidate, evidence, profile, and continuation records needed by the continuing agent in accessible workspace files; temporary response references and child control logs are not a complete research handoff. Reuse saved successful responses when appropriate rather than repurchasing identical data. Use the current CLI help if the available interface differs.
 
 ## Saved jobs and media
 
