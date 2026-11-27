@@ -13,7 +13,7 @@ Find the people who meet the user's requirements, as many as public evidence sup
 1. **Plan the search.** Read the user's goal, hard requirements, preferences, scope and count. List the directions where matching people can be found: role titles and synonyms (including other languages), target organizations, projects, publications or cases, platforms, and regions. If the user gives a list, verify and enrich those people first; when asked for more, exclude people already delivered. Ask a question only when missing details would change the search materially.
 2. **Search and skim.** Work through each direction with the matching tool below. Skim titles, links and snippets first, and open full pages only for promising results.
 3. **Confirm and record.** Count a person only when public evidence shows that their own role or work meets each hard requirement; keep the link and a short quote. Write each confirmed person, and each promising lead with what is still missing, to `people.md` as soon as you have them.
-4. **Keep going.** Use what you learn, such as co-authors, teammates and related organizations, to open new directions. For "find all" requests, use the largest supported page size and paginate. Continue until every direction is covered or new searches mostly return people already in `people.md`, within the user's count, time and cost limits.
+4. **Keep going.** Use what you learn, such as co-authors, teammates and related organizations, to open new directions. Paid search tools bill per returned record, so request about 10 records first and page further only while the results stay relevant. Continue until every direction is covered or new searches mostly return people already in `people.md`, within the user's count, time and cost limits.
 5. **Deliver from `people.md`.** Keep every confirmed person unless the user set a count.
 
 ## Tools
@@ -23,7 +23,7 @@ Run `okou data tools` and `okou data describe <tool>` before using a tool, and p
 | To | Use | How |
 | --- | --- | --- |
 | Find people from a description | `people_search`, `people_search_semantic` | `people_search` returns extracted profile fields with sources; `people_search_semantic` returns matching profile pages and text. |
-| Filter people by exact criteria | `people_search_structured`, `contact_search` | `people_search_structured` filters current title, employer, country or skill and pages with `scrollToken`; `contact_search` filters seniority, company size, domain or location and returns previews only. |
+| Filter people by exact criteria | `people_search_structured`, `contact_search` | `people_search_structured` filters current title, employer, country or skill, bills per returned record and pages with `scrollToken`; `contact_search` filters seniority, company size, domain or location and returns previews only. |
 | Find people through their work | `web_search` | Search team pages, personal sites, papers, repositories, talks, interviews and case studies, then trace the work to the people behind it. |
 | Find people on social or niche platforms | Platform tools in the [tool reference](references/tool-evidence.md#platform-tools) | Search accounts by handle, name or bio, or content by topic. Podcast search returns shows; confirm hosts and guests in episode sources. |
 | Read a profile or page | Platform readers such as `linkedin_profile`, `web_contents`, `web_scrape` | Prefer platform readers. `web_contents` reads 1–20 URLs; `web_scrape` extracts one page. |
