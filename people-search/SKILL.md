@@ -1,7 +1,7 @@
 ---
 name: people-search
 description: >-
-  Find relevant people for the user's goals and scope, or enrich an existing list. Bring together information from complementary sources to develop broad coverage, task-relevant profiles, and public professional contacts that help the user compare, assess, and contact people.
+  Find people who meet the user's requirements across the requested scope, or enrich an existing list. Use complementary sources to expand coverage, support each match with evidence, and develop task-relevant profiles and public professional contacts for comparison and outreach.
 ---
 
 # People Search
@@ -18,7 +18,7 @@ Discovery, fact-checking, and profile development work together throughout the r
 
 ## Discover people and develop coverage
 
-Choose complementary sources and search entry points according to the user's goals and where relevant people and their work can be found. Follow connections between people, organizations, responsibilities, projects, and publications to expand the candidate pool and deepen understanding of the people already found.
+Choose complementary sources and search entry points according to where evidence for the user's requirements can be found. Requirements about an organization can guide discovery of relevant organizations and the people responsible within them; requirements about personal experience can guide discovery through documented work and its contributors. Follow connections between people, organizations, responsibilities, projects, and publications to reach additional relevant groups and strengthen the evidence for each match.
 
 - **Expand queries**: Run batched searches using title synonyms (including bilingual titles and common variations), adjacent subfields, and target company/organization lists.
 - **Cross-channel entry points**:
@@ -27,7 +27,7 @@ Choose complementary sources and search entry points according to the user's goa
   3. **Work-to-people**: Use `web_search` or niche platforms to find papers, open-source repositories, talks, podcasts, industry articles, or award lists, then trace back to the authors and leads.
 - **Maximize coverage and pagination**: When asked to "find all" or "find as many as possible," use the maximum supported page size and paginate (e.g., via `scrollToken` in `people_search_structured`) within the user's quantity, time, and cost limits. If an entry point repeatedly returns the same people, switch to another platform or search angle.
 
-- **Coverage and consolidation**: For a defined population, such as a team roster or event speaker list, work through the full population. For an open-ended search, assess coverage through the relevant source pools explored and the additional people revealed by complementary searches. Consolidate when further exploration yields few additional relevant people, considering the user's goals, requested scope, and actual time or resource constraints. Explain the coverage achieved and the gaps that remain.
+- **Coverage and consolidation**: For a defined population, such as a team roster or event speaker list, work through the full population. For an open-ended search, assess coverage across relevant groups and source pools by the additional people found who meet the user's requirements. A decline in new matches from one entry point can guide a move to other relevant sources or search angles. Consolidate when complementary searches yield few additional supported matches, considering the user's goals, requested scope and count, and actual time or resource constraints. Explain the coverage achieved and the gaps that remain.
 
 | Next action | Recommended tool | Selection rule |
 | --- | --- | --- |
@@ -44,12 +44,12 @@ Choose complementary sources and search entry points according to the user's goa
 
 Develop profiles from the information that helps the user understand and compare people. Begin with relevant leads and enrich the understanding of each person through their roles, experience, work, contributions, and organizational context. The information gathered supports both the profile and the assessment of how the person relates to the request; it can also open further discovery paths.
 
-Choose the dimensions and depth needed for the user's decision. Continue discovering people while researching their profiles across the requested scope. Within the requested scope and count, retain people who meet the user's selection requirements even when some profile details remain unknown. Use those gaps to guide further research and make remaining limitations visible; profile completeness is not an additional selection requirement.
+Choose the dimensions and depth needed for the user's decision. Balance continued discovery, evidence needed to establish whether promising candidates meet the user's requirements, and profile development according to the gaps that most affect the result. Reuse relevant organizational or project facts while verifying each person's connection, responsibilities, and contribution. Within the requested scope and count, retain people who meet the user's requirements even when some profile details remain unknown. Use those profile gaps to guide further research and make remaining limitations visible; profile completeness is not an additional requirement.
 
 - **Identity and context**: Cross-check names or handles, organizations, profile links, and career history when connecting information across sources. Keep current roles and historical experience clear.
-- **Relevance to the request**: Use the available facts to explain how each person relates to the user's needs, updating that assessment as more information becomes available. Distinguish firm requirements from preferences and make unresolved conditions visible.
+- **Relevance to the request**: Use the available facts to explain how each person relates to the user's needs, updating that assessment as more information becomes available. Distinguish the user's requirements from their preferences and make remaining uncertainty about each match visible.
 - **Profile content**: Select and develop the professional information useful for the user's questions. Use concrete work and sources to show what the person knows, has done, and has contributed, together with the scope and limitations of that experience.
-- **Per-person research record**: For the dimensions relevant to the task, keep concrete facts with source URLs and relevant passages or locations, dates, attribution to the person, team, or organization, and open questions. Use these records to prepare the delivered profiles.
+- **Per-person research record**: Keep the facts supporting each candidate's match to the user's requirements alongside the task-relevant profile facts, source URLs and relevant passages or locations, dates, attribution to the person, team, or organization, and open questions. Use these records to guide further research and prepare the delivered profiles.
 - **Follow information gaps**: Read relevant source sections and use targeted follow-up queries to establish personal actions, observable outputs, and working context. Choose follow-ups by the missing facts that matter to the user's decision. A title, project name, or organization-level result alone does not establish a person's skills, actions, or outcomes.
 
 | Profile dimension | What to capture |
@@ -101,7 +101,7 @@ Present the people and the information needed to compare, assess, and contact th
 
 **Pre-delivery check**:
 
-- **Coverage and counts**: Reconcile the candidate records with the delivered list and the user's requested scope and count. Ensure relevant people have not been lost while enriching, batching, or summarizing their profiles.
+- **Coverage and counts**: Reconcile the candidate records, supporting evidence, and delivered list with the user's requirements, scope, and count. Account for relevant people still awaiting evidence and for gaps in source coverage. Ensure people who meet the user's requirements have not been lost while enriching, batching, or summarizing their profiles.
 - **Profile completeness**: For each delivered person, compare the task-relevant dimensions and recorded facts with what the user will actually receive in the answer or attachment. Follow up on material gaps within the task's constraints and explicitly describe what remains unknown. A source link alone does not deliver the facts contained in that source.
 - **Evidence and attribution**: Check that the delivered claims have working supporting links, preserve relevant dates and limitations, and distinguish personal contributions from team or organizational results.
 - **Delivery integrity**: Remove duplicates, confirm contacts are in their own column, keep counts consistent with selection status, and briefly note **coverage, key gaps, or enrichment shortfalls** after the table.
