@@ -40,6 +40,14 @@ Build coverage across the requested scope by combining complementary sources and
 | Enrich a selected person's full profile | `contact_enrich` (default profile mode) | Pass a supported ID, LinkedIn URL, or name + employer domain. Enrich selected targets on demand rather than every discovery result automatically. |
 | Look up a work email | `contact_enrich` (`fields: ["work-email"]`) | Pass the person's name + verified current employer domain. Retrieves work emails only—no personal emails or phone numbers. Never guess email formats. |
 
+## Organize research and preserve continuity
+
+Keep the cumulative research state in durable records that remain accessible as the work grows. Use tool-supported storage and output controls to preserve complete responses or retrievable references to full records. Where output can be captured before it enters the conversation, save large responses and return a relevant projection. Bring candidate indexes, relevant fields, and evidence passages into the active context, with pointers to the full records for further reading. Preserve source attribution, dates, and limitations when extracting information, and read additional sections when the current view cannot resolve a relevant question.
+
+Use available independent agents to research complementary sources or distinct candidate groups in parallel within the task's authorized scope and total time and cost limits. Give them the user's requirements and the relevant research state; collect concise findings together with evidence and profile records accessible to the agent continuing the work. Reconcile their contributions into the cumulative people, evidence, and coverage records. When independent delegation is unavailable, work in manageable batches using the same records.
+
+Maintain a recoverable checkpoint of the user's requirements, candidate identities and selection status, evidence and profile records, explored sources, pagination progress, unresolved leads, and remaining research directions. Refresh it as research progresses and before context handoffs or compaction when possible. Restore this state afterward and continue from the recorded work. Use context pressure to adjust batching and record access while deciding completion from the user's scope, remaining research opportunities, and actual task limits. Preserve qualifying people and researched profile detail through these transitions and into delivery.
+
 ## Research people and build task-relevant profiles
 
 Develop profiles from the information that helps the user understand and compare people. Begin with relevant leads and enrich the understanding of each person through their roles, experience, work, contributions, and organizational context. The information gathered supports both the profile and the assessment of how the person relates to the request; it can also open further discovery paths.
@@ -62,8 +70,6 @@ Choose the dimensions and depth needed for the user's decision. Direct research 
 | **Professional collaboration** | Relevant collaborators, co-authors, teams, or organizations, what they worked on together, and whether the relationship is personal or organizational. |
 
 Organize these details into comparable fields suited to the task. Describe facts and outcomes accurately, distinguish personal contributions from team or organizational achievements, and make clear which information is established and which remains uncertain.
-
-For large result sets, save complete tool responses locally and maintain a lightweight index for each candidate, including identity, sources, relevant information, open questions, and a full-record pointer. Work through the candidates in batches, reading full records as needed while preserving coverage of the whole result set.
 
 **Facts and citations**:
 - **Cite concrete facts**: Ground profile points in project names, dates, metrics, tangible outputs, or direct quotes rather than generic praise. Follower counts and views do not establish audience quality.
