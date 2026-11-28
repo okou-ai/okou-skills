@@ -12,7 +12,7 @@ Find the people who meet the user's requirements, as many as public evidence sup
 
 1. **Plan the search.** Read the user's goal, hard requirements, preferences, scope and count. List the directions where matching people can be found: role titles and synonyms (including other languages), target organizations, projects, publications or cases, platforms, and regions. If the user gives a list, verify and enrich those people first; when asked for more, exclude people already delivered. Ask a question only when missing details would change the search materially.
 2. **Search and skim.** Work through each direction with the matching tool below. Skim titles, links and snippets first, and open full pages only for promising results.
-3. **Confirm and record.** Count a person only when public evidence shows that their own role or work meets each hard requirement; keep the link and a short quote. Write each confirmed person, and each promising lead with what is still missing, to `people.md` as soon as you have them.
+3. **Confirm and record.** Count a person only when public evidence shows each hard requirement is met, including requirements about their organization, such as which processes its systems cover; a title, keyword or project announcement alone is not enough. Keep the link, a short quote, and the profile facts from the same page. Write each confirmed person to `people.md` as soon as you have them, and anyone with a requirement still unconfirmed as a lead with what is missing.
 4. **Keep going.** Use what you learn, such as co-authors, teammates and related organizations, to open new directions. Paid search tools bill per returned record, so request about 10 records first and page further only while the results stay relevant. Continue until every direction is covered or new searches mostly return people already in `people.md`, within the user's count, time and cost limits.
 5. **Deliver from `people.md`.** Keep every confirmed person unless the user set a count.
 
@@ -33,7 +33,7 @@ Run `okou data tools` and `okou data describe <tool>` before using a tool, and p
 
 ## Profiles
 
-Research the profile details that matter for this request and this person instead of filling a fixed template, for example their role and scope, the specific work they did, its outcomes, and the context they worked in. Use concrete facts with links, separate personal contributions from team or company results, keep current and past roles distinct, and mark what is unconfirmed. Missing profile details do not remove a person who meets the requirements.
+Research the profile details that matter for this request and this person instead of filling a fixed template, for example their role and scope, the specific work they did, its outcomes, and the context they worked in. Read each recommended person's main source in full, and look for one source in their own words, such as an interview, talk or post. Write the specifics you read, with links, rather than labels: steps, prices, timelines, test methods and results, modules or transactions handled, and who they worked with. Separate personal contributions from team or company results, keep current and past roles distinct, and mark what is unconfirmed. Missing profile details do not remove a person who meets the requirements.
 
 ## Contacts
 
@@ -41,7 +41,6 @@ Take published professional contacts first: emails or phone numbers on papers, p
 
 ## Deliver
 
-- One row per person, ordered by relevance to the user's goal: name, role and organization, why they match with linked evidence, profile, and contact in its own column.
+- Use the format the user asks for. Otherwise give a numbered list ordered by relevance to the user's goal, one entry per person with labeled lines: role and organization, evidence for each requirement, profile, sources, and contact. A table may summarize the list but must not replace these entries; put a long list in an attached Markdown file.
 - List unconfirmed leads separately with what is missing, and note the coverage reached and the remaining gaps.
-- Use a Markdown table or XLSX unless the user asks for another format; put long profiles in an attached file with a pointer from each row.
 - Before delivering, check that everyone confirmed in `people.md` is in the list, the counts match, and each key claim has a working link.
